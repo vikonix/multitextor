@@ -13,4 +13,4 @@ This project is attempt of recreating my old text editor.
  - Linux Ubuntu 20.04 - gcc version 9.3.0
 
 ## What is ready now:
-1. Console input mode.
+ - Console input mode.
