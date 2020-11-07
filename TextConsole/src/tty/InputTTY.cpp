@@ -68,9 +68,20 @@ bool InputTTY::LoadKeyCode()
     for(i = 0; g_keyMap[i].code; ++i)
         m_KeyMap.AddKey(g_keyMap[i].sequence, g_keyMap[i].code);
     
-    LOG(DEBUG) << "keyMap1";
+#ifdef __linux__
+    if(!strcmp(getenv("TERM"), "linux"))
+    {
+        LOG(DEBUG) << "keyMap default linux";
     for(i = 0; g_keyMap1[i].code; ++i)
         m_KeyMap.AddKey(g_keyMap1[i].sequence, g_keyMap1[i].code);
+    }
+    else
+#endif
+    {
+        LOG(DEBUG) << "keyMap 2";
+        for(i = 0; g_keyMap2[i].code; ++i)
+            m_KeyMap.AddKey(g_keyMap2[i].sequence, g_keyMap2[i].code);
+    }
 
     LOG(DEBUG) << "keyCap";
     for(i = 0; g_keyCap[i].id; ++i)

@@ -35,3 +35,4 @@ struct KeyMap
 
 extern KeyMap g_keyMap[];
 extern KeyMap g_keyMap1[];
+extern KeyMap g_keyMap2[];

@@ -71,6 +71,12 @@ KeyMap g_keyMap[]
   {K_F2 | K_SHIFT, "\x1bO2Q"},
   {K_F3 | K_SHIFT, "\x1bO2R"},
   {K_F4 | K_SHIFT, "\x1bO2S"},
+
+  //linux XTerm console      
+  {K_F1 | K_SHIFT, "\x1b[1;2P"},
+  {K_F2 | K_SHIFT, "\x1b[1;2Q"},
+  {K_F3 | K_SHIFT, "\x1b[1;2R"},
+  {K_F4 | K_SHIFT, "\x1b[1;2S"},
   {K_F5 | K_SHIFT, "\x1b[15;2~"},
   {K_F6 | K_SHIFT, "\x1b[17;2~"},
   {K_F7 | K_SHIFT, "\x1b[18;2~"},
@@ -101,7 +107,23 @@ KeyMap g_keyMap[]
   {}
 };
 
+//linux terminal default
 KeyMap g_keyMap1[]
+{
+  {K_F11,          "\x1b[23~"},
+  {K_F12,          "\x1b[24~"},
+  {K_F1 | K_SHIFT, "\x1b[25~"},
+  {K_F2 | K_SHIFT, "\x1b[26~"},
+  {K_F3 | K_SHIFT, "\x1b[28~"},
+  {K_F4 | K_SHIFT, "\x1b[29~"},
+  {K_F5 | K_SHIFT, "\x1b[31~"},
+  {K_F6 | K_SHIFT, "\x1b[32~"},
+  {K_F7 | K_SHIFT, "\x1b[33~"},
+  {K_F8 | K_SHIFT, "\x1b[34~"},
+  {}
+};
+
+KeyMap g_keyMap2[]
 {
   {K_F1 | K_SHIFT, "\x1b[23~"},
   {K_F2 | K_SHIFT, "\x1b[24~"},
