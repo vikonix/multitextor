@@ -42,7 +42,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifndef HAVE_MAIN
   #include "tty/Mouse.h"
-  #include "Logger.h"
+  #include "logger.h"
 #else
   #include <iostream>    
   #define LOG(t) std::cout

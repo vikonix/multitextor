@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef WIN32
 
 #include "ConsoleInput.h"
-#include "Logger.h"
+#include "logger.h"
 
 #include <termios.h>
 #include <time.h>

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef _WIN32
 
 #include "win32/InputWin32.h"
-#include "Logger.h"
+#include "logger.h"
 
 
 std::atomic_bool InputWin32::s_fExit = 0;
