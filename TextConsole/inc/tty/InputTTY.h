@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ConsoleInput.h"
 #include "logger.h"
-#include "tty/termcapMap.h"
+#include "tty/TermcapMap.h"
 
 #include <termios.h>
 #include <time.h>
