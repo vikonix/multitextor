@@ -26,11 +26,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#include <cstdint>
-
-using input_t = uint32_t;
-using pos_t = uint16_t;
-
 
 #define K_UNUSED    0x00000000
 #define K_ERROR     0xffffffff

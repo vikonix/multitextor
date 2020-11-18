@@ -25,54 +25,20 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#ifdef WIN32
-
-#include "ConsoleInput.h"
-#include <windows.h>
-
-#include <atomic>
 
 //////////////////////////////////////////////////////////////////////////////
-class InputWin32 : public ConsoleInput
-{
-    HANDLE  m_hStdin { INVALID_HANDLE_VALUE };
-    HWND    m_hWnd { NULL };
-    cp_t    m_ioCP {0};
-    
-    //mouse input
-    bool    m_fMouseTrack { false };
-    bool    m_prevKeyUp { false };
-    pos_t   m_prevX { 0x100 };
-    pos_t   m_prevY { 0x100 };
-    input_t m_prevKey { 0 };
-    clock_t m_prevTime { 0 };
+#define COLOR_MASK        7
+#define FON_COLOR(color)  (((color) >> 4) & COLOR_MASK)
+#define TEXT_COLOR(color)  ((color)       & COLOR_MASK)
 
-protected:
-    static std::atomic_bool s_fExit;
-    static std::atomic_bool s_fCtrlC;
+#define TEXT_BLUE         1
+#define TEXT_GREEN        2
+#define TEXT_RED          4
+#define TEXT_BRIGHT       8
+#define FON_BLUE       0x10
+#define FON_GREEN      0x20
+#define FON_RED        0x40
+#define FON_BRIGHT     0x80
 
-public:
-    InputWin32() = default;
-    virtual ~InputWin32() { Deinit(); }
-
-    virtual bool Init() override final;
-    virtual void Deinit() override  final;
-    virtual bool InputPending(const std::chrono::milliseconds& WaitTime = 500ms) override  final;
-
-    virtual bool SwitchToStdConsole() override final;
-    virtual bool RestoreConsole() override final;
-
-protected:
-    static BOOL InputWin32::CtrlHandler(DWORD fdwCtrlType);
-
-    void ProcessInput();
-    void ProcessKeyEvent   (KEY_EVENT_RECORD*           pKeyEvent);
-    void ProcessMouseEvent (MOUSE_EVENT_RECORD*         pMouseEvent);
-    void ProcessResizeEvent(WINDOW_BUFFER_SIZE_RECORD*  pWindowBufferSizeEvent);
-    void ProcessFocusEvent (FOCUS_EVENT_RECORD*         pFocusEvent);
-    void ProcessMenuEvent  (MENU_EVENT_RECORD*          pMenuEvent);
-
-    void WriteResize(pos_t x, pos_t y);
-};
-
-#endif //WIN32
+#define DEFAULT_COLOR     (TEXT_RED | TEXT_GREEN | TEXT_BLUE)
+#define COLOR_INVERSE(color) ((((color) >> 4) & 0xf) | ((color & 0xf) << 4))

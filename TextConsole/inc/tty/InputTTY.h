@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "ConsoleInput.h"
 #include "logger.h"
+#include "tty/termcapMap.h"
 
 #include <termios.h>
 #include <time.h>
@@ -58,7 +59,7 @@ public:
         {
             m_maxSeqSize = std::max(m_maxSeqSize, sequence.size());
             m_map.emplace(sequence, code);
-            LOG(DEBUG) << "add seq=" << CastString(sequence) << " " << std::hex << ConsoleInput::CastKeyCode(code);
+            LOG(DEBUG) << "add seq=" << CastEscString(sequence) << " " << std::hex << ConsoleInput::CastKeyCode(code);
         }
         catch(...)
         {
@@ -94,7 +95,7 @@ public:
             {
                 if(seq.size() == sequence.size())
                 {
-                    LOG(DEBUG) << "seq=" << CastString(sequence) << " code=" << std::hex << code;
+                    LOG(DEBUG) << "seq=" << CastEscString(sequence) << " code=" << std::hex << code;
                     return code;
                 }
                 else
@@ -105,21 +106,6 @@ public:
         }
 
         return K_ERROR;
-    }
-    
-    static std::string CastString(const std::string& in) 
-    {
-        std::stringstream ss;
-
-        for (auto ch : in)
-        {
-            if(ch >= ' ' && ch < 0x7f)
-                ss << ch;
-            else
-                ss << "\\" << std::hex << std::setfill('0') << std::setw(2) << static_cast<uint32_t>(static_cast<uint8_t>(ch));
-        }
-
-        return ss.str(); 
     }
 };
 
@@ -132,16 +118,17 @@ class InputTTY : public ConsoleInput
     static std::atomic_bool s_fCtrlC;
     static std::atomic_bool s_fExit;
 
+    const TermcapBuffer&  m_termcap {TermcapBuffer::getInstance()};
+    
     struct termios  m_termnew;
     struct termios  m_termold;
-    char            m_termcapBuff[4096];
     
     KeyMapper       m_KeyMap;
 
-    int             m_stdin;
-    bool            m_fTerm;
-    bool            m_fTiocLinux; //linux only
-    input_t         m_prevMode;   //linux only
+    int             m_stdin {-1};
+    bool            m_fTerm{false};
+    bool            m_fTiocLinux{false}; //linux only
+    input_t         m_prevMode{K_UNUSED};   //linux only
 
     pos_t           m_prevX {0xff};
     pos_t           m_prevY {0xff};
@@ -150,22 +137,12 @@ class InputTTY : public ConsoleInput
     bool            m_prevUp {false};
 
 public:
-    InputTTY()
-    : m_stdin {-1} 
-    , m_fTerm {false}
-    , m_fTiocLinux {false}
-    , m_prevMode {K_UNUSED}
-    {
-    }
-    
-    virtual ~InputTTY()
-    {
-        Deinit();
-    }
+    InputTTY() = default;
+    virtual ~InputTTY() { Deinit(); }
 
     virtual bool    Init() override final;
     virtual void    Deinit() final;
-    virtual bool    InputPending(const std::chrono::milliseconds& WaitTime) override  final;
+    virtual bool    InputPending(const std::chrono::milliseconds& WaitTime = 500ms) override  final;
 
     virtual bool    SwitchToStdConsole() override final;
     virtual bool    RestoreConsole() override final;
@@ -177,7 +154,6 @@ private:
     static void     Child(int signal);
 
     bool            LoadKeyCode();
-    bool            LoadTermcap();
     bool            InitSignals();
     std::string     GetConsoleCP();
 

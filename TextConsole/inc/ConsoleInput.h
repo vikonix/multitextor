@@ -26,13 +26,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
+#include "Types.h"
 #include "KeyCodes.h"
 
 #include <list>
 #include <chrono>
 #include <string>
-
-using cp_t = uint32_t;
 
 using keybuff_t = std::list<input_t>;
 
@@ -117,13 +116,14 @@ public:
 };
 
 
+using namespace std::chrono_literals;
 //////////////////////////////////////////////////////////////////////////////
 class ConsoleInput : public InputBuffer
 {
 public:
     virtual bool Init() = 0;
     virtual void Deinit() = 0;
-    virtual bool InputPending(const std::chrono::milliseconds& WaitTime) = 0;
+    virtual bool InputPending(const std::chrono::milliseconds& WaitTime = 500ms) = 0;
 
     virtual bool SwitchToStdConsole() = 0;
     virtual bool RestoreConsole() = 0;

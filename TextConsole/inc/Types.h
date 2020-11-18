@@ -26,10 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#ifndef ELPP_THREAD_SAFE
-	#define ELPP_THREAD_SAFE
-#endif
-#include "easylogging++.h"
+#include <cstdint>
 
-void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize, const bool logScreen);
-std::string CastEscString(const std::string& string);
+using color_t = uint16_t;
+using input_t = uint32_t;
+using pos_t = int16_t;
+using cell_t = uint32_t;
+using cp_t = uint32_t;

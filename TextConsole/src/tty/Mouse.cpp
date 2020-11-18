@@ -39,6 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "KeyCodes.h"
+#include "Types.h"
 
 #ifndef HAVE_MAIN
   #include "tty/Mouse.h"

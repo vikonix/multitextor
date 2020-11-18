@@ -15,3 +15,4 @@ This project is attempt of recreating my old text editor.
 ## What is ready now:
  - Logging.
  - Console input mode.
+ - Console output mode.

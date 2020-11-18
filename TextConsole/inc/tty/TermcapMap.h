@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 #include "KeyCodes.h"
+#include "Types.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -102,5 +103,47 @@ struct ScreenCap
 //////////////////////////////////////////////////////////////////////////////
 extern KeyCap    g_keyCap[];
 extern ScreenCap g_screenCap[];
+
+#ifndef WIN32
+#include "logger.h"
+
+#include <term.h>
+
+class TermcapBuffer
+{
+public:
+    static TermcapBuffer& getInstance()
+    {
+        // Instantiated on first use.
+        // Guaranteed to be destroyed.
+        static TermcapBuffer instance;
+                                        
+        return instance;
+    }
+
+    void LoadTermcap() const
+    {
+        static char termcapBuff[0x2000];
+        char* term;
+        if (NULL == (term = getenv("TERM")))
+        {
+            return;
+        }
+
+        if (1 != tgetent(termcapBuff, term))
+        {
+            return;
+        }
+
+        LOG(DEBUG) << "LoadTermcap term=" << term;
+    }
+
+    TermcapBuffer(const TermcapBuffer&) = delete;
+    void operator= (const TermcapBuffer&) = delete;
+
+private:
+    TermcapBuffer() {LoadTermcap();}
+};
+#endif //WIN32
 
 

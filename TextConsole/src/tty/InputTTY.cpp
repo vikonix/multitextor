@@ -96,24 +96,6 @@ bool InputTTY::LoadKeyCode()
     return true;
 }
 
-//////////////////////////////////////////////////////////////////////////////
-bool InputTTY::LoadTermcap()
-{
-    char* term;
-    if(NULL == (term = getenv("TERM")))
-    {
-        return false;
-    }
-
-    if(1 != tgetent(m_termcapBuff, term))
-    {
-        return false;
-    }
-
-    LOG(DEBUG) << "LoadTermcap term=" << term;
-    return true;
-}
-
 
 //////////////////////////////////////////////////////////////////////////////
 std::string InputTTY::GetConsoleCP()
@@ -185,14 +167,12 @@ bool InputTTY::Init()
         
     m_fTerm = true;
 
-    rc = LoadTermcap();
     rc = LoadKeyCode();
 
     InitSignals();
 
     auto cp = GetConsoleCP();
-    LOG(DEBUG) << "Console CP=" << cp;
-    LOG(DEBUG) << "Inited";
+    LOG(DEBUG) << "Console input inited, CP=" << cp;
 
     return true;
 }
@@ -201,7 +181,7 @@ bool InputTTY::Init()
 //////////////////////////////////////////////////////////////////////////////
 void InputTTY::Deinit()
 {
-    //DeinitMouse();
+    DeinitMouse();
     if(m_stdin < 0)
         return;
     
@@ -492,6 +472,7 @@ void InputTTY::ProcessInput(bool fMouse)
             
             //LOG(DEBUG) << "utf8=" << KeyMapper::CastString(buff);
             
+            //??? utf8->utf16
             std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
             std::wstring wstr = converter.from_bytes(buff);
             for(auto& wc : wstr)
@@ -624,7 +605,7 @@ void InputTTY::ProcessInput(bool fMouse)
     }
     else
     {
-        LOG(WARNING) << "Not found seq=" << KeyMapper::CastString(buff);
+        LOG(WARNING) << "Not found seq=" << CastEscString(buff);
     }
 }
 
@@ -637,7 +618,7 @@ void InputTTY::ProcessSignals()
         //LOG(DEBUG) << "ProcessSignal: Resize";
         s_fResize = 0;
 
-        LoadTermcap();
+        m_termcap.LoadTermcap();
 
         pos_t x = 0;
         pos_t y = 0;
