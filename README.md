@@ -7,7 +7,7 @@ This project is attempt of recreating my old text editor.
  - Windows 10 - Microsoft Visual Studio Community 2019
  - Linux Ubuntu 20.04 - gcc version 9.3.0
 
-[![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)
+[![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)(https://travis-ci.org/vikonix/multitextor.svg)
 
 ## Need to install packages in Linux:
  - sudo apt-get install -y libncurses5-dev
