@@ -27,63 +27,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //#include <vld.h>
 
 #include "logger.h"
-#include "win32/InputWin32.h"
-#include "tty/InputTTY.h"
-
-#include "win32/ScreenWin32.h"
-#include "tty/ScreenTTY.h"
+#include "Console.h"
 
 #include <iostream>
 #include <chrono>
 
 
-void InputTest()
+void ConsoleTest()
 {
-    std::cout << "ConsoleInput test" << std::endl;
+    std::cout << "Console test" << std::endl;
     LOG(INFO);
-    LOG(INFO) << "ConsoleInput test";
+    LOG(INFO) << "Console test";
 
-#ifdef WIN32
-    InputWin32 console;
-#else
-    InputTTY console;
-#endif
+
+    Console console;
+
     console.Init();
 
-    while (1)
-    {
-        using namespace std::chrono_literals;
-        console.InputPending(500ms);
-        input_t key = console.GetInput();
-
-        LOG_IF(key, INFO) << "  " << ConsoleInput::CastKeyCode(key);
-        if (key == K_EXIT || key == K_ALT + 'X')
-            break;
-    }
-
-    console.Deinit();
-    LOG(INFO) << "ConsoleInput test end";
-}
-
-void OutputTest()
-{
-    std::cout << "ConsoleOutput test" << std::endl;
-    LOG(INFO);
-    LOG(INFO) << "ConsoleOutput test";
-
-#ifdef WIN32
-    InputWin32 console;
-    ScreenWin32 screen;
-#else
-    InputTTY console;
-    ScreenTTY screen;
-#endif
-
-    console.Init();
-    screen.Init();
-
-    auto waitKey = [&console, &screen]() {
-        screen.Flush();
+    auto waitKey = [&console]() {
+        console.Flush();
         while (1)
         {
             using namespace std::chrono_literals;
@@ -95,35 +57,35 @@ void OutputTest()
         }
     };
 
-    screen.WriteConsoleTitle(L"Console Screen \x428");
-    screen.ClrScr();
-    screen.SetCursor(cursor_t::CURSOR_NORMAL);
-    screen.GotoXY(0, 0);
+    console.WriteConsoleTitle(L"Console Screen \x428");
+    console.ClrScr();
+    console.SetCursor(cursor_t::CURSOR_NORMAL);
+    console.GotoXY(0, 0);
     waitKey();
 
-    screen.SetTextAttr(TEXT_BLUE);
-    screen.WriteChar(u'\x428'); // russian sh:'Ш'
+    console.SetTextAttr(TEXT_BLUE);
+    console.WriteChar(u'\x428'); // russian sh:'Ш'
 
-    screen.SetTextAttr(TEXT_RED);
-    screen.WriteChar('[');
+    console.SetTextAttr(TEXT_RED);
+    console.WriteChar('[');
     for(char16_t i = 1; i < ACS_MAX; ++i)
-        screen.WriteChar(i);
-    screen.WriteChar(']');
+        console.WriteChar(i);
+    console.WriteChar(']');
 
-    screen.SetTextAttr(COLOR_INVERSE(TEXT_GREEN));
-    screen.WriteStr(u"Text\x428_\x253c.");
+    console.SetTextAttr(COLOR_INVERSE(TEXT_GREEN));
+    console.WriteStr(u"Text\x428_\x253c.");
     
-    screen.WriteLastChar('[', ']');
+    console.WriteLastChar('[', ']');
     waitKey();
 
-    screen.SetTextAttr(TEXT_BLUE | FON_RED);
+    console.SetTextAttr(TEXT_BLUE | FON_RED);
     for (pos_t y = 0; y < 10; ++y)
     {
         pos_t x = 0;
-        screen.GotoXY(x + 2, y + 2);
+        console.GotoXY(x + 2, y + 2);
         for (; x < 20; ++x)
         {
-            screen.WriteChar('0' + x + y);
+            console.WriteChar('0' + x + y);
         }
     }
     waitKey();
@@ -133,37 +95,36 @@ void OutputTest()
     pos_t r = l + 11;
     pos_t b = t + 5;
 
-    screen.SetTextAttr(TEXT_RED | FON_BLUE);
+    console.SetTextAttr(TEXT_RED | FON_BLUE);
     pos_t n = 1;
 
-    screen.SetCursor(cursor_t::CURSOR_HIDE);
-    screen.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_RIGHT);
+    console.SetCursor(cursor_t::CURSOR_HIDE);
+    console.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_RIGHT);
     waitKey();
-    screen.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_DOWN);
+    console.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_DOWN);
     waitKey();
-    screen.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_LEFT);
+    console.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_LEFT);
     waitKey();
-    screen.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_UP);
+    console.ScrollBlock(l, t, r, b, n, scroll_t::SCROLL_UP);
     waitKey();
-    screen.SetCursor(cursor_t::CURSOR_OVERWRITE);
+    console.SetCursor(cursor_t::CURSOR_OVERWRITE);
 
     ScreenBuffer cell2((size_t)r - l + 1, (size_t)b - t + 1);
     cell2.Fill(MAKE_CELL(0, TEXT_RED | FON_BLUE, 'X'));
-    screen.WriteBlock(l, t, r, b, cell2);
+    console.WriteBlock(l, t, r, b, cell2);
     waitKey();
 
-    screen.Beep();
+    console.Beep();
     waitKey();
 
-    screen.Deinit();
+    console.Deinit();
     LOG(INFO) << "ConsoleOutput test end";
 }
 
 int main()
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log", 0x200000, false);
-    //InputTest();
-    OutputTest();
+    ConsoleTest();
 
     LOG(INFO) << "End";
     return 0;
