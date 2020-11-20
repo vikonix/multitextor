@@ -26,8 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
+#define USE_MOUSE
 #ifdef USE_MOUSE
-#include "KeyCodes.h"
+  #include "Types.h"
 
   #define InitMouse()   _InitMouse()
   #define DeinitMouse() _DeinitMouse()
@@ -38,6 +39,8 @@ bool    _InitMouse();
 bool    _DeinitMouse();
 int     _GetMouseFD();
 input_t _ReadMouse();
+
+  //#define OLD_MOUSE //define in case "SGR extended mouse reporting" not working
 
 #else
   #define InitMouse()   ((void) false)

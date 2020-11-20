@@ -26,27 +26,26 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef WIN32
 
-#include <dlfcn.h>
-#include <string.h>
-#include <errno.h>
-
 #ifdef __linux__
   #define USE_GPM
 #endif
 
-#ifdef USE_GPM
-  #include <gpm.h>
-#endif
-
+#include "tty/Mouse.h"
 #include "KeyCodes.h"
-#include "Types.h"
 
 #ifndef HAVE_MAIN
-  #include "tty/Mouse.h"
   #include "logger.h"
 #else
   #include <iostream>    
   #define LOG(t) std::cout
+#endif
+
+#include <dlfcn.h>
+#include <string.h>
+#include <errno.h>
+
+#ifdef USE_GPM
+  #include <gpm.h>
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
@@ -86,20 +85,20 @@ bool x_InitMouse()
 
     s_fMouseOpen = 1;
     LOG(DEBUG) << "xterm mouse";
-    /* save old highlite tracking */
+    // save old highlight tracking
     printf("\x1b[?1001s");
     fflush(stdout);
     
-    /* enable mouse tracking */
-#if 0
-    //only key down and up
-    printf("\x1b[?1000h");
-#else
+    // enable mouse tracking
     //key down, tracking and up
     printf("\x1b[?1002h");
-#endif
     fflush(stdout);
 
+#ifndef OLD_MOUSE    
+    // enable SGR extended mouse reporting
+    printf ("\x1b[?1006h");
+    fflush(stdout);
+#endif
     return true;
 }
 
@@ -112,11 +111,17 @@ bool x_DeinitMouse()
 
     s_fMouseOpen = 0;
 
-    /* disable mouse tracking */
-    printf("\x1b[?1000l");
+#ifndef OLD_MOUSE
+    // disable SGR extended mouse reporting
+    printf ("\x1b[?1006l");
+    fflush(stdout);
+#endif
+
+    // disable mouse tracking
+    printf("\x1b[?1002l");
     fflush(stdout);
     
-    /* restore old highlite tracking */
+    // restore old highlight tracking
     printf("\x1b[?1001r");
     fflush(stdout);
 

@@ -89,6 +89,7 @@ void OutputTest()
             using namespace std::chrono_literals;
             console.InputPending();
             input_t key = console.GetInput();
+            LOG_IF(key, INFO) << "  " << ConsoleInput::CastKeyCode(key);
             if (key == K_SPACE)
                 break;
         }

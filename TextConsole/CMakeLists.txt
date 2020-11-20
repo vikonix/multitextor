@@ -7,7 +7,7 @@ project(${PROJECT_NAME} VERSION 2.0.0)
 add_subdirectory(easyloggingpp)
 
 
-file(GLOB_RECURSE _LIB_INC "inc/*.h")
+file(GLOB_RECURSE _LIB_INC "inc/*.h*")
 file(GLOB_RECURSE _LIB_SRC "src/*.c*")
 file(GLOB_RECURSE _TEST_SRC "test/*")
 

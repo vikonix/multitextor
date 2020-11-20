@@ -29,10 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tty/InputTTY.h"
 #include "tty/KeyMap.h"
 #include "tty/TermcapMap.h"
-#include "logger.h"
-
-#define USE_MOUSE
 #include "tty/Mouse.h"
+#include "logger.h"
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -181,7 +179,6 @@ bool InputTTY::Init()
 //////////////////////////////////////////////////////////////////////////////
 void InputTTY::Deinit()
 {
-    DeinitMouse();
     if(m_stdin < 0)
         return;
     
@@ -194,6 +191,8 @@ void InputTTY::Deinit()
     while((-1 == close(m_stdin)) && (errno == EINTR));
     m_stdin = -1;
 
+    DeinitMouse();
+    
     LOG(DEBUG) << "Deinited";
 }
 
@@ -482,7 +481,8 @@ void InputTTY::ProcessInput(bool fMouse)
     }
 
 #ifdef USE_MOUSE
-    if(iLen >= 6 && buff[0] == 0x1b && buff[1] == 0x5b && buff[2] == 0x4d)
+#ifdef OLD_MOUSE
+    if(iLen >= 6 && buff[0] == 0x1b && buff[1] == 0x5b && buff[2] == 0x4d)//"\x1b[M"
     {
         //mouse input
         pos_t x = buff[4] - 0x21;
@@ -514,8 +514,49 @@ void InputTTY::ProcessInput(bool fMouse)
 
         //LOG(DEBUG) << "Mouse input iKey=" << std::hex << iKey;
     }
+#else
+    if(iLen >= 6 && buff[0] == 0x1b && buff[1] == 0x5b && buff[2] == 0x3c)//"\x1b[<"
+    {
+        //new mouse input
+        int k, x, y;
+        char m;
+        int n = sscanf(buff.c_str(), "\x1b[<%d;%d;%d%c", &k, &x, &y, &m);
+        if(n == 4)
+        {
+            --x;
+            --y;
+            //LOG(DEBUG) << "Mouse input k=" << k << " m=" << m << " x=" << x << " y=" << y;
+            
+            input_t key;
+            switch(k)
+            {
+            case 0:  key = m == 'M' ? K_MOUSEKL : K_MOUSEKUP; break;
+            case 1:  key = m == 'M' ? K_MOUSEKM : K_MOUSEKUP; break;
+            case 2:  key = m == 'M' ? K_MOUSEKR : K_MOUSEKUP; break;
+            case 64: key = K_MOUSEWUP | K_MOUSEW; break;
+            case 65: key = K_MOUSEWDN | K_MOUSEW; break;
+            case 32: key = K_MOUSEKL; break;
+            case 33: key = K_MOUSEKM; break;
+            case 34: key = K_MOUSEKR; break;
+            default: key = K_ERROR; break;
+            }
+
+            if((m_prevKey & K_TYPEMASK) == key && m_prevX == x && m_prevY == y)
+                return;
+                
+            input_t iMType = 0;
+
+            if((k & K_MOUSEW) == 0)
+                iMType = ProcessMouse(x, y, key);
+
+            iKey = K_MAKE_COORD_CODE(key | iKeyMode | iMType, x, y);
+
+            //LOG(DEBUG) << "Mouse input iKey=" << std::hex << iKey;
+        }
+    }
+#endif //!OLD_MOUSE    
     else
-#endif
+#endif //USE_MOUSE
 
     if(iLen >= 2 && buff[0] == 0x1b && buff[1] == 0x1b)
     {

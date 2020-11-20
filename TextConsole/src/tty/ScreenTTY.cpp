@@ -39,68 +39,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <filesystem>
 
 
-//////////////////////////////////////////////////////////////////////////////
-bool ScreenTTY::GetScreenSize(pos_t& sizex, pos_t& sizey)
-{
-    pos_t x = 0;
-    pos_t y = 0;
-
-#ifdef TIOCGWINSZ
-    winsize wind_struct;
-
-    do
-    {
-        if ((ioctl(1, TIOCGWINSZ, &wind_struct) == 0)
-         || (ioctl(0, TIOCGWINSZ, &wind_struct) == 0)
-         || (ioctl(2, TIOCGWINSZ, &wind_struct) == 0))
-        {
-            x = (pos_t) wind_struct.ws_col;
-            y = (pos_t) wind_struct.ws_row;
-            break;
-        }
-    }
-    while (errno == EINTR);
-    LOG(DEBUG) << std::dec << "screen size (1) x=" << x << " y=" << y;
-#endif
-
-    if(x <= 0 || y <= 0)
-    {
-        char* str = getenv("COLUMNS");
-        if(nullptr != str)
-            x = atoi(str);
-
-        str = getenv("LINES");
-        if(nullptr != str)
-            y = atoi(str);
-
-        LOG(DEBUG) << "screen size (2) x=" << x << " y=" << y;
-    }
-
-    if(x <= 0 || y <= 0)
-    {
-        x = tgetnum("co");
-        y = tgetnum("li");
-        LOG(DEBUG) << "screen size (3) x=" << x << " y=" << y;
-    }
-
-    if(x <= 0)
-        x = 80;
-    if(y <= 0)
-        y = 24;
-
-    if(x > MAX_COORD)
-        x = MAX_COORD;//max x size
-    if(y > MAX_COORD)
-        y = MAX_COORD;//max y size
-
-    LOG(DEBUG) << "screen size x=" << x << " y=" << y;
-    sizex = x;
-    sizey = y;
-
-    return true;
-}
-
-
 bool ScreenTTY::Init()
 {
     if(m_stdout > 0)
@@ -207,6 +145,68 @@ void ScreenTTY::Deinit()
     Flush();
 
     m_stdout = -1;
+}
+
+
+//////////////////////////////////////////////////////////////////////////////
+bool ScreenTTY::GetScreenSize(pos_t& sizex, pos_t& sizey)
+{
+    pos_t x = 0;
+    pos_t y = 0;
+
+#ifdef TIOCGWINSZ
+    winsize wind_struct;
+
+    do
+    {
+        if ((ioctl(1, TIOCGWINSZ, &wind_struct) == 0)
+         || (ioctl(0, TIOCGWINSZ, &wind_struct) == 0)
+         || (ioctl(2, TIOCGWINSZ, &wind_struct) == 0))
+        {
+            x = (pos_t) wind_struct.ws_col;
+            y = (pos_t) wind_struct.ws_row;
+            break;
+        }
+    }
+    while (errno == EINTR);
+    LOG(DEBUG) << std::dec << "screen size (1) x=" << x << " y=" << y;
+#endif
+
+    if(x <= 0 || y <= 0)
+    {
+        char* str = getenv("COLUMNS");
+        if(nullptr != str)
+            x = atoi(str);
+
+        str = getenv("LINES");
+        if(nullptr != str)
+            y = atoi(str);
+
+        LOG(DEBUG) << "screen size (2) x=" << x << " y=" << y;
+    }
+
+    if(x <= 0 || y <= 0)
+    {
+        x = tgetnum("co");
+        y = tgetnum("li");
+        LOG(DEBUG) << "screen size (3) x=" << x << " y=" << y;
+    }
+
+    if(x <= 0)
+        x = 80;
+    if(y <= 0)
+        y = 24;
+
+    if(x > MAX_COORD)
+        x = MAX_COORD;//max x size
+    if(y > MAX_COORD)
+        y = MAX_COORD;//max y size
+
+    LOG(DEBUG) << "screen size x=" << x << " y=" << y;
+    sizex = x;
+    sizey = y;
+
+    return true;
 }
 
 

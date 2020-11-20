@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include "KeyCodes.h"
 #include "Types.h"
+#include "termdb.hpp"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -114,10 +115,7 @@ class TermcapBuffer
 public:
     static TermcapBuffer& getInstance()
     {
-        // Instantiated on first use.
-        // Guaranteed to be destroyed.
         static TermcapBuffer instance;
-                                        
         return instance;
     }
 
@@ -126,14 +124,10 @@ public:
         static char termcapBuff[0x2000];
         char* term;
         if (NULL == (term = getenv("TERM")))
-        {
             return;
-        }
 
         if (1 != tgetent(termcapBuff, term))
-        {
             return;
-        }
 
         LOG(DEBUG) << "LoadTermcap term=" << term;
     }
