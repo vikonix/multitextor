@@ -1,0 +1,33 @@
+language: c++
+dist: trusty
+
+os:
+  - linux
+  - windows
+
+compiler:
+  - gcc
+  - clang
+
+cache:
+
+script:
+  - cd TextConsole
+  - cmake -B _build -S .
+  - |-
+      case $TRAVIS_OS_NAME in
+        "windows")
+          cmake --build . --target ALL_BUILD --config Release
+          ;;
+        "linux"|"osx")
+          cd _build
+          make
+          ;;
+      esac
+
+jobs:
+  include:
+    - os: linux
+      dist: trusty
+    - os: windows
+      dist: server-2016
