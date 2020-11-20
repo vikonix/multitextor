@@ -9,7 +9,13 @@ compiler:
   - gcc
   - clang
 
-cache:
+install:
+  - |-
+      case $TRAVIS_OS_NAME in
+        "linux")
+          sudo apt-get install -y libgpm-dev libncurses5-dev
+          ;;
+      esac
 
 script:
   - cd TextConsole
@@ -19,7 +25,7 @@ script:
         "windows")
           cmake --build . --target ALL_BUILD --config Release
           ;;
-        "linux"|"osx")
+        "linux")
           cd _build
           make
           ;;
