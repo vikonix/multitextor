@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(PROJECT_NAME test)
+set(PROJECT_NAME ctest)
 project(${PROJECT_NAME} VERSION 2.0.0)
 
 
