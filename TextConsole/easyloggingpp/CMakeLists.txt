@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.10)
+cmake_minimum_required(VERSION 3.9)
 
 set(PROJECT_NAME LoggerLib)
 project(${PROJECT_NAME})

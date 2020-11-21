@@ -20,13 +20,13 @@ install:
 script:
   - cd TextConsole
   - cmake -B _build -S .
+  - cd _build
   - |-
       case $TRAVIS_OS_NAME in
         "windows")
           cmake --build . --target ALL_BUILD --config Release
           ;;
         "linux")
-          cd _build
           make
           ;;
       esac
