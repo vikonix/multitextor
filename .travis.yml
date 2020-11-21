@@ -34,6 +34,6 @@ script:
 jobs:
   include:
     - os: linux
-      dist: trusty
+      dist: bionic
     - os: windows
       dist: server-2016
