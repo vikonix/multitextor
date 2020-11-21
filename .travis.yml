@@ -22,8 +22,9 @@ install:
 
 script:
   - cd TextConsole
-  - cmake -B _build -S .
+  - mkdir _build
   - cd _build
+  - cmake ..
   - |-
       case $TRAVIS_OS_NAME in
         "windows")
