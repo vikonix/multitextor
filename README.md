@@ -4,10 +4,12 @@ Cross Platform console mode library and text editor.
 This project is attempt of recreating my old text editor.
 
 ## Tested on:
-You need compiler with C++0x17 full support.
-
  - Windows 10 - Microsoft Visual Studio Community 2019
  - Linux Ubuntu 20.04 - gcc version 9.3.0
+
+Need compiler with C++ 0x17 full support.
+
+Minimal requirenment: gcc 8.0 or MSVS 2017
 
 [![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)](https://travis-ci.org/vikonix/multitextor)
 
@@ -17,6 +19,8 @@ You need compiler with C++0x17 full support.
  - sudo apt-get install -y gpm
  
 ## What is ready now:
- - Logging.
- - Console input mode.
- - Console output mode.
+ - Logging library.
+ - Console input/output library.
+ 
+## In progress:
+ - Windows library.
