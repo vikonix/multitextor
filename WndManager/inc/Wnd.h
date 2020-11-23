@@ -33,8 +33,6 @@ class Wnd : public CaptureInput
     friend class WndManager;
 
 protected:
-    std::shared_ptr<WndManager> m_WndManager;
-
     pos_t m_left {0};
     pos_t m_top {0};
     pos_t m_sizex {0};

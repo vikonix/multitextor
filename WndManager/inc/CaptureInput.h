@@ -14,8 +14,8 @@ public:
     virtual ~CaptureInput() {InputRelease();}
 
     virtual input_t EventProc(input_t code) {return code;}
-    virtual bool  InputCapture() = 0;
-    virtual bool  InputRelease() = 0;
+    virtual bool  InputCapture();
+    virtual bool  InputRelease();
 
     bool IsInputCaptured() {return m_fCaptured;}
 };
