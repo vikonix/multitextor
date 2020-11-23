@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Console.h"
 
 #include <iostream>
-#include <chrono>
 
 
 void ConsoleTest()
@@ -38,7 +37,6 @@ void ConsoleTest()
     std::cout << "Console test" << std::endl;
     LOG(INFO);
     LOG(INFO) << "Console test";
-
 
     Console console;
 
@@ -48,7 +46,6 @@ void ConsoleTest()
         console.Flush();
         while (1)
         {
-            using namespace std::chrono_literals;
             console.InputPending();
             input_t key = console.GetInput();
             LOG_IF(key, INFO) << "  " << ConsoleInput::CastKeyCode(key);

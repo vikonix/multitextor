@@ -30,7 +30,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "KeyCodes.h"
 
 #include <list>
-#include <chrono>
 #include <string>
 
 using keybuff_t = std::list<input_t>;
@@ -116,7 +115,6 @@ public:
 };
 
 
-using namespace std::chrono_literals;
 //////////////////////////////////////////////////////////////////////////////
 class ConsoleInput : public InputBuffer
 {

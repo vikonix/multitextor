@@ -44,14 +44,6 @@ enum class cursor_t
     CURSOR_OVERWRITE    = 5
 };
 
-enum class scroll_t
-{
-    SCROLL_UP           = 1,
-    SCROLL_DOWN         = 2,
-    SCROLL_LEFT         = 3,
-    SCROLL_RIGHT        = 4
-};
-
 enum invalidate_t : uint32_t
 {
     INVALIDATE_NO       = 0,

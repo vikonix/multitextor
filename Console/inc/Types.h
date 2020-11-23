@@ -27,9 +27,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include <cstdint>
+#include <chrono>
 
 using color_t = uint16_t;
 using input_t = uint32_t;
 using pos_t = int16_t;
 using cell_t = uint32_t;
 using cp_t = uint32_t;
+
+using namespace std::chrono_literals;
+
+enum class scroll_t
+{
+    SCROLL_UP    = 1,
+    SCROLL_DOWN  = 2,
+    SCROLL_LEFT  = 3,
+    SCROLL_RIGHT = 4
+};
+

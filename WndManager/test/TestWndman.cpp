@@ -28,10 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "logger.h"
 #include "Console.h"
-#include "Wnd.h"
+#include "WndManager.h"
 
 #include <iostream>
-#include <chrono>
 
 
 int main()
