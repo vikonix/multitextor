@@ -38,6 +38,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //////////////////////////////////////////////////////////////////////////////
 enum class cursor_t
 {
+    CURSOR_OFF          = -1,
     CURSOR_HIDE         = 0,
     CURSOR_SHOW         = 1, //???
     CURSOR_NORMAL       = 3,

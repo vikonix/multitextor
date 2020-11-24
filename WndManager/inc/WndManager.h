@@ -3,134 +3,142 @@
 #include "Console.h"
 #include "Wnd.h"
 
+#include <array>
+
+
+enum class split_t
+{
+    no_split = 0,
+    split_h  = 1,
+    split_v  = 2
+};
+
 //////////////////////////////////////////////////////////////////////////////
 struct Logo
 {
-  color_t FillColor;
-  color_t LogoColor;
-  int     fill;         //fill char
-  short   x, y;         //left up corner
-  short   nstr;         //number logo str
-  char**  ppStr;        //logo str
+    color_t     fillColor;
+    color_t     logoColor;
+    char16_t    fillChar;
+    pos_t       x;  //left up corner
+    pos_t       y;         
+    std::list<std::string>  logoStr;
 };
-
 
 struct View
 {
-  short left, top;
-  short sx,   sy;
-  Wnd*  pWnd;
+    pos_t   left;
+    pos_t   top;
+    pos_t   sisex;
+    pos_t   sizey;
+    std::shared_ptr<Wnd> wnd;
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class WndManager
+class WndManager final
 {
 protected:
-  View          m_View[3];
-  Wnd*          m_TopWnd;     //список окон отсортированный в Z порядке с учетом активности
+    std::array<View, 3> m_View{};
+    std::list<Wnd*>     m_TopWnd;   //windows list sorted in Z order with them activity
 
-  cell_t*         m_TextBuff;   //текущий буффер цвет/символ/изменение
-  int           m_BuffSize;
-  //сначала все изменения помещаем в новый буффер и потом выводим разницу ???
+    std::vector<cell_t> m_TextBuff; //current buffer color/symbol/changing
+    const Logo*         m_pLogo{nullptr};
 
-  const Logo*   m_pLogo;
-
-  int           m_fNotPaint;
-  color_t       m_Color;
-  short         m_cursorx;
-  short         m_cursory;
-  int           m_cursor;
-  int           m_fInvalidate;
-  int           m_fInvTitle;
+    color_t             m_Color     {};
+    pos_t               m_cursorx   {};
+    pos_t               m_cursory   {};
+    cursor_t            m_cursor    {cursor_t::CURSOR_OFF};
+    int                 m_fNotPaint {0};
+    bool                m_fInvalidate {true}; //first paint
+    bool                m_fInvTitle {true};
 
 public:
-  Console*     m_Console;
+    std::shared_ptr<Console>    m_Console;
 
-  #define CallConsole(p) ((m_fNotPaint) ? 0 : m_Console-> p)
+    #define CallConsole(p) ((m_fNotPaint) ? 0 : m_Console-> p)
 
-  //view management
-  short         m_nSplitX;      //15 min
-  short         m_nSplitY;      //3  min
-  int           m_nSplitType;   //0-no_view 1-horiz 2-vert
-  int           m_nActiveView;
+    //view management
+    pos_t               m_nSplitX{};      //15 min
+    pos_t               m_nSplitY{};      //3  min
+    split_t             m_nSplitType{};   //0-no_view 1-horiz 2-vert
+    int                 m_nActiveView{};
 
-  short         m_sizex;        //
-  short         m_sizey;        //размер экрана
-  short         m_TopLine;      //количество линий занятых программой вверху
-  short         m_BottomLine;   //количество линий занятых программой внизу
+    pos_t               m_sizex{};        //screen size
+    pos_t               m_sizey{};        //
+    pos_t               m_TopLine{};      //number of line used on top
+    pos_t               m_BottomLine{};   //number of line used on bottom
 
 public:
-  WndManager();
-  ~WndManager();
+    WndManager() = default;
+    ~WndManager() = default;
 
-  int   Init();
-  int   Deinit();
-  int   Resize(short sizex, short sizey);
+    bool    Init();
+    bool    Deinit();
+    bool    Resize(pos_t sizex, pos_t sizey);
 
-  int   CheckInput(int time);
-  int   PutMacro(int cmd);
-  int   ProcInput(int code);    //обработчик событий что не обработанно передается в активное окно
-  int   ShowInputCursor(int nCursor, short x = -1, short y = -1);
-  int   HideCursor();
-  int   Beep() {return m_Console->Beep();}
+    bool    CheckInput(const std::chrono::milliseconds& waitTime);
+    bool    PutMacro(input_t cmd);
+    bool    ProcInput(input_t code); //event that not treated will pass to active window
+    bool    ShowInputCursor(cursor_t nCursor, pos_t x = -1, pos_t y = -1);
+    bool    HideCursor();
+    bool    Beep() {return m_Console->Beep();}
 
-  int   Cls();
-  int   Refresh();
-  int   CheckRefresh();
-  void  StopPaint()  {++m_fNotPaint;}
-  void  BeginPaint() {--m_fNotPaint;}
-  int   Flush();
-  int   SetLogo(const Logo * pLogo) {m_pLogo = pLogo; return 0;}
+    bool    Cls();
+    bool    Refresh();
+    bool    CheckRefresh();
+    void    StopPaint()  {++m_fNotPaint;}
+    void    BeginPaint() {--m_fNotPaint;}
+    bool    Flush();
+    void    SetLogo(const Logo* pLogo) {m_pLogo = pLogo;}
+    bool    WriteConsoleTitle(bool set = true);
 
-  int   SetConsoleTitle(int fSet = 0);
-  int   IsVisible(Wnd* pWnd);
-  int   AddWnd(Wnd* wnd);
-  int   AddLastWnd(Wnd* wnd);
-  int   DelWnd(Wnd* wnd);
-  int   SetTopWnd(Wnd* pWnd, int view = -1);
-  int   SetTopWnd(int n, int view = -1);
-  Wnd*  GetWnd(int n = 0, int view = -1);
-  int   GetWndCount();
+    bool    IsVisible(Wnd* pWnd);
+    bool    AddWnd(Wnd* wnd);
+    bool    AddLastWnd(Wnd* wnd);
+    bool    DelWnd(Wnd* wnd);
+    bool    SetTopWnd(Wnd* pWnd, int view = -1);
+    bool    SetTopWnd(int pos, int view = -1);
+    bool    GetWndCount();
+    Wnd*    GetWnd(int pos = 0, int view = -1);
 
-  int   SetView(short x = 40, short y = 11, int type = 0);
-  int   ChangeViewMode(int fType = 0);//0-create/del 1-horiz/vert
-  int   CalcView();
-  int   CloneView(Wnd* wnd = NULL);
-  int   SetActiveView(int n = -1);
-  int   GetActiveView() {return m_nActiveView;}
-  View* GetView(Wnd* wnd);
-  int   TrackView(char* pMsg);
+    bool    Show(Wnd* wnd, bool refresh = 1, int view = 0);
+    bool    Hide(Wnd* wnd, bool refresh = 1);
+    bool    Move(Wnd* wnd, bool refresh = 1);
 
-  int   Show(Wnd* wnd, int fRefresh = 1, int view = 0);
-  int   Hide(Wnd* wnd, int fRefresh = 1);
-  int   Move(Wnd* wnd, int fRefresh = 1);
+    bool    SetView(pos_t x = 40, pos_t y = 11, split_t type = split_t::no_split);
+    bool    ChangeViewMode(split_t fType = split_t::no_split);
+    bool    CalcView();
+    bool    CloneView(Wnd* wnd = NULL);
+    bool    SetActiveView(int pos = -1);
+    int     GetActiveView() {return m_nActiveView;}
+    bool    TrackView(const std::string& msg);
+    View*   GetView(Wnd* wnd);
 
-  int   Invalidate() {return m_fInvalidate = 1;}
+    void    Invalidate() {m_fInvalidate = 1;}
 
-  ////////////////////////////////////////////////////////////////////////////
+    ////////////////////////////////////////////////////////////////////////////
 
-  int   GotoXY(short x, short y);
-  int   SetTextAttr(color_t color);
+    bool    GotoXY(pos_t x, pos_t y);
+    bool    SetTextAttr(color_t color);
   
-  int   WriteStr(const char* pStr);
-  int   WriteChar(char c = ' ');
-//  int   WriteWStr(wchar* pStr);
-//  int   WriteColorWStr(wchar* pStr, color_t* pColor);
-//  int   WriteWChar(wchar c = ' ');
+    bool    WriteStr(const std::string& str);
+    bool    WriteChar(char c = ' ');
+    bool    WriteWStr(const std::u16string& str);
+    bool    WriteColorWStr(std::u16string& str, const std::vector<color_t>& color);
+    bool    WriteWChar(char16_t c = ' ');
 
-  int   Scroll(short left, short top, short right, short bottom, short n, int mode);
-  int   FillRect(short left, short top, short sizex, short sizey, int c, color_t color);
-  int   ColorRect(short left, short top, short sizex, short sizey, color_t color);
-  int   InvColorRect(short left, short top, short sizex, short sizey);
-  int   WriteColor(short x, short y, color_t* pColor);
+    bool    Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode);
+    bool    FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color);
+    bool    ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color);
+    bool    InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey);
+    bool    WriteColor(pos_t x, pos_t y, std::vector<color_t>& color);
 
-  int   ShowBuff();
-  int   ShowBuff(short left, short top, short sizex, short sizey);
+    bool    ShowBuff();
+    bool    ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey);
 
-  int   GetBlock(cell_t* pBlock, short left, short top, short right, short bottom);
-  int   PutBlock(cell_t* pBlock, short left, short top, short right, short bottom);
+    bool    GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std::vector<cell_t>& block);
+    bool    PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block);
 
 protected:
-  int   WriteBlock(cell_t* pBlock, short left, short top, short right, short bottom);
+    bool    WriteBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block);
 };
 
