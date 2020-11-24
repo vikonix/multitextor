@@ -21,7 +21,6 @@ install:
       esac
 
 script:
-  - cd TextConsole
   - mkdir _build
   - cd _build
   - cmake ..
