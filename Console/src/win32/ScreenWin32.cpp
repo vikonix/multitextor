@@ -409,8 +409,8 @@ bool ScreenWin32::WriteBlock(
     if (INVALID_HANDLE_VALUE == m_hStdout)
         return false;
 
-    size_t sizex = (size_t)right - left;
-    size_t sizey = (size_t)bottom - top;
+    size_t sizex = (size_t)right - left + 1;
+    size_t sizey = (size_t)bottom - top + 1;
 
     cell_array outBuff(sizex * sizey);
 

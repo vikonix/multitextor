@@ -47,7 +47,7 @@ enum
   C_DIALOG_FIELD_ACT,
   C_SHADE,
 
-  C_PAIRS
+  C_COUNT
 };
 
 

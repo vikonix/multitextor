@@ -91,19 +91,38 @@ using cell_array = std::vector<cell_t>;
 //////////////////////////////////////////////////////////////////////////////
 class ScreenBuffer
 {
-    size_t      m_sizex;
-    size_t      m_sizey;
+    size_t      m_sizex{};
+    size_t      m_sizey{};
     cell_array  m_buffer;
 
 public:
+    ScreenBuffer() = default;
     explicit ScreenBuffer(size_t x, size_t y)
     : m_sizex{x}
     , m_sizey{y}
     , m_buffer(x * y)
     {}
 
+    bool SetSize(size_t x = 0, size_t y = 0)
+    {
+        m_sizex = x;
+        m_sizey = y;
+        try {
+            if (0 != x && 0 != y)
+                m_buffer.resize(x * y);
+            else
+                m_buffer.clear();
+        }
+        catch (...)
+        {
+            return false;
+        }
+        return true;
+    }
+
     void Fill(cell_t fill) { std::for_each(m_buffer.begin(), m_buffer.end(), [fill](cell_t& cell) {cell = fill; }); }
     void GetSize(size_t& x, size_t& y) const { x = m_sizex; y = m_sizey; }
+    size_t GetSize() const { return m_sizex * m_sizey; }
     cell_t GetCell(size_t x, size_t y) const
     { 
         if (x >= m_sizex || y >= m_sizey)
@@ -112,6 +131,16 @@ public:
             return 0;
         }
         return m_buffer[x + y * m_sizex]; 
+    }
+    bool SetSell(size_t x, size_t y, cell_t c)
+    {
+        if (x >= m_sizex || y >= m_sizey)
+        {
+            LOG(ERROR) << __func__;
+            return false;
+        }
+        m_buffer[x + y * m_sizex] = c;
+        return true;
     }
 };
 

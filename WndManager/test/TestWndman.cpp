@@ -24,7 +24,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-//#include <vld.h>
+#ifdef _DEBUG
+  #ifdef USE_VLD
+    #include <vld.h>
+  #endif
+#endif
 
 #include "logger.h"
 #include "Console.h"
@@ -32,10 +36,40 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
+/////////////////////////////////////////////////////////////////////////////
+Logo g_Logo {
+  ColorScreen,
+  ColorScreen,
+  '-',
+  -1, -1, 
+  {
+      "----------  ----",
+      "--------- # ----",
+      "-------- ## ----",
+      "------- ###   --",
+      "------ #### # --",
+      "----- #### ## --",
+      "---- #### ###   ",
+      "--- #### #### # ",
+      "-- #### #### ## ",
+      "- #### #### ### ",
+      " #### #### #### "
+  }
+};
+
 
 int main()
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log", 0x200000, false);
+    
+    WndManager manager;
+
+    manager.Init();
+    manager.SetLogo(&g_Logo);
+    manager.Refresh();
+    manager.CheckInput(5s);
+
+    manager.Deinit();
 
     LOG(INFO) << "End";
     return 0;

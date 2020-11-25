@@ -34,6 +34,15 @@ set_target_properties(${PROJECT_NAME}
 if(MSVC)
     # warning level 4
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+    if(VLD)
+        target_compile_definitions(${PROJECT_NAME} PUBLIC USE_VLD)
+        target_include_directories(${PROJECT_NAME} PUBLIC
+            "C:/Program Files (x86)/Visual Leak Detector/include"
+        )
+        target_link_libraries(${PROJECT_NAME} PUBLIC
+            "C:/Program Files (x86)/Visual Leak Detector/lib/Win64/vld.lib"
+        )
+    endif()    
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)

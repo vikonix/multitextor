@@ -65,7 +65,6 @@ public:
 
     bool    Show(bool refresh = true, int view = 0);
     bool    Hide(bool refresh = true);
-    bool    Move(pos_t left, pos_t top, pos_t sizex, pos_t sizey, bool fRefresh = true);
 
     void    StopPaint();
     void    BeginPaint();

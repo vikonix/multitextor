@@ -629,8 +629,8 @@ bool ScreenTTY::WriteBlock(
         fLast = 1;
 
     color_t color {0};
-    pos_t sizex = right - left;
-    pos_t sizey = bottom - top;
+    pos_t sizex = right - left + 1;
+    pos_t sizey = bottom - top + 1;
     for(pos_t y = 0; y < sizey; ++y)
     {
         GotoXY(left, top + y);

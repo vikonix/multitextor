@@ -21,15 +21,15 @@ struct Logo
     char16_t    fillChar;
     pos_t       x;  //left up corner
     pos_t       y;         
-    std::list<std::string>  logoStr;
+    std::list<std::string> logoStr;
 };
 
 struct View
 {
-    pos_t   left;
-    pos_t   top;
-    pos_t   sisex;
-    pos_t   sizey;
+    pos_t       left  {};
+    pos_t       top   {};
+    pos_t       sizex {};
+    pos_t       sizey {};
     std::shared_ptr<Wnd> wnd;
 };
 
@@ -37,35 +37,34 @@ struct View
 class WndManager final
 {
 protected:
-    std::array<View, 3> m_View{};
-    std::list<Wnd*>     m_TopWnd;   //windows list sorted in Z order with them activity
+    Console             m_console;
+#define CallConsole(p) ((m_disablePaint) ? 0 : m_console. p)
 
-    std::vector<cell_t> m_TextBuff; //current buffer color/symbol/changing
-    const Logo*         m_pLogo{nullptr};
+    std::array<View, 3> m_view {};
+    std::vector<Wnd*>   m_wndList;  //windows list sorted in Z order with them activity
 
-    color_t             m_Color     {};
-    pos_t               m_cursorx   {};
-    pos_t               m_cursory   {};
-    cursor_t            m_cursor    {cursor_t::CURSOR_OFF};
-    int                 m_fNotPaint {0};
-    bool                m_fInvalidate {true}; //first paint
-    bool                m_fInvTitle {true};
+    ScreenBuffer        m_textBuff; //current buffer color/symbol/changing
+    const Logo*         m_pLogo         {nullptr};
+
+    color_t             m_color         {};
+    pos_t               m_cursorx       {};
+    pos_t               m_cursory       {};
+    cursor_t            m_cursor        {cursor_t::CURSOR_OFF};
+    int                 m_disablePaint  {0};
+    bool                m_invalidate    {true}; //first paint
+    bool                m_invalidTitle  {true};
 
 public:
-    std::shared_ptr<Console>    m_Console;
-
-    #define CallConsole(p) ((m_fNotPaint) ? 0 : m_Console-> p)
-
     //view management
-    pos_t               m_nSplitX{};      //15 min
-    pos_t               m_nSplitY{};      //3  min
-    split_t             m_nSplitType{};   //0-no_view 1-horiz 2-vert
-    int                 m_nActiveView{};
+    pos_t               m_splitX{};      //15 minimal
+    pos_t               m_splitY{};      //3  minimal
+    split_t             m_splitType{};
+    int                 m_activeView{};
 
-    pos_t               m_sizex{};        //screen size
-    pos_t               m_sizey{};        //
-    pos_t               m_TopLine{};      //number of line used on top
-    pos_t               m_BottomLine{};   //number of line used on bottom
+    pos_t               m_sizex{};       //screen size
+    pos_t               m_sizey{};       //
+    pos_t               m_topLines{};    //number of line used on top
+    pos_t               m_bottomLines{}; //number of line used on bottom
 
 public:
     WndManager() = default;
@@ -80,13 +79,13 @@ public:
     bool    ProcInput(input_t code); //event that not treated will pass to active window
     bool    ShowInputCursor(cursor_t nCursor, pos_t x = -1, pos_t y = -1);
     bool    HideCursor();
-    bool    Beep() {return m_Console->Beep();}
+    bool    Beep() {return m_console.Beep();}
 
     bool    Cls();
     bool    Refresh();
     bool    CheckRefresh();
-    void    StopPaint()  {++m_fNotPaint;}
-    void    BeginPaint() {--m_fNotPaint;}
+    void    StopPaint()  {++m_disablePaint;}
+    void    BeginPaint() {--m_disablePaint;}
     bool    Flush();
     void    SetLogo(const Logo* pLogo) {m_pLogo = pLogo;}
     bool    WriteConsoleTitle(bool set = true);
@@ -100,20 +99,19 @@ public:
     bool    GetWndCount();
     Wnd*    GetWnd(int pos = 0, int view = -1);
 
-    bool    Show(Wnd* wnd, bool refresh = 1, int view = 0);
-    bool    Hide(Wnd* wnd, bool refresh = 1);
-    bool    Move(Wnd* wnd, bool refresh = 1);
+    bool    Show(Wnd* wnd, bool refresh = true, int view = 0);
+    bool    Hide(Wnd* wnd, bool refresh = true);
 
     bool    SetView(pos_t x = 40, pos_t y = 11, split_t type = split_t::no_split);
     bool    ChangeViewMode(split_t fType = split_t::no_split);
     bool    CalcView();
     bool    CloneView(Wnd* wnd = NULL);
     bool    SetActiveView(int pos = -1);
-    int     GetActiveView() {return m_nActiveView;}
+    int     GetActiveView() {return m_activeView;}
     bool    TrackView(const std::string& msg);
     View*   GetView(Wnd* wnd);
 
-    void    Invalidate() {m_fInvalidate = 1;}
+    void    Invalidate() {m_invalidate = 1;}
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -135,10 +133,10 @@ public:
     bool    ShowBuff();
     bool    ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey);
 
-    bool    GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std::vector<cell_t>& block);
-    bool    PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block);
+    //bool    GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std::vector<cell_t>& block);
+    //bool    PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block);
 
 protected:
-    bool    WriteBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block);
+    bool    WriteBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const ScreenBuffer& block);
 };
 
