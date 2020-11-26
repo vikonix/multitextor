@@ -50,8 +50,10 @@ enum acs_char : int
     ACS_CSQUARE         = '0'
 };
 
-class ScreenTTY : public ConsoleScreen
+class ScreenTTY final : public ConsoleScreen
 {
+    friend class Console;
+    
     inline static const size_t OUTBUFF_SIZE {2048};
 
     const TermcapBuffer&  m_termcap {TermcapBuffer::getInstance()};
@@ -101,7 +103,7 @@ public:
 
     virtual bool Flush() override;
 
-    bool GetScreenSize(pos_t& sizex, pos_t& sizey);
+    bool GetScreenSize(pos_t& sizex, pos_t& sizey) const;
 
 private:
     bool Resize(pos_t sizex, pos_t sizey);

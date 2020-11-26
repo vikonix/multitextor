@@ -59,7 +59,7 @@ public:
         {
             m_maxSeqSize = std::max(m_maxSeqSize, sequence.size());
             m_map.emplace(sequence, code);
-            LOG(DEBUG) << "add seq=" << CastEscString(sequence) << " " << std::hex << ConsoleInput::CastKeyCode(code);
+            LOG(DEBUG) << "add seq=" << CastEscString(sequence) << " " << std::hex << ConsoleInput::CastKeyCode(code) << std::dec;
         }
         catch(...)
         {
@@ -95,7 +95,7 @@ public:
             {
                 if(seq.size() == sequence.size())
                 {
-                    LOG(DEBUG) << "seq=" << CastEscString(sequence) << " code=" << std::hex << code;
+                    LOG(DEBUG) << "seq=" << CastEscString(sequence) << " code=" << std::hex << code << std::dec;
                     return code;
                 }
                 else
@@ -110,7 +110,7 @@ public:
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class InputTTY : public ConsoleInput
+class InputTTY final: public ConsoleInput
 {
     inline static const size_t MaxInputLen {32};
     

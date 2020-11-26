@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <list>
 #include <string>
+#include <functional>
 
 using keybuff_t = std::list<input_t>;
 
@@ -114,10 +115,16 @@ public:
     }
 };
 
+using ResizeFunction = std::function<bool(pos_t& x, pos_t& y)>;
 
 //////////////////////////////////////////////////////////////////////////////
 class ConsoleInput : public InputBuffer
 {
+friend class Console;
+
+protected:
+ResizeFunction m_ResizeCallback {nullptr};
+
 public:
     virtual bool Init() = 0;
     virtual void Deinit() = 0;

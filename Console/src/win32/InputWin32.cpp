@@ -263,7 +263,7 @@ void InputWin32::ProcessKeyEvent(KEY_EVENT_RECORD* pKeyEvent)
         << " scan=" << pKeyEvent->wVirtualScanCode
         << " char=" << std::hex << +pKeyEvent->uChar.AsciiChar << ":" << pKeyEvent->uChar.UnicodeChar
         << " ctrl=" << std::hex << pKeyEvent->dwControlKeyState
-        << " down=" << pKeyEvent->bKeyDown
+        << " down=" << pKeyEvent->bKeyDown << std::dec
         ;
 //*/
     if(!pKeyEvent->bKeyDown)
@@ -419,7 +419,7 @@ void InputWin32::ProcessMouseEvent(MOUSE_EVENT_RECORD* pMouseEvent)
         << " x=" << pMouseEvent->dwMousePosition.X
         << " y=" << pMouseEvent->dwMousePosition.Y
         << " ctrl=" << std::hex << pMouseEvent->dwControlKeyState
-        << " event=" << pMouseEvent->dwEventFlags
+        << " event=" << pMouseEvent->dwEventFlags << std::dec
         ;
 //*/
     pos_t x = pMouseEvent->dwMousePosition.X;
@@ -471,7 +471,7 @@ void InputWin32::ProcessMouseEvent(MOUSE_EVENT_RECORD* pMouseEvent)
         iMKey = K_MOUSEWDN | K_MOUSEW;
         break;
     default:
-        LOG(DEBUG) << "dwButtonState=" << std::hex << pMouseEvent->dwButtonState;
+        LOG(DEBUG) << "dwButtonState=" << std::hex << pMouseEvent->dwButtonState << std::dec;
         break;
     }
 

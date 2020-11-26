@@ -84,7 +84,7 @@ bool ScreenTTY::Init()
 
     for(i = 0; i < CAP_NUMBER; ++i)
         if(!m_cap[i].str.empty())
-            LOG(DEBUG) << std::dec << " Cap[" << i << "][" << m_cap[i].id << "]" << CastEscString(m_cap[i].str);
+            LOG(DEBUG) << " Cap[" << i << "][" << m_cap[i].id << "]" << CastEscString(m_cap[i].str);
 
     //use alternative screen buffer
     const char* cmd = "\x1b[?47h";
@@ -149,27 +149,27 @@ void ScreenTTY::Deinit()
 
 
 //////////////////////////////////////////////////////////////////////////////
-bool ScreenTTY::GetScreenSize(pos_t& sizex, pos_t& sizey)
+bool ScreenTTY::GetScreenSize(pos_t& sizex, pos_t& sizey) const
 {
     pos_t x = 0;
     pos_t y = 0;
 
 #ifdef TIOCGWINSZ
-    winsize wind_struct;
+    winsize win_struct;
 
     do
     {
-        if ((ioctl(1, TIOCGWINSZ, &wind_struct) == 0)
-         || (ioctl(0, TIOCGWINSZ, &wind_struct) == 0)
-         || (ioctl(2, TIOCGWINSZ, &wind_struct) == 0))
+        if ((ioctl(1, TIOCGWINSZ, &win_struct) == 0)
+         || (ioctl(0, TIOCGWINSZ, &win_struct) == 0)
+         || (ioctl(2, TIOCGWINSZ, &win_struct) == 0))
         {
-            x = (pos_t) wind_struct.ws_col;
-            y = (pos_t) wind_struct.ws_row;
+            x = (pos_t) win_struct.ws_col;
+            y = (pos_t) win_struct.ws_row;
             break;
         }
     }
     while (errno == EINTR);
-    LOG(DEBUG) << std::dec << "screen size (1) x=" << x << " y=" << y;
+    LOG(DEBUG) << "screen size (1) x=" << x << " y=" << y;
 #endif
 
     if(x <= 0 || y <= 0)
@@ -445,7 +445,7 @@ bool ScreenTTY::WriteLastChar(char16_t prevC, char16_t lastC)
     if(m_stdout <= 0)
         return false;
 
-    LOG(DEBUG) << "WriteLastChar " << std::hex << prevC << " " << lastC;
+    LOG(DEBUG) << "WriteLastChar " << std::hex << prevC << " " << lastC << std::dec;
 
     bool rc = GotoXY(m_sizex - 2, m_sizey - 1)
     && WriteChar(lastC)
@@ -622,7 +622,7 @@ bool ScreenTTY::WriteBlock(
 {
     bool rc = false;
 
-    LOG(DEBUG) << "WriteBlock l=" << std::dec << left << " t=" << top << " r=" << right << " b=" << bottom;
+    LOG(DEBUG) << "WriteBlock l=" << left << " t=" << top << " r=" << right << " b=" << bottom;
     
     bool fLast {false};
     if(right == m_sizex - 1 && bottom == m_sizey - 1)

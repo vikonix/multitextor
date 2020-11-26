@@ -23,13 +23,12 @@ bool WndManager::Init()
     return true;
 }
 
-
 bool WndManager::Deinit()
 {
     LOG(INFO) << __func__;
 
     if (m_view[2].wnd)
-        m_view[2].wnd.reset();
+        m_view[2].wnd = nullptr;
 
     m_wndList.clear();
 
@@ -129,7 +128,7 @@ bool WndManager::Refresh()
     
     if (!m_wndList.empty())
     {
-        if (m_wndList.size() > 1 && m_wndList[0]->GetWndType() == "DLG")
+        if (m_wndList.size() > 1 && m_wndList[0]->GetWndType() == wnd_t::dialog)
             m_wndList[1]->Refresh();
 
         if (m_view[2].wnd)
@@ -169,7 +168,7 @@ bool WndManager::SetTextAttr(color_t color)
     return rc;
 }
 
-bool WndManager::GotoXY(short x, short y)
+bool WndManager::GotoXY(pos_t x, pos_t y)
 {
     m_cursorx = x;
     m_cursory = y;
@@ -295,6 +294,50 @@ bool WndManager::WriteStr(const std::string& str)
 
     for(const auto& c : wstr)
         m_textBuff.SetSell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
+
+    return rc;
+}
+
+bool WndManager::Resize(pos_t sizex, pos_t sizey)
+{
+    LOG(INFO) << "  M::Resize x=" << sizex << " y=" << sizey;
+
+    m_sizex = sizex;
+    m_sizey = sizey;
+    CalcView();
+
+    m_textBuff.SetSize(sizex, sizey);
+
+    bool rc = Refresh();
+    return rc;
+}
+
+bool WndManager::CheckRefresh()
+{
+    if (m_invalidate)
+    {
+        m_invalidate = 0;
+        WriteConsoleTitle();
+        Refresh();
+    }
+    return 0;
+}
+
+bool WndManager::WriteConsoleTitle(bool set)
+{
+    if (!set && !m_invalidTitle)
+        return true;
+
+    std::wstring name;
+    if (0 != m_wndList.size())
+    {
+        if (m_view[2].wnd && m_activeView == 1)
+            name = m_view[2].wnd->GetObjName();
+        else
+            name = m_wndList[0]->GetObjName();
+    }
+
+    bool rc = m_console.WriteConsoleTitle(name + L" - " + L"AppName");//???
 
     return rc;
 }

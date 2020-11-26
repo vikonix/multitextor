@@ -6,7 +6,7 @@
 
 
 //////////////////////////////////////////////////////////////////////////////
-class Console
+class Console final
 {
 #ifdef WIN32
     InputWin32  m_input;
@@ -18,7 +18,18 @@ class Console
 
 public:
     bool Init()
-        {return m_input.Init() && m_screen.Init();}
+    {
+#ifndef WIN32        
+        m_input.m_ResizeCallback = [this](pos_t& x, pos_t& y) {
+            bool rc = m_screen.GetScreenSize(x, y)
+                   && m_screen.SetSize(x, y);
+            return rc;       
+        };
+#endif        
+        return m_input.Init() 
+        && m_screen.Init();
+    }
+    
     void Deinit()
         {m_input.Deinit(); m_screen.Deinit();}
     
@@ -75,7 +86,7 @@ public:
     bool Flush()
         {return m_screen.Flush();}
 
-    void GetScreenSize(pos_t& sizex, pos_t& sizey)
+    void GetScreenSize(pos_t& sizex, pos_t& sizey) const
     {
         sizex = m_screen.m_sizex;
         sizey = m_screen.m_sizey;

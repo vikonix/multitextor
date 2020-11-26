@@ -61,12 +61,18 @@ Logo g_Logo {
 int main()
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log", 0x200000, false);
-    
-    WndManager manager;
+    LOG(INFO);
+    LOG(INFO) << "Winman test";
+
+    WndManager& manager = WndManager::getInstance();
 
     manager.Init();
     manager.SetLogo(&g_Logo);
+    manager.WriteConsoleTitle();
     manager.Refresh();
+    manager.ShowInputCursor(cursor_t::CURSOR_NORMAL, 10, 10);
+    //manager.Beep();
+
     manager.CheckInput(5s);
 
     manager.Deinit();

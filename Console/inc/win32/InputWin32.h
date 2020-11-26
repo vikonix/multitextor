@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <atomic>
 
 //////////////////////////////////////////////////////////////////////////////
-class InputWin32 : public ConsoleInput
+class InputWin32 final : public ConsoleInput
 {
     HANDLE  m_hStdin { INVALID_HANDLE_VALUE };
     HWND    m_hWnd { NULL };

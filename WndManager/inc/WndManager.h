@@ -30,7 +30,7 @@ struct View
     pos_t       top   {};
     pos_t       sizex {};
     pos_t       sizey {};
-    std::shared_ptr<Wnd> wnd;
+    Wnd*        wnd   {};
 };
 
 //////////////////////////////////////////////////////////////////////////////
@@ -66,9 +66,20 @@ public:
     pos_t               m_topLines{};    //number of line used on top
     pos_t               m_bottomLines{}; //number of line used on bottom
 
-public:
+protected:
     WndManager() = default;
+
+public:
     ~WndManager() = default;
+
+    WndManager(const WndManager&) = delete;
+    void operator= (const WndManager&) = delete;
+
+    static WndManager& getInstance()
+    {
+        static WndManager instance;
+        return instance;
+    }
 
     bool    Init();
     bool    Deinit();
@@ -86,7 +97,7 @@ public:
     bool    CheckRefresh();
     void    StopPaint()  {++m_disablePaint;}
     void    BeginPaint() {--m_disablePaint;}
-    bool    Flush();
+    bool    Flush() { return m_console.Flush(); }
     void    SetLogo(const Logo* pLogo) {m_pLogo = pLogo;}
     bool    WriteConsoleTitle(bool set = true);
 

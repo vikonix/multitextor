@@ -28,6 +28,15 @@ enum class invrect_t
     invFull   = 4
 };
 
+enum class wnd_t
+{
+    wnd     = 1,
+    fwnd    = 2,
+    menu    = 3,
+    dialog  = 4,
+    editor  = 5
+};
+
 class Wnd : public CaptureInput
 {
     friend class WndManager;
@@ -45,23 +54,22 @@ public:
     Wnd() = default;
     virtual ~Wnd() {Hide();}
 
-    virtual const std::string       GetWndType()    {return "WND";}
-    virtual const std::string       GetObjPath()    {return "...";}
-    virtual const std::string       GetObjName()    {return {};}
-    virtual char                    GetAccessInfo() {return ' ';}
+    virtual wnd_t                   GetWndType() const      {return wnd_t::wnd;}
+    virtual const std::wstring      GetObjPath() const      {return L"...";}
+    virtual const std::wstring      GetObjName() const      {return {};}
+    virtual char                    GetAccessInfo() const   {return ' ';}
+    virtual bool                    IsClone() const         {return false;}
+    virtual bool                    IsUsedTimer() const     {return false;}
+    virtual bool                    IsUsedView() const      {return false;}
 
-    virtual bool                    IsClone()       {return false;}
-    virtual bool                    IsUsedTimer()   {return false;}
-    virtual bool                    IsUsedView()    {return false;}
-    virtual std::shared_ptr<Wnd>    CloneWnd()      {return nullptr;}
-    virtual std::shared_ptr<Wnd>    GetLinkedWnd()  {return nullptr;}
-    virtual input_t                 Close()         {delete this; return K_CLOSE;}
-    virtual bool                    Refresh()       {return 0;}
-    virtual bool                    CheckWndPos(pos_t /*x*/, pos_t /*y*/) { return false; }
+    virtual Wnd*                    CloneWnd()              {return nullptr;}
+    virtual Wnd*                    GetLinkedWnd()          {return nullptr;}
+    virtual bool                    Refresh()               {return 0;}
 
-    virtual void                    ClientToScreen(pos_t& x, pos_t& y);
-    virtual void                    ScreenToClient(pos_t& x, pos_t& y);
-    virtual bool                    CheckClientPos(pos_t x, pos_t y);
+    virtual bool                    CheckWndPos(pos_t /*x*/, pos_t /*y*/) const {return false;}
+    virtual bool                    CheckClientPos(pos_t x, pos_t y) const;
+    virtual void                    ClientToScreen(pos_t& x, pos_t& y) const;
+    virtual void                    ScreenToClient(pos_t& x, pos_t& y) const;
 
     bool    Show(bool refresh = true, int view = 0);
     bool    Hide(bool refresh = true);
@@ -73,15 +81,13 @@ public:
 
 class FrameWnd : public Wnd
 {
-    friend class WndManager;
-
-    const color_t* m_pColorWindow       {&ColorWindow};
-    const color_t* m_pColorWindowTitle  {&ColorWindowTitle};
-    const color_t* m_pColorWindowBorder {&ColorWindowBorder};
-
 protected:
-    border_t  m_border  {border_t::NO_BORDER};
-    color_t   m_color   {*m_pColorWindow};
+    const color_t*  m_pColorWindow      {&ColorWindow};
+    const color_t*  m_pColorWindowTitle {&ColorWindowTitle};
+    const color_t*  m_pColorWindowBorder{&ColorWindowBorder};
+
+    border_t        m_border            {border_t::NO_BORDER};
+    color_t         m_color             {*m_pColorWindow};
 
 public:
     FrameWnd() = default;
@@ -95,13 +101,13 @@ public:
     }
     virtual ~FrameWnd() = default;
 
-    virtual const std::string   GetWndType() override {return "FWN";}
+    virtual wnd_t               GetWndType() const override {return wnd_t::fwnd;}
     virtual bool                Refresh() override;
 
-    virtual void                ClientToScreen(pos_t& x, pos_t& y) override;
-    virtual void                ScreenToClient(pos_t& x, pos_t& y) override;
-    virtual bool                CheckClientPos(pos_t x, pos_t y) override;
-    virtual bool                CheckWndPos(pos_t x, pos_t y) override;
+    virtual bool                CheckWndPos(pos_t x, pos_t y) const override;
+    virtual bool                CheckClientPos(pos_t x, pos_t y) const override;
+    virtual void                ClientToScreen(pos_t& x, pos_t& y) const override;
+    virtual void                ScreenToClient(pos_t& x, pos_t& y) const override;
 
     virtual bool                Repaint() { return true; }
     virtual bool                Invalidate(
@@ -134,10 +140,10 @@ public:
     bool  PutMacro(input_t cmd);
     bool  CheckInput(const std::chrono::milliseconds& waitTime = 100ms);
 
-    pos_t GetWSizeX();
-    pos_t GetWSizeY();
+    pos_t GetWSizeX() const;
+    pos_t GetWSizeY() const;
 
 protected:
-    pos_t GetCSizeX();
-    pos_t GetCSizeY();
+    pos_t GetCSizeX() const;
+    pos_t GetCSizeY() const;
 };

@@ -371,7 +371,7 @@ input_t InputTTY::ProcessMouse(pos_t x, pos_t y, input_t k)
         
         const clock_t waitTicks = 500;
         clock_t t = clock();
-        //LOG(DEBUG) << "dt=" << std::dec << t - m_prevTime << " c=" << waitTicks;
+        //LOG(DEBUG) << "dt=" << t - m_prevTime << " c=" << waitTicks;
 
         if((m_prevKey & K_TYPEMASK) == k && m_prevX == x && m_prevY == y && m_prevTime + waitTicks > t)
         {
@@ -512,7 +512,7 @@ void InputTTY::ProcessInput(bool fMouse)
 
         iKey = K_MAKE_COORD_CODE(k | iMType, x, y);
 
-        //LOG(DEBUG) << "Mouse input iKey=" << std::hex << iKey;
+        //LOG(DEBUG) << "Mouse input iKey=" << std::hex << iKey << std::dec;
     }
 #else
     if(iLen >= 6 && buff[0] == 0x1b && buff[1] == 0x5b && buff[2] == 0x3c)//"\x1b[<"
@@ -551,7 +551,7 @@ void InputTTY::ProcessInput(bool fMouse)
 
             iKey = K_MAKE_COORD_CODE(key | iKeyMode | iMType, x, y);
 
-            //LOG(DEBUG) << "Mouse input iKey=" << std::hex << iKey;
+            //LOG(DEBUG) << "Mouse input iKey=" << std::hex << iKey << std::dec;
         }
     }
 #endif //!OLD_MOUSE    
@@ -665,6 +665,8 @@ void InputTTY::ProcessSignals()
         pos_t y = 0;
         //read screen size
         //resise screen
+        if(m_ResizeCallback)
+            m_ResizeCallback(x, y);
 
         PutInput(K_MAKE_COORD_CODE(K_RESIZE, x, y));
     }

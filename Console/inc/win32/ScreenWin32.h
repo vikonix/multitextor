@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "windows.h"
 
-class ScreenWin32 : public ConsoleScreen
+class ScreenWin32 final : public ConsoleScreen
 {
     HANDLE  m_hStdout { INVALID_HANDLE_VALUE };
     pos_t   m_scrSizeX {80};
@@ -72,7 +72,7 @@ public:
         pos_t left, pos_t top, pos_t right, pos_t bottom,
         const ScreenBuffer& block, pos_t xoffset = 0, pos_t yoffset = 0) override;
 
-    virtual bool Flush() override { return false; };
+    virtual bool Flush() override { return true; };
 };
 
 #endif //WIN32

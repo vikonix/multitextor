@@ -109,7 +109,10 @@ public:
         m_sizey = y;
         try {
             if (0 != x && 0 != y)
+            {
                 m_buffer.resize(x * y);
+                std::for_each(m_buffer.begin(), m_buffer.end(), [](cell_t& cell) {cell = 0;});
+            }
             else
                 m_buffer.clear();
         }
