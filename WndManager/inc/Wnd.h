@@ -7,7 +7,8 @@
 #include <string>
 
 //////////////////////////////////////////////////////////////////////////////
-enum class border_t
+using border_t = uint32_t;
+enum enum_border_t
 {
     NO_BORDER     =    0,
     BORDER_TOP    =    1,
@@ -48,11 +49,13 @@ protected:
     pos_t m_sizey {0};
     pos_t m_cursorx {0};
     pos_t m_cursory {0};
-    bool  m_fVisible {false};
+    bool  m_visible {false};
 
 public:
     Wnd() = default;
     virtual ~Wnd() {Hide();}
+    
+    virtual void                    Destroy() {};
 
     virtual wnd_t                   GetWndType() const      {return wnd_t::wnd;}
     virtual const std::wstring      GetObjPath() const      {return L"...";}
@@ -61,10 +64,10 @@ public:
     virtual bool                    IsClone() const         {return false;}
     virtual bool                    IsUsedTimer() const     {return false;}
     virtual bool                    IsUsedView() const      {return false;}
+    virtual Wnd*                    CloneWnd() const        {return nullptr;}
+    virtual Wnd*                    GetLinkedWnd() const    {return nullptr;}
 
-    virtual Wnd*                    CloneWnd()              {return nullptr;}
-    virtual Wnd*                    GetLinkedWnd()          {return nullptr;}
-    virtual bool                    Refresh()               {return 0;}
+    virtual bool                    Refresh()               {return true;}
 
     virtual bool                    CheckWndPos(pos_t /*x*/, pos_t /*y*/) const {return false;}
     virtual bool                    CheckClientPos(pos_t x, pos_t y) const;
@@ -86,18 +89,18 @@ protected:
     const color_t*  m_pColorWindowTitle {&ColorWindowTitle};
     const color_t*  m_pColorWindowBorder{&ColorWindowBorder};
 
-    border_t        m_border            {border_t::NO_BORDER};
+    border_t        m_border            {NO_BORDER};
     color_t         m_color             {*m_pColorWindow};
 
 public:
     FrameWnd() = default;
-    FrameWnd(pos_t left, pos_t top, pos_t sizex, pos_t sizey, border_t border = border_t::NO_BORDER)
+    FrameWnd(pos_t left, pos_t top, pos_t sizex, pos_t sizey, border_t border = NO_BORDER)
     {
-        m_left  = left;
-        m_top   = top;
-        m_sizex = sizex;
-        m_sizey = sizey;
-        m_border = border;
+        m_left      = left;
+        m_top       = top;
+        m_sizex     = sizex;
+        m_sizey     = sizey;
+        m_border    = border;
     }
     virtual ~FrameWnd() = default;
 
@@ -115,7 +118,7 @@ public:
         [[maybe_unused]] pos_t pos = 0, [[maybe_unused]] pos_t size = 0)
         {return true;}
 
-    bool  SetBorder(border_t border = border_t::NO_BORDER);
+    bool  SetBorder(border_t border = NO_BORDER);
     bool  DrawBorder();
 
     bool  WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color);
@@ -134,7 +137,7 @@ public:
     bool  WriteColorStr(pos_t x, pos_t y, const std::u16string str, color_t* pColor);
     bool  ShowBuff(pos_t left, pos_t top, pos_t, pos_t);
 
-    void  GetWindowSize(pos_t& sizeX, pos_t& sizeY);
+    void  GetWindowSize(pos_t& sizeX, pos_t& sizeY) const;
 
     bool  Beep();
     bool  PutMacro(input_t cmd);

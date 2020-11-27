@@ -266,6 +266,7 @@ bool ScreenWin32::SetTextAttr(color_t color)
     if(m_color == color)
         return true;
 
+    LOG(DEBUG) << "SetTextAttr " << color;
     m_color = color;
     return SetConsoleTextAttribute(m_hStdout, color);
 }

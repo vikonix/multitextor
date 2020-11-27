@@ -4,6 +4,7 @@
 #include "Wnd.h"
 
 #include <array>
+#include <deque>
 
 
 enum class split_t
@@ -41,7 +42,7 @@ protected:
 #define CallConsole(p) ((m_disablePaint) ? 0 : m_console. p)
 
     std::array<View, 3> m_view {};
-    std::vector<Wnd*>   m_wndList;  //windows list sorted in Z order with them activity
+    std::deque<Wnd*>    m_wndList;  //windows list sorted in Z order with them activity
 
     ScreenBuffer        m_textBuff; //current buffer color/symbol/changing
     const Logo*         m_pLogo         {nullptr};
@@ -101,13 +102,13 @@ public:
     void    SetLogo(const Logo* pLogo) {m_pLogo = pLogo;}
     bool    WriteConsoleTitle(bool set = true);
 
-    bool    IsVisible(Wnd* pWnd);
+    bool    IsVisible(const Wnd* pWnd);
     bool    AddWnd(Wnd* wnd);
     bool    AddLastWnd(Wnd* wnd);
     bool    DelWnd(Wnd* wnd);
     bool    SetTopWnd(Wnd* pWnd, int view = -1);
     bool    SetTopWnd(int pos, int view = -1);
-    bool    GetWndCount();
+    size_t  GetWndCount() const;
     Wnd*    GetWnd(int pos = 0, int view = -1);
 
     bool    Show(Wnd* wnd, bool refresh = true, int view = 0);
@@ -116,11 +117,11 @@ public:
     bool    SetView(pos_t x = 40, pos_t y = 11, split_t type = split_t::no_split);
     bool    ChangeViewMode(split_t fType = split_t::no_split);
     bool    CalcView();
-    bool    CloneView(Wnd* wnd = NULL);
+    bool    CloneView(const Wnd* wnd = nullptr);
     bool    SetActiveView(int pos = -1);
     int     GetActiveView() {return m_activeView;}
     bool    TrackView(const std::string& msg);
-    View*   GetView(Wnd* wnd);
+    const View& GetView(const Wnd* wnd) const;
 
     void    Invalidate() {m_invalidate = 1;}
 

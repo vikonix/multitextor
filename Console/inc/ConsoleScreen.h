@@ -151,7 +151,7 @@ class ConsoleScreen
 {
 protected:
     cursor_t    m_cursor { cursor_t::CURSOR_HIDE };
-    color_t     m_color { DEFAULT_COLOR };
+    color_t     m_color {};
 
     pos_t       m_posx {};
     pos_t       m_posy {};

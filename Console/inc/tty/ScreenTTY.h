@@ -54,7 +54,7 @@ class ScreenTTY final : public ConsoleScreen
 {
     friend class Console;
     
-    inline static const size_t OUTBUFF_SIZE {2048};
+    inline static const size_t OUTBUFF_SIZE {0x10000};
 
     const TermcapBuffer&  m_termcap {TermcapBuffer::getInstance()};
     

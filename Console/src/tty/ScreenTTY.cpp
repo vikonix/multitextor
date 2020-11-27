@@ -325,7 +325,7 @@ bool ScreenTTY::Flush()
         break;
     }
 
-    LOG(DEBUG) << "Flush buff size=" << m_OutBuff.size() << " rc=" << rc;
+    LOG(DEBUG) << "Flush buff size=" << m_OutBuff.size() << "->" << rc;
     m_OutBuff.clear();
 
     return rc > 0;
@@ -641,6 +641,7 @@ bool ScreenTTY::WriteBlock(
             char16_t t = GET_CTEXT(c);
             if(color != a)
             {
+                //LOG(DEBUG) << "x=" << x << " y=" << y << " a=" << std::hex << a << std::dec;
                 rc = SetTextAttr(a);
                 color = a;
             }

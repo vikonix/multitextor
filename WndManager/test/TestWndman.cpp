@@ -70,9 +70,18 @@ int main()
     manager.SetLogo(&g_Logo);
     manager.WriteConsoleTitle();
     manager.Refresh();
+
     manager.ShowInputCursor(cursor_t::CURSOR_NORMAL, 10, 10);
     //manager.Beep();
+    manager.CheckInput(5s);
 
+    FrameWnd wnd{20, 5, 20, 10, BORDER_FULL };
+    wnd.Show();
+    manager.Refresh();
+    manager.CheckInput(5s);
+
+    wnd.Hide();
+    manager.Refresh();
     manager.CheckInput(5s);
 
     manager.Deinit();

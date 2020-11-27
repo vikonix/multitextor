@@ -342,6 +342,266 @@ bool WndManager::WriteConsoleTitle(bool set)
     return rc;
 }
 
+bool WndManager::WriteWChar(char16_t c)
+{
+    HideCursor();
+    bool rc = true;
+    if (m_cursory != m_sizey - 1 || m_cursorx < m_sizex - 1)
+        rc = CallConsole(WriteChar(c));
+    else
+    {
+        char16_t PrevC = GET_CTEXT(m_textBuff.GetCell((size_t)m_cursorx - 1, m_cursory));
+        rc = CallConsole(WriteLastChar(PrevC, c));
+    }
+
+    m_textBuff.SetSell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
+
+    return rc;
+}
+
+bool WndManager::Show(Wnd* wnd, bool refresh, int view)
+{
+    LOG(DEBUG) << "Show w=" << wnd << " r=" << refresh << " v=" << view;
+
+    if (!view)
+    {
+        m_activeView = 0;
+        AddWnd(wnd);
+    }
+    else
+        SetTopWnd(wnd, view);
+
+    bool inv = m_invalidate;
+    if (!inv && !refresh)
+        m_invalidate = false;
+
+    return true;
+}
+
+bool WndManager::Hide(Wnd* wnd, bool refresh)
+{
+    LOG(DEBUG) << "Hide w=" << wnd << " r=" << refresh;
+
+    if (wnd == m_view[2].wnd)
+    {
+        m_view[2].wnd = nullptr;
+        m_splitType = split_t::no_split;
+        m_activeView = 0;
+        m_invalidate = true;
+        CalcView();
+    }
+    else
+    {
+        DelWnd(wnd);
+        bool inv = m_invalidate;
+        if (!inv && !refresh)
+            m_invalidate = false;
+    }
+
+    return true;
+}
+
+const View& WndManager::GetView(const Wnd* wnd) const
+{
+    int view = 0;
+
+    if (split_t::no_split != m_splitType && wnd->IsUsedView())
+    {
+        if (m_view[2].wnd == wnd)
+            view = 2;
+        else
+            view = 1;
+    }
+
+    LOG(DEBUG) << "GetView n=" << view;
+
+    return m_view[view];
+}
+
+bool WndManager::CloneView(const Wnd* wnd)
+{
+    LOG(DEBUG) << "CloneView w=" << wnd;
+
+    if (m_view[2].wnd)
+    {
+        if (m_view[2].wnd->IsClone())
+            m_view[2].wnd->Destroy();
+        else
+        {
+            if (!m_activeView)
+                AddLastWnd(m_view[2].wnd);
+            else
+                AddWnd(m_view[2].wnd);
+        }
+    }
+
+    if (!wnd)
+    {
+        m_activeView = false;
+        m_splitType = split_t::no_split;
+        m_view[2].wnd = nullptr;
+    }
+    else
+    {
+        m_view[2].wnd = wnd->CloneWnd();
+    }
+
+    return 0;
+}
+
+bool WndManager::AddWnd(Wnd* wnd)
+{
+    LOG(DEBUG) << "AddWnd w=" << wnd;
+
+    //add to top
+    m_wndList.push_front(wnd);
+    m_invalidate = true;
+    m_invalidTitle = true;
+    return true;
+}
+
+bool WndManager::AddLastWnd(Wnd* wnd)
+{
+    LOG(DEBUG) << "AddLastWnd w=" << wnd;
+    //add to bottom
+    if (m_wndList.empty())
+    {
+        m_invalidate = true;
+        m_invalidTitle = true;
+    }
+    m_wndList.push_back(wnd);
+
+    return true;
+}
+
+bool WndManager::DelWnd(Wnd* wnd)
+{
+    LOG(DEBUG) << "DelWnd w=" << wnd;
+
+    //del from list
+    if (wnd == m_view[2].wnd)
+    {
+        CloneView();
+    }
+    for (auto it = m_wndList.begin(); it != m_wndList.end(); ++it)
+    {
+        if (*it == wnd)
+        {
+            m_wndList.erase(it);
+            break;
+        }
+    }
+    m_invalidate = true;
+    m_invalidTitle = true;
+
+    return true;
+}
+
+size_t WndManager::GetWndCount() const
+{
+    return m_wndList.size() + m_view[2].wnd != nullptr ? 1 : 0;
+}
+
+
+Wnd* WndManager::GetWnd(int n, int view)
+{
+    if (view == -1)
+        view = m_activeView;
+
+    if (view == 1 || n < 0)
+        return m_view[2].wnd;
+
+    if (n < (int)m_wndList.size())
+        return m_wndList[n];
+    else
+        return nullptr;
+}
+
+bool WndManager::SetTopWnd(int n, int view)
+{
+    LOG(DEBUG) << "SetTopWnd n=" << n << " v=" <<view;
+
+    if ((n == 0 && view == 0) || (n < 0 && view != 0))
+        return true;
+
+    if (n < 0)
+        return SetTopWnd(m_view[2].wnd);
+    else if (n < (int)m_wndList.size())
+        return SetTopWnd(m_wndList[n], view);
+    else
+        return false;
+}
+
+bool WndManager::SetTopWnd(Wnd* wnd, int view)
+{
+    LOG(DEBUG) << "SetTopWnd w=" << wnd << " view=" << view;
+    LOG(DEBUG) << "top=" << m_wndList[0] << " v2=" << m_view[2].wnd << " av=" << m_activeView;
+
+    if (!wnd)
+        return true;
+
+    if (split_t::no_split == m_splitType)
+        view = 0;
+    else if (view == -1)
+        view = m_activeView;
+
+    if (!view)
+    {
+        if (wnd == m_wndList[0])
+            return true;
+
+        if (m_view[2].wnd && m_view[2].wnd->IsClone())
+        {
+            Wnd* pDel = m_view[2].wnd;
+            m_view[2].wnd = nullptr;
+            pDel->Destroy();
+
+            Wnd* pTop = m_wndList[0];
+            DelWnd(pTop);
+            m_view[2].wnd = pTop;
+        }
+
+        if (wnd != m_view[2].wnd)
+            DelWnd(wnd);
+        else
+        {
+            m_view[2].wnd = nullptr;
+            CloneView(wnd);
+        }
+        AddWnd(wnd);
+    }
+    else
+    {
+        if (m_view[2].wnd == wnd)
+            return true;
+
+        if (m_view[2].wnd)
+        {
+            if (!m_view[2].wnd->IsClone())
+            {
+                AddLastWnd(m_view[2].wnd);
+                m_view[2].wnd = nullptr;
+            }
+            else
+            {
+                Wnd* pDel = m_view[2].wnd;
+                m_view[2].wnd = nullptr;
+                pDel->Destroy();
+            }
+        }
+
+        if (wnd == m_wndList[0])
+            CloneView(wnd);
+        else
+        {
+            DelWnd(wnd);
+            m_view[2].wnd = wnd;
+        }
+    }
+
+    return true;
+}
+
 bool WndManager::CheckInput(const std::chrono::milliseconds& waitTime)
 {
     while (1)
