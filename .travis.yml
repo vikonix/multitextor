@@ -1,5 +1,5 @@
 language: cpp
-dist: bionic
+dist: focal
 
 os:
   - linux
@@ -15,8 +15,6 @@ install:
         "linux")
           sudo apt-get update
           sudo apt-get install -y libgpm-dev libncurses5-dev
-          sudo apt-get install -y g++-8 gcc-8
-          export CXX="g++-8" CC="gcc-8"
           ;;
       esac
 
@@ -37,6 +35,6 @@ script:
 jobs:
   include:
     - os: linux
-      dist: bionic
+      dist: focal
     - os: windows
       dist: server-2016
