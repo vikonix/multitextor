@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tty/TermcapMap.h"
 #include "tty/Mouse.h"
 #include "logger.h"
+#include "utf8.h"
 
 #include <unistd.h>
 #include <fcntl.h>
@@ -40,8 +41,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <locale.h>
 #include <sys/ioctl.h>
 #include <sys/wait.h>
-
-#include <codecvt>
 
 #ifdef _POSIX_VDISABLE
     #define NULL_VALUE _POSIX_VDISABLE
@@ -470,10 +469,7 @@ void InputTTY::ProcessInput(bool fMouse)
                 iLen += rc;
             
             //LOG(DEBUG) << "utf8=" << KeyMapper::CastString(buff);
-            
-            //??? utf8->utf16
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            std::wstring wstr = converter.from_bytes(buff);
+            std::u16string wstr = utf8::utf8to16(buff);
             for(auto& wc : wstr)
                 PutInput(wc | iKeyMode);
             return;

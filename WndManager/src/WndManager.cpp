@@ -26,8 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "logger.h"
 #include "WndManager.h"
-
-#include <codecvt>
+#include "utf8.h"
 
 
 static const pos_t SPLIT_WIDTH { 1 };
@@ -301,9 +300,7 @@ bool WndManager::WriteStr(const std::string& str)
 {
     HideCursor();
 
-    //??? utf8->utf16
-    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> converter;
-    std::u16string wstr = converter.from_bytes(str);
+    std::u16string wstr = utf8::utf8to16(str);
 
     size_t l = wstr.size();
 

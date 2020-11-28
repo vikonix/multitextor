@@ -30,6 +30,12 @@ target_compile_definitions(${PROJECT_NAME}
     PRIVATE
         UNICODE
         _UNICODE
+        NOMINMAX
+)
+
+target_compile_features(${PROJECT_NAME} 
+    PUBLIC 
+        cxx_std_17
 )
 
 set_target_properties(${PROJECT_NAME}
@@ -40,7 +46,7 @@ set_target_properties(${PROJECT_NAME}
 
 if(MSVC)
     # warning level 4
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4  /Zc:__cplusplus)
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)

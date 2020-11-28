@@ -39,12 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 
 
-#ifdef max
-#undef max
-#endif
-
 #define K_CHAR 0xfffe
-
 
 //////////////////////////////////////////////////////////////////////////////
 class KeyMapper

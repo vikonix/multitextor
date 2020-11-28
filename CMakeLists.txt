@@ -5,6 +5,8 @@ project(${PROJECT_NAME} VERSION 2.0.0)
 
 #option(VLD "VLD" ON)
 
+include_directories(utfcpp)
+
 add_subdirectory(easyloggingpp)
 add_subdirectory(Console)
 add_subdirectory(Console/test)

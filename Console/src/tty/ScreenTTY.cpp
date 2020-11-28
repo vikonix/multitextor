@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "tty/ScreenTTY.h"
 #include "logger.h"
+#include "utf8.h"
 
 #include <errno.h>
 #include <unistd.h>
@@ -218,9 +219,9 @@ bool ScreenTTY::WriteConsoleTitle(const std::wstring& title)
     //for XTERM
     if(m_fXTERMconsole)
     {
-        //??? utf8->utf16
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        std::string _title = converter.to_bytes(title);
+        std::string _title;
+        for(auto& c : title)
+            utf8::append(c, _title);
 
         std::string str {"\x1b]0;" + _title + "\7"};
         write(m_stdout, str.c_str(), str.size());
@@ -363,9 +364,8 @@ bool ScreenTTY::_WriteWChar(char16_t wc)
     else if(wc < ACS_MAX)
     {
         //Alt char set
-        //??? utf8->utf16
-        std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-        std::string str = converter.to_bytes(m_ACS[wc]);
+        std::string str;
+        utf8::append(m_ACS[wc], str);
         rc = _WriteStr(str.c_str());
     }
     else 
@@ -376,9 +376,8 @@ bool ScreenTTY::_WriteWChar(char16_t wc)
         }
         else
         {
-            //??? utf8->utf16
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            std::string str = converter.to_bytes(wc);
+            std::string str;
+            utf8::append(wc, str);
             rc = _WriteStr(str.c_str());
         }
     }
