@@ -11,7 +11,11 @@ Need compiler with C++ 0x17 full support.
 
 Minimal requirenment: gcc 8.0 or MSVS 2017
 
-[![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)](https://travis-ci.org/vikonix/multitextor)
+[![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)][travis]
+[![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)][license]
+
+[travis]: https://travis-ci.org/vikonix/multitextor
+[license]: https://github.com/vikonix/multitextor/master/LICENSE
 
 ## Need to install packages in Linux:
  - sudo apt-get install -y libncurses5-dev
