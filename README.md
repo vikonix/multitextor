@@ -15,7 +15,7 @@ Minimal requirenment: gcc 8.0 or MSVS 2017
 [![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)][license]
 
 [travis]: https://travis-ci.org/vikonix/multitextor
-[license]: https://github.com/vikonix/multitextor/blob/master/LICENSE
+[license]: https://github.com/vikonix/multitextor/blob/main/LICENSE
 
 ## Need to install packages in Linux:
  - sudo apt-get install -y libncurses5-dev
