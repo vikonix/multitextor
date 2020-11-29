@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "KeyCodes.h"
 
 #ifndef HAVE_MAIN
-  #include "logger.h"
+  #include "utils/logger.h"
 #else
   #include <iostream>    
   #define LOG(t) std::cout

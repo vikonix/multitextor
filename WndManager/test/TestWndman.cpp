@@ -30,7 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #endif
 #endif
 
-#include "logger.h"
+#include "utils/logger.h"
 #include "Console.h"
 #include "WndManager.h"
 

@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef ELPP_THREAD_SAFE
 	#define ELPP_THREAD_SAFE
 #endif
-#include "easylogging++.h"
+#include "easyloggingpp/easylogging++.h"
 
 void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize, const bool logScreen);
 std::string CastEscString(const std::string& string);

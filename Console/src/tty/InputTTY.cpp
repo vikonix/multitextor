@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "tty/KeyMap.h"
 #include "tty/TermcapMap.h"
 #include "tty/Mouse.h"
-#include "logger.h"
-#include "utf8.h"
+#include "utils/logger.h"
+#include "utfcpp/utf8.h"
 
 #include <unistd.h>
 #include <fcntl.h>

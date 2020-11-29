@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef WIN32
 
 #include "win32/ScreenWin32.h"
-#include "logger.h"
+#include "utils/logger.h"
 
 
 //////////////////////////////////////////////////////////////////////////////

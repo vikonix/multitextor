@@ -24,9 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "logger.h"
+#include "utils/logger.h"
 #include "WndManager.h"
-#include "utf8.h"
+#include "utfcpp/utf8.h"
 
 
 static const pos_t SPLIT_WIDTH { 1 };

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include "KeyCodes.h"
 #include "Types.h"
-#include "termdb.hpp"
+//#include "termdb/termdb.hpp"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -106,7 +106,7 @@ extern KeyCap    g_keyCap[];
 extern ScreenCap g_screenCap[];
 
 #ifndef WIN32
-#include "logger.h"
+#include "utils/logger.h"
 
 #include <term.h>
 

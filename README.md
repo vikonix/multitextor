@@ -23,7 +23,7 @@ Minimal requirenment: gcc 8.0 or MSVS 2017
  - sudo apt-get install -y gpm
  
 ## What is ready now:
- - Logging library.
+ - Third party library (easyloggingpp, utfcpp, termdb).
  - Console input/output library.
  
 ## In progress:
