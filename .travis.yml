@@ -7,7 +7,6 @@ os:
 
 compiler:
   - gcc
-  allow_failures:
   - clang
 
 install:
