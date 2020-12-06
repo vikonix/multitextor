@@ -81,7 +81,7 @@ enum acs_t
 #define CCOLOR_MASK 0x00ff0000l
 #define CATTR_MASK  0xff000000l
 
-#define MAKE_CELL(attr, color, text)    ((((color) << 16) & CCOLOR_MASK) | ((text) & CTEXT_MASK))
+#define MAKE_CELL(attr, color, text)    (((static_cast<uint32_t>(color) << 16) & CCOLOR_MASK) | (static_cast<uint32_t>(text) & CTEXT_MASK))
 #define GET_CATTR(cell)                 static_cast<uint8_t>(((cell) & CATTR_MASK)  >> 24)
 #define GET_CCOLOR(cell)                static_cast<color_t>(((cell) & CCOLOR_MASK) >> 16)
 #define GET_CTEXT(cell)                 static_cast<char16_t>((cell) & CTEXT_MASK)
@@ -130,7 +130,7 @@ public:
     { 
         if (x >= m_sizex || y >= m_sizey)
         {
-            LOG(ERROR) << __func__;
+            LOG(ERROR) << __FUNCTION__;
             return 0;
         }
         return m_buffer[x + y * m_sizex]; 
@@ -139,7 +139,7 @@ public:
     {
         if (x >= m_sizex || y >= m_sizey)
         {
-            LOG(ERROR) << __func__;
+            LOG(ERROR) << __FUNCTION__;
             return false;
         }
         m_buffer[x + y * m_sizex] = c;

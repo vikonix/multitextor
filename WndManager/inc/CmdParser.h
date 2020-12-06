@@ -28,19 +28,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Types.h"
 
-#include <memory>
+#include <list>
+#include <vector>
 
-class CaptureInput
+
+class CmdParser final
 {
-    CaptureInput* m_prevCaptured{};
+    std::vector<std::list<input_t>> m_keyMap;
+    std::vector<std::list<input_t>> m_cmdMap;
+
+    std::list<input_t>  m_outCommands;
+    std::list<input_t>  m_savedKeys;
 
 public:
-    CaptureInput() = default;
-    virtual ~CaptureInput() {InputRelease();}
+    CmdParser() = default;
 
-    virtual input_t EventProc(input_t code) {return code;}
-    virtual bool  InputCapture();
-    virtual bool  InputRelease();
-
-    bool IsInputCaptured() {return nullptr != m_prevCaptured;}
+    bool    IsInited() const;
+    bool    SetCmdMap(const input_t* cmdMap);
+    int     ScanKey(input_t key);
+    input_t GetCommand();
 };

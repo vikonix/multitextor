@@ -111,7 +111,6 @@ class InputTTY final: public ConsoleInput
     
     static std::atomic_bool s_fResize;
     static std::atomic_bool s_fCtrlC;
-    static std::atomic_bool s_fExit;
 
     const TermcapBuffer&  m_termcap {TermcapBuffer::getInstance()};
     

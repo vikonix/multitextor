@@ -25,14 +25,15 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "WndManager.h"
+#include "App.h"
+
 
 bool CaptureInput::InputCapture()
 {
-    if (!m_fCaptured)
+    if (nullptr == m_prevCaptured)
     {
-        LOG(DEBUG) << __func__ << this;
-//???        m_pPrevCapture = g_pApplication->Capture(this);
-        m_fCaptured = true;
+        LOG(DEBUG) << __FUNCTION__ << " " << this;
+        m_prevCaptured = Application::getInstance().Capture(this);
     }
     return true;
 }
@@ -40,12 +41,11 @@ bool CaptureInput::InputCapture()
 
 bool CaptureInput::InputRelease()
 {
-    if (m_fCaptured)
+    if (nullptr != m_prevCaptured)
     {
-        LOG(DEBUG) << __func__ << this;
-//???        g_pApplication->Capture(m_pPrevCapture);
-        m_pPrevCapture = NULL;
-        m_fCaptured = false;
+        LOG(DEBUG) << __FUNCTION__ << " " << this;
+        Application::getInstance().Capture(m_prevCaptured);
+        m_prevCaptured = nullptr;
     }
     return true;
 }
@@ -105,7 +105,7 @@ bool Wnd::CheckClientPos(pos_t x, pos_t y) const
 //////////////////////////////////////////////////////////////////////////////
 bool FrameWnd::Refresh()
 {
-    LOG(DEBUG) << __func__;
+    LOG(DEBUG) << __FUNCTION__;
     if (!m_visible)
         return true;
 
@@ -116,7 +116,7 @@ bool FrameWnd::Refresh()
 
 bool FrameWnd::GotoXY(pos_t x, pos_t y)
 {
-    LOG(DEBUG) << __func__ << "x=" << x << " y=" << y;
+    LOG(DEBUG) << __FUNCTION__ << "x=" << x << " y=" << y;
     m_cursorx = x;
     m_cursory = y;
 

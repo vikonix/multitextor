@@ -31,8 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "utils/logger.h"
-#include "Console.h"
-#include "WndManager.h"
+#include "App.h"
 
 #include <iostream>
 
@@ -83,6 +82,19 @@ int main()
     wnd.Hide();
     manager.Refresh();
     manager.CheckInput(5s);
+
+    menu_list menu{
+        {MENU_ITEM,       "&File",     K_MENU + 1},
+        {MENU_ITEM,       "&Edit",     K_MENU + 2},
+        {MENU_ITEM,       "Bloc&k",    K_MENU + 3},
+        {MENU_ITEM,       "&Search",   K_MENU + 4},
+        {MENU_ITEM,       "&Tools",    K_MENU + 5},
+        {MENU_ITEM,       "Windo&ws",  K_MENU + 6},
+        {MENU_ITEM,       "&Help",     K_MENU + 7}
+    };
+    LineMenu mainMenu{menu, 0, 0};
+    mainMenu.Activate(true);
+    mainMenu.Close(K_CLOSE);
 
     manager.Deinit();
 

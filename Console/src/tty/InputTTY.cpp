@@ -49,9 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 
+std::atomic_bool ConsoleInput::s_fExit { false };
 std::atomic_bool InputTTY::s_fResize {false};
 std::atomic_bool InputTTY::s_fCtrlC {false};
-std::atomic_bool InputTTY::s_fExit {false};
 
 
 //////////////////////////////////////////////////////////////////////////////

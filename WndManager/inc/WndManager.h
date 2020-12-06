@@ -63,6 +63,8 @@ struct View
 //////////////////////////////////////////////////////////////////////////////
 class WndManager final
 {
+    friend class Application;
+
 protected:
     Console             m_console;
 #define CallConsole(p) ((m_disablePaint) ? 0 : m_console. p)
@@ -113,8 +115,9 @@ public:
     bool    Resize(pos_t sizex, pos_t sizey);
 
     bool    CheckInput(const std::chrono::milliseconds& waitTime);
-    bool    PutMacro(input_t cmd);
-    bool    ProcInput(input_t code); //event that not treated will pass to active window
+    bool    PutInput(input_t code) { return m_console.PutInput(code); }
+    bool    PutMacro(input_t code);
+    bool    ProcInput(input_t code); //events that not treated will pass to active window
     bool    ShowInputCursor(cursor_t nCursor, pos_t x = -1, pos_t y = -1);
     bool    HideCursor();
     bool    Beep() {return m_console.Beep();}
@@ -125,7 +128,7 @@ public:
     void    StopPaint()  {++m_disablePaint;}
     void    BeginPaint() {--m_disablePaint;}
     bool    Flush() { return m_console.Flush(); }
-    void    SetLogo(const Logo* pLogo) {m_pLogo = pLogo;}
+    void    SetLogo(const Logo* pLogo) {m_pLogo = pLogo;}//???
     bool    WriteConsoleTitle(bool set = true);
 
     bool    IsVisible(const Wnd* pWnd);
@@ -141,15 +144,15 @@ public:
     bool    Hide(Wnd* wnd, bool refresh = true);
 
     bool    SetView(pos_t x = 40, pos_t y = 11, split_t type = split_t::no_split);
-    bool    ChangeViewMode(split_t fType = split_t::no_split);
+    bool    ChangeViewMode(int type = 0);//0-create/del 1-horiz/vert
     bool    CalcView();
     bool    CloneView(const Wnd* wnd = nullptr);
-    bool    SetActiveView(int pos = -1);
+    bool    SetActiveView(int n = -1);
     int     GetActiveView() {return m_activeView;}
     bool    TrackView(const std::string& msg);
     const View& GetView(const Wnd* wnd) const;
 
-    void    Invalidate() {m_invalidate = 1;}
+    void    Invalidate() {m_invalidate = true;}
 
     ////////////////////////////////////////////////////////////////////////////
 
@@ -171,8 +174,8 @@ public:
     bool    ShowBuff();
     bool    ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey);
 
-    //bool    GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std::vector<cell_t>& block);
-    //bool    PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block);
+    bool    GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std::vector<cell_t>& block);
+    bool    PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block);
 
 protected:
     bool    WriteBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const ScreenBuffer& block);

@@ -27,20 +27,43 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "Types.h"
+#include <vector>
 
-#include <memory>
+#define SHADE_PAINT  0x20
+#define SHADE_SAVE   0x10
 
-class CaptureInput
+#define SHADE_TOP    0x01
+#define SHADE_LEFT   0x02
+#define SHADE_RIGHT  0x04
+#define SHADE_BOTTOM 0x08
+#define SHADE_ALL    0x0f
+
+
+class Shade final
 {
-    CaptureInput* m_prevCaptured{};
+    pos_t   m_x;
+    pos_t   m_y;
+    pos_t   m_sizex;
+    pos_t   m_sizey;
+    int     m_mode;
+
+    std::vector<cell_t> m_pSaveT;
+    std::vector<cell_t> m_pSaveL;
+    std::vector<cell_t> m_pSaveR;
+    std::vector<cell_t> m_pSaveB;
+
+    std::vector<cell_t> m_SaveTL;
+    std::vector<cell_t> m_SaveTR;
+    std::vector<cell_t> m_SaveBL;
+    std::vector<cell_t> m_SaveBR;
 
 public:
-    CaptureInput() = default;
-    virtual ~CaptureInput() {InputRelease();}
+    Shade() = delete;
+    explicit Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode = SHADE_ALL);
+    ~Shade();
 
-    virtual input_t EventProc(input_t code) {return code;}
-    virtual bool  InputCapture();
-    virtual bool  InputRelease();
-
-    bool IsInputCaptured() {return nullptr != m_prevCaptured;}
+    bool Paint();
+    bool Hide();
+    bool Discard() {m_mode = 0; return 0;}
 };
+

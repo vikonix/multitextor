@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 
 
-std::atomic_bool InputWin32::s_fExit = 0;
-std::atomic_bool InputWin32::s_fCtrlC = 0;
+std::atomic_bool ConsoleInput::s_fExit {false};
+std::atomic_bool InputWin32::s_fCtrlC {false};
 
 //////////////////////////////////////////////////////////////////////////////
 bool InputWin32::Init()

@@ -25,9 +25,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "utils/logger.h"
-#include "WndManager.h"
 #include "utfcpp/utf8.h"
-
+#include "WndManager.h"
+#include "App.h"
 
 static const pos_t SPLIT_WIDTH { 1 };
 
@@ -40,7 +40,7 @@ bool WndManager::Init()
 
     m_console.GetScreenSize(m_sizex, m_sizey);
 
-    LOG(INFO) << __func__ << " x=" << m_sizex << " y=" << m_sizey;
+    LOG(INFO) << __FUNCTION__ << " x=" << m_sizex << " y=" << m_sizey;
     CalcView();
 
     m_textBuff.SetSize(m_sizex, m_sizey);
@@ -50,7 +50,7 @@ bool WndManager::Init()
 
 bool WndManager::Deinit()
 {
-    LOG(INFO) << __func__;
+    LOG(INFO) << __FUNCTION__;
 
     if (m_view[2].wnd)
         m_view[2].wnd = nullptr;
@@ -72,7 +72,7 @@ bool WndManager::Deinit()
 
 bool WndManager::CalcView()
 {
-    LOG(DEBUG) << "CalcView t=" << static_cast<int>(m_splitType);
+    LOG(DEBUG) << __FUNCTION__ << " t=" << static_cast<int>(m_splitType);
 
     //for dialogs
     m_view[0].left  = 0;
@@ -149,7 +149,7 @@ bool WndManager::Refresh()
         }
     }
 
-//???    rc = g_pApplication->Repaint();
+    rc = Application::getInstance().Repaint();
     
     if (!m_wndList.empty())
     {
@@ -253,7 +253,8 @@ bool WndManager::HideCursor()
 
 bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color)
 {
-    LOG(DEBUG) << "  M::FillRect l=" << left << " t=" << top << " x=" << sizex << " y=" << sizey << " c=" << c << " color=" <<  color;
+    LOG(DEBUG) << "  M::FillRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey 
+        << " c=" << c << " color=" << std::hex << color << std::dec;
 
     HideCursor();
     cell_t cl = MAKE_CELL(0, color, c);
@@ -263,7 +264,26 @@ bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input
             m_textBuff.SetSell((size_t)left + x, (size_t)top + y, cl);
     }
 
-    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));//???
+    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
+    return rc;
+}
+
+bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
+{
+    LOG(DEBUG) << "  M::InvColorRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
+
+    HideCursor();
+    for (pos_t y = 0; y < sizey; ++y)
+    {
+        for (pos_t x = 0; x < sizex; ++x)
+        {
+            color_t color = COLOR_INVERSE(GET_CCOLOR(m_textBuff.GetCell((size_t)left + x, (size_t)top + y)));
+            cell_t cl = MAKE_CELL(0, color, m_textBuff.GetCell((size_t)left + x, (size_t)top + y));
+            m_textBuff.SetSell((size_t)left + x, (size_t)top + y, cl);
+        }
+    }
+
+    int rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
     return rc;
 }
 
@@ -293,6 +313,27 @@ bool WndManager::WriteBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, co
 {
     HideCursor();
     bool rc = CallConsole(WriteBlock(left, top, right, bottom, block));
+    return rc;
+}
+
+bool WndManager::GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std::vector<cell_t>& block)
+{
+    block.clear();
+    for (pos_t x = left; x <= right; ++x)
+        for (pos_t y = top; y <= bottom; ++y)
+            block.push_back(m_textBuff.GetCell(x, y));
+    return true;
+}
+
+bool WndManager::PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block)
+{
+    HideCursor();
+    size_t i = 0;
+    for (pos_t x = left; x <= right; ++x)
+        for (pos_t y = top; y <= bottom; ++y)
+            m_textBuff.SetSell(x, y, block[i++]);
+
+    bool rc = CallConsole(WriteBlock(left, top, right, bottom, m_textBuff));
     return rc;
 }
 
@@ -352,7 +393,7 @@ bool WndManager::WriteConsoleTitle(bool set)
         return true;
 
     std::wstring name;
-    if (0 != m_wndList.size())
+    if (!m_wndList.empty())
     {
         if (m_view[2].wnd && m_activeView == 1)
             name = m_view[2].wnd->GetObjName();
@@ -363,6 +404,13 @@ bool WndManager::WriteConsoleTitle(bool set)
     bool rc = m_console.WriteConsoleTitle(name + L" - " + L"AppName");//???
 
     return rc;
+}
+
+bool WndManager::WriteChar(char c)
+{
+    std::string str { c };
+    std::u16string wstr = utf8::utf8to16(str);
+    return WriteWChar(wstr[0]);
 }
 
 bool WndManager::WriteWChar(char16_t c)
@@ -382,9 +430,27 @@ bool WndManager::WriteWChar(char16_t c)
     return rc;
 }
 
+bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color)
+{
+    LOG(DEBUG) << "  M::ColorRect l=" << left << " t=" << top << " x=" << sizex << " y=" << sizey << " c=" << color;
+
+    HideCursor();
+    for (pos_t y = 0; y < sizey; ++y)
+    {
+        for (pos_t x = 0; x < sizex; ++x)
+        {
+            cell_t cl = MAKE_CELL(0, color, m_textBuff.GetCell((size_t)left + x, (size_t)top + y));
+            m_textBuff.SetSell((size_t)left + x, (size_t)top + y, cl);
+        }
+    }
+
+    int rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
+    return rc;
+}
+
 bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 {
-    LOG(DEBUG) << "Show w=" << wnd << " r=" << refresh << " v=" << view;
+    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd << " r=" << refresh << " v=" << view;
 
     if (!view)
     {
@@ -403,7 +469,7 @@ bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 
 bool WndManager::Hide(Wnd* wnd, bool refresh)
 {
-    LOG(DEBUG) << "Hide w=" << wnd << " r=" << refresh;
+    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd << " r=" << refresh;
 
     if (wnd == m_view[2].wnd)
     {
@@ -436,14 +502,14 @@ const View& WndManager::GetView(const Wnd* wnd) const
             view = 1;
     }
 
-    LOG(DEBUG) << "GetView n=" << view;
+    LOG(DEBUG) << __FUNCTION__ << " n=" << view;
 
     return m_view[view];
 }
 
 bool WndManager::CloneView(const Wnd* wnd)
 {
-    LOG(DEBUG) << "CloneView w=" << wnd;
+    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
 
     if (m_view[2].wnd)
     {
@@ -474,7 +540,7 @@ bool WndManager::CloneView(const Wnd* wnd)
 
 bool WndManager::AddWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << "AddWnd w=" << wnd;
+    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
 
     //add to top
     m_wndList.push_front(wnd);
@@ -485,7 +551,7 @@ bool WndManager::AddWnd(Wnd* wnd)
 
 bool WndManager::AddLastWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << "AddLastWnd w=" << wnd;
+    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
     //add to bottom
     if (m_wndList.empty())
     {
@@ -499,7 +565,7 @@ bool WndManager::AddLastWnd(Wnd* wnd)
 
 bool WndManager::DelWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << "DelWnd w=" << wnd;
+    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
 
     //del from list
     if (wnd == m_view[2].wnd)
@@ -542,7 +608,7 @@ Wnd* WndManager::GetWnd(int n, int view)
 
 bool WndManager::SetTopWnd(int n, int view)
 {
-    LOG(DEBUG) << "SetTopWnd n=" << n << " v=" <<view;
+    LOG(DEBUG) << __FUNCTION__ << " n=" << n << " v=" <<view;
 
     if ((n == 0 && view == 0) || (n < 0 && view != 0))
         return true;
@@ -557,7 +623,7 @@ bool WndManager::SetTopWnd(int n, int view)
 
 bool WndManager::SetTopWnd(Wnd* wnd, int view)
 {
-    LOG(DEBUG) << "SetTopWnd w=" << wnd << " view=" << view;
+    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd << " view=" << view;
     LOG(DEBUG) << "top=" << m_wndList[0] << " v2=" << m_view[2].wnd << " av=" << m_activeView;
 
     if (!wnd)
@@ -623,6 +689,266 @@ bool WndManager::SetTopWnd(Wnd* wnd, int view)
     }
 
     return true;
+}
+
+bool WndManager::ProcInput(input_t code)
+{
+    LOG(DEBUG) << "  M:ProcInput " <<  std::hex << code << std::dec;
+    bool rc = 0;
+
+    if (code == K_REFRESH)
+    {
+        //refresh
+        LOG(DEBUG) << "WndManager Refresh";
+        Refresh();
+    }
+    else if ((code & K_TYPEMASK) == K_RESIZE)
+        rc = Resize(K_GET_X(code), K_GET_Y(code));
+    else
+    {
+        if (!m_wndList.empty())
+        {
+            if ((code & K_MOUSE) == K_MOUSE)
+            {
+                //mouse event
+                if ((code & K_TYPEMASK) == K_MOUSEKUP
+                    || (code & K_MOUSEW) == K_MOUSEW)
+                {
+                    if (!m_activeView)
+                        rc = m_wndList[0]->EventProc(code);
+                    else
+                        rc = m_view[2].wnd->EventProc(code);
+                }
+                else
+                {
+                    //mouse click
+                    pos_t x = K_GET_X(code);
+                    pos_t y = K_GET_Y(code);
+
+                    if (m_wndList[0]->CheckWndPos(x, y))
+                    {
+                        SetActiveView(0);
+                        m_wndList[0]->ScreenToClient(x, y);
+                        if (m_wndList[0]->CheckClientPos(x, y))
+                            rc = m_wndList[0]->EventProc(code);
+                    }
+                    else if (m_view[2].wnd)
+                    {
+                        if (m_view[2].wnd->CheckWndPos(x, y))
+                        {
+                            SetActiveView(1);
+                            m_view[2].wnd->ScreenToClient(x, y);
+                            if (m_view[2].wnd->CheckClientPos(x, y))
+                                rc = m_view[2].wnd->EventProc(code);
+                        }
+                        else
+                        {
+                            LOG(DEBUG) << "Split line";
+                            if ((code & K_TYPEMASK) == K_MOUSEKL)
+                                TrackView({});
+                        }
+                    }
+                }
+            }
+            else
+            {
+                //other event
+                if ((code & K_TYPEMASK) != K_TIME)
+                {
+                    if (!m_activeView)
+                        rc = m_wndList[0]->EventProc(code);
+                    else
+                        rc = m_view[2].wnd->EventProc(code);
+                }
+                else if (m_wndList[0]->IsUsedTimer())
+                {
+                    for(auto& wnd : m_wndList)
+                        wnd->EventProc(code);
+
+                    if (m_view[2].wnd)
+                        m_view[2].wnd->EventProc(code);
+                }
+            }
+        }
+    }
+
+    return rc;
+}
+
+bool WndManager::SetActiveView(int n)
+{
+    LOG(DEBUG) << "SetActiveView st=" << static_cast<int>(m_splitType) << " av=" << m_activeView << " n=" << n;
+
+    if (m_splitType == split_t::no_split)
+        return 0;
+
+    if (n < 0)
+        m_activeView = m_activeView ? 0 : 1;
+    else if (n <= 1)
+        m_activeView = n;
+    else
+        m_activeView = 0;
+
+    return WriteConsoleTitle(true);
+}
+
+bool WndManager::ChangeViewMode(int type)//0-create/del 1-horiz/vert
+{
+    LOG(DEBUG) << "ChangeViewMode st=" << static_cast<int>(m_splitType) << " t=" << type;
+
+    if (m_wndList.empty())
+        return true;
+
+    if (!m_splitX || !m_splitY)
+    {
+        m_splitX = m_sizex / 2;
+        m_splitY = m_sizey / 2;
+    }
+
+    if (type == 0)
+    {
+        //create/del
+        if (m_splitType != split_t::no_split)
+        {
+            m_splitType = split_t::no_split;
+            CloneView();
+        }
+        else
+        {
+            m_splitType = split_t::split_h;
+            CalcView();
+            CloneView(m_wndList[0]);
+        }
+    }
+    else
+    {
+        if (m_splitType == split_t::no_split)
+            return 0;
+
+        if (m_splitType == split_t::split_h)
+            m_splitType = split_t::split_v;
+        else
+            m_splitType = split_t::split_h;
+    }
+
+    bool rc = CalcView()
+    && Refresh();
+
+    return rc;
+}
+
+
+bool WndManager::SetView(pos_t x, pos_t y, split_t type)
+{
+    LOG(DEBUG) << "SetView x=" << x << " y=" << y << " t=" << static_cast<int>(type);
+
+    if (!x || !y)
+        return true;
+
+    if (y < 3)
+        y = 3;
+    if (y > m_sizey - m_topLines - m_bottomLines - 4)
+        y = m_sizey - m_topLines - m_bottomLines - 4;
+
+    if (x < 15)
+        x = 15;
+    if (x > m_sizex - 16)
+        x = m_sizex - 16;
+
+    if (type != split_t::split_v && type != split_t::split_h)
+        type = split_t::no_split;
+
+    m_splitX = x;
+    m_splitY = y;
+    m_splitType = type;
+
+    CalcView();
+    return 0;
+}
+
+bool WndManager::TrackView(const std::string& msg)
+{
+    if (m_splitType == split_t::no_split)
+        return true;
+
+    Application::getInstance().SetHelpLine(msg);
+
+    if (m_splitType == split_t::split_h)
+        InvColorRect(m_view[2].left, m_view[2].top - 1, m_view[2].sizex, 1);
+    else if (m_splitType == split_t::split_v)
+        InvColorRect(m_view[2].left - SPLIT_WIDTH, m_view[2].top, SPLIT_WIDTH, m_view[2].sizey);
+
+    bool loop = true;
+    while (loop)
+    {
+        input_t iKey = m_console.InputPending(500ms);
+
+        Application::getInstance().PrintClock();
+        if (iKey)
+        {
+            iKey = m_console.GetInput();
+            LOG(DEBUG) << "TrackView " << std::hex << iKey << std::dec;
+            if (iKey == K_ESC || iKey == K_ENTER || iKey == K_SPACE)
+                break;
+
+            if ((iKey & K_TYPEMASK) == K_RESIZE)
+            {
+                Application::getInstance().SetHelpLine();
+                return Resize(K_GET_X(iKey), K_GET_Y(iKey));
+            }
+
+            pos_t x = m_splitX;
+            pos_t y = m_splitY;
+
+            if (iKey == K_LEFT || iKey == K_UP)
+            {
+                if (m_splitType == split_t::split_h)
+                    --y;
+                else
+                    --x;
+            }
+            else if (iKey == K_RIGHT || iKey == K_DOWN)
+            {
+                if (m_splitType == split_t::split_h)
+                    ++y;
+                else
+                    ++x;
+            }
+
+            if ((iKey & K_MOUSE) == K_MOUSE)
+            {
+                //mouse event
+                x = K_GET_X(iKey);
+                y = K_GET_Y(iKey) - m_topLines;
+
+                if ((iKey & K_TYPEMASK) == K_MOUSEKUP)
+                    loop = false;
+            }
+
+            if (x != m_splitX || y != m_splitY)
+            {
+                if (m_splitType == split_t::split_h)
+                    InvColorRect(m_view[2].left, m_view[2].top - 1, m_view[2].sizex, 1);
+                else if (m_splitType == split_t::split_v)
+                    InvColorRect(m_view[2].left - SPLIT_WIDTH, m_view[2].top, SPLIT_WIDTH, m_view[2].sizey);
+
+                if (m_splitType == split_t::split_h)
+                    SetView(m_splitX, y, m_splitType);
+                else
+                    SetView(x, m_splitY, m_splitType);
+
+                if (m_splitType == split_t::split_h)
+                    InvColorRect(m_view[2].left, m_view[2].top - 1, m_view[2].sizex, 1);
+                else if (m_splitType == split_t::split_v)
+                    InvColorRect(m_view[2].left - SPLIT_WIDTH, m_view[2].top, SPLIT_WIDTH, m_view[2].sizey);
+            }
+        }
+    }
+
+    bool rc = Application::getInstance().SetHelpLine()
+    && Refresh();
+
+    return rc;
 }
 
 bool WndManager::CheckInput(const std::chrono::milliseconds& waitTime)

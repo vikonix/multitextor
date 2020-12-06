@@ -48,7 +48,6 @@ class InputWin32 final : public ConsoleInput
     clock_t m_prevTime { 0 };
 
 protected:
-    static std::atomic_bool s_fExit;
     static std::atomic_bool s_fCtrlC;
 
 public:

@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <string>
 #include <functional>
+#include <atomic>
 
 using keybuff_t = std::list<input_t>;
 
@@ -126,6 +127,8 @@ protected:
 ResizeFunction m_ResizeCallback {nullptr};
 
 public:
+    static std::atomic_bool s_fExit;
+
     virtual bool Init() = 0;
     virtual void Deinit() = 0;
     virtual bool InputPending(const std::chrono::milliseconds& WaitTime = 500ms) = 0;

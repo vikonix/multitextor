@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "CaptureInput.h"
 #include "KeyCodes.h"
 #include "ColorMap.h"
+#include "CmdParser.h"
 
 #include <string>
 
@@ -80,8 +81,8 @@ protected:
 public:
     Wnd() = default;
     virtual ~Wnd() {Hide();}
-    
-    virtual void                    Destroy() {};
+    virtual input_t                 Destroy() { return K_CLOSE; };
+
 
     virtual wnd_t                   GetWndType() const      {return wnd_t::wnd;}
     virtual const std::wstring      GetObjPath() const      {return L"...";}
@@ -111,6 +112,8 @@ public:
 class FrameWnd : public Wnd
 {
 protected:
+    CmdParser       m_cmdParser;
+
     const color_t*  m_pColorWindow      {&ColorWindow};
     const color_t*  m_pColorWindowTitle {&ColorWindowTitle};
     const color_t*  m_pColorWindowBorder{&ColorWindowBorder};
@@ -144,6 +147,7 @@ public:
         [[maybe_unused]] pos_t pos = 0, [[maybe_unused]] pos_t size = 0)
         {return true;}
 
+    bool  SetCmdParser(const input_t* cmdMap);
     bool  SetBorder(border_t border = NO_BORDER);
     bool  DrawBorder();
 
