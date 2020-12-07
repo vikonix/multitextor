@@ -63,14 +63,38 @@ int main()
     LOG(INFO);
     LOG(INFO) << "Winman test";
 
-    WndManager& manager = WndManager::getInstance();
+    Application& app = Application::getInstance();
 
-    manager.Init();
-    manager.SetLogo(&g_Logo);
-    manager.WriteConsoleTitle();
-    manager.Refresh();
+    app.Init();
+    app.SetLogo(g_Logo);
+    app.WriteAppName(L"TestApp");
+    app.Refresh();
 
-    manager.ShowInputCursor(cursor_t::CURSOR_NORMAL, 10, 10);
+    menu_list menu{
+    {MENU_ITEM,       "&File",     K_MENU + 1},
+    {MENU_ITEM,       "&Edit",     K_MENU + 2},
+    {MENU_ITEM,       "Bloc&k",    K_MENU + 3},
+    {MENU_ITEM,       "&Search",   K_MENU + 4},
+    {MENU_ITEM,       "&Tools",    K_MENU + 5},
+    {MENU_ITEM,       "Windo&ws",  K_MENU + 6},
+    {MENU_ITEM,       "&Help",     K_MENU + 7}
+    };
+    menu_list menu1{
+    {MENU_ITEM,       "menu1",     K_MENU + 1},
+    {MENU_ITEM,       "menu2",     K_F2},
+    {MENU_SEPARATOR,  "menu3",     K_F3},
+    {MENU_ITEM,       "menu4",     K_F4},
+    {MENU_ITEM,       "menu5",     K_F5},
+    {MENU_ITEM,       "menu6",     K_F6},
+    };
+
+    app.SetMenu({menu, menu1});
+    app.SetClock(clock_pos::bottom);
+    
+    app.MainProc(K_F1);
+
+/*
+    app.ShowInputCursor(cursor_t::CURSOR_NORMAL, 10, 10);
     //manager.Beep();
     manager.CheckInput(5s);
 
@@ -95,8 +119,8 @@ int main()
     LineMenu mainMenu{menu, 0, 0};
     mainMenu.Activate(true);
     mainMenu.Close(K_CLOSE);
-
-    manager.Deinit();
+*/
+    app.Deinit();
 
     LOG(INFO) << "End";
     return 0;

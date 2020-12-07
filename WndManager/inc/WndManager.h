@@ -43,11 +43,11 @@ enum class split_t
 //////////////////////////////////////////////////////////////////////////////
 struct Logo
 {
-    color_t     fillColor;
-    color_t     logoColor;
-    char16_t    fillChar;
-    pos_t       x;  //left up corner
-    pos_t       y;         
+    color_t     fillColor{};
+    color_t     logoColor{};
+    char16_t    fillChar{};
+    pos_t       x{};  //left up corner
+    pos_t       y{};
     std::list<std::string> logoStr;
 };
 
@@ -73,7 +73,7 @@ protected:
     std::deque<Wnd*>    m_wndList;  //windows list sorted in Z order with them activity
 
     ScreenBuffer        m_textBuff; //current buffer color/symbol/changing
-    const Logo*         m_pLogo         {nullptr};
+    Logo                m_logo;
 
     color_t             m_color         {};
     pos_t               m_cursorx       {};
@@ -128,7 +128,7 @@ public:
     void    StopPaint()  {++m_disablePaint;}
     void    BeginPaint() {--m_disablePaint;}
     bool    Flush() { return m_console.Flush(); }
-    void    SetLogo(const Logo* pLogo) {m_pLogo = pLogo;}//???
+    void    SetLogo(const Logo& logo) {m_logo = logo;}
     bool    WriteConsoleTitle(bool set = true);
 
     bool    IsVisible(const Wnd* pWnd);

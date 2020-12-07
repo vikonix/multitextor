@@ -55,10 +55,10 @@ enum class clock_pos
 };
 
 //////////////////////////////////////////////////////////////////////////////
-class Application// : public CaptureInput
+class Application
 {
 public:
-    std::string m_pAppName;
+    std::wstring                m_appName;
 
 protected:
     WndManager&                 m_wndManager;
@@ -103,11 +103,12 @@ public:
     input_t ParseCommand(input_t code);
     input_t EventProc(input_t code);
 
-    bool             SetMenu(const std::vector<menu_list>& menu) { m_menuArray = menu; return true; }
-    const menu_list& GetMenu(size_t n) { return m_menuArray[n]; }
-
+    bool    SetMenu(const std::vector<menu_list>& menu);
+    std::optional<std::reference_wrapper<const menu_list>> GetMenu(size_t n);
+    
+    void    WriteAppName(std::wstring name) { m_appName = name; }
     bool    IsInsertMode() {return m_insert;}
-    bool    SetLogo(const Logo& logo);
+    void    SetLogo(const Logo& logo) { m_wndManager.SetLogo(logo); }
     bool    SetAccessMenu(const menu_list& menu);
     void    SetClock(clock_pos set = clock_pos::off) {m_clock = set;}
     bool    SetStatusLine(const sline_list& line);
@@ -121,7 +122,7 @@ public:
     bool    PrintStatusLine();
 
     bool    Repaint();
-    bool    Refresh();
+    bool    Refresh() { return m_wndManager.Refresh(); }
 
     bool    PutCode(input_t cmd);
     bool    RecordMacro();

@@ -24,7 +24,6 @@ input_t Menu::Close(input_t code)
         m_shade.reset();
     }
 
-    m_menu = {};
     if(!m_saveBlock.empty())
     {
         if((code & K_TYPEMASK) != K_RESIZE)
@@ -183,6 +182,7 @@ bool LineMenu::Refresh()
         }
         m.size = x - m.x;
         ++x;
+        ++n;
         if (x >= WndManager::getInstance().m_sizex)
             break;
 
@@ -236,7 +236,8 @@ input_t LineMenu::EventProc(input_t code)
 
     if(!m_menu.empty() && code)
     {
-        LOG(DEBUG) << "LineMenu::Proc menu code=" << code;
+        if(code != K_TIME)
+            LOG(DEBUG) << __FUNCTION__ << "code=" << std::hex << code << std::dec;
         if(code == K_ESC)
         {
             close = true;
@@ -284,7 +285,7 @@ input_t LineMenu::EventProc(input_t code)
             if(x >= m_left && x < m_left + m_sizex
                 && y >= m_top  && y < m_top + m_sizey)
             {
-                LOG(DEBUG) << "LineMenu::Check mouse c=" << code << " x=" << x << " y=" << y;
+                LOG(DEBUG) << "LineMenu::Check mouse c=" << std::hex << code << std::dec << " x=" << x << " y=" << y;
                 if((code & K_TYPEMASK) != K_MOUSEKL
                 && (code & K_TYPEMASK) != K_MOUSEKR
                 && (code & K_TYPEMASK) != K_MOUSEKUP)
@@ -338,19 +339,23 @@ input_t LineMenu::EventProc(input_t code)
 
             if(open)
             {
-                LOG(DEBUG) << "LineMenu::Select fOpen=" << open;
+                LOG(DEBUG) << "LineMenu::Select open=" << open;
                 code = m_menu[m_selected].code;
 
                 if((code & K_TYPEMASK) == K_MENU)
                 {
-                    try {
-                        auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);
-                        m_nextMenu = std::make_unique<FrameMenu>(menu, m_menu[m_selected].x, (pos_t)1);
+                    if (m_nextMenu)
+                    {
+                        LOG(DEBUG) << "next menu close 3";
+                        m_nextMenu.release();
+                    }
+
+                    auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);
+                    if (menu)
+                    {
+                        m_nextMenu = std::make_unique<FrameMenu>(*menu, m_menu[m_selected].x, (pos_t)1);
                         if (m_nextMenu)
                             m_nextMenu->Activate();
-                    }
-                    catch (...) {
-                        m_nextMenu.release();
                     }
                 }
                 else if(open == 4 || open == 3)
@@ -444,20 +449,20 @@ bool FrameMenu::Refresh()
     if(m_selected != -1)
         Application::getInstance().SetHelpLine(m_menu[m_selected].helpLine);
 
-    WndManager::getInstance().StopPaint();
+    //WndManager::getInstance().StopPaint();//???
 
     bool rc = WndManager::getInstance().GotoXY(m_left, m_top)
-    && WndManager::getInstance().SetTextAttr(ColorMenuBorder)
-    && WndManager::getInstance().WriteChar(ACS_ULCORNER)
-    && WndManager::getInstance().FillRect(m_left + 1, m_top, m_sizex - 2, 1, ACS_HLINE, ColorMenuBorder)
-    && WndManager::getInstance().GotoXY(m_left + m_sizex - 1, m_top)
-    && WndManager::getInstance().WriteChar(ACS_URCORNER);
+        && WndManager::getInstance().SetTextAttr(ColorMenuBorder)
+        && WndManager::getInstance().WriteChar(ACS_ULCORNER)
+        && WndManager::getInstance().FillRect(m_left + 1, m_top, m_sizex - 2, 1, ACS_HLINE, ColorMenuBorder)
+        && WndManager::getInstance().GotoXY(m_left + m_sizex - 1, m_top)
+        && WndManager::getInstance().WriteChar(ACS_URCORNER);
 
     int n = 0;
     pos_t y = m_top + 1;
     for(auto mi = m_menu.begin(); mi != m_menu.end() && y < WndManager::getInstance().m_sizey - 1; ++mi, ++y, ++n)
     {
-        if((mi->type & MENU_TYPE_MASK) == MENU_ITEM && !mi->name.empty())
+        if((mi->type & MENU_TYPE_MASK) == MENU_ITEM && mi->name.empty())
         {
             mi->x    = 0;
             mi->y    = 0;
@@ -470,8 +475,8 @@ bool FrameMenu::Refresh()
         mi->y = y;
 
         rc = WndManager::getInstance().GotoXY(m_left, y)
-        && WndManager::getInstance().SetTextAttr(ColorMenuBorder)
-        && WndManager::getInstance().WriteChar(ACS_VLINE);
+          && WndManager::getInstance().SetTextAttr(ColorMenuBorder)
+          && WndManager::getInstance().WriteChar(ACS_VLINE);
 
         if((mi->type & MENU_TYPE_MASK) == MENU_SEPARATOR)
             rc = WndManager::getInstance().FillRect(m_left + 1, y, m_sizex - 2, 1, ACS_HLINE, ColorMenuBorder);
@@ -557,12 +562,12 @@ bool FrameMenu::Refresh()
         rc = WndManager::getInstance().WriteChar(ACS_VLINE);
     }
 
-    rc = WndManager::getInstance().GotoXY(m_left, y);
-    rc = WndManager::getInstance().SetTextAttr(ColorMenuBorder);
-    rc = WndManager::getInstance().WriteChar(ACS_LLCORNER);
-    rc = WndManager::getInstance().FillRect(m_left + 1, y, m_sizex - 2, 1, ACS_HLINE, ColorMenuBorder);
-    rc = WndManager::getInstance().GotoXY(m_left + m_sizex - 1, y);
-    rc = WndManager::getInstance().WriteChar(ACS_LRCORNER);
+    rc = WndManager::getInstance().GotoXY(m_left, y)
+      && WndManager::getInstance().SetTextAttr(ColorMenuBorder)
+      && WndManager::getInstance().WriteChar(ACS_LLCORNER)
+      && WndManager::getInstance().FillRect(m_left + 1, y, m_sizex - 2, 1, ACS_HLINE, ColorMenuBorder)
+      && WndManager::getInstance().GotoXY(m_left + m_sizex - 1, y)
+      && WndManager::getInstance().WriteChar(ACS_LRCORNER);
 
     m_sizey = y - m_top + 1;//real size
 
@@ -746,14 +751,12 @@ input_t FrameMenu::EventProc(input_t code)
                         m_nextMenu.release();
                     }
                     
-                    try {
-                        auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);
-                        m_nextMenu = std::make_unique<FrameMenu>(menu, m_menu[m_selected].x, (pos_t)1);
+                    auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);
+                    if (menu)
+                    {
+                        m_nextMenu = std::make_unique<FrameMenu>(*menu, m_menu[m_selected].x, (pos_t)1);
                         if (m_nextMenu)
                             m_nextMenu->Activate();
-                    }
-                    catch (...) {
-                        m_nextMenu.release();
                     }
                 }
                 else if(open == 4 || open == 3)

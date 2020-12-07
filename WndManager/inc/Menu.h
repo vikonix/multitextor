@@ -18,15 +18,15 @@
 //
 struct menu
 {
-    int         type;
+    int         type{};
     std::string name;
-    input_t     code;
+    input_t     code{};
     std::string helpLine;
 
-    input_t     iKey;
-    pos_t       x;
-    pos_t       y;
-    pos_t       size;
+    input_t     iKey{};
+    pos_t       x{};
+    pos_t       y{};
+    pos_t       size{};
 };
 
 using menu_list = std::vector<menu>;

@@ -32,7 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class CaptureInput
 {
-    CaptureInput* m_prevCaptured{};
+    CaptureInput*   m_prevCaptured{};
+    bool            m_captured{false};
 
 public:
     CaptureInput() = default;

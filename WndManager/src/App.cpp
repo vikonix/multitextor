@@ -30,6 +30,25 @@ void Application::Deinit()
     m_wndManager.Deinit();
 }
 
+bool Application::SetMenu(const std::vector<menu_list>& menu)
+{ 
+    m_menuArray = menu; 
+    if (!menu.empty())
+        m_mainMenu = std::make_shared<LineMenu>(menu[0]);
+    else
+        m_mainMenu.reset();
+
+    return true; 
+}
+
+std::optional<std::reference_wrapper<const menu_list>> Application::GetMenu(size_t n)
+{ 
+    if (n < m_menuArray.size())
+        return std::cref(m_menuArray[n]);
+    else
+        return std::nullopt;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 bool Application::Repaint()
 {
@@ -295,7 +314,7 @@ input_t  Application::CheckMouse(input_t code)
     uint32_t x = K_GET_X(code);
     pos_t y = K_GET_Y(code);
 
-    if (!y)
+    if (!y && m_mainMenu)
     {
         //main menu
         if ((code & K_TYPEMASK) == K_MOUSEKL)
@@ -343,7 +362,8 @@ input_t Application::ParseCommand(input_t code)
 {
     if((code & K_TYPEMASK) == K_MENU)
     {
-        m_mainMenu->Activate(code);
+        if(m_mainMenu)
+            m_mainMenu->Activate(code);
         return 0;
     }
 

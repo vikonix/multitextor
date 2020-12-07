@@ -122,7 +122,7 @@ bool WndManager::Refresh()
     m_textBuff.Fill(0);
 
     bool rc;
-    if (!m_pLogo)
+    if (m_logo.fillChar == 0)
     {
         rc = SetTextAttr(ColorScreen)
           && Cls();
@@ -130,19 +130,19 @@ bool WndManager::Refresh()
     else
     {
         //with logo
-        rc = FillRect(0, 0, m_sizex, m_sizey, m_pLogo->fillChar, m_pLogo->fillColor);
+        rc = FillRect(0, 0, m_sizex, m_sizey, m_logo.fillChar, m_logo.fillColor);
 
-        pos_t x = m_pLogo->x;
-        pos_t y = m_pLogo->y;
+        pos_t x = m_logo.x;
+        pos_t y = m_logo.y;
 
         if (x < 0)
-            x = (m_sizex - (pos_t)m_pLogo->logoStr.front().size()) / 2;
+            x = (m_sizex - (pos_t)m_logo.logoStr.front().size()) / 2;
         if (y < 0)
-            y = (m_sizey - (pos_t)m_pLogo->logoStr.size()) / 2;
+            y = (m_sizey - (pos_t)m_logo.logoStr.size()) / 2;
 
-        SetTextAttr(m_pLogo->logoColor);
+        SetTextAttr(m_logo.logoColor);
 
-        for(const auto& str : m_pLogo->logoStr)
+        for(const auto& str : m_logo.logoStr)
         {
             GotoXY(x, y++);
             WriteStr(str);
@@ -188,6 +188,7 @@ bool WndManager::Cls()
 
 bool WndManager::SetTextAttr(color_t color)
 {
+    //LOG(DEBUG) << __FUNCTION__ << " c=" << std::hex << color << std::dec;
     m_color = color;
     bool rc = CallConsole(SetTextAttr(color));
     return rc;
@@ -264,7 +265,7 @@ bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input
             m_textBuff.SetSell((size_t)left + x, (size_t)top + y, cl);
     }
 
-    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
+    bool rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
     return rc;
 }
 
@@ -283,7 +284,7 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
         }
     }
 
-    int rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
+    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
     return rc;
 }
 
@@ -312,7 +313,7 @@ bool WndManager::ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
 bool WndManager::WriteBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const ScreenBuffer& block)
 {
     HideCursor();
-    bool rc = CallConsole(WriteBlock(left, top, right, bottom, block));
+    bool rc = CallConsole(WriteBlock(left, top, right, bottom, block, left, top));
     return rc;
 }
 
@@ -327,13 +328,16 @@ bool WndManager::GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std:
 
 bool WndManager::PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const std::vector<cell_t>& block)
 {
+    if (block.empty())
+        return true;
+
     HideCursor();
     size_t i = 0;
     for (pos_t x = left; x <= right; ++x)
         for (pos_t y = top; y <= bottom; ++y)
             m_textBuff.SetSell(x, y, block[i++]);
 
-    bool rc = CallConsole(WriteBlock(left, top, right, bottom, m_textBuff));
+    bool rc = WriteBlock(left, top, right, bottom, m_textBuff);
     return rc;
 }
 
@@ -401,7 +405,7 @@ bool WndManager::WriteConsoleTitle(bool set)
             name = m_wndList[0]->GetObjName();
     }
 
-    bool rc = m_console.WriteConsoleTitle(name + L" - " + L"AppName");//???
+    bool rc = m_console.WriteConsoleTitle(name + L" - " + Application::getInstance().m_appName);
 
     return rc;
 }
@@ -415,6 +419,7 @@ bool WndManager::WriteChar(char c)
 
 bool WndManager::WriteWChar(char16_t c)
 {
+    //LOG(DEBUG) << __FUNCTION__ << std::hex << c << std::dec;
     HideCursor();
     bool rc = true;
     if (m_cursory != m_sizey - 1 || m_cursorx < m_sizex - 1)
@@ -444,7 +449,7 @@ bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, colo
         }
     }
 
-    int rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
+    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
     return rc;
 }
 

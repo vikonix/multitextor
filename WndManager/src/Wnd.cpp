@@ -30,10 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool CaptureInput::InputCapture()
 {
-    if (nullptr == m_prevCaptured)
+    if (!m_captured)
     {
         LOG(DEBUG) << __FUNCTION__ << " " << this;
         m_prevCaptured = Application::getInstance().Capture(this);
+        m_captured = true;
     }
     return true;
 }
@@ -41,11 +42,12 @@ bool CaptureInput::InputCapture()
 
 bool CaptureInput::InputRelease()
 {
-    if (nullptr != m_prevCaptured)
+    if (m_captured)
     {
         LOG(DEBUG) << __FUNCTION__ << " " << this;
         Application::getInstance().Capture(m_prevCaptured);
         m_prevCaptured = nullptr;
+        m_captured = false;
     }
     return true;
 }
