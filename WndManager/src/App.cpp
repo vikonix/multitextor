@@ -76,6 +76,34 @@ std::optional<std::reference_wrapper<const menu_list>> Application::GetMenu(size
         return std::nullopt;
 }
 
+bool Application::SetStatusLine(const sline_list& line)
+{
+    m_sLine = line;
+
+    m_wndManager.m_bottomLines = 0;
+    if (!m_accessMenu.empty())
+        ++m_wndManager.m_bottomLines;
+    if (!m_sLine.empty())
+        ++m_wndManager.m_bottomLines;
+
+    bool rc = m_wndManager.CalcView();
+    return rc;
+}
+
+bool Application::SetAccessMenu(const menu_list& menu)
+{
+    m_accessMenu = menu;
+
+    m_wndManager.m_bottomLines = 0;
+    if (!m_accessMenu.empty())
+        ++m_wndManager.m_bottomLines;
+    if (!m_sLine.empty())
+        ++m_wndManager.m_bottomLines;
+    
+    bool rc = m_wndManager.CalcView();
+    return rc;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 bool Application::Repaint()
 {
@@ -126,13 +154,10 @@ bool  Application::PrintClock(bool print)
     if (clock_pos::off == m_clock)
         return true;
 
-    LOG(DEBUG) << __FUNCTION__;
-
     time_t curTime = time(nullptr);
 
     if (curTime <= m_prevTime + 1 && !print)
         return true;
-
     m_prevTime = curTime;
 
     tm _tm;
@@ -142,11 +167,13 @@ bool  Application::PrintClock(bool print)
     _tm = *std::localtime(&curTime);
 #endif
 
+    //LOG(DEBUG) << __FUNCTION__ << " " << curTime;
+
     std::stringstream stream;
-    if(curTime & 1)
-        stream << std::put_time(&_tm, "H:M");
+    if(curTime & 2)
+        stream << std::put_time(&_tm, "%H:%M");
     else
-        stream << std::put_time(&_tm, "H M");
+        stream << std::put_time(&_tm, "%H %M");
 
     pos_t len = (pos_t)stream.str().size();
     pos_t y = (clock_pos::bottom == m_clock) ? m_wndManager.m_sizey - 1 : 0;
@@ -211,7 +238,7 @@ bool  Application::PrintStatusLine()
             ++li;
             rc = m_wndManager.SetTextAttr(ColorStatusLineG);
             rc = m_wndManager.WriteChar(c);
-            if (li->color == stat_color::normal)
+            if (li == m_sLine.cend() || li->color == stat_color::normal)
                 rc = m_wndManager.SetTextAttr(ColorStatusLine);
         }
         else

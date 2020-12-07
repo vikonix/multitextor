@@ -35,7 +35,7 @@ enum class stat_color
 {
     normal = 0,
     grayed = 1,
-    error = 2
+    error  = 2
 };
 
 //0 info from begin; other from end

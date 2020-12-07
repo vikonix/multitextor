@@ -698,9 +698,10 @@ bool WndManager::SetTopWnd(Wnd* wnd, int view)
 
 bool WndManager::ProcInput(input_t code)
 {
-    LOG(DEBUG) << "  M:ProcInput " <<  std::hex << code << std::dec;
-    bool rc = 0;
+    if(code != K_TIME)
+        LOG(DEBUG) << "  M:ProcInput " <<  std::hex << code << std::dec;
 
+    bool rc = 0;
     if (code == K_REFRESH)
     {
         //refresh
