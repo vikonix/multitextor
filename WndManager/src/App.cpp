@@ -135,7 +135,13 @@ bool  Application::PrintClock(bool print)
 
     m_prevTime = curTime;
 
-    tm _tm = *std::localtime(&curTime);
+    tm _tm;
+#ifdef WIN32    
+    localtime_s(&_tm, &curTime);
+#else
+    _tm = *std::localtime(&curTime);
+#endif
+
     std::stringstream stream;
     if(curTime & 1)
         stream << std::put_time(&_tm, "H:M");
@@ -412,12 +418,13 @@ input_t Application::ParseCommand(input_t code)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-bool Application::ChangeStatusLine(size_t n, std::optional<std::string_view> text, stat_color color)
+bool Application::ChangeStatusLine(size_t n, std::optional<std::reference_wrapper<const std::string>> text, stat_color color)
 {
     if (m_sLine.empty())
         return true;
 
-    LOG(DEBUG) << " A::ChangeStatusLine n=" << n << " '" << text.value_or("") << "' c=" << static_cast<int>(color);
+    auto& msg = text.has_value() ? text.value().get() : "";
+    LOG(DEBUG) << " A::ChangeStatusLine n=" << n << " '" << msg << "' c=" << static_cast<int>(color);
 
     if (n >= m_sLine.size())
     {
@@ -432,9 +439,9 @@ bool Application::ChangeStatusLine(size_t n, std::optional<std::string_view> tex
     if (m_sLine[n].text.empty() && !text.has_value())
         return true;
 
-    if (m_sLine[n].text.empty() || !text.has_value() || m_sLine[n].text != text || m_sLine[n].color != color)
+    if (m_sLine[n].text.empty() || !text.has_value() || m_sLine[n].text != msg || m_sLine[n].color != color)
     {
-        m_sLine[n].text = text.value_or("");
+        m_sLine[n].text = msg;
         m_sLine[n].color = color;
         PrintStatusLine();
     }
