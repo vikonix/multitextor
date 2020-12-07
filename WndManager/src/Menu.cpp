@@ -1,3 +1,29 @@
+/*
+FreeBSD License
+
+Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #include "Menu.h"
 #include "WndManager.h"
 #include "App.h"
@@ -50,8 +76,8 @@ input_t Menu::Close(input_t code)
 
 int Menu::GetNextItem(int n)
 {
-    size_t size = m_menu.size();
-    for(size_t i = 0; i < size; ++i)
+    int size = static_cast<int>(m_menu.size());
+    for(int i = 0; i < size; ++i)
     {
         ++n;
         if(n >= size)
@@ -72,8 +98,8 @@ int Menu::GetNextItem(int n)
 
 int Menu::GetPrevItem(int n)
 {
-    size_t size = m_menu.size();
-    for(size_t i = 0; i < size; ++i)
+    int size = static_cast<int>(m_menu.size());
+    for(int i = 0; i < size; ++i)
     {
         --n;
         if(n < 0)
@@ -196,7 +222,7 @@ bool LineMenu::Refresh()
     WndManager::getInstance().BeginPaint();
     rc = WndManager::getInstance().ShowBuff(m_left, m_top, m_sizex, m_sizey);
 
-    return true;
+    return rc;
 }
 
 
@@ -533,7 +559,7 @@ bool FrameMenu::Refresh()
             auto klen = key.size();
             mi->size = m_sizex - 2;
 
-            for(; x < mi->size - klen - 1; ++x)
+            for(; x < mi->size - (pos_t)klen - 1; ++x)
                 WndManager::getInstance().WriteChar();
 
             auto ki = key.cbegin();

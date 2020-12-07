@@ -71,21 +71,21 @@ int main()
     app.Refresh();
 
     menu_list menu{
-    {MENU_ITEM,       "&File",     K_MENU + 1},
-    {MENU_ITEM,       "&Edit",     K_MENU + 2},
-    {MENU_ITEM,       "Bloc&k",    K_MENU + 3},
-    {MENU_ITEM,       "&Search",   K_MENU + 4},
-    {MENU_ITEM,       "&Tools",    K_MENU + 5},
-    {MENU_ITEM,       "Windo&ws",  K_MENU + 6},
-    {MENU_ITEM,       "&Help",     K_MENU + 7}
+        {MENU_ITEM,       "&File",     K_MENU + 1},
+        {MENU_ITEM,       "&Edit",     K_MENU + 2},
+        {MENU_ITEM,       "Bloc&k",    K_MENU + 3},
+        {MENU_ITEM,       "&Search",   K_MENU + 4},
+        {MENU_ITEM,       "&Tools",    K_MENU + 5},
+        {MENU_ITEM,       "Windo&ws",  K_MENU + 6},
+        {MENU_ITEM,       "&Help",     K_MENU + 7}
     };
     menu_list menu1{
-    {MENU_ITEM,       "menu1",     K_MENU + 1},
-    {MENU_ITEM,       "menu2",     K_F2},
-    {MENU_SEPARATOR,  "menu3",     K_F3},
-    {MENU_ITEM,       "menu4",     K_F4},
-    {MENU_ITEM,       "menu5",     K_F5},
-    {MENU_ITEM,       "menu6",     K_F6},
+        {MENU_ITEM,       "menu1",     K_MENU + 1},
+        {MENU_ITEM,       "menu2",     K_F2},
+        {MENU_SEPARATOR,  "menu3",     K_F3},
+        {MENU_ITEM,       "menu4",     K_F4},
+        {MENU_ITEM,       "menu5",     K_F5},
+        {MENU_ITEM,       "menu6",     K_F6}
     };
 
     app.SetMenu({menu, menu1});
