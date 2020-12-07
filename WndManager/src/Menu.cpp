@@ -449,7 +449,7 @@ bool FrameMenu::Refresh()
     if(m_selected != -1)
         Application::getInstance().SetHelpLine(m_menu[m_selected].helpLine);
 
-    //WndManager::getInstance().StopPaint();//???
+    WndManager::getInstance().StopPaint();
 
     bool rc = WndManager::getInstance().GotoXY(m_left, m_top)
         && WndManager::getInstance().SetTextAttr(ColorMenuBorder)
@@ -490,8 +490,7 @@ bool FrameMenu::Refresh()
                 WndManager::getInstance().SetTextAttr(ColorMenuSel);
 
             WndManager::getInstance().WriteChar();
-            WndManager::getInstance().WriteChar();
-            pos_t x = 2;
+            pos_t x = 1;
 
             const std::string& name = mi->name;
             std::string key;
@@ -534,7 +533,7 @@ bool FrameMenu::Refresh()
             auto klen = key.size();
             mi->size = m_sizex - 2;
 
-            for(; x < mi->size - klen - 2; ++x)
+            for(; x < mi->size - klen - 1; ++x)
                 WndManager::getInstance().WriteChar();
 
             auto ki = key.cbegin();

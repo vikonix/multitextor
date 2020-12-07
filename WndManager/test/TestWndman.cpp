@@ -89,7 +89,7 @@ int main()
     };
 
     app.SetMenu({menu, menu1});
-    app.SetClock(clock_pos::bottom);
+    //app.SetClock(clock_pos::bottom);
     
     app.MainProc(K_F1);
 

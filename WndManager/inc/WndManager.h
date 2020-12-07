@@ -67,7 +67,7 @@ class WndManager final
 
 protected:
     Console             m_console;
-#define CallConsole(p) ((m_disablePaint) ? 0 : m_console. p)
+#define CallConsole(p) ((m_disablePaint) ? true : m_console. p)
 
     std::array<View, 3> m_view {};
     std::deque<Wnd*>    m_wndList;  //windows list sorted in Z order with them activity
@@ -126,7 +126,7 @@ public:
     bool    Refresh();
     bool    CheckRefresh();
     void    StopPaint()  {++m_disablePaint;}
-    void    BeginPaint() {--m_disablePaint;}
+    void    BeginPaint() { if (m_disablePaint) --m_disablePaint; else { _assert(!"BeginPaint"); } }
     bool    Flush() { return m_console.Flush(); }
     void    SetLogo(const Logo& logo) {m_logo = logo;}
     bool    WriteConsoleTitle(bool set = true);

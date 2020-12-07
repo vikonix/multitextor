@@ -33,3 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize, const bool logScreen);
 std::string CastEscString(const std::string& string);
+
+#ifdef WIN32
+#define _assert(v) _ASSERT(v)
+#else
+#define _assert(v)
+#endif
