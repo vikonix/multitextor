@@ -40,7 +40,7 @@ bool WndManager::Init()
 
     m_console.GetScreenSize(m_sizex, m_sizey);
 
-    LOG(INFO) << __FUNCTION__ << " x=" << m_sizex << " y=" << m_sizey;
+    LOG(INFO) << "  M::Init" << " x=" << m_sizex << " y=" << m_sizey;
     CalcView();
 
     m_textBuff.SetSize(m_sizex, m_sizey);
@@ -50,7 +50,7 @@ bool WndManager::Init()
 
 bool WndManager::Deinit()
 {
-    LOG(INFO) << __FUNCTION__;
+    LOG(INFO) << "  M::Deinit";
 
     if (m_view[2].wnd)
         m_view[2].wnd = nullptr;
@@ -340,7 +340,7 @@ bool WndManager::WriteColorWStr(std::u16string& str, const std::vector<color_t>&
     pos_t x = m_cursorx;
     pos_t y = m_cursory;
     pos_t len = static_cast<pos_t>(str.size());
-    for(size_t i = 0; i < len; ++i)
+    for(pos_t i = 0; i < len; ++i)
         m_textBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, color[i], str[i]));
 
     bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_textBuff));

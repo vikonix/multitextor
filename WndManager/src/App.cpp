@@ -34,6 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 bool Application::Init()
 {
     LOG(DEBUG) << " A::Init";
+    LOG(DEBUG) << __FUNC__;
+    
     if (m_inited)
         return true;
 
@@ -54,6 +56,7 @@ void Application::Deinit()
     {
         m_capturedInput->EventProc(K_ESC);
     }
+    m_mainMenu.reset();
     m_wndManager.Deinit();
 }
 

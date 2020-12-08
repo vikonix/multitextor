@@ -655,8 +655,8 @@ bool ScreenTTY::WriteBlock(
     if(fLast)
     {
         rc = WriteLastChar(
-            GET_CTEXT(block.GetCell(xoffset + right - 2, yoffset + bottom)), 
-            GET_CTEXT(block.GetCell(xoffset + right - 1, yoffset + bottom)));
+            GET_CTEXT(block.GetCell(m_sizex - 2, m_sizey - 1)), 
+            GET_CTEXT(block.GetCell(m_sizex - 1, m_sizey - 1)));
     }
 
     rc = Flush();

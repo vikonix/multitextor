@@ -36,6 +36,9 @@ std::string CastEscString(const std::string& string);
 
 #ifdef WIN32
 #define _assert(v) _ASSERT(v)
+#define __FUNC__ __FUNCTION__
 #else
 #define _assert(v)
+#define __FUNC__ __PRETTY_FUNCTION__ 
 #endif
+
