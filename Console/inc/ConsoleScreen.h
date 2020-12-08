@@ -135,7 +135,7 @@ public:
         }
         return m_buffer[x + y * m_sizex]; 
     }
-    bool SetSell(size_t x, size_t y, cell_t c)
+    bool SetCell(size_t x, size_t y, cell_t c)
     {
         if (x >= m_sizex || y >= m_sizey)
         {

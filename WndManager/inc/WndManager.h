@@ -116,7 +116,6 @@ public:
 
     bool    CheckInput(const std::chrono::milliseconds& waitTime);
     bool    PutInput(input_t code) { return m_console.PutInput(code); }
-    bool    PutMacro(input_t code);
     bool    ProcInput(input_t code); //events that not treated will pass to active window
     bool    ShowInputCursor(cursor_t nCursor, pos_t x = -1, pos_t y = -1);
     bool    HideCursor();
@@ -131,7 +130,7 @@ public:
     void    SetLogo(const Logo& logo) {m_logo = logo;}
     bool    WriteConsoleTitle(bool set = true);
 
-    bool    IsVisible(const Wnd* pWnd);
+    bool    IsVisible(const Wnd* wnd);
     bool    AddWnd(Wnd* wnd);
     bool    AddLastWnd(Wnd* wnd);
     bool    DelWnd(Wnd* wnd);
@@ -161,9 +160,9 @@ public:
   
     bool    WriteStr(const std::string& str);
     bool    WriteChar(char c = ' ');
+    bool    WriteWChar(char16_t c = ' ');
     bool    WriteWStr(const std::u16string& str);
     bool    WriteColorWStr(std::u16string& str, const std::vector<color_t>& color);
-    bool    WriteWChar(char16_t c = ' ');
 
     bool    Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode);
     bool    FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color);

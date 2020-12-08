@@ -252,42 +252,6 @@ bool WndManager::HideCursor()
     return rc;
 }
 
-bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color)
-{
-    LOG(DEBUG) << "  M::FillRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey 
-        << " c=" << c << " color=" << std::hex << color << std::dec;
-
-    HideCursor();
-    cell_t cl = MAKE_CELL(0, color, c);
-    for (pos_t y = 0; y < sizey; ++y)
-    {
-        for (pos_t x = 0; x < sizex; ++x)
-            m_textBuff.SetSell((size_t)left + x, (size_t)top + y, cl);
-    }
-
-    bool rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
-    return rc;
-}
-
-bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
-{
-    LOG(DEBUG) << "  M::InvColorRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
-
-    HideCursor();
-    for (pos_t y = 0; y < sizey; ++y)
-    {
-        for (pos_t x = 0; x < sizex; ++x)
-        {
-            color_t color = COLOR_INVERSE(GET_CCOLOR(m_textBuff.GetCell((size_t)left + x, (size_t)top + y)));
-            cell_t cl = MAKE_CELL(0, color, m_textBuff.GetCell((size_t)left + x, (size_t)top + y));
-            m_textBuff.SetSell((size_t)left + x, (size_t)top + y, cl);
-        }
-    }
-
-    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
-    return rc;
-}
-
 bool WndManager::ShowBuff()
 {
     if (0 == m_textBuff.GetSize())
@@ -335,7 +299,7 @@ bool WndManager::PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, cons
     size_t i = 0;
     for (pos_t x = left; x <= right; ++x)
         for (pos_t y = top; y <= bottom; ++y)
-            m_textBuff.SetSell(x, y, block[i++]);
+            m_textBuff.SetCell(x, y, block[i++]);
 
     bool rc = WriteBlock(left, top, right, bottom, m_textBuff);
     return rc;
@@ -343,12 +307,15 @@ bool WndManager::PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, cons
 
 bool WndManager::WriteStr(const std::string& str)
 {
+    std::u16string wstr = utf8::utf8to16(str);
+    return WriteWStr(wstr);
+}
+    
+bool WndManager::WriteWStr(const std::u16string& wstr)
+{
     HideCursor();
 
-    std::u16string wstr = utf8::utf8to16(str);
-
     size_t l = wstr.size();
-
     bool rc;
     if (m_cursory != m_sizey - 1 || m_cursorx + (pos_t)l <= m_sizex - 1)
         rc = CallConsole(WriteStr(wstr));
@@ -361,8 +328,22 @@ bool WndManager::WriteStr(const std::string& str)
     }
 
     for(const auto& c : wstr)
-        m_textBuff.SetSell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
+        m_textBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
 
+    return rc;
+}
+
+bool WndManager::WriteColorWStr(std::u16string& str, const std::vector<color_t>& color)
+{
+    HideCursor();
+
+    pos_t x = m_cursorx;
+    pos_t y = m_cursory;
+    pos_t len = static_cast<pos_t>(str.size());
+    for(size_t i = 0; i < len; ++i)
+        m_textBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, color[i], str[i]));
+
+    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_textBuff));
     return rc;
 }
 
@@ -430,8 +411,27 @@ bool WndManager::WriteWChar(char16_t c)
         rc = CallConsole(WriteLastChar(PrevC, c));
     }
 
-    m_textBuff.SetSell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
+    m_textBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
 
+    return rc;
+}
+
+bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color)
+{
+    LOG(DEBUG) << "  M::FillRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey 
+        << " ch=" << std::hex << c << " c=" << static_cast<int>(color) << std::dec;
+
+    HideCursor();
+    cell_t cl = MAKE_CELL(0, color, c);
+    for (pos_t y = 0; y < sizey; ++y)
+    {
+        for (pos_t x = 0; x < sizex; ++x)
+        {
+            m_textBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+        }
+    }
+
+    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
     return rc;
 }
 
@@ -445,7 +445,26 @@ bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, colo
         for (pos_t x = 0; x < sizex; ++x)
         {
             cell_t cl = MAKE_CELL(0, color, m_textBuff.GetCell((size_t)left + x, (size_t)top + y));
-            m_textBuff.SetSell((size_t)left + x, (size_t)top + y, cl);
+            m_textBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+        }
+    }
+
+    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
+    return rc;
+}
+
+bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
+{
+    LOG(DEBUG) << "  M::InvColorRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
+
+    HideCursor();
+    for (pos_t y = 0; y < sizey; ++y)
+    {
+        for (pos_t x = 0; x < sizex; ++x)
+        {
+            color_t color = COLOR_INVERSE(GET_CCOLOR(m_textBuff.GetCell((size_t)left + x, (size_t)top + y)));
+            cell_t cl = MAKE_CELL(0, color, m_textBuff.GetCell((size_t)left + x, (size_t)top + y));
+            m_textBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
         }
     }
 
@@ -694,6 +713,13 @@ bool WndManager::SetTopWnd(Wnd* wnd, int view)
     }
 
     return true;
+}
+
+bool WndManager::IsVisible(const Wnd* wnd)
+{
+    return wnd == m_view[2].wnd 
+        || (!m_wndList.empty() && wnd == m_wndList[0])
+        || (m_wndList.size() > 1 && m_wndList[0]->GetWndType() == wnd_t::dialog && m_wndList[1] == wnd);
 }
 
 bool WndManager::ProcInput(input_t code)

@@ -104,6 +104,74 @@ bool Application::SetAccessMenu(const menu_list& menu)
     return rc;
 }
 
+bool Application::ChangeStatusLine(size_t n, std::optional<std::reference_wrapper<const std::string>> text, stat_color color)
+{
+    if (m_sLine.empty())
+        return true;
+
+    auto& msg = text.has_value() ? text.value().get() : "";
+    LOG(DEBUG) << " A::ChangeStatusLine n=" << n << " '" << msg << "' c=" << static_cast<int>(color);
+
+    if (n >= m_sLine.size())
+    {
+        LOG(ERROR) << __FUNCTION__ << " error n=" << n << " > size=" << m_sLine.size();
+        return false;
+    }
+
+    if (n == 0 && m_sLine[0].color == stat_color::error && text.has_value() && color != stat_color::error)
+        //save error line until input event
+        return true;
+
+    if (m_sLine[n].text.empty() && !text.has_value())
+        return true;
+
+    if (m_sLine[n].text.empty() || !text.has_value() || m_sLine[n].text != msg || m_sLine[n].color != color)
+    {
+        m_sLine[n].text = msg;
+        m_sLine[n].color = color;
+        PrintStatusLine();
+    }
+
+    return 0;
+}
+
+bool Application::ChangeStatusLine(size_t n, stat_color color)
+{
+    if (m_sLine.empty())
+        return true;
+
+    if (m_sLine[n].color != color)
+    {
+        LOG(DEBUG) << " A::ChangeStatusLine n=" << n << " c=" << static_cast<int>(color);
+        m_sLine[n].color = color;
+        PrintStatusLine();
+    }
+
+    return true;
+}
+
+bool Application::SwapStatusLine(size_t n)
+{
+    m_sLine[n].text.swap(m_sLine[n].textAlt);
+
+    PrintStatusLine();
+    return true;
+}
+
+bool Application::ShowProgressBar(uint16_t n)
+{
+    n /= 2;
+    if (n <= 0 || n > 50)
+        return true;
+
+    pos_t y = m_wndManager.m_sizey - 1;
+
+    bool rc = m_wndManager.ColorRect(0, y, n, 1, ColorStatusLineB)
+    && PrintClock();
+
+    return rc;
+}
+
 //////////////////////////////////////////////////////////////////////////////
 bool Application::Repaint()
 {
@@ -445,374 +513,13 @@ input_t Application::ParseCommand(input_t code)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-bool Application::ChangeStatusLine(size_t n, std::optional<std::reference_wrapper<const std::string>> text, stat_color color)
+bool Application::PutMacro(input_t code)
 {
-    if (m_sLine.empty())
+    if (m_recordMacro && code != K_TIME)
+        return m_wndManager.m_console.PutMacro(code);
+    else
         return true;
-
-    auto& msg = text.has_value() ? text.value().get() : "";
-    LOG(DEBUG) << " A::ChangeStatusLine n=" << n << " '" << msg << "' c=" << static_cast<int>(color);
-
-    if (n >= m_sLine.size())
-    {
-        LOG(ERROR) << __FUNCTION__ << " error n=" << n << " > size=" << m_sLine.size();
-        return false;
-    }
-
-    if (n == 0 && m_sLine[0].color == stat_color::error && text.has_value() && color != stat_color::error)
-        //save error line until input event
-        return true;
-
-    if (m_sLine[n].text.empty() && !text.has_value())
-        return true;
-
-    if (m_sLine[n].text.empty() || !text.has_value() || m_sLine[n].text != msg || m_sLine[n].color != color)
-    {
-        m_sLine[n].text = msg;
-        m_sLine[n].color = color;
-        PrintStatusLine();
-    }
-
-    return 0;
 }
-
-
-#if 0
-
-int  Application::SetLogo(Logo* pLogo)
-{
-  return m_wndManager.SetLogo(pLogo);
-}
-
-
-int  Application::SetAccessMenu(menu* pMenu)
-{
-  int rc = 0;
-  m_pAccessMenu = pMenu;
-  if(pMenu)
-  {
-    if(m_pSLine)
-      m_wndManager.m_BottomLine = 2;
-    else
-      m_wndManager.m_BottomLine = 1;
-  }
-  else
-  {
-    if(m_pSLine)
-      m_wndManager.m_BottomLine = 1;
-    else
-      m_wndManager.m_BottomLine = 0;
-  }
-  m_wndManager.CalcView();
-
-  return rc;
-}
-
-
-int  Application::SetStatusLine(statline* pLine)
-{
-  int rc = 0;
-  m_pSLine = pLine;
-  if(pLine)
-  {
-    if(m_pAccessMenu)
-      m_wndManager.m_BottomLine = 2;
-    else
-      m_wndManager.m_BottomLine = 1;
-  }
-  else
-  {
-    if(m_pAccessMenu)
-      m_wndManager.m_BottomLine = 1;
-    else
-      m_wndManager.m_BottomLine = 0;
-  }
-  m_wndManager.CalcView();
-
-  return rc;
-}
-
-
-int  Application::Refresh()
-{
-  return m_wndManager.Refresh();
-}
-
-
-int  Application::Repaint()
-{
-  TPRINT((" A::Repaint b=%d s=%d\n",
-    m_pAccessMenu != NULL, m_pSLine != NULL));
-
-  int rc = 0;
-
-  if(m_pAccessMenu)
-  {
-    short x = 0;
-    short y = m_wndManager.m_sizey - m_wndManager.m_BottomLine;
-
-    m_wndManager.StopPaint();
-    m_wndManager.GotoXY(x, y);
-    m_wndManager.SetTextAttr(ColorAccessMenu);
-    for(menu* m = m_pAccessMenu; m->pName && x < m_wndManager.m_sizex - 1; ++m)
-    {
-      const char* pName = GetSStr(m->pName);
-      int i;
-      int n = 0;
-      for(i = 0; pName[i] && n < 8; ++i, ++x)
-      {
-        char c = pName[i];
-        if(c != '&')
-          m_wndManager.WriteChar(c);
-        else
-        {
-          m_wndManager.SetTextAttr(ColorAccessMenuB);
-          m_wndManager.WriteChar(pName[++i]);
-          m_wndManager.SetTextAttr(ColorAccessMenu);
-        }
-        ++n;
-      }
-      for(;n < 8; ++n, ++x)
-        m_wndManager.WriteChar();
-    }
-    if(x < m_wndManager.m_sizex)
-      m_wndManager.FillRect(x, y, m_wndManager.m_sizex - x, 1, ' ', ColorAccessMenu);
-    m_wndManager.BeginPaint();
-    m_wndManager.ShowBuff(0, y, m_wndManager.m_sizex, 1);
-  }
-
-  rc = PrintStatusLine();
-  rc = PrintClock(1);
-
-  return rc;
-}
-
-
-int  Application::PrintClock(int fPrint)
-{
-  if(!m_fClock)
-    return 0;
-
-  //TPRINT((" A::PrintClock\n"));
-
-  static int n = 0;
-  static time_t prevTime = 0;
-  time_t curTime = time(NULL);
-
-  if(curTime <= prevTime + 1 && !fPrint)
-    return 0;
-
-  if(curTime > prevTime + 1)
-    n = (n) ? 0 : 1;
-
-  prevTime = curTime;
-  tm Tm;
-  int rc = localtime_s(&Tm, &curTime);
-
-  char buff[32];
-  snprintf(buff, sizeof(buff) - 1, "%02d%c%02d", Tm.tm_hour, (n) ? ':' : ' ', Tm.tm_min);
-
-  short y = (m_fClock == 2) ? m_wndManager.m_sizey - 1 : 0;
-  m_wndManager.StopPaint();
-  rc = m_wndManager.GotoXY(m_wndManager.m_sizex - (short)strlen(buff), y);
-  rc = m_wndManager.SetTextAttr(ColorClock);
-  rc = m_wndManager.WriteStr(buff);
-  m_wndManager.BeginPaint();
-  rc = m_wndManager.ShowBuff(m_wndManager.m_sizex - (short)strlen(buff), y, (short)strlen(buff), 1);
-
-  return rc;
-}
-
-
-int  Application::ShowProgressBar(short n)
-{
-  n /= 2;
-  if(n <= 0 || n > 50)
-    return 0;
-
-  short y = m_wndManager.m_sizey - 1;
-
-  int rc = m_wndManager.ColorRect(0, y, n, 1, ColorStatusLineB);
-  rc = PrintClock();
-
-  return rc;
-}
-
-
-int  Application::PrintStatusLine()
-{
-  if(!m_pSLine)
-    return 0;
-
-  //TPRINT((" A::PrintStatusLine\n"));
-  short x = 0;
-  short y = m_wndManager.m_sizey - 1;
-
-  m_wndManager.StopPaint();
-  int rc = m_wndManager.GotoXY(x, y);
-
-  statline* s = m_pSLine;
-  if(s->pText)
-  {
-    if(s->color != 2)
-      rc = m_wndManager.SetTextAttr(ColorStatusLine);
-    else
-      rc = m_wndManager.SetTextAttr(ColorStatusLineB);
-    rc = m_wndManager.WriteStr(GetSStr(s->pText));
-    x += (short)strlen(GetSStr(s->pText));
-  }
-
-  //fill rest of line
-  rc = m_wndManager.SetTextAttr(ColorStatusLine);
-  rc = m_wndManager.FillRect(x, y, m_wndManager.m_sizex - x - ((m_fClock == 2) ? 5 : 0), 1, ' ', ColorStatusLine);
-
-  char buff[256] = {0};
-  short l = 0;
-  for(++s; s->pText && x < m_wndManager.m_sizex; ++s)
-  {
-    if(s->pText)
-      l += (short)snprintf(buff + l, sizeof(buff) - 1 - l, "|%s", GetSStr(s->pText));
-  }
-  if(m_fClock == 2)
-  {
-    strcat_s(buff, "|");
-    //reserv place for clock
-    l = (short)strlen(buff) + 5;
-  }
-
-  rc = m_wndManager.GotoXY(m_wndManager.m_sizex - l, y);
-  s = m_pSLine;
-  for(int i = 0; buff[i]; ++i)
-  {
-    if(buff[i] == '|')
-    {
-      ++s;
-      rc = m_wndManager.SetTextAttr(ColorStatusLineG);
-      rc = m_wndManager.WriteChar(buff[i]);
-      if(!s->color)
-        rc = m_wndManager.SetTextAttr(ColorStatusLine);
-    }
-    else
-      rc = m_wndManager.WriteChar(buff[i]);
-  }
-  m_wndManager.BeginPaint();
-  rc = m_wndManager.ShowBuff(0, y, m_wndManager.m_sizex, 1);
-
-  return rc;
-}
-
-
-int  Application::ChangeStatusLine(int n, const char* pText, color_t color)
-{
-  if(!m_pSLine)
-    return 0;
-
-  //TPRINT((" A::ChangeStatusLine n=%d %s gr=%d\n", n, GetSStr(pText), color));
-
-  if(n == 0 && m_pSLine[n].color == 2 && pText && color != 2)
-    //save error line until input event
-    return 0;
-
-  if(!m_pSLine[n].pText && !pText)
-    return 0;
-
-  if(!m_pSLine[n].pText || !pText
-  || strcmp(GetSStr(m_pSLine[n].pText), GetSStr(pText)) || m_pSLine[n].color != color)
-  {
-    if(pText)
-    {
-      strcpy_s(m_sLine, GetSStr(pText));
-      m_pSLine[n].pText = m_sLine;
-    }
-    else
-      m_pSLine[n].pText = pText;
-    m_pSLine[n].color = color;
-    PrintStatusLine();
-  }
-//  else
-//    TPRINT(("Not Changed\n"));
-
-  return 0;
-}
-
-
-int  Application::ChangeStatusLine(int n, color_t color)
-{
-  if(!m_pSLine)
-    return 0;
-
-  if(m_pSLine[n].color != color)
-  {
-    //TPRINT((" A::ChangeStatusLine n=%d gr=%d\n", n, color));
-    m_pSLine[n].color = color;
-    PrintStatusLine();
-  }
-
-  return 0;
-}
-
-
-int  Application::SwapStatusLine(int n)
-{
-  const char* pText         = m_pSLine[n].pText;
-  m_pSLine[n].pText    = m_pSLine[n].pTextAlt;
-  m_pSLine[n].pTextAlt = pText;
-
-  PrintStatusLine();
-  return 0;
-}
-
-
-int  Application::PutCode(int cmd)
-{
-  return m_Console->PutInput(cmd);
-}
-
-
-int Application::RecordMacro()
-{
-  if(!m_fRecordMacro)
-  {
-    //start record
-    m_fRecordMacro = 1;
-    m_Console->ClearMacro();
-    StatusRecordMacro(1);
-  }
-  else
-  {
-    //stop record
-    m_fRecordMacro = 0;
-    StatusRecordMacro(0);
-  }
-  return 0;
-}
-
-
-int Application::PutMacro(int cmd)
-{
-  if(m_fRecordMacro && cmd != K_TIME)
-    return m_Console->PutMacro(cmd);
-  else
-    return 0;
-}
-
-
-int Application::PlayMacro()
-{
-  return m_Console->PlayMacro();
-}
-
-int Application::SetKeyConv(int* pConv)
-{
-    if (m_pKeyConv)
-        delete m_pKeyConv;
-    m_pKeyConv = new KeyConv(pConv);
-    return 0;
-}
-
-
-
-#endif
 
 std::string Application::GetKeyName(input_t code)
 {

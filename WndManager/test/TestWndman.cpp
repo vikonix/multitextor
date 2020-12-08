@@ -56,7 +56,7 @@ Logo g_Logo {
   }
 };
 
-menu_list menu {
+menu_list menu0 {
     {MENU_ITEM,       "&File",     K_MENU + 1},
     {MENU_ITEM,       "&Edit",     K_MENU + 2},
     {MENU_ITEM,       "Bloc&k",    K_MENU + 3},
@@ -110,7 +110,7 @@ int main()
     app.SetLogo(g_Logo);
     app.WriteAppName(L"TestApp");
 
-    app.SetMenu({menu, menu1});
+    app.SetMenu({menu0, menu1});
     app.SetAccessMenu(mAccess);
     app.SetStatusLine(sLine);
     app.SetClock(clock_pos::bottom);

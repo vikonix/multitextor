@@ -594,7 +594,7 @@ bool FrameMenu::Refresh()
       && WndManager::getInstance().GotoXY(m_left + m_sizex - 1, y)
       && WndManager::getInstance().WriteChar(ACS_LRCORNER);
 
-    m_sizey = y - m_top + 1;//real size
+    m_sizey = y - m_top + 1;//real size ???
 
     WndManager::getInstance().BeginPaint();
     rc = WndManager::getInstance().ShowBuff(m_left, m_top, m_sizex, m_sizey);

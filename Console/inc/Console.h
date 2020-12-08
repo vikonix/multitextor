@@ -67,6 +67,8 @@ public:
         {return m_input.RestoreConsole();}
     bool PutInput(const input_t code)
         {return m_input.PutInput(code);}
+    bool PutMacro(const input_t code)
+        {return m_input.PutMacro(code);}
     size_t GetInputLen()
         {return m_input.GetInputLen();}
     input_t GetInput()

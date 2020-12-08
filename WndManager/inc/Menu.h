@@ -105,7 +105,7 @@ public:
 
 class FrameMenu : public Menu
 {
-    pos_t     m_realSizey{};  //real y size
+    pos_t     m_realSizey{};  //real y size ???
 
 public:
     FrameMenu() = delete;

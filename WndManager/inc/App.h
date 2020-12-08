@@ -95,8 +95,8 @@ public:
     virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  { return true; } //configuration saving
     virtual bool    LoadCfg()                                   { return true; } //configuration loading
 
-    bool Init();
-    void Deinit();
+    bool    Init();
+    void    Deinit();
     
     input_t MainProc(input_t exit_code = K_EXIT);//input treatment loop
     input_t CheckMouse(input_t code);
@@ -113,7 +113,7 @@ public:
     void    SetClock(clock_pos set = clock_pos::off) {m_clock = set;}
     bool    SetStatusLine(const sline_list& line);
     bool    ChangeStatusLine(size_t n, std::optional<std::reference_wrapper<const std::string>> text = std::nullopt, stat_color color = stat_color::normal);
-    bool    ChangeStatusLine(size_t n, color_t color);
+    bool    ChangeStatusLine(size_t n, stat_color color);
     bool    SwapStatusLine(size_t n);
     bool    ShowProgressBar(uint16_t n = 100);
     bool    SetHelpLine(std::optional<std::reference_wrapper<const std::string>> help = std::nullopt, stat_color color = stat_color::normal) {return ChangeStatusLine(0, help, color);}
@@ -124,9 +124,9 @@ public:
     bool    Repaint();
     bool    Refresh() { return m_wndManager.Refresh(); }
 
-    bool    PutCode(input_t cmd);
+    bool    PutCode(input_t code) { return m_wndManager.m_console.PutInput(code); }
     bool    RecordMacro();
-    bool    PutMacro(input_t cmd);
+    bool    PutMacro(input_t code);
     input_t PlayMacro();
     bool    IsRecordMacro() {return m_recordMacro;}
 
