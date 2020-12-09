@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Shade::Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode)
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
 
     m_x     = x;
     m_y     = y;
@@ -89,7 +89,7 @@ Shade::Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode)
 
 Shade::~Shade()
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
 
     if(m_mode & SHADE_SAVE)
         Hide();
@@ -98,7 +98,7 @@ Shade::~Shade()
 
 bool Shade::Paint()
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
 
     color_t color = ColorShade;
 
@@ -126,7 +126,7 @@ bool Shade::Paint()
 
 bool Shade::Hide()
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
 
     WndManager::getInstance().PutBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y - 1, m_pSaveT);
     WndManager::getInstance().PutBlock(m_x - 1, m_y, m_x - 1, m_y + m_sizey - 1, m_pSaveL);

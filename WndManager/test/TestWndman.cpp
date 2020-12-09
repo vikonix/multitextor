@@ -97,6 +97,30 @@ menu_list mAccess {
   {MENU_ITEM, "&F&1&0Ll"}
 };
 
+/*
+class MyApp : public Application<MyApp>
+{
+public:
+    virtual input_t AppProc(input_t code) override final 
+    { 
+        //input treatment in user function
+        LOG(DEBUG) << __FUNC__;
+        return code; 
+    } 
+    virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  override final 
+    { 
+        //configuration saving
+        LOG(DEBUG) << __FUNC__;
+        return true;
+    } 
+    virtual bool    LoadCfg()  override final 
+    { 
+        //configuration loading
+        LOG(DEBUG) << __FUNC__;
+        return true;
+    } 
+};
+*/
 
 int main()
 {
@@ -105,6 +129,7 @@ int main()
     LOG(INFO) << "Winman test";
 
     Application& app = Application::getInstance();
+    //MyApp app;
     app.Init();
 
     app.SetLogo(g_Logo);

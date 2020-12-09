@@ -32,19 +32,18 @@ bool CaptureInput::InputCapture()
 {
     if (!m_captured)
     {
-        LOG(DEBUG) << __FUNCTION__ << " " << this;
+        LOG(DEBUG) << __FUNC__ << " " << this;
         m_prevCaptured = Application::getInstance().Capture(this);
         m_captured = true;
     }
     return true;
 }
 
-
 bool CaptureInput::InputRelease()
 {
     if (m_captured)
     {
-        LOG(DEBUG) << __FUNCTION__ << " " << this;
+        LOG(DEBUG) << __FUNC__ << " " << this;
         Application::getInstance().Capture(m_prevCaptured);
         m_prevCaptured = nullptr;
         m_captured = false;
@@ -107,18 +106,18 @@ bool Wnd::CheckClientPos(pos_t x, pos_t y) const
 //////////////////////////////////////////////////////////////////////////////
 bool FrameWnd::Refresh()
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
     if (!m_visible)
         return true;
 
     bool rc = DrawBorder()
-           && Clr();
+        && Clr();
     return rc;
 }
 
 bool FrameWnd::GotoXY(pos_t x, pos_t y)
 {
-    LOG(DEBUG) << __FUNCTION__ << "x=" << x << " y=" << y;
+    LOG(DEBUG) << __FUNC__ << "x=" << x << " y=" << y;
     m_cursorx = x;
     m_cursory = y;
 

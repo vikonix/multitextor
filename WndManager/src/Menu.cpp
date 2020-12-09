@@ -36,7 +36,7 @@ input_t Menu::Close(input_t code)
     if(m_menu.empty())
         return 0;
 
-    LOG(DEBUG) << __FUNCTION__ << " k=" << std::hex << code << std::dec;
+    LOG(DEBUG) << __FUNC__ << " k=" << std::hex << code << std::dec;
 
     if(m_nextMenu)
     {
@@ -120,7 +120,7 @@ int Menu::GetPrevItem(int n)
 /////////////////////////////////////////////////////////////////////////////
 input_t LineMenu::Activate(bool capture)
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
     if (m_menu.empty())
         return 0;
   
@@ -153,7 +153,7 @@ input_t LineMenu::Close(input_t code)
 
 bool LineMenu::Refresh()
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
 
     pos_t x = m_left;
 
@@ -263,7 +263,7 @@ input_t LineMenu::EventProc(input_t code)
     if(!m_menu.empty() && code)
     {
         if(code != K_TIME)
-            LOG(DEBUG) << __FUNCTION__ << "code=" << std::hex << code << std::dec;
+            LOG(DEBUG) << __FUNC__ << "code=" << std::hex << code << std::dec;
         if(code == K_ESC)
         {
             close = true;
@@ -406,7 +406,7 @@ input_t LineMenu::EventProc(input_t code)
 /////////////////////////////////////////////////////////////////////////////
 input_t FrameMenu::Activate(bool capture)
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
     if (m_menu.empty())
         return 0;
 
@@ -470,7 +470,7 @@ input_t FrameMenu::Activate(bool capture)
 
 bool FrameMenu::Refresh()
 {
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
 
     if(m_selected != -1)
         Application::getInstance().SetHelpLine(m_menu[m_selected].helpLine);

@@ -40,7 +40,6 @@ enum class cursor_t
 {
     CURSOR_OFF          = -1,
     CURSOR_HIDE         = 0,
-    CURSOR_SHOW         = 1, //???
     CURSOR_NORMAL       = 3,
     CURSOR_OVERWRITE    = 5
 };
@@ -62,7 +61,7 @@ enum acs_t
     ACS_LLCORNER        = 6,
     ACS_TTEE            = 7,
     ACS_RTEE            = 8,
-    S_TAB               = 9, //symbol TAB
+    S_TAB               = 9,  //symbol TAB
     S_LF                = 10, //symbol LF
     ACS_LTEE            = 11,
     ACS_BTEE            = 12,
@@ -130,7 +129,7 @@ public:
     { 
         if (x >= m_sizex || y >= m_sizey)
         {
-            LOG(ERROR) << __FUNCTION__ << " x=" << x << " y=" << y;
+            LOG(ERROR) << __FUNC__ << " x=" << x << " y=" << y;
             return 0;
         }
         return m_buffer[x + y * m_sizex]; 
@@ -139,7 +138,7 @@ public:
     {
         if (x >= m_sizex || y >= m_sizey)
         {
-            LOG(ERROR) << __FUNCTION__;
+            LOG(ERROR) << __FUNC__;
             return false;
         }
         m_buffer[x + y * m_sizex] = c;

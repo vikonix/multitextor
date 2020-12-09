@@ -117,7 +117,7 @@ bool Application::ChangeStatusLine(size_t n, std::optional<std::reference_wrappe
 
     if (n >= m_sLine.size())
     {
-        LOG(ERROR) << __FUNCTION__ << " error n=" << n << " > size=" << m_sLine.size();
+        LOG(ERROR) << __FUNC__ << " error n=" << n << " > size=" << m_sLine.size();
         return false;
     }
 
@@ -238,7 +238,7 @@ bool  Application::PrintClock(bool print)
     _tm = *std::localtime(&curTime);
 #endif
 
-    //LOG(DEBUG) << __FUNCTION__ << " " << curTime;
+    //LOG(DEBUG) << __FUNC__ << " " << curTime;
 
     std::stringstream stream;
     if(curTime & 2)
@@ -265,7 +265,7 @@ bool  Application::PrintStatusLine()
     if (m_sLine.empty())
         return true;
 
-    LOG(DEBUG) << __FUNCTION__;
+    LOG(DEBUG) << __FUNC__;
     
     pos_t x = 0;
     pos_t y = m_wndManager.m_sizey - 1;

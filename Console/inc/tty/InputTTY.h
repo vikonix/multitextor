@@ -124,8 +124,8 @@ class InputTTY final: public ConsoleInput
     bool            m_fTiocLinux{false}; //linux only
     input_t         m_prevMode{K_UNUSED};   //linux only
 
-    pos_t           m_prevX {0xff};
-    pos_t           m_prevY {0xff};
+    pos_t           m_prevX { MAX_COORD };
+    pos_t           m_prevY { MAX_COORD };
     input_t         m_prevKey {0};
     clock_t         m_prevTime {0};
     bool            m_prevUp {false};

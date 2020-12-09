@@ -72,7 +72,7 @@ bool WndManager::Deinit()
 
 bool WndManager::CalcView()
 {
-    LOG(DEBUG) << __FUNCTION__ << " t=" << static_cast<int>(m_splitType);
+    LOG(DEBUG) << __FUNC__ << " t=" << static_cast<int>(m_splitType);
 
     //for dialogs
     m_view[0].left  = 0;
@@ -188,7 +188,7 @@ bool WndManager::Cls()
 
 bool WndManager::SetTextAttr(color_t color)
 {
-    //LOG(DEBUG) << __FUNCTION__ << " c=" << std::hex << color << std::dec;
+    //LOG(DEBUG) << __FUNC__ << " c=" << std::hex << color << std::dec;
     m_color = color;
     bool rc = CallConsole(SetTextAttr(color));
     return rc;
@@ -400,7 +400,7 @@ bool WndManager::WriteChar(char c)
 
 bool WndManager::WriteWChar(char16_t c)
 {
-    //LOG(DEBUG) << __FUNCTION__ << std::hex << c << std::dec;
+    //LOG(DEBUG) << __FUNC__ << std::hex << c << std::dec;
     HideCursor();
     bool rc = true;
     if (m_cursory != m_sizey - 1 || m_cursorx < m_sizex - 1)
@@ -474,7 +474,7 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
 
 bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 {
-    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd << " r=" << refresh << " v=" << view;
+    LOG(DEBUG) << __FUNC__ << " w=" << wnd << " r=" << refresh << " v=" << view;
 
     if (!view)
     {
@@ -493,7 +493,7 @@ bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 
 bool WndManager::Hide(Wnd* wnd, bool refresh)
 {
-    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd << " r=" << refresh;
+    LOG(DEBUG) << __FUNC__ << " w=" << wnd << " r=" << refresh;
 
     if (wnd == m_view[2].wnd)
     {
@@ -526,14 +526,14 @@ const View& WndManager::GetView(const Wnd* wnd) const
             view = 1;
     }
 
-    LOG(DEBUG) << __FUNCTION__ << " n=" << view;
+    LOG(DEBUG) << __FUNC__ << " n=" << view;
 
     return m_view[view];
 }
 
 bool WndManager::CloneView(const Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
 
     if (m_view[2].wnd)
     {
@@ -564,7 +564,7 @@ bool WndManager::CloneView(const Wnd* wnd)
 
 bool WndManager::AddWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
 
     //add to top
     m_wndList.push_front(wnd);
@@ -575,7 +575,7 @@ bool WndManager::AddWnd(Wnd* wnd)
 
 bool WndManager::AddLastWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
     //add to bottom
     if (m_wndList.empty())
     {
@@ -589,7 +589,7 @@ bool WndManager::AddLastWnd(Wnd* wnd)
 
 bool WndManager::DelWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
 
     //del from list
     if (wnd == m_view[2].wnd)
@@ -632,7 +632,7 @@ Wnd* WndManager::GetWnd(int n, int view)
 
 bool WndManager::SetTopWnd(int n, int view)
 {
-    LOG(DEBUG) << __FUNCTION__ << " n=" << n << " v=" <<view;
+    LOG(DEBUG) << __FUNC__ << " n=" << n << " v=" <<view;
 
     if ((n == 0 && view == 0) || (n < 0 && view != 0))
         return true;
@@ -647,7 +647,7 @@ bool WndManager::SetTopWnd(int n, int view)
 
 bool WndManager::SetTopWnd(Wnd* wnd, int view)
 {
-    LOG(DEBUG) << __FUNCTION__ << " w=" << wnd << " view=" << view;
+    LOG(DEBUG) << __FUNC__ << " w=" << wnd << " view=" << view;
     LOG(DEBUG) << "top=" << m_wndList[0] << " v2=" << m_view[2].wnd << " av=" << m_activeView;
 
     if (!wnd)

@@ -143,7 +143,7 @@ public:
 
     virtual bool                Repaint() { return true; }
     virtual bool                Invalidate(
-        [[maybe_unused]]size_t nline, [[maybe_unused]] invrect_t type, 
+        [[maybe_unused]] size_t nline, [[maybe_unused]] invrect_t type, 
         [[maybe_unused]] pos_t pos = 0, [[maybe_unused]] pos_t size = 0)
         {return true;}
 
