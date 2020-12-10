@@ -61,10 +61,11 @@ input_t Menu::Close(input_t code)
     if ((code & K_TYPEMASK) != K_RESIZE)
         Application::getInstance().SetHelpLine();
 
+    m_menu.clear();
     if(m_fMain)
     {
         WndManager::getInstance().PutInput(code);
-        Hide(0);
+        Hide(false);
         return K_CLOSE;
     }
     else
@@ -232,6 +233,11 @@ input_t LineMenu::EventProc(input_t code)
     int open{0};//open next frame menu
     int select = m_selected;
 
+    if (code == K_TIME || code == K_FOCUSLOST || code == K_FOCUSSET)
+    {
+        return 0;
+    }
+
     if(m_nextMenu)
     {
         code = m_nextMenu->EventProc(code);
@@ -262,8 +268,7 @@ input_t LineMenu::EventProc(input_t code)
 
     if(!m_menu.empty() && code)
     {
-        if(code != K_TIME)
-            LOG(DEBUG) << __FUNC__ << "code=" << std::hex << code << std::dec;
+        LOG(DEBUG) << __FUNC__ << "code=" << std::hex << code << std::dec;
         if(code == K_ESC)
         {
             close = true;
@@ -614,9 +619,14 @@ input_t FrameMenu::EventProc(input_t code)
         if(!m_nextMenu->IsActive())
         {
             LOG(DEBUG) << "next not active code=" << std::hex << code << std::dec;
-            if(code == K_ESC
-            || code == K_LEFT
-            || code == K_RIGHT)
+            if (code == 0)
+            {
+                _assert(0);//???
+                return 0;
+            }
+            else if(code == K_ESC
+                 || code == K_LEFT
+                 || code == K_RIGHT)
             {
                 m_nextMenu.release();
                 return 0;
@@ -627,7 +637,9 @@ input_t FrameMenu::EventProc(input_t code)
                 open = 1;
             }
             else
+            {
                 return Close(code);
+            }
         }
     }
 
@@ -636,20 +648,25 @@ input_t FrameMenu::EventProc(input_t code)
 
     if(!m_menu.empty() && code)
     {
-        if(code != K_TIME)
-            LOG(DEBUG) << "FrameMenu::Proc menu code=" << std::hex << code << std::dec;
-
-        if(code == K_ESC
-        || code == K_LEFT
-        || code == K_RIGHT)
+        LOG(DEBUG) << "FrameMenu::Proc menu code=" << std::hex << code << std::dec;
+        if (code == K_ESC || code == K_LEFT)
         {
-            if(!m_fMain)
+            return Close(code);
+        }
+        else if(code == K_RIGHT)
+        {
+            input_t mcode = m_menu[m_selected].code;
+            if ((mcode & K_TYPEMASK) == K_MENU && (mcode & K_CODEMASK) != 0)
+            {
+                //open next menu
+                open = 4;
+            }
+            else
                 return Close(code);
-            else if(code == K_ESC)
-                return Close(0);
         }
         else if(code == K_ENTER)
         {
+            //open next menu
             open = 4;
         }
         else if(code == K_UP)

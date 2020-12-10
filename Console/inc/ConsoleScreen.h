@@ -130,6 +130,7 @@ public:
         if (x >= m_sizex || y >= m_sizey)
         {
             LOG(ERROR) << __FUNC__ << " x=" << x << " y=" << y;
+            _assert(!"x,y");
             return 0;
         }
         return m_buffer[x + y * m_sizex]; 

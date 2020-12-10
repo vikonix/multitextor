@@ -84,16 +84,13 @@ public:
     Application(const Application&) = delete;
     void operator= (const Application&) = delete;
 
-    static Application& getInstance()
-    {
-        static Application instance;
-        return instance;
-    }
+    static Application& s_app;
+    static Application& getInstance() { return s_app; }
 
     virtual ~Application() = default;
     virtual input_t AppProc(input_t code)                       { return code; } //input treatment in user function
-    virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  { return true; } //configuration saving
     virtual bool    LoadCfg()                                   { return true; } //configuration loading
+    virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  { return true; } //configuration saving
 
     bool    Init();
     void    Deinit();

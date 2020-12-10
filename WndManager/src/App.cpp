@@ -39,7 +39,8 @@ bool Application::Init()
     if (m_inited)
         return true;
 
-    bool rc = m_wndManager.Init();
+    bool rc = LoadCfg();
+    rc = m_wndManager.Init();
     if (rc)
         m_inited = true;
     return rc;

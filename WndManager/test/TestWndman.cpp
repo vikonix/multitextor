@@ -24,10 +24,8 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#ifdef _DEBUG
-  #ifdef USE_VLD
-    #include <vld.h>
-  #endif
+#ifdef USE_VLD
+  #include <vld.h>
 #endif
 
 #include "utils/logger.h"
@@ -57,8 +55,8 @@ Logo g_Logo {
 };
 
 menu_list menu0 {
-    {MENU_ITEM,       "&File",     K_MENU + 1},
-    {MENU_ITEM,       "&Edit",     K_MENU + 2},
+    {MENU_ITEM,       "&File",     K_MENU + 1, "File menu"},
+    {MENU_ITEM,       "&Edit",     K_MENU + 2, "Edit menu"},
     {MENU_ITEM,       "Bloc&k",    K_MENU + 3},
     {MENU_ITEM,       "&Search",   K_MENU + 4},
     {MENU_ITEM,       "&Tools",    K_MENU + 5},
@@ -66,7 +64,7 @@ menu_list menu0 {
     {MENU_ITEM,       "&Help",     K_MENU + 7}
 };
 menu_list menu1 {
-    {MENU_ITEM,       "menu1",     K_MENU + 1},
+    {MENU_ITEM,       "menu1",     K_MENU + 1, "Next menu"},
     {MENU_ITEM,       "menu2",     K_F2},
     {MENU_SEPARATOR,  "menu3",     K_F3},
     {MENU_ITEM,       "menu4",     K_F4},
@@ -97,30 +95,33 @@ menu_list mAccess {
   {MENU_ITEM, "&F&1&0Ll"}
 };
 
-/*
-class MyApp : public Application<MyApp>
+class MyApp : public Application
 {
 public:
     virtual input_t AppProc(input_t code) override final 
     { 
         //input treatment in user function
-        LOG(DEBUG) << __FUNC__;
+        if(code != K_TIME)
+            LOG(DEBUG) << __FUNC__;
         return code; 
     } 
-    virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  override final 
+    virtual bool    LoadCfg()  override final
+    {
+        //configuration loading
+        LOG(DEBUG) << __FUNC__;
+        return true;
+    }
+    virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  override final
     { 
         //configuration saving
         LOG(DEBUG) << __FUNC__;
         return true;
     } 
-    virtual bool    LoadCfg()  override final 
-    { 
-        //configuration loading
-        LOG(DEBUG) << __FUNC__;
-        return true;
-    } 
 };
-*/
+
+MyApp app;
+Application& Application::s_app{app};
+
 
 int main()
 {
@@ -128,7 +129,7 @@ int main()
     LOG(INFO);
     LOG(INFO) << "Winman test";
 
-    Application& app = Application::getInstance();
+    //Application& app = Application::getInstance();
     //MyApp app;
     app.Init();
 
