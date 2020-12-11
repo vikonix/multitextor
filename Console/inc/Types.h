@@ -45,3 +45,5 @@ enum class scroll_t
     SCROLL_RIGHT = 4
 };
 
+#define MAX_COORD       0xff //maximal X Y coordinate
+

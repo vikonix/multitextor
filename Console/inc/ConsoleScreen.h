@@ -72,8 +72,6 @@ enum acs_t
     ACS_MAX             = 16
 };
 
-#define MAX_COORD       0xff //maximal X Y coordinate
-
 
 //////////////////////////////////////////////////////////////////////////////
 #define CTEXT_MASK  0x0000ffffl

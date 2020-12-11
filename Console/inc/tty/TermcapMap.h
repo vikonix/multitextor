@@ -106,9 +106,9 @@ extern KeyCap    g_keyCap[];
 extern ScreenCap g_screenCap[];
 
 #ifndef WIN32
-#include "utils/logger.h"
 
 #include <term.h>
+#include <cstdlib>
 
 class TermcapBuffer
 {
@@ -128,8 +128,6 @@ public:
 
         if (1 != tgetent(termcapBuff, term))
             return;
-
-        LOG(DEBUG) << "LoadTermcap term=" << term;
     }
 
     TermcapBuffer(const TermcapBuffer&) = delete;

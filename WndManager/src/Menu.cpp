@@ -64,7 +64,8 @@ input_t Menu::Close(input_t code)
     m_menu.clear();
     if(m_fMain)
     {
-        WndManager::getInstance().PutInput(code);
+        if(code)
+            WndManager::getInstance().PutInput(code);
         Hide(false);
         return K_CLOSE;
     }
@@ -243,19 +244,17 @@ input_t LineMenu::EventProc(input_t code)
         code = m_nextMenu->EventProc(code);
         if(!m_nextMenu->IsActive())
         {
+            m_nextMenu.reset();
             if(code == K_ESC)
             {
-                m_nextMenu.reset();
                 return 0;
             }
             else if(code == K_LEFT || code == K_RIGHT)
             {
-                m_nextMenu.reset();
                 open = 1;
             }
             else if(K_MOUSE == (code & K_MOUSE))
             {
-                m_nextMenu.reset();
                 open = 1;
             }
             else
@@ -378,7 +377,7 @@ input_t LineMenu::EventProc(input_t code)
                     if (m_nextMenu)
                     {
                         LOG(DEBUG) << "next menu close 3";
-                        m_nextMenu.release();
+                        m_nextMenu.reset();
                     }
 
                     auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);
@@ -619,6 +618,7 @@ input_t FrameMenu::EventProc(input_t code)
         if(!m_nextMenu->IsActive())
         {
             LOG(DEBUG) << "next not active code=" << std::hex << code << std::dec;
+            m_nextMenu.reset();
             if (code == 0)
             {
                 _assert(0);//???
@@ -628,12 +628,10 @@ input_t FrameMenu::EventProc(input_t code)
                  || code == K_LEFT
                  || code == K_RIGHT)
             {
-                m_nextMenu.release();
                 return 0;
             }
             else if(K_MOUSE == (code & K_MOUSE))
             {
-                m_nextMenu.release();
                 open = 1;
             }
             else
@@ -775,7 +773,7 @@ input_t FrameMenu::EventProc(input_t code)
                 if(m_nextMenu)
                 {
                     LOG(DEBUG) << "next menu close 1";
-                    m_nextMenu.release();
+                    m_nextMenu.reset();
                     open = 1;
                 }
                 Refresh();
@@ -790,7 +788,7 @@ input_t FrameMenu::EventProc(input_t code)
                     if(m_nextMenu)
                     {
                         LOG(DEBUG) << "next menu close 2";
-                        m_nextMenu.release();
+                        m_nextMenu.reset();
                     }
                     
                     auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);

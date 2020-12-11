@@ -38,9 +38,11 @@ if(MSVC)
     if(VLD)
         target_compile_definitions(${PROJECT_NAME} PUBLIC USE_VLD)
         target_include_directories(${PROJECT_NAME} PUBLIC
+            #"../../ThirdParty/inc/vld"
             "C:/Program Files (x86)/Visual Leak Detector/include"
         )
         target_link_libraries(${PROJECT_NAME} PUBLIC
+            #"../../../ThirdParty/lib/vld"
             "C:/Program Files (x86)/Visual Leak Detector/lib/Win64/vld.lib"
         )
     endif()    
