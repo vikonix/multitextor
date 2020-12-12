@@ -72,7 +72,7 @@ protected:
     std::array<View, 3> m_view {};
     std::deque<Wnd*>    m_wndList;  //windows list sorted in Z order with them activity
 
-    ScreenBuffer        m_textBuff; //current buffer color/symbol/changing
+    ScreenBuffer        m_screenBuff; //current buffer color/symbol/changing
     Logo                m_logo;
 
     color_t             m_color         {};

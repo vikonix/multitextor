@@ -43,7 +43,7 @@ bool WndManager::Init()
     LOG(INFO) << "  M::Init" << " x=" << m_sizex << " y=" << m_sizey;
     CalcView();
 
-    m_textBuff.SetSize(m_sizex, m_sizey);
+    m_screenBuff.SetSize(m_sizex, m_sizey);
 
     return true;
 }
@@ -58,12 +58,12 @@ bool WndManager::Deinit()
     m_wndList.clear();
 
     bool rc = true;
-    if (0 != m_textBuff.GetSize())
+    if (0 != m_screenBuff.GetSize())
     {
         rc = m_console.SetTextAttr(DEFAULT_COLOR)
           && m_console.ClrScr();
 
-        m_textBuff.SetSize();
+        m_screenBuff.SetSize();
     }
 
     m_console.Deinit();
@@ -119,7 +119,7 @@ bool WndManager::Refresh()
         return false;
 
     m_disablePaint = 1;
-    m_textBuff.Fill(0);
+    m_screenBuff.Fill(0);
 
     bool rc;
     if (m_logo.fillChar == 0)
@@ -254,23 +254,23 @@ bool WndManager::HideCursor()
 
 bool WndManager::ShowBuff()
 {
-    if (0 == m_textBuff.GetSize())
+    if (0 == m_screenBuff.GetSize())
         return false;
 
-    bool rc = WriteBlock(0, 0, m_sizex - 1, m_sizey - 1, m_textBuff);
+    bool rc = WriteBlock(0, 0, m_sizex - 1, m_sizey - 1, m_screenBuff);
     return rc;
 }
 
 bool WndManager::ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
 {
-    if (0 == m_textBuff.GetSize())
+    if (0 == m_screenBuff.GetSize())
         return false;
 
     bool rc = false;
     if (left < 0 || top < 0 || left + sizex > m_sizex || top + sizey > m_sizey)
         LOG(ERROR) << "  M::ShowBuff l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
     else
-        rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
+        rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff);
     return rc;
 }
 
@@ -286,7 +286,7 @@ bool WndManager::GetBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, std:
     block.clear();
     for (pos_t x = left; x <= right; ++x)
         for (pos_t y = top; y <= bottom; ++y)
-            block.push_back(m_textBuff.GetCell(x, y));
+            block.push_back(m_screenBuff.GetCell(x, y));
     return true;
 }
 
@@ -299,9 +299,9 @@ bool WndManager::PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, cons
     size_t i = 0;
     for (pos_t x = left; x <= right; ++x)
         for (pos_t y = top; y <= bottom; ++y)
-            m_textBuff.SetCell(x, y, block[i++]);
+            m_screenBuff.SetCell(x, y, block[i++]);
 
-    bool rc = WriteBlock(left, top, right, bottom, m_textBuff);
+    bool rc = WriteBlock(left, top, right, bottom, m_screenBuff);
     return rc;
 }
 
@@ -328,7 +328,7 @@ bool WndManager::WriteWStr(const std::u16string& wstr)
     }
 
     for(const auto& c : wstr)
-        m_textBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
+        m_screenBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
 
     return rc;
 }
@@ -341,9 +341,9 @@ bool WndManager::WriteColorWStr(std::u16string& str, const std::vector<color_t>&
     pos_t y = m_cursory;
     pos_t len = static_cast<pos_t>(str.size());
     for(pos_t i = 0; i < len; ++i)
-        m_textBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, color[i], str[i]));
+        m_screenBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, color[i], str[i]));
 
-    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_textBuff));
+    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff));
     return rc;
 }
 
@@ -355,7 +355,7 @@ bool WndManager::Resize(pos_t sizex, pos_t sizey)
     m_sizey = sizey;
     CalcView();
 
-    m_textBuff.SetSize(sizex, sizey);
+    m_screenBuff.SetSize(sizex, sizey);
 
     bool rc = Refresh();
     return rc;
@@ -407,11 +407,11 @@ bool WndManager::WriteWChar(char16_t c)
         rc = CallConsole(WriteChar(c));
     else
     {
-        char16_t PrevC = GET_CTEXT(m_textBuff.GetCell((size_t)m_cursorx - 1, m_cursory));
+        char16_t PrevC = GET_CTEXT(m_screenBuff.GetCell((size_t)m_cursorx - 1, m_cursory));
         rc = CallConsole(WriteLastChar(PrevC, c));
     }
 
-    m_textBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
+    m_screenBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, m_color, c));
 
     return rc;
 }
@@ -427,11 +427,11 @@ bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input
     {
         for (pos_t x = 0; x < sizex; ++x)
         {
-            m_textBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+            m_screenBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
         }
     }
 
-    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff));
+    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff));
     return rc;
 }
 
@@ -444,12 +444,12 @@ bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, colo
     {
         for (pos_t x = 0; x < sizex; ++x)
         {
-            cell_t cl = MAKE_CELL(0, color, m_textBuff.GetCell((size_t)left + x, (size_t)top + y));
-            m_textBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell((size_t)left + x, (size_t)top + y));
+            m_screenBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
         }
     }
 
-    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
+    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff);
     return rc;
 }
 
@@ -462,13 +462,13 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
     {
         for (pos_t x = 0; x < sizex; ++x)
         {
-            color_t color = COLOR_INVERSE(GET_CCOLOR(m_textBuff.GetCell((size_t)left + x, (size_t)top + y)));
-            cell_t cl = MAKE_CELL(0, color, m_textBuff.GetCell((size_t)left + x, (size_t)top + y));
-            m_textBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+            color_t color = COLOR_INVERSE(GET_CCOLOR(m_screenBuff.GetCell((size_t)left + x, (size_t)top + y)));
+            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell((size_t)left + x, (size_t)top + y));
+            m_screenBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
         }
     }
 
-    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_textBuff);
+    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff);
     return rc;
 }
 
