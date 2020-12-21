@@ -331,7 +331,7 @@ input_t Application::MainProc(input_t exit_code)
     [[maybe_unused]]bool rc = false;
     input_t iKey = 0;
 
-    while ((iKey & K_TYPEMASK) != exit_code && m_inited)
+    while ((iKey /*???& K_TYPEMASK*/) != exit_code && m_inited)
     {
         rc = m_wndManager.CheckRefresh();
 

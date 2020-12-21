@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "utils/logger.h"
 #include "App.h"
+#include "DlgControls.h"
 
 #include <iostream>
 
@@ -144,7 +145,7 @@ int main()
     app.Refresh();
     app.MainProc(K_F1);
     app.Deinit();
-
+    
     LOG(INFO) << "End";
     return 0;
 }

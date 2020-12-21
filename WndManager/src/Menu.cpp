@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "App.h"
 #include "utils/logger.h"
 
+#include <cwctype>
 
 /////////////////////////////////////////////////////////////////////////////
 input_t Menu::Close(input_t code)
@@ -200,7 +201,7 @@ bool LineMenu::Refresh()
                     WndManager::getInstance().SetTextAttr(ColorMenuBSel);
 
                 WndManager::getInstance().WriteChar(m.name[++i]);
-                m.iKey = m.name[i];//??? wc2upper(char2wchar(g_textCP, pName[i]));
+                m.iKey = std::toupper(m.name[i]);
 
                 if(n != m_selected)
                     WndManager::getInstance().SetTextAttr(ColorMenu);
@@ -294,7 +295,7 @@ input_t LineMenu::EventProc(input_t code)
         }
         else if(0 == (code & K_TYPEMASK) && 0 == (code & K_CTRL) && 0 == (code & K_ALT))
         {
-            char16_t wc = (char16_t)code;//??? wc2upper((wchar)code);
+            char16_t wc = std::towupper((char16_t)code);
             int n = 0;
             for (const auto& m : m_menu)
             {
@@ -544,7 +545,7 @@ bool FrameMenu::Refresh()
                                 WndManager::getInstance().SetTextAttr(ColorMenuBSel);
 
                             WndManager::getInstance().WriteChar(name[++i]);
-                            mi->iKey = name[i]; //??? wc2upper(char2wchar(g_textCP, pName[i]));
+                            mi->iKey = std::toupper(name[i]);
 
                             if(n != m_selected)
                                 WndManager::getInstance().SetTextAttr(ColorMenu);
@@ -685,7 +686,7 @@ input_t FrameMenu::EventProc(input_t code)
         }
         else if(0 == (code & K_TYPEMASK) && 0 == (code & K_CTRL) && 0 == (code & K_ALT))
         {
-            char16_t wc = (char16_t)code; //??? wc2upper((wchar)code);
+            char16_t wc = std::towupper((char16_t)code);
             int n = 0;
             for (auto mi = m_menu.cbegin(); mi != m_menu.cend(); ++mi, ++n)
             {

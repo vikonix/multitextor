@@ -48,7 +48,7 @@ struct menu
     int         type{};
     std::string name;
     input_t     code{};
-    std::string helpLine{};
+    std::string helpLine;
 
     input_t     iKey{};
     pos_t       x{};
