@@ -102,6 +102,8 @@ struct control
 };
 
 /////////////////////////////////////////////////////////////////////////////
+class Control;
+
 class Dialog : public FrameWnd
 {
     friend class Control;

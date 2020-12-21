@@ -60,7 +60,7 @@ public:
         , m_pos{ pos }
         , m_name{ name }
         , m_helpLine{ helpLine }
-        , m_var{ m_var }
+        , m_var{ var }
         , m_type{ type }
         , m_id{ id }
         , m_posx{ x }
@@ -89,7 +89,7 @@ public:
     virtual bool Select() { return false; }
     virtual bool LostSelect() { return false; }
     virtual bool SetName(const std::string& name) { m_name = name; return true; }
-    virtual const std::string& GetName() { return m_name; }
+    virtual const std::string_view GetName() { return m_name; }
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = MAX_COORD, pos_t sizey = MAX_COORD)
     {
         if (x != MAX_COORD)     m_posx = x;
@@ -275,10 +275,10 @@ public:
         m_list.erase(m_list.begin() + n);
         return true;
     }
-    const std::string& GetStr(size_t n)
+    const std::string_view GetStr(size_t n)
     {
         if (n >= m_list.size())
-            return {};
+            return "";
         return m_list[n];
     }
     int Clear()
@@ -313,7 +313,7 @@ public:
     virtual bool LostSelect() override;
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = MAX_COORD, pos_t sizey = MAX_COORD) override;
     virtual bool SetName(const std::string& name) override {return SetSelect(m_list.SetName(name));}
-    virtual const std::string& GetName() override;
+    virtual const std::string_view GetName() override;
 
     //control list
     size_t GetStrCount() {return m_list.GetStrCount();}
@@ -321,7 +321,7 @@ public:
     bool AppendStr(const std::string& str) { return m_list.AppendStr(str); }
     bool ChangeStr(size_t n, std::string& str) { return m_list.ChangeStr(n, str); }
     bool DelStr(size_t n) { return m_list.DelStr(n); }
-    const std::string& GetStr(size_t n) { return m_list.GetStr(n); }
+    const std::string_view GetStr(size_t n) { return m_list.GetStr(n); }
     bool Clear() { return m_list.Clear(); }
 
     int GetSelected() { return m_list.GetSelected(); }
@@ -349,7 +349,7 @@ public:
     virtual bool SetName(const std::string& name) override {m_dcursorx = m_edit.m_dcursorx; return m_edit.SetName(name);}
 
     //control edit
-    const std::string& GetName() {return m_edit.GetName();}
+    const std::string_view GetName() {return m_edit.GetName();}
 
     //control list
     size_t GetStrCount() { return m_list.GetStrCount(); }
@@ -357,7 +357,7 @@ public:
     bool AppendStr(const std::string& str) { return m_list.AppendStr(str); }
     bool ChangeStr(size_t n, std::string& str) { return m_list.ChangeStr(n, str); }
     bool DelStr(size_t n) { return m_list.DelStr(n); }
-    const std::string& GetStr(size_t n) { return m_list.GetStr(n); }
+    const std::string_view GetStr(size_t n) { return m_list.GetStr(n); }
     bool Clear() { return m_list.Clear(); }
 
     int GetSelected() { return m_list.GetSelected(); }
