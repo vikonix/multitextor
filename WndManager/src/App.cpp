@@ -192,7 +192,6 @@ bool Application::Repaint()
 
         for(const auto& m : m_accessMenu)
         {
-            const std::string name = m.name;
             size_t size = 0;
             for (size_t i = 0; i < m.name.size() && size < 8 && x < m_wndManager.m_sizex - 1; ++i, ++x, ++size)
             {
@@ -331,7 +330,7 @@ input_t Application::MainProc(input_t exit_code)
     [[maybe_unused]]bool rc = false;
     input_t iKey = 0;
 
-    while ((iKey /*???& K_TYPEMASK*/) != exit_code && m_inited)
+    while ((iKey & K_TYPEMASK) != exit_code && m_inited)
     {
         rc = m_wndManager.CheckRefresh();
 

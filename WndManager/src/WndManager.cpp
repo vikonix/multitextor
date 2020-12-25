@@ -526,7 +526,7 @@ const View& WndManager::GetView(const Wnd* wnd) const
             view = 1;
     }
 
-    LOG(DEBUG) << __FUNC__ << " n=" << view;
+    //LOG(DEBUG) << __FUNC__ << " n=" << view;
 
     return m_view[view];
 }

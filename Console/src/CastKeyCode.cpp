@@ -195,6 +195,21 @@ std::string ConsoleInput::CastKeyCode(input_t code)
         case K_EXIT:
             keyType = "Exit";
             break;
+        case K_CLOSE:
+            keyType = "Close";
+            break;
+        case K_SELECT:
+            keyType = "Select";
+            break;
+        case K_MENU:
+            keyType = "Menu";
+            break;
+        case K_CONTROL:
+            keyType = "Control";
+            break;
+        case K_REFRESH:
+            keyType = "Refresh";
+            break;
         case K_APP:
             keyType = "App";
             break;

@@ -104,14 +104,27 @@ public:
         //input treatment in user function
         if(code != K_TIME)
             LOG(DEBUG) << __FUNC__;
+        if (code == K_F2)
+        {
+            MsgBox("Title", "Str111", "Str2222222", MBOX_OK);
+            code = 0;
+        }
+        else if (code == K_F3)
+        {
+            WndManager::getInstance().PutInput(K_MENU);
+            code = 0;
+        }
+
         return code; 
     } 
+
     virtual bool    LoadCfg()  override final
     {
         //configuration loading
         LOG(DEBUG) << __FUNC__;
         return true;
     }
+
     virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  override final
     { 
         //configuration saving
@@ -144,6 +157,7 @@ int main()
     
     app.Refresh();
     app.MainProc(K_F1);
+
     app.Deinit();
     
     LOG(INFO) << "End";

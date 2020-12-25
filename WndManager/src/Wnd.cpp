@@ -286,3 +286,89 @@ bool FrameWnd::DrawBorder()
     return rc;
 }
 
+bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
+{
+    if (!m_visible)
+        return true;
+
+    if (x == MAX_COORD || y == MAX_COORD || x > GetWSizeX() || y > GetWSizeY())
+        return true;
+    
+    pos_t wleft = m_left + WndManager::getInstance().GetView(this).left + x;
+    pos_t wtop = m_top + WndManager::getInstance().GetView(this).top + y;
+    LOG(DEBUG) << "WriteWnd wx=" << x << " wy=" << y << " x=" << wleft << " y=" << wtop << " s=" << str;
+
+    bool rc = WndManager::getInstance().GotoXY(wleft, wtop);
+    rc = WndManager::getInstance().SetTextAttr(color);
+    if(str.size() < m_sizex - (wleft - m_left))
+        rc = WndManager::getInstance().WriteStr(str);
+    else
+    {
+        std::string shortStr(str, m_sizex - (wleft - m_left));
+        rc = WndManager::getInstance().WriteStr(shortStr);
+    }
+
+    return rc;
+}
+
+
+bool FrameWnd::WriteStr(pos_t x, pos_t y, const std::string& str, color_t color)
+{
+    if (!m_visible)
+        return true;
+
+    if (x == MAX_COORD || y == MAX_COORD || x > GetCSizeX() || y > GetCSizeY())
+        return true;
+
+    ClientToScreen(x, y);
+
+    bool rc = WndManager::getInstance().GotoXY(x, y);
+    rc = WndManager::getInstance().SetTextAttr(color);
+    if (str.size() < m_sizex - x)
+        rc = WndManager::getInstance().WriteStr(str);
+    else
+    {
+        std::string shortStr(str, m_sizex - x);
+        rc = WndManager::getInstance().WriteStr(shortStr);
+    }
+
+    return rc;
+}
+
+bool FrameWnd::WriteChar(pos_t x, pos_t y, char c, color_t color)
+{
+    if (!m_visible)
+        return true;
+
+    if (x == MAX_COORD || y == MAX_COORD || x > GetCSizeX() || y > GetCSizeY())
+        return true;
+
+    ClientToScreen(x, y);
+
+    bool rc = WndManager::getInstance().GotoXY(x, y);
+    rc = WndManager::getInstance().SetTextAttr(color);
+    rc = WndManager::getInstance().WriteChar(c);
+
+    return rc;
+}
+
+bool FrameWnd::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, int c, color_t color)
+{
+    if (!m_visible)
+        return true;
+
+    ClientToScreen(left, top);
+
+    bool rc = WndManager::getInstance().FillRect(left, top, sizex, sizey, c, color);
+    return rc;
+}
+
+bool FrameWnd::ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
+{
+    if (!m_visible)
+        return true;
+
+    ClientToScreen(left, top);
+    return WndManager::getInstance().ShowBuff(left, top, sizex, sizey);
+}
+

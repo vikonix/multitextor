@@ -79,16 +79,18 @@ public:
     }
     virtual ~Menu() { Close(0); }
 
-    bool    IsActive() {return !m_menu.empty();}
-    int     GetNextItem(int n);
-    int     GetPrevItem(int n);
-
     virtual input_t Close(input_t code);
     virtual input_t Activate(bool capture = false) = 0;
 
     //from Wnd class
     virtual wnd_t   GetWndType() const override {return wnd_t::menu;}
     virtual bool    Refresh() override = 0;
+
+    bool    IsActive() { return !m_menu.empty(); }
+
+protected:
+    int     GetNextItem(int n);
+    int     GetPrevItem(int n);
 };
 
 class LineMenu : public Menu

@@ -88,7 +88,7 @@ enum MBoxKey
 /////////////////////////////////////////////////////////////////////////////
 struct control
 {
-    CtrlType    type{ CTRL_END };
+    int         type{ CTRL_END };
     std::string name;
     int         id{};
     std::any    var;
@@ -106,15 +106,17 @@ class Control;
 
 class Dialog : public FrameWnd
 {
-    friend class Control;
+friend class Control;
 
 protected:
+    //first coltrol in list must be CTRL_TITLE
     std::vector<std::shared_ptr<Control>>   m_controls;
     Shade   m_Shade;
 
     int     m_activeView{};
-    int     m_selected{};
+    size_t  m_selected{};
     bool    m_saveHelpLine{};
+    int     m_mouseKey{};
 
     void    UpdateVar();
 
@@ -125,7 +127,7 @@ public:
     virtual wnd_t   GetWndType() const override {return wnd_t::dialog;}
     virtual bool    Refresh() override;
 
-    virtual input_t EventProc(input_t code);
+    virtual input_t EventProc(input_t code) override;
     virtual input_t DialogProc(input_t code) {return code;}
     virtual input_t Activate();
     virtual bool    OnActivate() {return true;}
@@ -133,22 +135,23 @@ public:
     virtual bool    OnClose([[maybe_unused]]int id) {return true;}
     virtual bool    UserPaint() {return true;}
 
+protected:
     bool    AllignButtons();
     bool    _Refresh();
 
-    int     SelectItem(size_t item);
-    int     Select(size_t n);
+    int     SelectItem(int id);
+    bool    Select(size_t n);
 
-    int     GetNextItem();
-    int     GetPrevItem();
-    int     GetNextTabItem();
-    int     GetPrevTabItem();
+    size_t  GetNextItem();
+    size_t  GetPrevItem();
+    size_t  GetNextTabItem();
+    size_t  GetPrevTabItem();
     int     GetSelectedId();
-    std::shared_ptr<Control> GetItem(size_t id);
+    std::shared_ptr<Control> GetItem(int id);
 
-    bool    CtrlRadioChecked(size_t pos);
+    bool    CtrlRadioSelect(size_t pos);
     bool    SaveHelpLine(bool save = true) {return m_saveHelpLine = save;}
 };
 
 /////////////////////////////////////////////////////////////////////////////
-int MsgBox(const std::string& title, const std::string& line1, const std::string& line2, int type);
+input_t MsgBox(const std::string& title, const std::string& line1, const std::string& line2, int type);

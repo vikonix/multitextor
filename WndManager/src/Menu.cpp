@@ -62,7 +62,6 @@ input_t Menu::Close(input_t code)
     if ((code & K_TYPEMASK) != K_RESIZE)
         Application::getInstance().SetHelpLine();
 
-    m_menu.clear();
     if(m_fMain)
     {
         if(code)
@@ -72,10 +71,10 @@ input_t Menu::Close(input_t code)
     }
     else
     {
+        m_menu.clear();
         return code;
     }
 }   
-
 
 int Menu::GetNextItem(int n)
 {
@@ -97,7 +96,6 @@ int Menu::GetNextItem(int n)
 
     return -1;
 }
-
 
 int Menu::GetPrevItem(int n)
 {
@@ -152,7 +150,6 @@ input_t LineMenu::Close(input_t code)
 
     return Menu::Close(code);
 }
-
 
 bool LineMenu::Refresh()
 {
@@ -228,7 +225,6 @@ bool LineMenu::Refresh()
     return rc;
 }
 
-
 input_t LineMenu::EventProc(input_t code)
 {
     bool close{false};//close menu
@@ -302,6 +298,7 @@ input_t LineMenu::EventProc(input_t code)
                 if ((m.type & MENU_TYPE_MASK) == MENU_ITEM
                     && wc == m.iKey)
                 {
+                    //hot key
                     select = n;
                     open = 4;
                     break;
@@ -694,6 +691,7 @@ input_t FrameMenu::EventProc(input_t code)
                     && (mi->type & MENU_DISABLED) == 0
                     && wc == mi->iKey)
                 {
+                    //hot key
                     selected = n;
                     open = 4;
                     break;

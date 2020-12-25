@@ -111,6 +111,9 @@ public:
 
 class FrameWnd : public Wnd
 {
+friend class Control;
+friend class CtrlStatic;
+
 protected:
     CmdParser       m_cmdParser;
 
@@ -165,7 +168,7 @@ public:
     bool  ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color);
     bool  WriteColor(pos_t x, pos_t y, color_t* pColor);
     bool  WriteColorStr(pos_t x, pos_t y, const std::u16string str, color_t* pColor);
-    bool  ShowBuff(pos_t left, pos_t top, pos_t, pos_t);
+    bool  ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey);
 
     void  GetWindowSize(pos_t& sizeX, pos_t& sizeY) const;
 

@@ -32,10 +32,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////
 class Control : public CaptureInput
 {
-    friend class Dialog;
+friend class Dialog;
 
 protected:
-    Dialog& m_dialog;
+    Dialog&     m_dialog;
+
     size_t      m_pos;
     std::string m_name;
     std::string m_helpLine;
@@ -70,25 +71,16 @@ public:
     {}
     virtual ~Control() = default;
 
-    virtual input_t EventProc(input_t code)
-    {
-        return code;
-    }
-    virtual bool Refresh([[maybe_unused]] CtrlState state = CTRL_NORMAL)
-    {
-        return true;
-    }
-    virtual bool UpdateVar()
-    {
-        return true;
-    }
+    virtual input_t EventProc(input_t code) { return code; }
+    virtual bool Refresh([[maybe_unused]] CtrlState state = CTRL_NORMAL) { return true; }
+    virtual bool UpdateVar() { return true; }
     virtual bool CheckMouse(pos_t x, pos_t y)
     {
         return (x >= m_posx && x < m_posx + m_sizex && y >= m_posy && y < m_posy + m_sizey);
     }
     virtual bool Select() { return false; }
     virtual bool LostSelect() { return false; }
-    virtual bool SetName(const std::string& name) { m_name = name; return true; }
+    virtual bool SetName(const std::string& name);
     virtual const std::string_view GetName() { return m_name; }
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = MAX_COORD, pos_t sizey = MAX_COORD)
     {
@@ -99,22 +91,10 @@ public:
         return true;
     }
 
-    bool SetHelpLine(const char& help)
-    {
-        m_helpLine = help; return true;
-    }
-    int  GetMode()
-    {
-        return m_type;
-    }
-    int  SetMode(int mode)
-    {
-        return m_type |= mode & CTRL_STATE_MASK;
-    }
-    int  ResetMode(int mode)
-    {
-        return m_type &= ~(mode & CTRL_STATE_MASK);
-    }
+    bool SetHelpLine(const char& help) { m_helpLine = help; return true; }
+    int  GetMode() { return m_type; }
+    int  SetMode(int mode) { return m_type |= mode & CTRL_STATE_MASK; }
+    int  ResetMode(int mode) { return m_type &= ~(mode & CTRL_STATE_MASK); }
 
     bool Paint(const std::string& str, int type);
 
@@ -131,24 +111,24 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class CtrlStatic : public Control
 {
-    friend class Dialog;
+friend class Dialog;
 
 public:
-    CtrlStatic(Dialog& dialog, const control& control);
+    CtrlStatic(Dialog& dialog, const control& control, size_t pos);
 
     virtual input_t EventProc(input_t code) override {return code;}
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
-    virtual bool SetName(const std::string& pName) override;
+    virtual bool SetName(const std::string& name) override;
 };
 
 
 /////////////////////////////////////////////////////////////////////////////
 class CtrlButton : public Control
 {
-    friend class Dialog;
+friend class Dialog;
 
 public:
-    CtrlButton(Dialog& dialog, const control& control);
+    CtrlButton(Dialog& dialog, const control& control, size_t pos);
 
   virtual input_t EventProc(input_t code) override;
   virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -158,12 +138,12 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class CtrlCheck : public Control
 {
-    friend class Dialog;
+friend class Dialog;
 
     bool m_checked;
 
 public:
-    CtrlCheck(Dialog& dialog, const control& control);
+    CtrlCheck(Dialog& dialog, const control& control, size_t pos);
 
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -176,13 +156,13 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class CtrlRadio : public Control
 {
-    friend class Dialog;
+friend class Dialog;
 
-    int  m_index;
+    size_t m_index;
     bool m_checked;
 
 public:
-    CtrlRadio(Dialog& pDialog, const control& pControl, int index);
+    CtrlRadio(Dialog& dialog, const control& control, size_t pos, size_t index);
 
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -195,10 +175,10 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class CtrlGroup : public Control
 {
-    friend class Dialog;
+friend class Dialog;
 
 public:
-    CtrlGroup(Dialog& dialog, const control& control);
+    CtrlGroup(Dialog& dialog, const control& control, size_t pos);
 
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -207,8 +187,8 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class CtrlEdit : public Control
 {
-    friend class Dialog;
-    friend class CtrlEditDropList;
+friend class Dialog;
+friend class CtrlEditDropList;
 
     pos_t m_pos;
     pos_t m_beginSel;
@@ -217,7 +197,7 @@ class CtrlEdit : public Control
     pos_t EndSelect(bool del = false);//false-unselect true-del
 
 public:
-    CtrlEdit(Dialog& dialog, const control& control);
+    CtrlEdit(Dialog& dialog, const control& control, size_t pos);
 
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -228,9 +208,9 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class CtrlList : public Control
 {
-    friend class Dialog;
-    friend class CtrlDropList;
-    friend class CtrlEditDropList;
+friend class Dialog;
+friend class CtrlDropList;
+friend class CtrlEditDropList;
 
     int     m_selected{};
     int     m_firstLine{};//signed
@@ -240,7 +220,7 @@ class CtrlList : public Control
 public:
     std::vector<std::string> m_list;
 
-    CtrlList(Dialog& dialog, const control& control);
+    CtrlList(Dialog& dialog, const control& control, size_t pos);
     virtual ~CtrlList();
 
     virtual input_t EventProc(input_t code) override;
@@ -303,7 +283,7 @@ class CtrlDropList : public Control
     int       m_selected{};
 
 public:
-    CtrlDropList(Dialog& dialog, const control& control);
+    CtrlDropList(Dialog& dialog, const control& control, size_t pos);
 
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -337,7 +317,7 @@ class CtrlEditDropList : public Control
     bool        m_listOpened{};
 
 public:
-    CtrlEditDropList(Dialog& dialog, const control& control);
+    CtrlEditDropList(Dialog& dialog, const control& control, size_t pos);
 
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -349,7 +329,7 @@ public:
     virtual bool SetName(const std::string& name) override {m_dcursorx = m_edit.m_dcursorx; return m_edit.SetName(name);}
 
     //control edit
-    const std::string_view GetName() {return m_edit.GetName();}
+    const std::string_view GetName() override {return m_edit.GetName();}
 
     //control list
     size_t GetStrCount() { return m_list.GetStrCount(); }
@@ -367,7 +347,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class CtrlColor : public Control
 {
-    friend class Dialog;
+friend class Dialog;
 
     color_t m_nColor{};
     size_t  m_nMaxColor{16};
@@ -376,7 +356,7 @@ class CtrlColor : public Control
     int PaintSelect(bool vis = 1, bool sel = 0);
 
 public:
-    CtrlColor(Dialog& dialog, const control& control);
+    CtrlColor(Dialog& dialog, const control& control, size_t pos);
 
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
@@ -387,6 +367,3 @@ public:
     size_t SetMaxColor(size_t max) {return m_nMaxColor = max;}
 };
 
-
-/////////////////////////////////////////////////////////////////////////////
-int MsgBox(const std::string& title, const std::string& line1, const std::string& line2, int type);
