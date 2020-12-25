@@ -72,11 +72,11 @@ Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
         case CTRL_LINE:
             m_controls.push_back(std::make_shared<CtrlStatic>(*this, control, pos));
             break;
-/*
         case CTRL_DEFBUTTON:
         case CTRL_BUTTON:
             m_controls.push_back(std::make_shared<CtrlButton>(*this, control, pos));
             break;
+/*
         case CTRL_CHECK:
             m_controls.push_back(std::make_shared<CtrlCheck>(*this, control, pos));
             break;
@@ -639,7 +639,7 @@ input_t Dialog::EventProc(input_t code)
     if(refresh)
         _Refresh();
 
-    return true;
+    return code;
 }
 
 bool Dialog::CtrlRadioSelect(size_t pos)
@@ -724,7 +724,6 @@ input_t MsgBox(const std::string& title, const std::string& line1, const std::st
     ++it;
     ++it;
     ++it;
-it->type = 0;//???
     ++it;
     switch(type)
     {

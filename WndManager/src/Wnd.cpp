@@ -117,7 +117,7 @@ bool FrameWnd::Refresh()
 
 bool FrameWnd::GotoXY(pos_t x, pos_t y)
 {
-    LOG(DEBUG) << __FUNC__ << "x=" << x << " y=" << y;
+    LOG(DEBUG) << __FUNC__ << " x=" << x << " y=" << y;
     m_cursorx = x;
     m_cursory = y;
 

@@ -130,8 +130,8 @@ friend class Dialog;
 public:
     CtrlButton(Dialog& dialog, const control& control, size_t pos);
 
-  virtual input_t EventProc(input_t code) override;
-  virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
+    virtual input_t EventProc(input_t code) override;
+    virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
 };
 
 

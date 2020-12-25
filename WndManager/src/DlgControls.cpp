@@ -1,3 +1,29 @@
+/*
+FreeBSD License
+
+Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #include "DlgControls.h"
 #include "ConsoleScreen.h"
 #include "utils/logger.h"
@@ -66,7 +92,7 @@ CtrlStatic::CtrlStatic(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlStatic::Refresh([[maybe_unused]]CtrlState state)
 {
-    LOG(DEBUG) << "     CtrlStatic::Refresh id=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "     CtrlStatic::Refresh pos=" << m_pos << " name=" << m_name;
     color_t color;
 
     if((m_type & CTRL_TYPE_MASK) == CTRL_TITLE)
@@ -143,60 +169,59 @@ bool CtrlStatic::SetName(const std::string& name)
     return true;
 }
 
-#if 0
 /////////////////////////////////////////////////////////////////////////////
-CtrlButton::CtrlButton(Dialog* pDialog, control* pControl)
- : Control(pDialog, pControl->type, pControl->pName, pControl->pVar, pControl->id
-   , pControl->x, pControl->y, (short)strlen(GetSStr(pControl->pName)), 1, pControl->pHelpLine)
+CtrlButton::CtrlButton(Dialog& dialog, const control& control, size_t pos)
+    : Control(dialog, pos, control.type, control.name, control.var, control.id
+        , control.x, control.y, (pos_t)control.name.size(), 1, control.helpLine)
 {
-  if(strchr(m_pName, '&'))//&
-    --m_sizex;
+    if(m_name.find('&') != std::string::npos)
+        --m_sizex;
 
-  if((m_nType & CTRL_TYPE_MASK) == CTRL_BUTTON)
-  {
-    m_dcursorx = 2;
-    m_sizex += m_nAddSize = 4;
+    if((m_type & CTRL_TYPE_MASK) == CTRL_BUTTON)
+    {
+        m_dcursorx = 2;
+        m_sizex += m_addSize = 4;
 
-  }
-  else
-  {
-    m_dcursorx = 3;
-    m_sizex += m_nAddSize = 6;
-  }
+    }
+    else
+    {
+        m_dcursorx = 3;
+        m_sizex += m_addSize = 6;
+    }
 }
 
 
-int CtrlButton::Refresh(int type)
+bool CtrlButton::Refresh(CtrlState state)
 {
-  //TPRINT(("     CtrlButton::Refresh id=%d name=%s\n", m_nId, m_pName));
-  char buff[128];
-  if((m_nType & CTRL_TYPE_MASK) == CTRL_BUTTON)
-    sprintf_s(buff, sizeof(buff), "[ %s ]", m_pName);
-  else
-    sprintf_s(buff, sizeof(buff), "[_ %s _]", m_pName);
+    LOG(DEBUG) << "     CtrlButton::Refresh pos=" << m_pos << " name=" << m_name;
+    std::string name;
+    if((m_type & CTRL_TYPE_MASK) == CTRL_BUTTON)
+        name = "[ " + m_name + " ]";
+    else
+        name = "[_ " + m_name + " _]";
 
-  Paint(buff, type | (m_nType & CTRL_STATE_MASK));
+    Paint(name, state | (m_type & CTRL_STATE_MASK));
 
-  return 0;
+    return true;
 }
 
 
-int CtrlButton::EventProc(int code)
+input_t CtrlButton::EventProc(input_t code)
 {
-  if(code == K_SPACE
-  || code == K_ENTER)
-  {
-    return m_nId;
-  }
-  else if(code & K_MOUSE)
-  {
-    if((code & K_TYPEMASK) == K_MOUSEKUP)
-      return m_nId;
-  }
+    if(code == K_SPACE || code == K_ENTER)
+    {
+        return m_id;
+    }
+    else if(code & K_MOUSE)
+    {
+        if((code & K_TYPEMASK) == K_MOUSEKUP)
+            return m_id;
+    }
 
-  return code;
+    return code;
 }
 
+#if 0
 
 /////////////////////////////////////////////////////////////////////////////
 CtrlCheck::CtrlCheck(Dialog* pDialog, control* pControl)

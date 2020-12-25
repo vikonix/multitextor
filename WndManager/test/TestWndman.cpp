@@ -106,13 +106,11 @@ public:
             LOG(DEBUG) << __FUNC__;
         if (code == K_F2)
         {
-            MsgBox("Title", "Str111", "Str2222222", MBOX_OK);
-            code = 0;
+            code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK);
         }
         else if (code == K_F3)
         {
-            WndManager::getInstance().PutInput(K_MENU);
-            code = 0;
+            code = WndManager::getInstance().PutInput(K_MENU);
         }
 
         return code; 
