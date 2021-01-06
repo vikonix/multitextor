@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -61,13 +61,14 @@ enum CtrlState
     CTRL_NOCOLOR    =      2,
     CTRL_HIDE       =      5,
     CTRL_SELECTED   =      8,
-    CTRL_STATE_MASK = 0x000f
+    CTRL_SORTED     =   0x10, 
+    CTRL_STATE_MASK = 0x001f
 };
 
 enum CtrlAlign
 {
-    CTRL_ALIGN_LEFT = 0x0010,
-    CTRL_ALIGN_MASK = 0x00f0
+    CTRL_ALIGN_LEFT = 0x0080,
+    CTRL_ALIGN_MASK = 0x0080
 };
 
 enum CtrlDefId
@@ -98,7 +99,7 @@ struct control
     pos_t       sizex{};
     pos_t       sizey{};
 
-    std::string helpLine;
+    std::string helpLine{};
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -107,6 +108,10 @@ class Control;
 class Dialog : public FrameWnd
 {
 friend class Control;
+friend class CtrlRadio;
+friend class CtrlGroup;
+friend class CtrlList;
+friend class CtrlColor;
 
 protected:
     //first coltrol in list must be CTRL_TITLE

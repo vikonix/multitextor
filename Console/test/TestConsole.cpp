@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without

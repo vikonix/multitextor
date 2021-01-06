@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -127,8 +127,8 @@ class InputTTY final: public ConsoleInput
     pos_t           m_prevX { MAX_COORD };
     pos_t           m_prevY { MAX_COORD };
     input_t         m_prevKey {0};
-    clock_t         m_prevTime {0};
     bool            m_prevUp {false};
+    std::chrono::steady_clock::time_point m_prevTime {};
 
 public:
     InputTTY() = default;

@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -101,9 +101,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define K_Y_MASK    0x000000ff //mouse y coord/ window y size
 
 #define K_MAKE_COORD_CODE(k, x, y) ((k) | ((x) << 8) | (y))
-#define K_GET_X(k)      (((k) & K_X_MASK) >> 8)
-#define K_GET_Y(k)      ((k) & K_Y_MASK)
-#define K_GET_CODE(k)   ((k) & K_CODEMASK)
+#define K_GET_X(k)      (pos_t)(((k) & K_X_MASK) >> 8)
+#define K_GET_Y(k)      (pos_t)((k) & K_Y_MASK)
+#define K_GET_CODE(k)   (char16_t)((k) & K_CODEMASK)
 
 /*
                  Linux            PuTTY             XTrem

@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -131,10 +131,12 @@ public:
             _assert(!"x,y");
             return 0;
         }
+        //LOG(DEBUG) << "get x=" << x << " y=" << y << " c=" << std::hex << m_buffer[x + y * m_sizex] << std::dec;
         return m_buffer[x + y * m_sizex]; 
     }
     bool SetCell(size_t x, size_t y, cell_t c)
     {
+        //LOG(DEBUG) << "set x=" << x << " y=" << y << " c=" << std::hex << c << std::dec;
         if (x >= m_sizex || y >= m_sizey)
         {
             LOG(ERROR) << __FUNC__;

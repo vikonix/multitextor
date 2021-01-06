@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "App.h"
 #include "DlgControls.h"
+#include "Dialogs/StdDialogs.h"
 
 #include <iostream>
 
@@ -84,16 +85,16 @@ sline_list sLine {
 
 /////////////////////////////////////////////////////////////////////////////
 menu_list mAccess {
-  {MENU_ITEM, "&F&1Help"},
-  {MENU_ITEM, "&F&2Aa"},
-  {MENU_ITEM, "&F&3Bb"},
-  {MENU_ITEM, "&F&4Cc"},
-  {MENU_ITEM, "&F&5Dd"},
-  {MENU_ITEM, "&F&6Ee"},
-  {MENU_ITEM, "&F&7Ff"},
-  {MENU_ITEM, "&F&8Gg"},
-  {MENU_ITEM, "&F&9Hh"},
-  {MENU_ITEM, "&F&1&0Ll"}
+  {MENU_ITEM, "&F&1Exit"},
+  {MENU_ITEM, "&F&2Menu"},
+  {MENU_ITEM, "&F&3DlgBox"},
+  {MENU_ITEM, "&F&4"},
+  {MENU_ITEM, "&F&5"},
+  {MENU_ITEM, "&F&6"},
+  {MENU_ITEM, "&F&7"},
+  {MENU_ITEM, "&F&8"},
+  {MENU_ITEM, "&F&9"},
+  {MENU_ITEM, "&F&1&0"}
 };
 
 class MyApp : public Application
@@ -104,13 +105,16 @@ public:
         //input treatment in user function
         if(code != K_TIME)
             LOG(DEBUG) << __FUNC__;
+
         if (code == K_F2)
         {
-            code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK);
+            code = WndManager::getInstance().PutInput(K_MENU);
         }
         else if (code == K_F3)
         {
-            code = WndManager::getInstance().PutInput(K_MENU);
+            //code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK_CANCEL_IGNORE);
+            FileDialog dlg{ FileDlgMode::Open };
+            dlg.Activate();
         }
 
         return code; 
@@ -157,7 +161,7 @@ int main()
     app.MainProc(K_F1);
 
     app.Deinit();
-    
+
     LOG(INFO) << "End";
     return 0;
 }

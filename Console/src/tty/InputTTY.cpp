@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -362,17 +362,19 @@ input_t InputTTY::ProcessMouse(pos_t x, pos_t y, input_t k)
     input_t iMType = 0;
     bool prevUp = m_prevUp;
     
+    //LOG(DEBUG) << __FUNC__ << " prevup=" << prevUp;
     if(k == K_MOUSEKUP)
         m_prevUp = true;
     else
     {
         m_prevUp = false;
         
-        const clock_t waitTicks = 500;
-        clock_t t = clock();
-        //LOG(DEBUG) << "dt=" << t - m_prevTime << " c=" << waitTicks;
+        const std::chrono::milliseconds waitTicks {500ms};
+        auto t = std::chrono::steady_clock::now();
+        auto dtms = std::chrono::duration_cast<std::chrono::milliseconds>(t - m_prevTime);
+        //LOG(DEBUG) << "dt=" << dtms.count() << " c=" << waitTicks.count();
 
-        if((m_prevKey & K_TYPEMASK) == k && m_prevX == x && m_prevY == y && m_prevTime + waitTicks > t)
+        if((m_prevKey & K_TYPEMASK) == k && m_prevX == x && m_prevY == y && dtms < waitTicks)
         {
             if(prevUp)
                 switch(m_prevKey & K_MODMASK)
@@ -537,9 +539,6 @@ void InputTTY::ProcessInput(bool fMouse)
             default: key = K_ERROR; break;
             }
 
-            if((m_prevKey & K_TYPEMASK) == key && m_prevX == x && m_prevY == y)
-                return;
-                
             input_t iMType = 0;
 
             if((k & K_MOUSEW) == 0)

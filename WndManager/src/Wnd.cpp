@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -300,7 +300,7 @@ bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
 
     bool rc = WndManager::getInstance().GotoXY(wleft, wtop);
     rc = WndManager::getInstance().SetTextAttr(color);
-    if(str.size() < m_sizex - (wleft - m_left))
+    if((pos_t)str.size() < m_sizex - (wleft - m_left))
         rc = WndManager::getInstance().WriteStr(str);
     else
     {
@@ -324,13 +324,7 @@ bool FrameWnd::WriteStr(pos_t x, pos_t y, const std::string& str, color_t color)
 
     bool rc = WndManager::getInstance().GotoXY(x, y);
     rc = WndManager::getInstance().SetTextAttr(color);
-    if (str.size() < m_sizex - x)
-        rc = WndManager::getInstance().WriteStr(str);
-    else
-    {
-        std::string shortStr(str, m_sizex - x);
-        rc = WndManager::getInstance().WriteStr(shortStr);
-    }
+    rc = WndManager::getInstance().WriteStr(str);
 
     return rc;
 }

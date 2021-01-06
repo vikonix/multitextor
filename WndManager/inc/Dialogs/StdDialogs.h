@@ -25,26 +25,26 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
+#include "Dialog.h"
 
-#include "Types.h"
-
-#include <list>
-#include <vector>
-
-
-class CmdParser final
+enum class FileDlgMode
 {
-    std::vector<std::list<input_t>> m_keyMap;
-    std::vector<std::list<input_t>> m_cmdMap;
+    Open,
+    Load,
+    Save
+};
 
-    std::list<input_t>  m_outCommands;
-    std::list<input_t>  m_savedKeys;
+class FileDialog : public Dialog
+{
+    FileDlgMode m_mode;
 
 public:
-    CmdParser() = default;
+    FileDialog(FileDlgMode mode, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
-    bool    IsInited() const;
-    bool    SetCmdMap(const input_t* cmdMap);
-    int     ScanKey(input_t key);
-    input_t GetCommand();
+    //virtual input_t DialogProc(input_t code) override;
+    bool OnActivate();
+    //bool OnClose(int id);
+
+protected:
+    //bool ReadDir();
 };

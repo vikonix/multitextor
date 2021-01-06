@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -285,19 +285,24 @@ bool ScreenTTY::SetTextAttr(color_t color)
     if(m_stdout <= 0)
         return false;
 
-    LOG(DEBUG) << "SetTextAttr " << color;
+    //LOG(DEBUG) << "SetTextAttr " << std::hex << color << std::dec;
     bool rc = true;
 
-    if(color & TEXT_BRIGHT)
-        rc = _WriteStr(m_cap[S_ColorBold].str);
-    if((color & TEXT_BRIGHT) == 0)
-        rc = _WriteStr(m_cap[S_Normal].str);
-
-    if(!m_cap[S_SetTextColor].str.empty())
-        rc = _WriteStr(tgoto(m_cap[S_SetTextColor].str.c_str(), 0, COLOR_CHANGE(TEXT_COLOR(color))));
-
-    if(!m_cap[S_SetFonColor].str.empty())
-        rc = _WriteStr(tgoto(m_cap[S_SetFonColor].str.c_str(), 0, COLOR_CHANGE(FON_COLOR(color))));
+    if((color & TEXT_BRIGHT) != (m_color & TEXT_BRIGHT))
+    {
+        if((color & TEXT_BRIGHT) == 0)
+            rc = _WriteStr(m_cap[S_Normal].str);
+        else
+            rc = _WriteStr(m_cap[S_ColorBold].str);
+    }
+    
+    if(TEXT_COLOR(color) != TEXT_COLOR(m_color) || FON_COLOR(color) != FON_COLOR(m_color))
+    {
+        if(!m_cap[S_SetTextColor].str.empty())
+            rc = _WriteStr(tgoto(m_cap[S_SetTextColor].str.c_str(), 0, COLOR_CHANGE(TEXT_COLOR(color))));
+        if(!m_cap[S_SetFonColor].str.empty())
+            rc = _WriteStr(tgoto(m_cap[S_SetFonColor].str.c_str(), 0, COLOR_CHANGE(FON_COLOR(color))));
+    }
 
     m_color = color;
     return rc;
@@ -327,6 +332,7 @@ bool ScreenTTY::Flush()
     }
 
     LOG(DEBUG) << "Flush buff size=" << m_OutBuff.size() << "->" << rc;
+    //LOG(DEBUG) << m_OutBuff;
     m_OutBuff.clear();
 
     return rc > 0;
@@ -444,7 +450,7 @@ bool ScreenTTY::WriteLastChar(char16_t prevC, char16_t lastC)
     if(m_stdout <= 0)
         return false;
 
-    LOG(DEBUG) << "WriteLastChar " << std::hex << prevC << " " << lastC << std::dec;
+    //LOG(DEBUG) << "WriteLastChar " << std::hex << prevC << " " << lastC << std::dec;
 
     bool rc = GotoXY(m_sizex - 2, m_sizey - 1)
     && WriteChar(lastC)
@@ -637,7 +643,7 @@ bool ScreenTTY::WriteBlock(
         {
             cell_t c = block.GetCell(xoffset + x, yoffset + y);
             color_t a = GET_CCOLOR(c);
-            char16_t t = GET_CTEXT(c);
+            char16_t ch = GET_CTEXT(c);
             if(color != a)
             {
                 //LOG(DEBUG) << "x=" << x << " y=" << y << " a=" << std::hex << a << std::dec;
@@ -645,7 +651,8 @@ bool ScreenTTY::WriteBlock(
                 color = a;
             }
             
-            rc = _WriteWChar(t);
+            //LOG(DEBUG) << "x=" << x << " y=" << y << " ch=" << std::hex << ch << std::dec;
+            rc = _WriteWChar(ch);
             
             if(fLast && y == sizey - 1 && x == sizex - 2)
                 break;

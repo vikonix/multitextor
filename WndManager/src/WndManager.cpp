@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -189,6 +189,7 @@ bool WndManager::Cls()
 bool WndManager::SetTextAttr(color_t color)
 {
     //LOG(DEBUG) << __FUNC__ << " c=" << std::hex << color << std::dec;
+    _assert(TEXT_COLOR(color) != FON_COLOR(color));
     m_color = color;
     bool rc = CallConsole(SetTextAttr(color));
     return rc;
@@ -307,6 +308,7 @@ bool WndManager::PutBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, cons
 
 bool WndManager::WriteStr(const std::string& str)
 {
+    //LOG(DEBUG) << __FUNC__ << " '" << str << "' x=" << m_cursorx << " y=" << m_cursory << " c=" << m_color << " p=" << !m_disablePaint;
     std::u16string wstr = utf8::utf8to16(str);
     return WriteWStr(wstr);
 }

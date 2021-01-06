@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -76,18 +76,17 @@ Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
         case CTRL_BUTTON:
             m_controls.push_back(std::make_shared<CtrlButton>(*this, control, pos));
             break;
-/*
         case CTRL_CHECK:
             m_controls.push_back(std::make_shared<CtrlCheck>(*this, control, pos));
             break;
         case CTRL_RADIO:
             m_controls.push_back(std::make_shared<CtrlRadio>(*this, control, pos, nRadioIndex++));
             break;
-        case CTRL_EDIT:
-            m_controls.push_back(std::make_shared<CtrlEdit>(*this, control, pos));
-            break;
         case CTRL_GROUP:
             m_controls.push_back(std::make_shared<CtrlGroup>(*this, control, pos));
+            break;
+        case CTRL_EDIT:
+            m_controls.push_back(std::make_shared<CtrlEdit>(*this, control, pos));
             break;
         case CTRL_LIST:
             m_controls.push_back(std::make_shared<CtrlList>(*this, control, pos));
@@ -101,8 +100,8 @@ Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
         case CTRL_COLOR:
             m_controls.push_back(std::make_shared<CtrlColor>(*this, control, pos));
             break;
-*/
-            default:
+
+        default:
             LOG(ERROR) << "Bad dialog control " << std::hex << control.type << std::dec;
             break;
         }
@@ -417,8 +416,8 @@ int Dialog::SelectItem(int id)
 
 bool Dialog::Select(size_t n)
 {
-    m_controls[m_selected]->LostSelect();
-    bool rc = m_controls[n]->Select();
+    m_controls[m_selected]->LostFocus();
+    bool rc = m_controls[n]->SetFocus();
     m_selected = n;
 
     return rc;
@@ -497,12 +496,6 @@ input_t Dialog::EventProc(input_t code)
 
     LOG(DEBUG) << "    Dialog::EventProc " << std::hex << code << std::dec;
     size_t n = m_selected;
-    bool radioChecked{false};
-    if((m_controls[m_selected]->m_type & CTRL_TYPE_MASK) == CTRL_RADIO)
-    {
-        //save previous radio button state
-        radioChecked = dynamic_cast<CtrlRadio*>(m_controls[m_selected].get())->m_checked;
-    }
 
     if(code & K_MOUSE)
     {
@@ -708,15 +701,15 @@ input_t MsgBox(const std::string& title, const std::string& line1, const std::st
 
     std::list<control> MBox 
     {
-    /*0*/ {CTRL_TITLE,                       title,    0,         NULL,  1, 0, len + 4, 8},
+    /*0*/ {CTRL_TITLE,                       title,    0,         nullptr,  1, 0, (pos_t)(len + 4), 8},
 
-    /*1*/ {CTRL_STATIC,                      line1,    0,         NULL,  1, 1, len1},
-    /*2*/ {CTRL_STATIC,                      line2,    0,         NULL,  1, 2, len2},
-    /*3*/ {CTRL_LINE,                        "",       0,         NULL,  1, 4, len},
+    /*1*/ {CTRL_STATIC,                      line1,    0,         nullptr,  1, 1, len1},
+    /*2*/ {CTRL_STATIC,                      line2,    0,         nullptr,  1, 2, len2},
+    /*3*/ {CTRL_LINE,                        "",       0,         nullptr,  1, 4, len},
 
-    /*4*/ {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT, "OK",     ID_OK,     NULL,  1, 5},
-    /*5*/ {CTRL_BUTTON | CTRL_ALIGN_LEFT,    "Cancel", ID_CANCEL, NULL,  2, 5},
-    /*6*/ {CTRL_BUTTON | CTRL_ALIGN_LEFT,    "Ignore", ID_IGNORE, NULL,  3, 5}
+    /*4*/ {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT, "OK",     ID_OK,     nullptr,  1, 5},
+    /*5*/ {CTRL_BUTTON | CTRL_ALIGN_LEFT,    "Cancel", ID_CANCEL, nullptr,  2, 5},
+    /*6*/ {CTRL_BUTTON | CTRL_ALIGN_LEFT,    "Ignore", ID_IGNORE, nullptr,  3, 5}
     };
 
     auto it {MBox.begin()};

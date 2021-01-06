@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -361,6 +361,7 @@ input_t Application::MainProc(input_t exit_code)
         }
         else
         {
+            //LOG(DEBUG) << __FUNC__ << " key=" << std::hex << iKey << std::dec;
             if (!(iKey & K_RESIZE) && !((iKey & K_TYPEMASK) == K_RELEASE)
                 && !m_sLine.empty() && m_sLine[0].color != stat_color::normal)
             {
