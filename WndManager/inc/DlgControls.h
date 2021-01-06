@@ -200,7 +200,7 @@ public:
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
     virtual bool UpdateVar() override;
     virtual bool SetFocus() override;
-    virtual bool SetName(const std::string& name);
+    virtual bool SetName(const std::string& name) override;
 };
 
 /////////////////////////////////////////////////////////////////////////////
