@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.9)
 set(PROJECT_NAME ThirdPartyLib)
 project(${PROJECT_NAME})
 
-file(GLOB_RECURSE _LIB_INC "inc/*.h")
+file(GLOB_RECURSE _LIB_INC "inc/*.h*")
 file(GLOB_RECURSE _LIB_SRC "src/*.c*")
 
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_LIB_INC})

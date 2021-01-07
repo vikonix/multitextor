@@ -1,7 +1,32 @@
-#if 0
-#ifndef __DIR_H__
-#define __DIR_H__
+#pragma once
+#include <filesystem>
 
+/////////////////////////////////////////////////////////////////////////////
+class Directory
+{
+    static std::string      m_runPath;
+    static std::string      m_name;
+    
+    std::filesystem::path   m_path;
+
+public:
+    Directory(const std::string& );
+    ~Directory();
+
+    std::string         GetPath();
+
+    static bool         SetCurDir(const std::string& path);
+    static bool         SetProjectName(const std::string& name);
+    
+    static std::string  GetRunPath() { return m_runPath; }
+    static std::string  GetCurPath();
+    static std::string  GetTmpPath();
+    static std::string  GetCfgPath();
+    static std::string  GetSysCfgPath();
+    static std::string  GetUserName();
+};
+
+#if 0
 #ifndef _WIN32
   #include <dirent.h>
   #include <limits.h>
@@ -41,57 +66,6 @@ struct FileInfo : public FInfo {
 };
 
 
-/////////////////////////////////////////////////////////////////////////////
-class SDir
-{
-  static char           m_SelfPath[];
-  static char           m_RunPath[];
-  static const char*    m_pName;
-
-  char*                 m_pPath;
-
-#ifdef _WIN32
-  HANDLE                m_hFind;
-#else
-  DIR*                  m_pDir;
-#endif
-  int                   m_nFound;
-
-public:
-  SDir(const char* pPath = NULL);
-  ~SDir();
-
-  int                   FindFirst(FileInfo* pInfo);
-  int                   FindNext(FileInfo* pInfo);
-  int                   FindClose();
-
-  char*                 GetPath() {return m_pPath;}
-
-  static int            SetCurDir(char* pPath);
-
-  static int            SetArg0(char* pArg0, const char* pName = "");
-  static const char*    GetSelfPath() {return m_SelfPath;}
-  static const char*    GetRunPath()  {return m_RunPath;}
-  static const char*    GetCurPath();
-  static const char*    GetTmpPath();
-  static const char*    GetCfgPath();
-  static const char*    GetSysCfgPath();
-  static const char*    GetUserName();
-  static const char*    FixPath(char* pPath);
-
-  static int            MkDir(const char* pPath, const char* pName, char* pBuff);
-
-  static int            CutMultiMask(char* pPath, char* pMask);
-  static int            CutMask(char* pPath, char* pMask);
-  static char*          FindLastName(char* pPath);
-  static int            CutLastName(char* pPath, char* pName);
-  static int            GetNextName(char** pPath, char* pName);
-  static int            MakeFullPath(char* pPath, const char* pName, char* pBuff);
-  static int            AppendName(char* pPath, const char* pName, char* pBuff);
-  static int            CutPath(const char* pPath, char* pBuff, int len);
-  static int            CutName(const char* pName, char* pBuff, int len);
-  static int            GetRelPath(const char* pPath, char* pBuff, int len);
-};
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -197,5 +171,4 @@ public:
   int       ControlFilesCount(const char* pPath, const char* pMask, int number);
 };
 
-#endif //__DIR_H__
 #endif

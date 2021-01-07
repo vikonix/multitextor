@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Dialogs/StdDialogs.h"
 #include "DlgControls.h"
 #include "WndManager.h"
+#include "utils/Directory.h"
 
 /////////////////////////////////////////////////////////////////////////////
 #define ID_OF_NAME      (ID_USER + 1)

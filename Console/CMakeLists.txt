@@ -18,6 +18,7 @@ add_library(${PROJECT_NAME} STATIC
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         ThirdPartyLib
+        UtilsLib
         ${CMAKE_DL_LIBS}
 )
 
