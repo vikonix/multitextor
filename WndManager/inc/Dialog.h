@@ -145,7 +145,7 @@ protected:
     bool    _Refresh();
 
     int     SelectItem(int id);
-    bool    Select(size_t n);
+    input_t  Select(size_t n);
 
     size_t  GetNextItem();
     size_t  GetPrevItem();

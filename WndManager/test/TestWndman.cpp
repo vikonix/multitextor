@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "utils/logger.h"
+#include "utils/Directory.h"
 #include "App.h"
 #include "DlgControls.h"
 #include "Dialogs/StdDialogs.h"
@@ -161,6 +162,13 @@ int main()
     app.MainProc(K_F1);
 
     app.Deinit();
+
+    LOG(DEBUG) << "run path=" << Directory::RunPath();
+    LOG(DEBUG) << "cur path=" << Directory::CurPath();
+    LOG(DEBUG) << "tmp path=" << Directory::TmpPath();
+    LOG(DEBUG) << "cfg path=" << Directory::CfgPath();
+    LOG(DEBUG) << "sys cfg path=" << Directory::SysCfgPath();
+    LOG(DEBUG) << "user=" << Directory::UserName();
 
     LOG(INFO) << "End";
     return 0;

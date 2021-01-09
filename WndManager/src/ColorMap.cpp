@@ -68,8 +68,8 @@ color_t g_ColorMap[C_COUNT]
     /*C_DIALOG_INFO      */ FON_RED | FON_GREEN | FON_BLUE |                         TEXT_BLUE | TEXT_BRIGHT,
     /*C_DIALOG_SEL       */                       FON_BLUE | TEXT_RED | TEXT_GREEN             | TEXT_BRIGHT,
     /*C_DIALOG_DISABLED  */ FON_RED | FON_GREEN | FON_BLUE |            TEXT_GREEN | TEXT_BLUE,
-    /*C_DIALOG_FIELD     */           FON_GREEN | FON_BLUE | TEXT_RED | TEXT_GREEN | TEXT_BLUE | TEXT_BRIGHT,
     /*C_DIALOG_FIELD_SEL */                       FON_BLUE | TEXT_RED | TEXT_GREEN | TEXT_BLUE,
+    /*C_DIALOG_FIELD     */           FON_GREEN | FON_BLUE,// | TEXT_RED | TEXT_GREEN | TEXT_BLUE,
     /*C_DIALOG_FIELD_ACT */           FON_GREEN | FON_BLUE | TEXT_RED | TEXT_GREEN | TEXT_BLUE | TEXT_BRIGHT,
     /*C_SHADE            */                       FON_BLUE,
 };

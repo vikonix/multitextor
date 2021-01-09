@@ -26,6 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 #include "Dialog.h"
+#include "utils/Directory.h"
+
 
 enum class FileDlgMode
 {
@@ -36,15 +38,15 @@ enum class FileDlgMode
 
 class FileDialog : public Dialog
 {
-    FileDlgMode m_mode;
+    FileDlgMode     m_mode;
+    DirectoryList   m_list;
 
 public:
     FileDialog(FileDlgMode mode, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
-    //virtual input_t DialogProc(input_t code) override;
+    virtual input_t DialogProc(input_t code) override;
     bool OnActivate();
-    //bool OnClose(int id);
 
 protected:
-    //bool ReadDir();
+    size_t ScanDir(const std::string& mask);
 };

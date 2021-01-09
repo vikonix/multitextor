@@ -447,6 +447,7 @@ void InputTTY::ProcessInput(bool fMouse)
             input_t k = iKey & K_TYPEMASK;
 
             input_t iMType = ProcessMouse(x, y, k);
+            //LOG(DEBUG) << "Mouse input iKey=" << std::hex << (iKey | iMType | iKeyMode) << std::dec;
             PutInput(iKey | iMType | iKeyMode);
         }
         return;

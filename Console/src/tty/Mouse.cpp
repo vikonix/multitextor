@@ -278,11 +278,11 @@ input_t _ReadMouse()
                 k = K_MOUSEKR;
             else if(gpmEvent.buttons & GPM_B_MIDDLE)
                 k = K_MOUSEKM;
-
-//            LOG(DEBUG) << "ReadMouse x=" << x << " y=" << y 
-//                << " b=" << gpmEvent.buttons << " t=" << gpmEvent.type << " k=" << k 
-//                << " wx=" << gpmEvent.wdx <<  " wy=" << gpmEvent.wdy;
-                
+/*
+            LOG(DEBUG) << "ReadMouse x=" << x << " y=" << y 
+                << " b=" << gpmEvent.buttons << " t=" << gpmEvent.type << " k=" << k 
+                << " wx=" << gpmEvent.wdx <<  " wy=" << gpmEvent.wdy;
+//*/                
             if(k == 0 && gpmEvent.wdy != 0)    
             {
                 if(gpmEvent.wdy == 1)

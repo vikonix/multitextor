@@ -103,6 +103,7 @@ Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
 
         default:
             LOG(ERROR) << "Bad dialog control " << std::hex << control.type << std::dec;
+            _assert(0);
             break;
         }
 
@@ -414,10 +415,10 @@ int Dialog::SelectItem(int id)
     return 0;
 }
 
-bool Dialog::Select(size_t n)
+input_t Dialog::Select(size_t n)
 {
     m_controls[m_selected]->LostFocus();
-    bool rc = m_controls[n]->SetFocus();
+    auto rc = m_controls[n]->SetFocus();
     m_selected = n;
 
     return rc;
@@ -619,7 +620,7 @@ input_t Dialog::EventProc(input_t code)
     bool refresh{false};
     if(n != m_selected)
     {
-        code = Select(n) ? K_SELECT : 0;
+        code = Select(n);
         refresh = true;
     }
 

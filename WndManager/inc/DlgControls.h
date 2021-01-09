@@ -78,8 +78,8 @@ public:
     {
         return (x >= m_posx && x < m_posx + m_sizex && y >= m_posy && y < m_posy + m_sizey);
     }
-    virtual bool SetFocus() { return false; }
-    virtual bool LostFocus() { return false; }
+    virtual input_t SetFocus() { return K_SELECT; }
+    virtual bool LostFocus() { return true; }
     virtual bool SetName(const std::string& name);
     virtual const std::string_view GetName() { return m_name; }
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = MAX_COORD, pos_t sizey = MAX_COORD)
@@ -90,6 +90,7 @@ public:
         if (sizey != MAX_COORD) m_sizey = sizey;
         return true;
     }
+    virtual pos_t GetSizeX() { return m_sizex; }
 
     bool SetHelpLine(const std::string& help) { m_helpLine = help; return true; }
     int  GetMode() { return m_type; }
@@ -199,7 +200,7 @@ public:
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
     virtual bool UpdateVar() override;
-    virtual bool SetFocus() override;
+    virtual input_t SetFocus() override;
     virtual bool SetName(const std::string& name) override;
 };
 
@@ -210,8 +211,8 @@ friend class Dialog;
 friend class CtrlDropList;
 friend class CtrlEditDropList;
 
-    int     m_selected{};//int ???
-    int     m_firstLine{};//signed ???
+    size_t  m_selected{};
+    size_t  m_firstLine{};
     input_t m_mouseCmd{};
     bool    m_mouse2{};
 
@@ -223,6 +224,7 @@ public:
     virtual input_t EventProc(input_t code) override;
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
     virtual bool UpdateVar() override;
+    virtual input_t SetFocus() override { return K_SELECT + (input_t)GetSelected(); }
 
     size_t GetStrCount() { return m_list.size(); }
     bool AddStr(size_t n, const std::string& str)
@@ -266,8 +268,8 @@ public:
         return true;
     }
 
-    int GetSelected() {return m_firstLine + m_selected;}
-    int SetSelect(int n = -1, bool refresh = true);
+    size_t GetSelected() {return m_firstLine + m_selected;}
+    size_t SetSelect(size_t n, bool refresh = true);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -284,10 +286,10 @@ public:
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
     virtual bool UpdateVar() override {return m_list.UpdateVar();}
     virtual bool CheckMouse(pos_t x, pos_t y) override;
-    virtual bool SetFocus() override;
+    virtual input_t SetFocus() override;
     virtual bool LostFocus() override;
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = 0, pos_t sizey = 0) override;
-    virtual bool SetName(const std::string& name) override {return SetSelect(m_list.SetName(name));}
+    virtual bool SetName(const std::string& name) override {return SetSelect(m_list.SetName(name));}//???
     virtual const std::string_view GetName() override;
 
     //control list
@@ -299,8 +301,8 @@ public:
     const std::string_view GetStr(size_t n) { return m_list.GetStr(n); }
     bool Clear() { return m_list.Clear(); }
 
-    int GetSelected() { return m_list.GetSelected(); }
-    int SetSelect(int n = -1);
+    size_t GetSelected() { return m_list.GetSelected(); }
+    size_t SetSelect(size_t n);
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -318,7 +320,7 @@ public:
     virtual bool Refresh(CtrlState state = CTRL_NORMAL) override;
     virtual bool UpdateVar() override { return m_edit.UpdateVar(); }
     virtual bool CheckMouse(pos_t x, pos_t y) override;
-    virtual bool SetFocus() override;
+    virtual input_t SetFocus() override;
     virtual bool LostFocus() override;
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = 0, pos_t sizey = 0) override;
     virtual bool SetName(const std::string& name) override {m_dcursorx = m_edit.m_dcursorx; return m_edit.SetName(name);}
@@ -335,8 +337,8 @@ public:
     const std::string_view GetStr(size_t n) { return m_list.GetStr(n); }
     bool Clear() { return m_list.Clear(); }
 
-    int GetSelected() { return m_list.GetSelected(); }
-    int SetSelect(int n = -1) {return m_list.SetSelect(n);}
+    size_t GetSelected() { return m_list.GetSelected(); }
+    size_t SetSelect(size_t n) {return m_list.SetSelect(n);}
 };
 
 /////////////////////////////////////////////////////////////////////////////

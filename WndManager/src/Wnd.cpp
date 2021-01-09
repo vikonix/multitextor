@@ -304,7 +304,7 @@ bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
         rc = WndManager::getInstance().WriteStr(str);
     else
     {
-        std::string shortStr(str, m_sizex - (wleft - m_left));
+        std::string shortStr(str, (size_t)m_sizex - wleft + m_left);
         rc = WndManager::getInstance().WriteStr(shortStr);
     }
 

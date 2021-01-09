@@ -1,116 +1,87 @@
+/*
+FreeBSD License
+
+Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+All rights reserved.
+
+Redistribution and use in source and binary forms, with or without
+modification, are permitted provided that the following conditions are met:
+
+1. Redistributions of source code must retain the above copyright notice, this
+   list of conditions and the following disclaimer.
+2. Redistributions in binary form must reproduce the above copyright notice,
+   this list of conditions and the following disclaimer in the documentation
+   and/or other materials provided with the distribution.
+
+THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND
+ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED
+WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR
+ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES
+(INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES;
+LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
+ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
+(INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
+SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+*/
 #pragma once
 #include <filesystem>
+#include <vector>
 
 /////////////////////////////////////////////////////////////////////////////
+using path_t = std::filesystem::path;
+using direntry_t = std::filesystem::directory_entry;
+
 class Directory
 {
-    static std::string      m_runPath;
-    static std::string      m_name;
-    
-    std::filesystem::path   m_path;
+    static path_t   m_runPath;
 
 public:
-    Directory(const std::string& );
-    ~Directory();
+    static std::string  m_projectName;
 
-    std::string         GetPath();
-
-    static bool         SetCurDir(const std::string& path);
-    static bool         SetProjectName(const std::string& name);
-    
-    static std::string  GetRunPath() { return m_runPath; }
-    static std::string  GetCurPath();
-    static std::string  GetTmpPath();
-    static std::string  GetCfgPath();
-    static std::string  GetSysCfgPath();
-    static std::string  GetUserName();
+    static bool     SetCurDir(const std::string& path);
+    static path_t   RunPath() { return m_runPath; }
+    static path_t   CurPath();
+    static path_t   TmpPath();
+    static path_t   CfgPath();
+    static path_t   SysCfgPath();
+    static path_t   UserName();
+    static std::string CutPath(const path_t& path, size_t len);
 };
+
+
+class DirectoryList
+{
+    std::string                 m_mask;
+    path_t                      m_path;
+    std::vector<std::string>    m_drvList;
+    std::vector<std::string>    m_dirList;
+    std::vector<direntry_t>     m_fileList;
+
+public:
+    const std::vector<std::string>& GetDrvList()  { return m_drvList; }
+    const std::vector<std::string>& GetDirList()  { return m_dirList; }
+    const std::vector<direntry_t>&  GetFileList() { return m_fileList; }
+    const path_t&                   GetPath()     { return m_path; }
+
+    bool    SetMask(const path_t& mask);
+    bool    Scan();
+};
+
+template <typename TP>
+std::time_t to_time_t(TP tp)
+{
+    using namespace std::chrono;
+    auto sctp = time_point_cast<system_clock::duration>(tp - TP::clock::now()
+        + system_clock::now());
+    return system_clock::to_time_t(sctp);
+}
 
 #if 0
-#ifndef _WIN32
-  #include <dirent.h>
-  #include <limits.h>
-#else
-  #include <windows.h>
-#endif
-#include <time.h>
-
-
-#ifndef MAX_PATH
-  #define MAX_PATH PATH_MAX
-#endif
-
-
-#define F_ATTR_DIRECTORY 0x1000
-#define F_ATTR_READONLY  0x2000
-#define F_ATTR_LINK      0x4000
-
-#ifdef _WIN32
-  #define F_SLASH  "\\"
-#else
-  #define F_SLASH  "/"
-#endif
-
-
-/////////////////////////////////////////////////////////////////////////////
-struct FInfo {
-  int          nFileAttr;
-  long long    nSize;
-  time_t       time;
-  void*        p;
-  char         sName[1];
-};
-
-struct FileInfo : public FInfo {
-  char         sNameExt[MAX_PATH];
-};
-
-
-
-
-/////////////////////////////////////////////////////////////////////////////
-#define MAX_FILES_NUM 0x8000
-
-#define INDEX_NUMBER     256
-
-struct FileIndex {
-  struct FileIndex* pNext;
-  FileInfo*         dIndex[INDEX_NUMBER];
-};
-
-
 enum SortOrder {
   byLast,   byName,   byExt,   bySize,   byDate,
   byLastIn, byNameIn, byExtIn, bySizeIn, byDateIn //inverce order
 };
-
-
-class FileList
-{
-  unsigned int  m_nItems;
-  FileIndex*    m_pFirstIndex;
-
-private:
-  FileInfo**    GetFreeItemPos();
-  FileInfo**    GetItemPos(unsigned int ItemNo);
-
-  int           CmpItems(FileInfo* p1, FileInfo* p2, int order);
-
-public:
-  FileList();
-  ~FileList();
-
-  int           Clear();
-  int           GetItemsNumber() {return m_nItems;}
-
-  int           AddItem(FileInfo* pInfo);
-  FileInfo*     GetItem(unsigned int ItemNo);
-
-  int           Sort(int order = byLast);
-
-  static int    CmpNames(const char* pName1, const char* pName2);
-};
-
 
 /////////////////////////////////////////////////////////////////////////////
 #define MASK_NUMBER 32
@@ -132,43 +103,6 @@ public:
 
   int   CheckFileByMask(const char* pName);
   int   CheckFileByMask(const char* pName, const char* pMask);
-};
-
-
-class DirList : public FileMask
-{
-  SDir*         m_pDir;
-
-  FileList*     m_pDrvList;
-  FileList*     m_pDirList;
-  FileList*     m_pFileList;
-
-  char          m_sPath[MAX_PATH + 1];
-  char          m_mMask[MAX_PATH + 1];
-  char          m_sMask[MAX_PATH + 1];
-
-private:
-  int SetPath(char* pPath = NULL);
-
-public:
-  DirList();
-  ~DirList();
-
-  FileInfo* GetDrvInfo(unsigned int nItem);
-  FileInfo* GetDirInfo(unsigned int nItem);
-  FileInfo* GetFileInfo(unsigned int nItem);
-
-  int       ReadDir();
-  int       ScanDir();
-
-  size_t    SetFullPath(char* pMask = NULL);
-
-  char*     GetPath()  {return m_sPath;}
-  char*     GetMask()  {if(m_sMask[0]) return m_sMask; else return m_mMask;}
-  char*     GetMMask() {return m_mMask;}
-
-  int       GetFilesCount(const char* pPath, const char* pMask);
-  int       ControlFilesCount(const char* pPath, const char* pMask, int number);
 };
 
 #endif

@@ -68,8 +68,8 @@ enum
   C_DIALOG_INFO,
   C_DIALOG_SEL,
   C_DIALOG_DISABLED,
-  C_DIALOG_FIELD,
   C_DIALOG_FIELD_SEL,
+  C_DIALOG_FIELD,
   C_DIALOG_FIELD_ACT,
   C_SHADE,
 
@@ -115,8 +115,8 @@ extern color_t g_ColorMap[];
 #define ColorDialogInfo     (g_ColorMap[C_DIALOG_INFO])
 #define ColorDialogSelect   (g_ColorMap[C_DIALOG_SEL])
 #define ColorDialogDisabled (g_ColorMap[C_DIALOG_DISABLED])
-#define ColorDialogField    (g_ColorMap[C_DIALOG_FIELD])
 #define ColorDialogFieldSel (g_ColorMap[C_DIALOG_FIELD_SEL])
+#define ColorDialogField    (g_ColorMap[C_DIALOG_FIELD])
 #define ColorDialogFieldAct (g_ColorMap[C_DIALOG_FIELD_ACT])
 #define ColorShade          (g_ColorMap[C_SHADE])
 

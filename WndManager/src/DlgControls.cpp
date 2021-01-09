@@ -94,7 +94,7 @@ CtrlStatic::CtrlStatic(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlStatic::Refresh([[maybe_unused]]CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlStatic::Refresh pos=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "    CtrlStatic::Refresh pos=" << m_pos << " name='" << m_name << "'";
     color_t color;
 
     if((m_type & CTRL_TYPE_MASK) == CTRL_TITLE)
@@ -142,30 +142,14 @@ bool CtrlStatic::Refresh([[maybe_unused]]CtrlState state)
 
 bool CtrlStatic::SetName(const std::string& name)
 {
-    pos_t oldLen = (pos_t)m_name.size();
-
-    //we save max string size
     pos_t sizex = m_sizex;
     Control::SetName(name);
     m_sizex = sizex;
 
     if((m_type & CTRL_TYPE_MASK) != CTRL_TITLE)
     {
-        if(m_sizex < (pos_t)m_name.size())
-            m_name.resize(m_sizex);
-
+        m_name.resize(m_sizex, ' ');
         Refresh();
-        pos_t newLen = (pos_t)m_name.size();
-        if(newLen < oldLen)
-        {
-            color_t color = *m_dialog.m_pColorWindow;
-            m_dialog.FillRect(m_posx + newLen, m_posy, oldLen - newLen, 1, ' ', color);
-        }
-    }
-    else
-    {
-        //???
-        //_assert(0);
     }
 
     return true;
@@ -195,7 +179,7 @@ CtrlButton::CtrlButton(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlButton::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlButton::Refresh pos=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "    CtrlButton::Refresh pos=" << m_pos << " name='" << m_name << "'";
     std::string name;
     if((m_type & CTRL_TYPE_MASK) == CTRL_BUTTON)
         name = "[ " + m_name + " ]";
@@ -237,7 +221,7 @@ CtrlCheck::CtrlCheck(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlCheck::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlCheck::Refresh pos=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "    CtrlCheck::Refresh pos=" << m_pos << " name='" << m_name << "'";
     std::string name;
     
     if(!m_checked)
@@ -306,7 +290,7 @@ CtrlRadio::CtrlRadio(Dialog& dialog, const control& control, size_t pos, size_t 
 
 bool CtrlRadio::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlRadio::Refresh pos=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "    CtrlRadio::Refresh pos=" << m_pos << " name='" << m_name << "'";
     std::string name;
     if(!m_checked)
         name = "( ) " + m_name;
@@ -373,7 +357,7 @@ CtrlGroup::CtrlGroup(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlGroup::Refresh(CtrlState)
 {
-    LOG(DEBUG) << "    CtrlGroup::Refresh pos=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "    CtrlGroup::Refresh pos=" << m_pos << " name='" << m_name << "'";
     color_t color = *m_dialog.m_pColorWindow;
 
     size_t size = m_sizex;
@@ -411,7 +395,7 @@ CtrlEdit::CtrlEdit(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlEdit::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlEdit::Refresh pos=" << m_pos << " name=<" << m_name << ">";
+    LOG(DEBUG) << "    CtrlEdit::Refresh pos=" << m_pos << " name='" << m_name << "'";
 
     color_t color;
     if(0 != (m_type & CTRL_DISABLED))
@@ -424,7 +408,7 @@ bool CtrlEdit::Refresh(CtrlState state)
             color = ColorDialogFieldSel;
     }
     else
-        color = ColorDialogField;
+        color = ColorDialogFieldAct;
 
     std::string str = m_name;
     str.resize(m_sizex, ' ');
@@ -620,13 +604,13 @@ bool CtrlEdit::SetName(const std::string& name)
     return true;
 }
 
-bool CtrlEdit::SetFocus()
+input_t CtrlEdit::SetFocus()
 {
     m_selected = true;
     m_dcursorx = (pos_t)m_name.size() < m_sizex ? (pos_t)m_name.size() : m_sizex - 1;
 
     m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
-    return true;
+    return K_SELECT;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -640,7 +624,7 @@ CtrlList::CtrlList(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlList::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlList::Refresh pos=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "    CtrlList::Refresh pos=" << m_pos << " name='" << m_name << "'";
     m_dialog.StopPaint();
     
     color_t color;
@@ -674,21 +658,23 @@ bool CtrlList::Refresh(CtrlState state)
         auto line = GetStr((size_t)m_firstLine + y);
         buff = line;
 
-        if (line.size() < (size_t)m_sizex - 2)
+        std::u16string wstr = utf8::utf8to16(buff);
+        if (wstr.size() < (size_t)m_sizex - 2)
         {
-            buff.resize((size_t)m_sizex - 2, ' ');
+            wstr.resize((size_t)m_sizex - 2, ' ');
         }
         else
         {
             //cut line
-            buff.resize((size_t)m_sizex - 3);
-            buff += '~';
+            wstr.resize((size_t)m_sizex - 3);
+            wstr += '~';
         }
+        buff = utf8::utf16to8(wstr);
 
         color_t lineColor = ColorDialogField;
         if(m_type & CTRL_DISABLED)
             lineColor = ColorDialogDisabled;
-        else if(y == m_selected)
+        else if((size_t)y == m_selected)
         {
             if(state & CTRL_SELECTED)
                 lineColor = ColorDialogSelect;
@@ -720,40 +706,32 @@ bool CtrlList::UpdateVar()
 {
     if (m_var.has_value())
     {
-        auto var = std::any_cast<int*>(m_var);
+        auto var = std::any_cast<size_t*>(m_var);
         if(var)
             *var = m_firstLine + m_selected;
     }
     return true;
 }
 
-int CtrlList::SetSelect(int n, bool refresh)
+size_t CtrlList::SetSelect(size_t pos, bool refresh)
 {
-    int count = (int)m_list.size();
-    if (n > count)
-        n = count;
+    size_t size = m_list.size();
+    if (pos > size)
+        pos = size;
+    size_t sizey = (size_t)m_sizey - 3;
 
-    if (n != m_firstLine + m_selected)
+    if (pos != m_firstLine + m_selected)
     {
-        if (n == -1)
-            n = count;
+        if (pos < sizey)
+            m_firstLine = 0;
+        else if (pos >= size - sizey)
+            m_firstLine = size - sizey - 1;
+        else
+            m_firstLine = pos - sizey / 2;
 
-        if (n - m_firstLine > m_sizey/* - 2*/ - 3)//???
-        {
-            m_firstLine = n - (m_sizey/* - 2*/ - 3);
-
-            if (m_firstLine + m_sizey - 3 > count)
-                m_firstLine = count - (m_sizey - 3);
-
-            if (m_firstLine < 0)
-                m_firstLine = 0;
-        }
-        else if (n - m_firstLine < 0)
-            m_firstLine = n;
-
-        m_selected = n - m_firstLine;
-
+        m_selected = pos - m_firstLine;
         m_dcursory = (pos_t)(m_selected + 1);
+
         if (refresh)
         {
             m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
@@ -761,13 +739,18 @@ int CtrlList::SetSelect(int n, bool refresh)
         }
     }
 
-    return n;
+    return pos;
 }
 
 input_t CtrlList::EventProc(input_t code)
 {
-    int n = (int)(m_firstLine + m_selected);//can be negative ???
+    int n = (int)(m_firstLine + m_selected);//can be negative
     size_t size = m_list.size();
+    if (size == 0)
+        return code;
+
+    size_t sizey = (size_t)m_sizey - 3;
+    size_t step = 0;
 
     if(code == K_TIME)
     {
@@ -789,19 +772,25 @@ input_t CtrlList::EventProc(input_t code)
         else
             return code;
     }
-    else if(code == K_UP)
+    else if (code == K_UP)
+    {
+        step = 1;
         --n;
-    else if(code == K_DOWN)
+    }
+    else if (code == K_DOWN)
+    {
+        step = 1;
         ++n;
+    }
     else if(code == K_PAGEUP)
     {
-        int d = m_sizey - 3;
-        n -= d ? d : 1;
+        step = sizey > 0 ? sizey : 1;
+        n -= (int)step;
     }
     else if(code == K_PAGEDN)
     {
-        int d = m_sizey - 3;
-        n += d ? d : 1;
+        step = sizey > 0 ? sizey : 1;
+        n += (int)step;
     }
     else if(code == K_HOME || code == K_HOME + K_CTRL)
         n = 0;
@@ -829,7 +818,7 @@ input_t CtrlList::EventProc(input_t code)
             else
                 m_mouseCmd = 0;
 
-            n = m_firstLine + p - 1;
+            n = (int)m_firstLine + p - 1;
             if(code & K_MOUSE2 && !m_mouseCmd)
             {
                 m_mouse2 = true;
@@ -838,13 +827,13 @@ input_t CtrlList::EventProc(input_t code)
         }
         else if((code & K_TYPEMASK) == K_MOUSEWUP)
         {
-            int d = (m_sizey - 2) / 3;
-            n -= d ? d : 1;
+            step = sizey / 3 > 0 ? sizey / 3 : 1;
+            n -= (int)step;
         }
         else if((code & K_TYPEMASK) == K_MOUSEWDN)
         {
-            int d = (m_sizey - 2) / 3;
-            n += d ? d : 1;
+            step = sizey / 3 > 0 ? sizey / 3 : 1;
+            n += (int)step;
         }
     }
     else if(code == K_SPACE)
@@ -852,28 +841,48 @@ input_t CtrlList::EventProc(input_t code)
     else
         return code;
 
-    if (size > 0)
-    {
-        if (n < 0)
-            n = 0;
-        if (n >= (int)size)
-            n = (int)(size - 1);
-    }
+    size_t pos;
+    if (n < 0)
+        pos = 0;
+    else if (n >= (int)size)
+        pos = size - 1;
     else
-        n = 0;
+        pos = (size_t)n;
 
-    if(n != m_firstLine + m_selected)
+    if(pos != m_firstLine + m_selected)
     {
-        if(n - m_firstLine > m_sizey - 3)
-          m_firstLine = n - (m_sizey - 3);
-        else if(n - m_firstLine < 0)
-          m_firstLine = n;
-        m_selected = n - m_firstLine;
+        if (step == 0)
+        {
+            if (pos < sizey)
+                m_firstLine = 0;
+            else if (pos >= size - sizey)
+                m_firstLine = size - sizey - 1;
+            else
+                m_firstLine = pos - sizey / 2;
+        }
+        else if (pos > m_firstLine + sizey)
+        {
+            if (m_firstLine + step < size - sizey)
+                m_firstLine += step;
+            else
+                m_firstLine = size - sizey - 1;
+        }
+        else if (pos < m_firstLine)
+        {
+            if (m_firstLine > step)
+                m_firstLine -= step;
+            else
+                m_firstLine = 0;
+        }
 
+        m_selected = pos - m_firstLine;
         m_dcursory = (pos_t)(m_selected + 1);
+
         m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
         Refresh(CTRL_SELECTED);
-        return K_SELECT + n;
+
+        _assert(pos < 0xffffff);
+        return K_SELECT + (input_t)(pos & 0xffffff);
     }
 
     return 0;
@@ -889,12 +898,12 @@ CtrlDropList::CtrlDropList(Dialog& dialog, const control& control, size_t pos)
     m_list.m_sizey -= 1;
 }
 
-bool CtrlDropList::SetFocus()
+input_t CtrlDropList::SetFocus()
 {
     m_dcursorx = m_sizex - 2;
     m_dcursory = 0;
 
-    return true;
+    return K_SELECT;
 }
 
 bool CtrlDropList::LostFocus()
@@ -910,7 +919,7 @@ bool CtrlDropList::LostFocus()
     return true;
 }
 
-int CtrlDropList::SetSelect(int n)
+size_t CtrlDropList::SetSelect(size_t n)
 {
     m_list.SetSelect(n, false);
     Refresh();
@@ -976,7 +985,7 @@ bool CtrlDropList::Refresh(CtrlState state)
 {
     LOG(DEBUG) << "    CtrlDropList::Refresh pos=" << m_pos;
 
-    int n = GetSelected();
+    auto n = GetSelected();
     std::string buff{ GetStr(n) };
 
     buff.resize((size_t)m_sizex - 3, ' ');
@@ -1042,7 +1051,7 @@ bool CtrlDropList::SetPos(pos_t x, pos_t y, pos_t sizex, pos_t sizey)
 
 const std::string_view CtrlDropList::GetName()
 {
-    int n = m_list.GetSelected();
+    auto n = m_list.GetSelected();
     auto str = m_list.GetStr(n);
 
     return str;
@@ -1081,9 +1090,9 @@ CtrlEditDropList::CtrlEditDropList(Dialog& dialog, const control& control, size_
 */
 }
 
-bool CtrlEditDropList::SetFocus()
+input_t CtrlEditDropList::SetFocus()
 {
-    bool rc = m_edit.SetFocus();
+    auto rc = m_edit.SetFocus();
     m_dcursorx = m_edit.m_dcursorx;
     m_dcursory = m_edit.m_dcursory;
 
@@ -1139,7 +1148,7 @@ input_t CtrlEditDropList::EventProc(input_t code)
     {
         if(code == K_ENTER)
         {
-            int n = GetSelected();
+            auto n = GetSelected();
             std::string str{ GetStr(n) };
             m_edit.SetName(str);
         }
@@ -1294,7 +1303,7 @@ bool CtrlColor::PaintSelect(bool visible, bool selected)
 
 bool CtrlColor::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlColor::Refresh pos=" << m_pos << " name=" << m_name;
+    LOG(DEBUG) << "    CtrlColor::Refresh pos=" << m_pos << " name='" << m_name << "'";
 
     color_t color;
     if(0 != (m_type & CTRL_DISABLED))
