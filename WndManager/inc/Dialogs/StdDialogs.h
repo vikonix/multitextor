@@ -45,7 +45,7 @@ public:
     FileDialog(FileDlgMode mode, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
     virtual input_t DialogProc(input_t code) override;
-    bool OnActivate();
+    virtual bool OnActivate() override;
 
 protected:
     size_t ScanDir(const std::string& mask);

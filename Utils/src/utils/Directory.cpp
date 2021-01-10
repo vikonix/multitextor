@@ -29,9 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef WIN32
     #include <windows.h>
+    static const size_t c_BuffLen = 0x800;
 #endif
 
-static const size_t c_BuffLen = 0x800;
 
 std::string  Directory::m_projectName;
 path_t Directory::m_runPath = [] {
