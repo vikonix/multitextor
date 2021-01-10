@@ -97,7 +97,7 @@ path_t Directory::SysCfgPath()
 {
 #ifdef WIN32
     TCHAR buff[c_BuffLen];
-    bool rc = GetWindowsDirectory(buff, sizeof(buff) / sizeof(TCHAR));
+    [[maybe_unused]]bool rc = GetWindowsDirectory(buff, sizeof(buff) / sizeof(TCHAR));
     _assert(rc);
     return buff;
 #else
@@ -110,7 +110,7 @@ path_t Directory::UserName()
 #ifdef WIN32
     TCHAR buff[c_BuffLen];
     DWORD len = sizeof(buff) / sizeof(TCHAR);
-    int rc = GetUserName(buff, &len);
+    [[maybe_unused]]bool rc = GetUserName(buff, &len);
     _assert(rc);
     return buff;
 #else
