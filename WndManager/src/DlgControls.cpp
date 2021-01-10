@@ -236,7 +236,7 @@ bool CtrlCheck::Refresh(CtrlState state)
 
 input_t CtrlCheck::EventProc(input_t code)
 {
-    if(code == K_SPACE)
+    if(code == K_SPACE || code == K_ENTER)
     {
         m_checked = !m_checked;
         Refresh(CTRL_SELECTED);
@@ -390,11 +390,13 @@ CtrlEdit::CtrlEdit(Dialog& dialog, const control& control, size_t pos)
     {
         auto str = std::any_cast<std::string*>(m_var);
         m_name = *str;
+        m_str = utf8::utf8to16(m_name);
     }
 }
 
 bool CtrlEdit::Refresh(CtrlState state)
 {
+    m_name = utf8::utf16to8(m_str);
     LOG(DEBUG) << "    CtrlEdit::Refresh pos=" << m_pos << " name='" << m_name << "'";
 
     color_t color;
@@ -402,22 +404,24 @@ bool CtrlEdit::Refresh(CtrlState state)
         color = ColorDialogDisabled;
     else if(0 != (state & CTRL_SELECTED))
     {
-        if(0 != m_selected)
-            color = ColorDialogSelect;
-        else
+        if(m_selected)
             color = ColorDialogFieldSel;
+        else
+            color = ColorDialogSelect;
     }
     else
         color = ColorDialogFieldAct;
 
-    std::string str = m_name;
+    std::u16string str;
+    if(m_offset < m_str.size())
+        str = m_str.substr(m_offset);
     str.resize(m_sizex, ' ');
-    m_dialog.WriteStr(m_posx, m_posy, str, color);
+    m_dialog.WriteWStr(m_posx, m_posy, str, color);
 
     return true;
 }
 
-pos_t CtrlEdit::Unselect(bool del)
+bool CtrlEdit::Unselect(bool del)
 {
     if(m_selected)
     {
@@ -430,49 +434,65 @@ pos_t CtrlEdit::Unselect(bool del)
         else
         {
             //unselect and delete
+            m_offset = 0;
             m_dcursorx = 0;
             m_name.erase();
+            m_str.erase();
 
             m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
             Refresh(CTRL_SELECTED);
         }
     }
-    return m_dcursorx;
+    return true;
 }
 
 input_t CtrlEdit::EventProc(input_t code)
 {
+    size_t offset = m_offset;
     pos_t x = m_dcursorx;
-    pos_t len = (pos_t)m_name.size();
+    size_t len = m_str.size();
     bool changed{false};
 
     //moving
     if(code == K_LEFT)
     {
         Unselect();
-        if(x)
+        if (x)
             --x;
+        else if (m_offset)
+            --m_offset;
     }
     else if(code == K_RIGHT)
     {
         if(m_selected)
             Unselect();
         else
-            if(x < m_sizex - 1)
+        {
+            if (x < m_sizex - 1)
                 ++x;
+            else
+                ++m_offset;
+        }
     }
     else if(code == K_HOME)
     {
         Unselect();
+        m_offset = 0;
         x = 0;
     }
     else if(code == K_END)
     {
         Unselect();
-        if(len < m_sizex)
-            x = len;
+        if (len < (size_t)m_sizex)
+        {
+            m_offset = 0;
+            x = (pos_t)len;
+        }
         else
+        {
             x = m_sizex - 1;
+            m_offset = len - x;
+        }
     }
     else if (code & K_MOUSE)
     {
@@ -485,27 +505,30 @@ input_t CtrlEdit::EventProc(input_t code)
     //editing
     else if(code == K_BS)
     {
-        x = Unselect(true);
-        if(x)
+        Unselect(true);
+        x = m_dcursorx;
+        if(m_offset + x > 0)
         {
-            if(x > len)
+            if (x)
                 --x;
-            else
+            else if (m_offset)
+                --m_offset;
+            if (m_offset + x < len)
             {
-                --x;
                 //del char at x
-                m_name.erase(x, 1);
+                m_str.erase(m_offset + x, 1);
                 changed = true;
             }
         }
     }
     else if(code == K_DELETE)
     {
-        x = Unselect(true);
-        if(len && x <= len)
+        Unselect(true);
+        x = m_dcursorx;
+        if(len && m_offset + x < len)
         {
             //del char at x
-            m_name.erase(x, 1);
+            m_str.erase(m_offset + x, 1);
             changed = true;
         }
     }
@@ -514,25 +537,25 @@ input_t CtrlEdit::EventProc(input_t code)
         if(((code & K_MODMASK) & ~K_SHIFT) == 0
         && (code & K_CODEMASK) >= K_SPACE)
         {
-            x = Unselect(true);
             code &= ~K_SHIFT;
+            Unselect(true);
+            x = m_dcursorx;
 
-            std::u16string s16{ K_GET_CODE(code) };
-            std::string s8{ utf8::utf16to8(s16) };
-            char c{ s8[0] };
-
+            char16_t wc = K_GET_CODE(code);
             //edit symbol
-            if (x > len)
-                m_name.append((size_t)x - len, ' ');
+            if (m_offset + x > len)
+                m_str.append(m_offset + x - len, ' ');
             if (Application::getInstance().IsInsertMode())
-                m_name.insert(x, 1, c);
-            else if (x < len)
-                m_name[x] = c;
+                m_str.insert(m_offset + x, 1, wc);
+            else if (m_offset + x < len)
+                m_str[m_offset + x] = wc;
             else
-                m_name.append(1, c);
+                m_str.append(1, wc);
 
-            if(x < m_sizex - 1)
+            if (x < m_sizex - 1)
                 ++x;
+            else
+                ++m_offset;
             changed = true;
         }
         else
@@ -569,10 +592,8 @@ input_t CtrlEdit::EventProc(input_t code)
         m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
     }
     
-    if (changed)
+    if (changed || offset != m_offset)
     {
-        if ((pos_t)m_name.size() > m_sizex)
-            m_name.resize(m_sizex);
         Refresh(CTRL_SELECTED);
     }
 
@@ -586,7 +607,10 @@ bool CtrlEdit::UpdateVar()
     {
         auto var = std::any_cast<std::string*>(m_var);
         if (var)
+        {
+            m_name = utf8::utf16to8(m_str);
             *var = m_name;
+        }
     }
 
     return true;
@@ -595,19 +619,31 @@ bool CtrlEdit::UpdateVar()
 bool CtrlEdit::SetName(const std::string& name)
 {
     m_name = name;
-    if ((pos_t)m_name.size() > m_sizex)
-        m_name.resize(m_sizex);
+    m_str = utf8::utf8to16(name);
+    m_offset = 0;
 
-    m_dcursorx = (pos_t)m_name.size();
+    m_dcursorx = (pos_t)m_str.size();
+    if (m_dcursorx >= m_sizex)
+    {
+        m_offset = (size_t)m_dcursorx - m_sizex;
+        m_dcursorx = m_sizex;
+    }
+
     Refresh();
 
     return true;
 }
 
+const std::string_view CtrlEdit::GetName()
+{
+    m_name = utf8::utf16to8(m_str);
+    return m_name;
+}
+
 input_t CtrlEdit::SetFocus()
 {
     m_selected = true;
-    m_dcursorx = (pos_t)m_name.size() < m_sizex ? (pos_t)m_name.size() : m_sizex - 1;
+    m_dcursorx = (pos_t)m_str.size() < m_sizex ? (pos_t)m_str.size() : m_sizex - 1;
 
     m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
     return K_SELECT;

@@ -329,6 +329,23 @@ bool FrameWnd::WriteStr(pos_t x, pos_t y, const std::string& str, color_t color)
     return rc;
 }
 
+bool FrameWnd::WriteWStr(pos_t x, pos_t y, const std::u16string& str, color_t color)
+{
+    if (!m_visible)
+        return true;
+
+    if (x == MAX_COORD || y == MAX_COORD || x > GetCSizeX() || y > GetCSizeY())
+        return true;
+
+    ClientToScreen(x, y);
+
+    bool rc = WndManager::getInstance().GotoXY(x, y);
+    rc = WndManager::getInstance().SetTextAttr(color);
+    rc = WndManager::getInstance().WriteWStr(str);
+
+    return rc;
+}
+
 bool FrameWnd::WriteChar(pos_t x, pos_t y, char c, color_t color)
 {
     if (!m_visible)

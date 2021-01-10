@@ -59,15 +59,15 @@ enum
   C_MENU,
   C_MENU_BORDER,
   C_MENU_B,
+  C_MENU_DISABLED,
   C_MENU_SEL,
   C_MENU_B_SEL,
-  C_MENU_DISABLED,
   C_DIALOG,
   C_DIALOG_BORDER,
   C_DIALOG_TITLE,
   C_DIALOG_INFO,
-  C_DIALOG_SEL,
   C_DIALOG_DISABLED,
+  C_DIALOG_SEL,
   C_DIALOG_FIELD_SEL,
   C_DIALOG_FIELD,
   C_DIALOG_FIELD_ACT,
@@ -106,15 +106,15 @@ extern color_t g_ColorMap[];
 #define ColorMenu           (g_ColorMap[C_MENU])
 #define ColorMenuBorder     (g_ColorMap[C_MENU_BORDER])
 #define ColorMenuB          (g_ColorMap[C_MENU_B])
+#define ColorMenuDisabled   (g_ColorMap[C_MENU_DISABLED])
 #define ColorMenuSel        (g_ColorMap[C_MENU_SEL])
 #define ColorMenuBSel       (g_ColorMap[C_MENU_B_SEL])
-#define ColorMenuDisabled   (g_ColorMap[C_MENU_DISABLED])
 #define ColorDialog         (g_ColorMap[C_DIALOG])
 #define ColorDialogBorder   (g_ColorMap[C_DIALOG_BORDER])
 #define ColorDialogTitle    (g_ColorMap[C_DIALOG_TITLE])
 #define ColorDialogInfo     (g_ColorMap[C_DIALOG_INFO])
-#define ColorDialogSelect   (g_ColorMap[C_DIALOG_SEL])
 #define ColorDialogDisabled (g_ColorMap[C_DIALOG_DISABLED])
+#define ColorDialogSelect   (g_ColorMap[C_DIALOG_SEL])
 #define ColorDialogFieldSel (g_ColorMap[C_DIALOG_FIELD_SEL])
 #define ColorDialogField    (g_ColorMap[C_DIALOG_FIELD])
 #define ColorDialogFieldAct (g_ColorMap[C_DIALOG_FIELD_ACT])

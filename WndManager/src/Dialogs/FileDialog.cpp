@@ -181,7 +181,7 @@ size_t FileDialog::ScanDir(const std::string& mask)
     fListPtr->Clear();
 
     for (auto& file : m_list.GetFileList())
-        fListPtr->AppendStr(file.path().filename().string());
+        fListPtr->AppendStr(file.path().filename().u8string());
 
     auto dList = GetItem(ID_OF_DIRLIST);
     auto dListPtr = std::dynamic_pointer_cast<CtrlList>(dList);
@@ -242,7 +242,7 @@ input_t FileDialog::DialogProc(input_t code)
 
             if (m_mode != FileDlgMode::Save)
             {
-                GetItem(ID_OF_NAME)->SetName(info.path().filename().string());
+                GetItem(ID_OF_NAME)->SetName(info.path().filename().u8string());
                 /*???
                 if (m_nMode != DIALOG_OPENSESS && m_nMode != DIALOG_CMD)// && m_nMode != DIALOG_KEY)
                 {

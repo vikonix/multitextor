@@ -60,7 +60,7 @@ class ScreenTTY final : public ConsoleScreen
     
     int             m_stdout {-1};
     bool            m_fXTERMconsole{false};
-
+    bool            m_256colors{false};
     std::string     m_OutBuff;
 
     struct CapString

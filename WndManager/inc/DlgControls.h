@@ -190,9 +190,11 @@ class CtrlEdit : public Control
 friend class Dialog;
 friend class CtrlEditDropList;
 
-    bool m_selected{};
-    
-    pos_t Unselect(bool del = false);//false-unselect true-delete
+    bool            m_selected{};
+    size_t          m_offset{0};
+    std::u16string  m_str;
+
+    bool Unselect(bool del = false);//false-unselect true-delete
 
 public:
     CtrlEdit(Dialog& dialog, const control& control, size_t pos);
@@ -202,6 +204,7 @@ public:
     virtual bool UpdateVar() override;
     virtual input_t SetFocus() override;
     virtual bool SetName(const std::string& name) override;
+    virtual const std::string_view GetName() override;
 };
 
 /////////////////////////////////////////////////////////////////////////////

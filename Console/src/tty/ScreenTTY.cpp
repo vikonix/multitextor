@@ -79,17 +79,19 @@ bool ScreenTTY::Init()
     char* term = getenv("TERM");
     if(!strncmp(term, "xterm", 5))
         m_fXTERMconsole = true;
-
+    if(nullptr != strstr(term, "256"))
+        m_256colors = true;
+    
     LOG(DEBUG) << "term x=" << m_sizex << " y=" << m_sizey
-        << " xterm=" << m_fXTERMconsole;
+        << " xterm=" << m_fXTERMconsole << " 256=" << m_256colors;
 
     for(i = 0; i < CAP_NUMBER; ++i)
         if(!m_cap[i].str.empty())
             LOG(DEBUG) << " Cap[" << i << "][" << m_cap[i].id << "]" << CastEscString(m_cap[i].str);
 
     //use alternative screen buffer
-    const char* cmd = "\x1b[?47h";
-    write(m_stdout, cmd, strlen(cmd));
+    std::string cmd { "\x1b[?47h"};
+    write(m_stdout, cmd.c_str(), cmd.size());
 
     [[maybe_unused]] bool rc = _WriteStr(m_cap[S_AltCharEnable].str)
         && Flush();
@@ -105,12 +107,12 @@ bool ScreenTTY::Init()
         str = m_cap[S_ColorBold].str;
         len = str.size();
         if(len > 5 && str[len - 4] == '$' && str[len - 3] == '<')
-            m_cap[S_GotoXY].str.resize(len - 4);
+            m_cap[S_ColorBold].str.resize(len - 4);
 
         str = m_cap[S_Normal].str;
         len = str.size();
         if(len > 5 && str[len - 4] == '$' && str[len - 3] == '<')
-            m_cap[S_GotoXY].str.resize(len - 4);
+            m_cap[S_Normal].str.resize(len - 4);
     }
 
   return true;
@@ -298,10 +300,21 @@ bool ScreenTTY::SetTextAttr(color_t color)
     
     if(TEXT_COLOR(color) != TEXT_COLOR(m_color) || FON_COLOR(color) != FON_COLOR(m_color))
     {
-        if(!m_cap[S_SetTextColor].str.empty())
-            rc = _WriteStr(tgoto(m_cap[S_SetTextColor].str.c_str(), 0, COLOR_CHANGE(TEXT_COLOR(color))));
-        if(!m_cap[S_SetFonColor].str.empty())
-            rc = _WriteStr(tgoto(m_cap[S_SetFonColor].str.c_str(), 0, COLOR_CHANGE(FON_COLOR(color))));
+        if(!m_256colors)
+        {
+            if(!m_cap[S_SetTextColor].str.empty())
+                rc = _WriteStr(tgoto(m_cap[S_SetTextColor].str.c_str(), 0, COLOR_CHANGE(TEXT_COLOR(color))));
+            if(!m_cap[S_SetFonColor].str.empty())
+                rc = _WriteStr(tgoto(m_cap[S_SetFonColor].str.c_str(), 0, COLOR_CHANGE(FON_COLOR(color))));
+        }
+        else
+        {
+            int text = COLOR_CHANGE(TEXT_COLOR(color));
+            if(0 != (color & TEXT_BRIGHT))
+                text += 8;
+            rc = _WriteStr(tgoto("\x1b[38;5;%dm", 0, text));
+            rc = _WriteStr(tgoto("\x1b[48;5;%dm", 0, COLOR_CHANGE(FON_COLOR(color))));
+        }
     }
 
     m_color = color;
