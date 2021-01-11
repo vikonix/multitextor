@@ -502,7 +502,7 @@ input_t Dialog::EventProc(input_t code)
     {
         pos_t x = K_GET_X(code);
         pos_t y = K_GET_Y(code);
-        LOG(DEBUG) << "mouse screen x=" << x << " y=" << y;
+        //LOG(DEBUG) << "mouse screen x=" << x << " y=" << y;
         if(code & K_MOUSEW)
         {
             //mouse wheel
@@ -512,7 +512,7 @@ input_t Dialog::EventProc(input_t code)
              && y >= m_top  && y < m_top  + m_sizey)
         {
             ScreenToClient(x, y);
-            LOG(DEBUG) << "mouse client x=" << x << " y=" << y;
+            //LOG(DEBUG) << "mouse client x=" << x << " y=" << y;
 
             for(auto& control : m_controls)
             {
@@ -534,7 +534,7 @@ input_t Dialog::EventProc(input_t code)
                 {
                     if (control->CheckMouse(x, y))
                     {
-                        LOG(DEBUG) << "mouse select " << control->m_pos;
+                        //LOG(DEBUG) << "mouse select " << control->m_pos;
                         n = control->m_pos;
 
                         code = control->EventProc((code & ~K_CODEMASK) | ((x & 0xff) << 8) | (y & 0xff));
@@ -545,7 +545,7 @@ input_t Dialog::EventProc(input_t code)
         }
         else
         {
-            LOG(DEBUG) << "mouse outside";
+            //LOG(DEBUG) << "mouse outside";
             if((code & K_TYPEMASK) == K_MOUSEKUP)
                 code = K_ESC;
             else
@@ -560,7 +560,7 @@ input_t Dialog::EventProc(input_t code)
 
     if(code && 0 == (code & K_TYPEMASK) && 0 == (code & K_CTRL))
     {
-        LOG(DEBUG) << "symbol";
+        //LOG(DEBUG) << "symbol";
         char16_t wc = std::towupper(K_GET_CODE(code));
         
         for(auto& control: m_controls)
@@ -596,8 +596,7 @@ input_t Dialog::EventProc(input_t code)
         }
     }
 
-    LOG(DEBUG) << "code1=" << std::hex << code << std::dec;
-
+    //LOG(DEBUG) << "code1=" << std::hex << code << std::dec;
     if(code == K_ESC)
         return Close(ID_CANCEL);
     else if(code == ID_OK
@@ -605,7 +604,7 @@ input_t Dialog::EventProc(input_t code)
          || code == ID_IGNORE)
         return Close(code);
 
-    LOG(DEBUG) << "code2";
+    //LOG(DEBUG) << "code2";
     if(code == K_TAB)
         n = GetNextTabItem();
     else if(code == K_RIGHT

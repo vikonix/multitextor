@@ -26,11 +26,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "utils/Directory.h"
 #include "utils/logger.h"
+#include "utfcpp/utf8.h"
 
 #ifdef WIN32
     #include <windows.h>
     static const size_t c_BuffLen = 0x800;
 #endif
+
+#include <cwctype>
 
 
 std::string  Directory::m_projectName;
@@ -215,8 +218,25 @@ bool DirectoryList::Scan()
         LOG(ERROR) << __FUNC__ << " Exception: " << ex.what();
     }
 
-    std::sort(m_dirList.begin(), m_dirList.end());
-    std::sort(m_fileList.begin(), m_fileList.end());
+    std::sort(m_dirList.begin(), m_dirList.end(), [](const std::string& str1, const std::string& str2) {
+        std::u16string wstr1 = utf8::utf8to16(str1);
+        std::u16string wstr2 = utf8::utf8to16(str2);
+        std::transform(wstr1.begin(), wstr1.end(), wstr1.begin(),
+            [](char16_t c) -> char16_t { return std::towupper(c); });
+        std::transform(wstr2.begin(), wstr2.end(), wstr2.begin(),
+            [](char16_t c) -> char16_t { return std::towupper(c); });
+        return wstr1 < wstr2;
+        });
+
+    std::sort(m_fileList.begin(), m_fileList.end(),[](const direntry_t& entry1, const direntry_t& entry2) {
+        std::u16string wstr1 = entry1.path().u16string();
+        std::u16string wstr2 = entry2.path().u16string();
+        std::transform(wstr1.begin(), wstr1.end(), wstr1.begin(),
+            [](char16_t c) -> char16_t { return std::towupper(c); });
+        std::transform(wstr2.begin(), wstr2.end(), wstr2.begin(),
+            [](char16_t c) -> char16_t { return std::towupper(c); });
+        return wstr1 < wstr2;
+        });
 
     if(m_path.has_parent_path())
         m_dirList.insert(m_dirList.begin(), "..");

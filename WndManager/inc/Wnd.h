@@ -158,6 +158,7 @@ public:
     bool  WriteStr(pos_t x, pos_t y, const std::string& str, color_t color);
     bool  WriteWStr(pos_t x, pos_t y, const std::u16string& str, color_t color);
     bool  WriteChar(pos_t x, pos_t y, char c, color_t color);
+    bool  WriteWChar(pos_t x, pos_t y, char16_t c, color_t color);
 
     void  SetTextAttr(color_t color = ColorWindow) { m_color = color; }
     bool  Clr();

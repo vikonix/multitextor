@@ -266,7 +266,7 @@ bool ScreenWin32::SetTextAttr(color_t color)
     if(m_color == color)
         return true;
 
-    LOG(DEBUG) << "SetTextAttr " << color;
+    //LOG(DEBUG) << "SetTextAttr " << color;
     m_color = color;
     return SetConsoleTextAttribute(m_hStdout, color);
 }
@@ -409,6 +409,8 @@ bool ScreenWin32::WriteBlock(
 {
     if (INVALID_HANDLE_VALUE == m_hStdout)
         return false;
+
+    LOG(DEBUG) << "WriteBlock l=" << left << " t=" << top << " r=" << right << " b=" << bottom;
 
     size_t sizex = (size_t)right - left + 1;
     size_t sizey = (size_t)bottom - top + 1;

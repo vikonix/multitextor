@@ -104,18 +104,20 @@ public:
     virtual input_t AppProc(input_t code) override final 
     { 
         //input treatment in user function
-        if(code != K_TIME)
-            LOG(DEBUG) << __FUNC__;
+        if (code != K_TIME)
+            LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
 
         if (code == K_F2)
         {
-            code = WndManager::getInstance().PutInput(K_MENU);
+            WndManager::getInstance().PutInput(K_MENU);
+            code = 0;
         }
         else if (code == K_F3)
         {
             //code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK_CANCEL_IGNORE);
             FileDialog dlg{ FileDlgMode::Open };
             dlg.Activate();
+            code = 0;
         }
 
         return code; 

@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
+#include "utfcpp/utf8.h"
 #include "Dialog.h"
 
 
@@ -35,31 +36,31 @@ class Control : public CaptureInput
 friend class Dialog;
 
 protected:
-    Dialog&     m_dialog;
+    Dialog&         m_dialog;
 
-    size_t      m_pos;
-    std::string m_name;
-    std::string m_helpLine;
+    size_t          m_pos;
+    std::u16string  m_name;
+    std::string     m_helpLine;
 
-    std::any    m_var;
-    int         m_type;
-    int         m_id;
-    pos_t       m_posx;
-    pos_t       m_posy;
-    pos_t       m_sizex;
-    pos_t       m_sizey;
+    std::any        m_var;
+    int             m_type;
+    int             m_id;
+    pos_t           m_posx;
+    pos_t           m_posy;
+    pos_t           m_sizex;
+    pos_t           m_sizey;
 
-    input_t     m_key{};
-    pos_t       m_addSize{};
-    pos_t       m_dcursorx{};
-    pos_t       m_dcursory{};
+    input_t         m_key{};
+    pos_t           m_addSize{};
+    pos_t           m_dcursorx{};
+    pos_t           m_dcursory{};
 
 public:
     explicit Control(Dialog& dialog, size_t pos, int type, const std::string name, std::any var,
         int id, pos_t x, pos_t y, pos_t sizex, pos_t sizey, const std::string helpLine)
         : m_dialog{ dialog }
         , m_pos{ pos }
-        , m_name{ name }
+        , m_name{ utf8::utf8to16(name) }
         , m_helpLine{ helpLine }
         , m_var{ var }
         , m_type{ type }
@@ -81,7 +82,8 @@ public:
     virtual input_t SetFocus() { return K_SELECT; }
     virtual bool LostFocus() { return true; }
     virtual bool SetName(const std::string& name);
-    virtual const std::string_view GetName() { return m_name; }
+    virtual std::string GetName() { return utf8::utf16to8(m_name); }
+    virtual std::u16string GetWName() { return m_name; };
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = MAX_COORD, pos_t sizey = MAX_COORD)
     {
         if (x != MAX_COORD)     m_posx = x;
@@ -97,7 +99,7 @@ public:
     int  SetMode(int mode) { return m_type |= mode & CTRL_STATE_MASK; }
     int  ResetMode(int mode) { return m_type &= ~(mode & CTRL_STATE_MASK); }
 
-    bool Paint(const std::string& str, int type);
+    bool Paint(const std::u16string& str, int type);
 
     bool GetPos(pos_t& x, pos_t& y, pos_t& sizex, pos_t& sizey)
     {
@@ -192,7 +194,6 @@ friend class CtrlEditDropList;
 
     bool            m_selected{};
     size_t          m_offset{0};
-    std::u16string  m_str;
 
     bool Unselect(bool del = false);//false-unselect true-delete
 
@@ -204,7 +205,6 @@ public:
     virtual bool UpdateVar() override;
     virtual input_t SetFocus() override;
     virtual bool SetName(const std::string& name) override;
-    virtual const std::string_view GetName() override;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -293,7 +293,7 @@ public:
     virtual bool LostFocus() override;
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = 0, pos_t sizey = 0) override;
     virtual bool SetName(const std::string& name) override {return SetSelect(m_list.SetName(name));}//???
-    virtual const std::string_view GetName() override;
+    virtual std::string GetName() override;
 
     //control list
     size_t GetStrCount() {return m_list.GetStrCount();}
@@ -329,7 +329,7 @@ public:
     virtual bool SetName(const std::string& name) override {m_dcursorx = m_edit.m_dcursorx; return m_edit.SetName(name);}
 
     //control edit
-    const std::string_view GetName() override {return m_edit.GetName();}
+    std::string GetName() override {return m_edit.GetName();}
 
     //control list
     size_t GetStrCount() { return m_list.GetStrCount(); }

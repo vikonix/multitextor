@@ -203,7 +203,7 @@ size_t FileDialog::ScanDir(const std::string& mask)
 
 input_t FileDialog::DialogProc(input_t code)
 {
-    LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
+    //LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
 
     if ((code & K_TYPEMASK) == K_SELECT)
     {

@@ -117,7 +117,7 @@ bool FrameWnd::Refresh()
 
 bool FrameWnd::GotoXY(pos_t x, pos_t y)
 {
-    LOG(DEBUG) << __FUNC__ << " x=" << x << " y=" << y;
+    //LOG(DEBUG) << __FUNC__ << " x=" << x << " y=" << y;
     m_cursorx = x;
     m_cursory = y;
 
@@ -296,7 +296,7 @@ bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
     
     pos_t wleft = m_left + WndManager::getInstance().GetView(this).left + x;
     pos_t wtop = m_top + WndManager::getInstance().GetView(this).top + y;
-    LOG(DEBUG) << "WriteWnd wx=" << x << " wy=" << y << " x=" << wleft << " y=" << wtop << " s=" << str;
+    //LOG(DEBUG) << "WriteWnd wx=" << x << " wy=" << y << " x=" << wleft << " y=" << wtop << " s=" << str;
 
     bool rc = WndManager::getInstance().GotoXY(wleft, wtop);
     rc = WndManager::getInstance().SetTextAttr(color);
@@ -359,6 +359,23 @@ bool FrameWnd::WriteChar(pos_t x, pos_t y, char c, color_t color)
     bool rc = WndManager::getInstance().GotoXY(x, y);
     rc = WndManager::getInstance().SetTextAttr(color);
     rc = WndManager::getInstance().WriteChar(c);
+
+    return rc;
+}
+
+bool FrameWnd::WriteWChar(pos_t x, pos_t y, char16_t c, color_t color)
+{
+    if (!m_visible)
+        return true;
+
+    if (x == MAX_COORD || y == MAX_COORD || x > GetCSizeX() || y > GetCSizeY())
+        return true;
+
+    ClientToScreen(x, y);
+
+    bool rc = WndManager::getInstance().GotoXY(x, y);
+    rc = WndManager::getInstance().SetTextAttr(color);
+    rc = WndManager::getInstance().WriteWChar(c);
 
     return rc;
 }
