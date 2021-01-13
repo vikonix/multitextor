@@ -141,6 +141,27 @@ public:
 MyApp app;
 Application& Application::s_app{app};
 
+void CheckDirectoryFunc()
+{
+    LOG(DEBUG) << "run path=" << Directory::RunPath();
+    LOG(DEBUG) << "cur path=" << Directory::CurPath();
+    LOG(DEBUG) << "tmp path=" << Directory::TmpPath();
+    LOG(DEBUG) << "cfg path=" << Directory::CfgPath();
+    LOG(DEBUG) << "sys cfg path=" << Directory::SysCfgPath();
+    LOG(DEBUG) << "user=" << Directory::UserName();
+
+    _assert( Directory::Match<std::string>("geeks", "g*ks")); // Yes 
+    _assert( Directory::Match<std::string>("geeksforgeeks", "ge?ks*")); // Yes 
+    _assert(!Directory::Match<std::string>("gee", "g*k"));  // No because 'k' is not in second 
+    _assert(!Directory::Match<std::string>("pqrst", "*pqrs")); // No because 't' is not in first 
+    _assert( Directory::Match<std::string>("abcdhghgbcd", "abc*bcd")); // Yes 
+    _assert(!Directory::Match<std::string>("abcd", "abc*c?d")); // No because second must have 2 instances of 'c' 
+    _assert( Directory::Match<std::string>("abcd", "*c*d")); // Yes 
+    _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
+    _assert( Directory::Match<std::string>("acd", "*?c*d")); // Yes 
+    _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
+    _assert( Directory::Match<std::u16string>(u"abcd", u"*?c*d")); // Yes 
+}
 
 int main()
 {
@@ -165,13 +186,7 @@ int main()
 
     app.Deinit();
 
-    LOG(DEBUG) << "run path=" << Directory::RunPath();
-    LOG(DEBUG) << "cur path=" << Directory::CurPath();
-    LOG(DEBUG) << "tmp path=" << Directory::TmpPath();
-    LOG(DEBUG) << "cfg path=" << Directory::CfgPath();
-    LOG(DEBUG) << "sys cfg path=" << Directory::SysCfgPath();
-    LOG(DEBUG) << "user=" << Directory::UserName();
-
+    CheckDirectoryFunc();
     LOG(INFO) << "End";
     return 0;
 }

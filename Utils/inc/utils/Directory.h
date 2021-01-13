@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include <filesystem>
 #include <vector>
+#include <cwctype>
 
 /////////////////////////////////////////////////////////////////////////////
 using path_t = std::filesystem::path;
@@ -47,12 +48,77 @@ public:
     static path_t   SysCfgPath();
     static path_t   UserName();
     static std::string CutPath(const path_t& path, size_t len);
+
+    template<typename T>
+    static bool Match(const T& name, const T& mask, bool nametoupper = false)
+    {
+        // Based at algorithm written by Jack Handy - <A href="mailto:jakkhandy@hotmail.com">jakkhandy@hotmail.com</A>
+        auto nameIt = name.cbegin();
+        auto maskIt = mask.cbegin();
+
+        decltype(nameIt) namePos;
+        decltype(maskIt) maskPos;
+
+        auto cmp_chars = [nametoupper](decltype(*nameIt) c1, decltype(*maskIt) c2) -> bool
+        {
+            if (!nametoupper)
+                return c1 == c2;
+            else
+            {
+                if constexpr (sizeof(c1) == 1)
+                    return std::toupper(c1) == c2;// std::toupper(c2);
+                else
+                    return std::towupper(c1) == c2;// std::towupper(c2);
+            }
+        };
+
+        while (nameIt != name.cend() && maskIt != mask.cend() && *maskIt != '*')
+        {
+            if (!cmp_chars(*nameIt, *maskIt) && *maskIt != '?')
+                return false;
+            ++nameIt;
+            ++maskIt;
+        }
+
+        while (nameIt != name.cend() && maskIt != mask.cend())
+        {
+            if (*maskIt == '*')
+            {
+                if (++maskIt == mask.cend())
+                    return true;
+                namePos = nameIt + 1;
+                maskPos = maskIt;
+            }
+            else if (cmp_chars(*nameIt, *maskIt) || *maskIt == '?')
+            {
+                ++nameIt;
+                ++maskIt;
+            }
+            else
+            {
+                if (namePos == name.cend())
+                    return false;
+                nameIt = namePos++;
+                maskIt = maskPos;
+            }
+        }
+        if (nameIt != name.cend())
+            return false;
+
+        while (maskIt != mask.cend() && *maskIt == '*')
+            ++maskIt;
+
+        return maskIt == mask.cend();
+    }
 };
 
 
 class DirectoryList
 {
     std::string                 m_mask;
+    std::vector<std::u16string> m_maskList;
+    bool                        m_single{false};
+
     path_t                      m_path;
     std::vector<std::string>    m_drvList;
     std::vector<std::string>    m_dirList;
@@ -62,10 +128,15 @@ public:
     const std::vector<std::string>& GetDrvList()  { return m_drvList; }
     const std::vector<std::string>& GetDirList()  { return m_dirList; }
     const std::vector<direntry_t>&  GetFileList() { return m_fileList; }
-    const path_t&                   GetPath()     { return m_path; }
+    const path_t                    GetPath()     { return m_path; }
+    std::string                     GetMask()     { return m_mask; }
 
     bool    SetMask(const path_t& mask);
     bool    Scan();
+    bool    IsFound();
+
+protected:
+    bool    AddMask(const path_t& mask);
 };
 
 template <typename TP>
@@ -76,33 +147,3 @@ std::time_t to_time_t(TP tp)
         + system_clock::now());
     return system_clock::to_time_t(sctp);
 }
-
-#if 0
-enum SortOrder {
-  byLast,   byName,   byExt,   bySize,   byDate,
-  byLastIn, byNameIn, byExtIn, bySizeIn, byDateIn //inverce order
-};
-
-/////////////////////////////////////////////////////////////////////////////
-#define MASK_NUMBER 32
-
-class FileMask
-{
-protected:
-  char      m_dMask[MAX_PATH + 1];
-  size_t    m_nOffset1[MASK_NUMBER];
-  size_t    m_nOffset2[MASK_NUMBER];
-
-protected:
-  int   Match(char* pName, char* pMask);
-
-public:
-  FileMask();
-
-  int   SetMMask(const char* pMask);
-
-  int   CheckFileByMask(const char* pName);
-  int   CheckFileByMask(const char* pName, const char* pMask);
-};
-
-#endif

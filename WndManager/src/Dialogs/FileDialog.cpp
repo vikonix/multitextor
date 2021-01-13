@@ -159,11 +159,12 @@ bool FileDialog::OnActivate()
     m_DList.SetFullPath(buff);
 */
     ScanDir(".");
+    //ScanDir("c:/work/MyProjects/*.c*;*.h;*.m*");
 
     return true;
 }
 
-size_t FileDialog::ScanDir(const std::string& mask)
+bool FileDialog::ScanDir(const std::string& mask)
 {
     std::u16string wmask = utf8::utf8to16(mask);
     m_list.SetMask(wmask);
@@ -172,9 +173,9 @@ size_t FileDialog::ScanDir(const std::string& mask)
     GetItem(ID_OF_NAME)->SetName("");
     GetItem(ID_OF_INFO)->SetName("");
 
-    auto& path = m_list.GetPath();
+    auto path = m_list.GetPath() / m_list.GetMask();
     auto pathCtrl = GetItem(ID_OF_PATH);
-    pathCtrl->SetName(Directory::CutPath(path.lexically_normal().string(), pathCtrl->GetSizeX()));
+    pathCtrl->SetName(Directory::CutPath(path.lexically_normal().u8string(), pathCtrl->GetSizeX()));
     
     auto fList = GetItem(ID_OF_FILELIST);
     auto fListPtr = std::dynamic_pointer_cast<CtrlList>(fList);
@@ -198,7 +199,7 @@ size_t FileDialog::ScanDir(const std::string& mask)
     SelectItem(item);
     Refresh();
 
-    return m_list.GetFileList().size();
+    return m_list.IsFound();
 }
 
 input_t FileDialog::DialogProc(input_t code)
@@ -294,13 +295,13 @@ input_t FileDialog::DialogProc(input_t code)
             else
             {
                 auto name = GetItem(ID_OF_NAME)->GetName();
-                auto n = ScanDir(std::string(name));
+                auto found = ScanDir(std::string(name));
 
                 //сохраняем тип разбора
                 //???CtrlSList* pCtrl = (CtrlSList*)GetItem(ID_OF_TYPE);
                 //int parse = pCtrl->GetSelect();
 
-                if (n > 1)//(!m || (n != 0 && n != 1))
+                if (!found)//(!m || (n != 0 && n != 1))
                 {
                     //if not simple mask or found many files
                     code = 0;
@@ -309,6 +310,7 @@ input_t FileDialog::DialogProc(input_t code)
                 {
                     //восстанавливаем тип разбора
                     //???pCtrl->SetSelect(parse);
+                    LOG(DEBUG) << "Found";
                 }
             }
         }
@@ -324,4 +326,15 @@ input_t FileDialog::DialogProc(input_t code)
     }
 
     return code;
+}
+
+bool FileDialog::OnClose(int id)
+{
+    if (id == ID_OK)
+    {
+        auto path = m_list.GetPath();
+        auto name = GetItem(ID_OF_NAME)->GetName();
+        LOG(DEBUG) << "path=" << path << " file=" << name;
+    }
+    return true;
 }

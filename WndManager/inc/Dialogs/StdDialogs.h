@@ -46,7 +46,8 @@ public:
 
     virtual input_t DialogProc(input_t code) override;
     virtual bool OnActivate() override;
+    virtual bool OnClose(int id) override;
 
 protected:
-    size_t ScanDir(const std::string& mask);
+    bool ScanDir(const std::string& mask);
 };

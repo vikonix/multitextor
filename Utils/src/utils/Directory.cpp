@@ -33,8 +33,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     static const size_t c_BuffLen = 0x800;
 #endif
 
-#include <cwctype>
-
 
 std::string  Directory::m_projectName;
 path_t Directory::m_runPath = [] {
@@ -42,7 +40,7 @@ path_t Directory::m_runPath = [] {
 
 #ifdef WIN32
     TCHAR buff[c_BuffLen];
-    DWORD len = GetModuleFileName(NULL, buff, sizeof(buff) / sizeof(TCHAR));
+    DWORD len = GetModuleFileName(NULL, buff, c_BuffLen);
     buff[len] = 0;
     _assert(len > 0);
     path = buff;
@@ -100,7 +98,7 @@ path_t Directory::SysCfgPath()
 {
 #ifdef WIN32
     TCHAR buff[c_BuffLen];
-    [[maybe_unused]]bool rc = GetWindowsDirectory(buff, sizeof(buff) / sizeof(TCHAR));
+    [[maybe_unused]]bool rc = GetWindowsDirectory(buff, c_BuffLen);
     _assert(rc);
     return buff;
 #else
@@ -112,7 +110,7 @@ path_t Directory::UserName()
 {
 #ifdef WIN32
     TCHAR buff[c_BuffLen];
-    DWORD len = sizeof(buff) / sizeof(TCHAR);
+    DWORD len = c_BuffLen;
     [[maybe_unused]]bool rc = GetUserName(buff, &len);
     _assert(rc);
     return buff;
@@ -141,32 +139,73 @@ std::string Directory::CutPath(const path_t& path, size_t len)
     return shortPath.u8string();
 }
 
+bool DirectoryList::AddMask(const path_t& mask)
+{
+    //LOG(DEBUG) << "AddMask " << mask;
+    
+    m_mask = mask.u8string();
+    m_single = true;
+    m_maskList.clear();
+
+    std::u16string m;
+    auto wmask = mask.u16string();
+    for (auto ch : wmask)
+    {
+        if (ch == ';')
+        {
+            m_maskList.push_back(m);
+            m.clear();
+        }
+        else
+        {
+            m += std::towupper(ch);
+            if (ch == '*' || ch == '?')
+                m_single = false;
+        }
+    }
+    if (m.size())
+        m_maskList.push_back(m);
+
+    if (m_maskList.size() > 1)
+        m_single = false;
+    
+    return true;
+}
+
 bool DirectoryList::SetMask(const path_t& mask)
 {
-    auto path = m_path / mask.u16string();
+    LOG(DEBUG) << "SetMask " << mask;
+
+    path_t path;
+    if (mask.has_parent_path())
+        path = mask;
+    else
+        path = m_path / mask.u16string();
+
+    m_path = "/";
+
+    if (!std::filesystem::is_directory(path))
+    {
+        auto file = path.filename();
+        path.remove_filename();
+        AddMask(file);
+    }
+
+    if (!std::filesystem::is_directory(path))
+    {
+        path = "/";
+    }
+
     try
     {
-        m_path = std::filesystem::canonical(path.u16string());
+        m_path = std::filesystem::canonical(path);
     }
     catch (const std::exception& ex)
     {
         LOG(ERROR) << __FUNC__ << " Exception: " << ex.what();
     }
 
-    if (!std::filesystem::is_directory(m_path))
-    {
-        auto file = m_path.filename();
-        m_path.remove_filename();
-        m_mask = file.u8string();
-    }
-    else
-        m_mask.clear();
-
-    if (!std::filesystem::is_directory(m_path))
-    {
-        m_path = "/";
-    }
-
+    LOG(DEBUG) << "path=" << m_path << " single mask=" << m_single;
     return true;
 }
 
@@ -209,7 +248,19 @@ bool DirectoryList::Scan()
             }
             else if (entry.is_regular_file())
             {
-                m_fileList.push_back(entry);
+                if(m_maskList.empty())
+                    m_fileList.push_back(entry);
+                else
+                {
+                    for (const auto& mask : m_maskList)
+                    {
+                        if (Directory::Match<std::u16string>(entry.path().filename().u16string(), mask, true))
+                        {
+                            m_fileList.push_back(entry);
+                            break;
+                        }
+                    }
+                }
             }
         }
     }
@@ -242,5 +293,13 @@ bool DirectoryList::Scan()
         m_dirList.insert(m_dirList.begin(), "..");
 
     return true;
+}
+
+bool DirectoryList::IsFound()
+{
+    if (m_fileList.size() == 1 && m_single)
+        return true;
+    else
+        return false;
 }
 
