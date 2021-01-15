@@ -52,11 +52,6 @@ class Shade final
     std::vector<cell_t> m_pSaveR;
     std::vector<cell_t> m_pSaveB;
 
-    std::vector<cell_t> m_SaveTL;
-    std::vector<cell_t> m_SaveTR;
-    std::vector<cell_t> m_SaveBL;
-    std::vector<cell_t> m_SaveBR;
-
 public:
     Shade() = delete;
     explicit Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode = SHADE_ALL);

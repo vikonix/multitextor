@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 Shade::Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode)
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
 
     m_x     = x;
     m_y     = y;
@@ -54,47 +54,56 @@ Shade::Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode)
             m_mode &= ~SHADE_LEFT;
 
     if(m_mode & SHADE_RIGHT)
-        if(x + sizex > WndManager::getInstance().m_sizex - 1)
+        if(x + sizex >= WndManager::getInstance().m_sizex)
             m_mode &= ~SHADE_RIGHT;
 
     if(m_mode & SHADE_BOTTOM)
-        if(y + sizey > WndManager::getInstance().m_sizey - 2)
+        if(y + sizey >= WndManager::getInstance().m_sizey - 2)
             m_mode &= ~SHADE_BOTTOM;
 
+    if (m_mode & SHADE_LEFT)
+    {
+        --m_x;
+        ++m_sizex;
+    }
+    if (m_mode & SHADE_RIGHT)
+        ++m_sizex;
+    
     if(m_mode & SHADE_SAVE)
     {
-        if(m_mode & SHADE_TOP)
-          WndManager::getInstance().GetBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y - 1, m_pSaveT);
+        if (m_mode & SHADE_TOP)
+            WndManager::getInstance().GetBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y - 1, m_pSaveT);
         if(m_mode & SHADE_LEFT)
-          WndManager::getInstance().GetBlock(m_x - 1, m_y, m_x - 1, m_y + m_sizey - 1, m_pSaveL);
+            WndManager::getInstance().GetBlock(m_x, m_y, m_x, m_y + m_sizey - 1, m_pSaveL);
         if(m_mode & SHADE_RIGHT)
-          WndManager::getInstance().GetBlock(m_x + m_sizex, m_y, m_x + m_sizex, m_y + m_sizey - 1, m_pSaveR);
-        if(m_mode & SHADE_BOTTOM)
-          WndManager::getInstance().GetBlock(m_x, m_y + m_sizey, m_x + m_sizex - 1, m_y + m_sizey, m_pSaveB);
-
-        if((m_mode & SHADE_TOP) && (m_mode & SHADE_LEFT))
-          WndManager::getInstance().GetBlock(m_x - 1, m_y - 1, m_x - 1, m_y - 1, m_SaveTL);
-        if((m_mode & SHADE_TOP) && (m_mode & SHADE_RIGHT))
-          WndManager::getInstance().GetBlock(m_x + m_sizex, m_y - 1, m_x + m_sizex, m_y - 1, m_SaveTR);
-        if((m_mode & SHADE_BOTTOM) && (m_mode & SHADE_LEFT))
-          WndManager::getInstance().GetBlock(m_x - 1, m_y + m_sizey, m_x - 1, m_y + m_sizey, m_SaveBL);
-        if((m_mode & SHADE_BOTTOM) && (m_mode & SHADE_RIGHT))
-          WndManager::getInstance().GetBlock(m_x + m_sizex, m_y + m_sizey, m_x + m_sizex, m_y + m_sizey, m_SaveBR);
+            WndManager::getInstance().GetBlock(m_x + m_sizex - 1, m_y, m_x + m_sizex - 1, m_y + m_sizey - 1, m_pSaveR);
+        if (m_mode & SHADE_BOTTOM)
+            WndManager::getInstance().GetBlock(m_x, m_y + m_sizey, m_x + m_sizex - 1, m_y + m_sizey, m_pSaveB);
     }
 
     if(m_mode & SHADE_PAINT)
         Paint();
 }
 
-
 Shade::~Shade()
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
 
     if(m_mode & SHADE_SAVE)
         Hide();
 }
 
+bool Shade::Hide()
+{
+    LOG(DEBUG) << __FUNC__;
+
+    WndManager::getInstance().PutBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y, m_pSaveT);
+    WndManager::getInstance().PutBlock(m_x, m_y, m_x, m_y + m_sizey - 1, m_pSaveL);
+    WndManager::getInstance().PutBlock(m_x + m_sizex - 1, m_y, m_x + m_sizex - 1, m_y + m_sizey - 1, m_pSaveR);
+    WndManager::getInstance().PutBlock(m_x, m_y + m_sizey, m_x + m_sizex - 1, m_y + m_sizey, m_pSaveB);
+
+    return true;
+}
 
 bool Shade::Paint()
 {
@@ -102,41 +111,14 @@ bool Shade::Paint()
 
     color_t color = ColorShade;
 
-    if(m_mode & SHADE_TOP)
+    if (m_mode & SHADE_TOP)
         WndManager::getInstance().ColorRect(m_x, m_y - 1, m_sizex, 1, color);
     if(m_mode & SHADE_LEFT)
-        WndManager::getInstance().ColorRect(m_x - 1, m_y, 1, m_sizey, color);
+        WndManager::getInstance().ColorRect(m_x, m_y, 1, m_sizey, color);
     if(m_mode & SHADE_RIGHT)
-        WndManager::getInstance().ColorRect(m_x + m_sizex, m_y, 1, m_sizey, color);
-    if(m_mode & SHADE_BOTTOM)
+        WndManager::getInstance().ColorRect(m_x + m_sizex - 1, m_y, 1, m_sizey, color);
+    if (m_mode & SHADE_BOTTOM)
         WndManager::getInstance().ColorRect(m_x, m_y + m_sizey, m_sizex, 1, color);
-
-    if((m_mode & SHADE_TOP) && (m_mode & SHADE_LEFT))
-        WndManager::getInstance().ColorRect(m_x - 1, m_y - 1, 1, 1, color);
-    if((m_mode & SHADE_TOP) && (m_mode & SHADE_RIGHT))
-        WndManager::getInstance().ColorRect(m_x + m_sizex, m_y - 1, 1, 1, color);
-    if((m_mode & SHADE_BOTTOM) && (m_mode & SHADE_LEFT))
-        WndManager::getInstance().ColorRect(m_x - 1, m_y + m_sizey, 1, 1, color);
-    if((m_mode & SHADE_BOTTOM) && (m_mode & SHADE_RIGHT))
-        WndManager::getInstance().ColorRect(m_x + m_sizex, m_y + m_sizey, 1, 1, color);
-
-    return true;
-}
-
-
-bool Shade::Hide()
-{
-    LOG(DEBUG) << __FUNC__;
-
-    WndManager::getInstance().PutBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y - 1, m_pSaveT);
-    WndManager::getInstance().PutBlock(m_x - 1, m_y, m_x - 1, m_y + m_sizey - 1, m_pSaveL);
-    WndManager::getInstance().PutBlock(m_x + m_sizex, m_y, m_x + m_sizex, m_y + m_sizey - 1, m_pSaveR);
-    WndManager::getInstance().PutBlock(m_x, m_y + m_sizey, m_x + m_sizex - 1, m_y + m_sizey, m_pSaveB);
-
-    WndManager::getInstance().PutBlock(m_x - 1, m_y - 1, m_x - 1, m_y - 1, m_SaveTL);
-    WndManager::getInstance().PutBlock(m_x + m_sizex, m_y - 1, m_x + m_sizex, m_y - 1, m_SaveTR);
-    WndManager::getInstance().PutBlock(m_x - 1, m_y + m_sizey, m_x - 1, m_y + m_sizey, m_SaveBL);
-    WndManager::getInstance().PutBlock(m_x + m_sizex, m_y + m_sizey, m_x + m_sizex, m_y + m_sizey, m_SaveBR);
 
     return true;
 }

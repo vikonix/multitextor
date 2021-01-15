@@ -82,8 +82,10 @@ bool InputWin32::Init()
     char* pLC_CTYPE = setlocale(LC_CTYPE, "");
     LOG(INFO) << "LC_CTYPE=" << pLC_CTYPE;
 
+    HWND wnd = GetConsoleWindow();
+
     m_hWnd = GetForegroundWindow();
-    LOG(INFO) << "hWnd=" << m_hWnd;
+    LOG(INFO) << "hWnd=" << m_hWnd << " consolewnd=" << wnd;
 
     return true;
 }

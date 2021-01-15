@@ -264,7 +264,7 @@ input_t LineMenu::EventProc(input_t code)
 
     if(!m_menu.empty() && code)
     {
-        LOG(DEBUG) << __FUNC__ << "code=" << std::hex << code << std::dec;
+        LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
         if(code == K_ESC)
         {
             close = true;
@@ -446,15 +446,15 @@ input_t FrameMenu::Activate(bool capture)
 
     m_selected = GetNextItem(-1);
 
-    if(m_sizex > WndManager::getInstance().m_sizex)
-        m_sizex = WndManager::getInstance().m_sizex;
-    if(m_left + m_sizex >= WndManager::getInstance().m_sizex)
-        m_left = WndManager::getInstance().m_sizex - m_sizex;
+    if(m_sizex >= WndManager::getInstance().m_sizex - 1)
+        m_sizex = WndManager::getInstance().m_sizex - 1;
+    if(m_left + m_sizex >= WndManager::getInstance().m_sizex - 1)
+        m_left = WndManager::getInstance().m_sizex - m_sizex - 1;
 
-    if(m_sizey > WndManager::getInstance().m_sizey - 1)
+    if(m_sizey >= WndManager::getInstance().m_sizey - 1)
         m_sizey = WndManager::getInstance().m_sizey - 1;
-    if(m_top + m_sizey >= WndManager::getInstance().m_sizey)
-        m_top = WndManager::getInstance().m_sizey - m_sizey;
+    if(m_top + m_sizey >= WndManager::getInstance().m_sizey - 1)
+        m_top = WndManager::getInstance().m_sizey - m_sizey - 1;
 
     LOG(DEBUG) << "FrameMenu::Activate x=" << m_left << " y=" << m_top << " sx=" << m_sizex << " sy=" << m_sizey;
 

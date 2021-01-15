@@ -640,7 +640,7 @@ bool ScreenTTY::WriteBlock(
 {
     bool rc = false;
 
-    LOG(DEBUG) << "WriteBlock l=" << left << " t=" << top << " r=" << right << " b=" << bottom;
+    //LOG(DEBUG) << "WriteBlock l=" << left << " t=" << top << " r=" << right << " b=" << bottom;
     
     bool fLast {false};
     if(right == m_sizex - 1 && bottom == m_sizey - 1)

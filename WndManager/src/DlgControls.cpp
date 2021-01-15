@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////
 bool Control::SetName(const std::string& name)
 {
+    //LOG(DEBUG) << __FUNC__ << " '" << name << "'";
     m_name = utf8::utf8to16(name);
     m_sizex = (pos_t)m_name.size() + m_addSize;
     return true;

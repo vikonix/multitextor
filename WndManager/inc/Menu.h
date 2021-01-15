@@ -98,7 +98,7 @@ class LineMenu : public Menu
 public:
     LineMenu() = delete;
     explicit LineMenu(const menu_list& menu, pos_t x = 0, pos_t y = 0) : Menu(menu, x, y) {}
-    virtual ~LineMenu() { LOG(DEBUG) << __FUNC__; }
+    virtual ~LineMenu() = default; //{ LOG(DEBUG) << __FUNC__; }
 
     virtual input_t Close(input_t code) override final;
     virtual input_t Activate(bool fCapture = false) override final;
@@ -113,7 +113,7 @@ class FrameMenu : public Menu
 public:
     FrameMenu() = delete;
     explicit FrameMenu(const menu_list& menu, pos_t x, pos_t y) : Menu(menu, x, y) {}
-    virtual ~FrameMenu() { LOG(DEBUG) << __FUNC__; }
+    virtual ~FrameMenu() = default; //{ LOG(DEBUG) << __FUNC__; }
 
     virtual input_t Close(input_t code) override {return Menu::Close(code);}
     virtual input_t Activate(bool fCapture = false) override;

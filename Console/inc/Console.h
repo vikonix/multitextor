@@ -58,7 +58,17 @@ public:
     
     void Deinit()
         {m_input.Deinit(); m_screen.Deinit();}
-    
+
+    bool SetScreenSize(pos_t sizex, pos_t sizey) 
+    { 
+#ifdef WIN32        
+        m_screen.SetSize(sizex, sizey); 
+        return m_screen.Resize();
+#else
+        return true;
+#endif
+    }
+
     bool InputPending(const std::chrono::milliseconds& waitTime = 500ms)
         {return m_input.InputPending(waitTime);}
     bool SwitchToStdConsole()

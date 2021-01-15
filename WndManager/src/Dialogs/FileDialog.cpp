@@ -173,9 +173,9 @@ bool FileDialog::ScanDir(const std::string& mask)
     GetItem(ID_OF_NAME)->SetName("");
     GetItem(ID_OF_INFO)->SetName("");
 
-    auto path = m_list.GetPath() / m_list.GetMask();
+    auto path = m_list.GetPath() / utf8::utf8to16(m_list.GetMask());
     auto pathCtrl = GetItem(ID_OF_PATH);
-    pathCtrl->SetName(Directory::CutPath(path.lexically_normal().u8string(), pathCtrl->GetSizeX()));
+    pathCtrl->SetName(Directory::CutPath(path, pathCtrl->GetSizeX()));
     
     auto fList = GetItem(ID_OF_FILELIST);
     auto fListPtr = std::dynamic_pointer_cast<CtrlList>(fList);

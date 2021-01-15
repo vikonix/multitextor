@@ -265,7 +265,7 @@ bool  Application::PrintStatusLine()
     if (m_sLine.empty())
         return true;
 
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
     
     pos_t x = 0;
     pos_t y = m_wndManager.m_sizey - 1;
