@@ -28,10 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 
 
-template class BuffPool<std::string>;
-template class SBuff<std::string, std::string_view>;
-template class StrBuff<std::string, std::string_view>;
-
 /////////////////////////////////////////////////////////////////////////////
 template <typename Tbuff>
 BuffPool<Tbuff>::BuffPool(size_t n)
@@ -342,3 +338,6 @@ bool StrBuff<Tbuff, Tview>::ClearModifyFlag()
     return rc;
 }
 
+template class BuffPool<std::string>;
+template class SBuff<std::string, std::string_view>;
+template class StrBuff<std::string, std::string_view>;
