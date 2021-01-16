@@ -59,7 +59,7 @@ public:
     void Deinit()
         {m_input.Deinit(); m_screen.Deinit();}
 
-    bool SetScreenSize(pos_t sizex, pos_t sizey) 
+    bool SetScreenSize([[maybe_unused]]pos_t sizex, [[maybe_unused]] pos_t sizey)
     { 
 #ifdef WIN32        
         m_screen.SetSize(sizex, sizey); 

@@ -73,7 +73,8 @@ menu_list menu1 {
     {MENU_SEPARATOR,  "menu3",     K_F3},
     {MENU_ITEM,       "menu4",     K_F4},
     {MENU_ITEM,       "menu5",     K_F5},
-    {MENU_ITEM,       "menu6",     K_F6}
+    {MENU_ITEM,       "menu6",     K_MENU + 1, "Next menu"},
+    {MENU_ITEM,       "menu7",     K_F7}
 };
 
 sline_list sLine {
@@ -201,7 +202,7 @@ int main()
     //Application& app = Application::getInstance();
     //MyApp app;
     app.Init();
-    WndManager::getInstance().SetScreenSize(255, 255);
+    WndManager::getInstance().SetScreenSize(80, 24);
 
     app.SetLogo(g_Logo);
     app.WriteAppName(L"TestApp");

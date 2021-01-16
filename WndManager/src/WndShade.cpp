@@ -46,7 +46,7 @@ Shade::Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode)
     }
 
     if(m_mode & SHADE_TOP)
-        if(y <= 1)
+        if(y < 1)
             m_mode &= ~SHADE_TOP;
 
     if(m_mode & SHADE_LEFT)
@@ -58,7 +58,7 @@ Shade::Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode)
             m_mode &= ~SHADE_RIGHT;
 
     if(m_mode & SHADE_BOTTOM)
-        if(y + sizey >= WndManager::getInstance().m_sizey - 2)
+        if(y + sizey > WndManager::getInstance().m_sizey - 2)
             m_mode &= ~SHADE_BOTTOM;
 
     if (m_mode & SHADE_LEFT)
@@ -97,7 +97,7 @@ bool Shade::Hide()
 {
     LOG(DEBUG) << __FUNC__;
 
-    WndManager::getInstance().PutBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y, m_pSaveT);
+    WndManager::getInstance().PutBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y - 1, m_pSaveT);
     WndManager::getInstance().PutBlock(m_x, m_y, m_x, m_y + m_sizey - 1, m_pSaveL);
     WndManager::getInstance().PutBlock(m_x + m_sizex - 1, m_y, m_x + m_sizex - 1, m_y + m_sizey - 1, m_pSaveR);
     WndManager::getInstance().PutBlock(m_x, m_y + m_sizey, m_x + m_sizex - 1, m_y + m_sizey, m_pSaveB);

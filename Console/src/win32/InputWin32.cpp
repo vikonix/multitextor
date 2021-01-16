@@ -86,7 +86,8 @@ bool InputWin32::Init()
 
     m_hWnd = GetForegroundWindow();
     LOG(INFO) << "hWnd=" << m_hWnd << " consolewnd=" << wnd;
-
+    
+    SetWindowPos(m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE);
     return true;
 }
 

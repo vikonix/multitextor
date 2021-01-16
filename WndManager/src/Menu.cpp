@@ -462,7 +462,7 @@ input_t FrameMenu::Activate(bool capture)
 
     Refresh();
 
-    m_shade = std::make_unique<Shade>(m_left, m_top, m_sizex, m_sizey, SHADE_ALL | SHADE_PAINT | SHADE_SAVE);
+    m_shade = std::make_unique<Shade>(m_left, m_top, m_sizex, m_sizey, (SHADE_ALL | SHADE_PAINT | SHADE_SAVE) & ~SHADE_TOP);
 
     if(capture)
         InputCapture();
