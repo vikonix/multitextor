@@ -188,7 +188,7 @@ void BuffTest()
         sbuff->DelStr(1);
 
         LOG(DEBUG) << sbuff->GetStr(0) << sbuff->GetStr(1) << sbuff->GetStr(2);
-        LOG(DEBUG) << sbuff->GetBuff();
+        LOG(DEBUG) << *(sbuff->GetBuff());
     }
 }
 

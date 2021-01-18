@@ -198,6 +198,11 @@ bool DirectoryList::SetMask(const path_t& mask)
     try
     {
         m_path = std::filesystem::canonical(path, ec);
+        if (ec || m_path.empty())
+        {
+            LOG(ERROR) << __FUNC__ << " err=" << ec << " - " << ec.message();
+            m_path = path.remove_filename();
+        }
     }
     catch (const std::exception& ex)
     {
@@ -238,7 +243,8 @@ bool DirectoryList::Scan()
 
     try
     {
-        for (auto& entry : std::filesystem::directory_iterator(m_path))
+        std::error_code ec;
+        for (auto& entry : std::filesystem::directory_iterator(m_path, std::filesystem::directory_options::skip_permission_denied, ec))
         {
             if (entry.is_directory())
             {
