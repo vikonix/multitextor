@@ -882,12 +882,15 @@ input_t CtrlList::EventProc(input_t code)
     {
         if (step == 0)
         {
-            if (pos < sizey)
-                m_firstLine = 0;
-            else if (pos >= size - sizey)
-                m_firstLine = size - sizey - 1;
-            else
-                m_firstLine = pos - sizey / 2;
+            if (pos < m_firstLine || pos > m_firstLine + sizey)
+            {
+                if (pos < sizey)
+                    m_firstLine = 0;
+                else if (pos >= size - sizey)
+                    m_firstLine = size - sizey - 1;
+                else
+                    m_firstLine = pos - sizey / 2;
+            }
         }
         else if (pos > m_firstLine + sizey)
         {

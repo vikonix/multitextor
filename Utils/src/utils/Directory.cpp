@@ -182,27 +182,27 @@ bool DirectoryList::SetMask(const path_t& mask)
     else
         path = m_path / mask.u16string();
 
-    m_path = "/";
-
-    if (!std::filesystem::is_directory(path))
+    std::error_code ec;
+    if (!std::filesystem::is_directory(path, ec))
     {
         auto file = path.filename();
         path.remove_filename();
         AddMask(file);
     }
 
-    if (!std::filesystem::is_directory(path))
+    if (!std::filesystem::is_directory(path, ec))
     {
         path = "/";
     }
 
     try
     {
-        m_path = std::filesystem::canonical(path);
+        m_path = std::filesystem::canonical(path, ec);
     }
     catch (const std::exception& ex)
     {
         LOG(ERROR) << __FUNC__ << " Exception: " << ex.what();
+        m_path = "/";
     }
 
     LOG(DEBUG) << "path=" << m_path << " single mask=" << m_single;
