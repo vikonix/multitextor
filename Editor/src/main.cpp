@@ -177,7 +177,7 @@ void BuffTest()
     pool->ReleaseBuff(b);
 
     {
-        auto sbuff = std::make_unique<StrBuff<std::string, std::string_view>>( pool );
+        auto sbuff = std::make_unique<StrBuff<std::string, std::string_view>>();
         sbuff->GetBuff();
 
         sbuff->AppendStr("Hello");
@@ -221,5 +221,6 @@ int main()
     CheckDirectoryFunc();
 
     LOG(INFO) << "End";
+
     return 0;
 }

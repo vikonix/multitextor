@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <memory>
 #include <string>
+#include <vector>
+#include <optional>
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -71,6 +73,8 @@ class BuffPool
     size_t              m_stepBlocks{};
 
 public:
+    static BuffPool     s_pool;
+
     BuffPool(size_t n = STEP_BLOCKS);
     ~BuffPool() = default;
 
@@ -83,8 +87,13 @@ public:
 
 /////////////////////////////////////////////////////////////////////////////
 template <typename Tbuff, typename Tview>
+class MemStrBuff;
+
+template <typename Tbuff, typename Tview>
 class SBuff
 {
+    friend class MemStrBuff<std::string, std::string_view>;
+
 protected:
     //we use last element as 'end of buffer' offset
     std::array<size_t, STR_NUM + 1> m_strOffsets{};
@@ -97,8 +106,8 @@ public:
     SBuff() = default;
     ~SBuff() = default;
 
-    size_t  GetStrCount() {return m_strCount;}
     bool    Clear();
+    size_t  GetStrCount() {return m_strCount;}
     Tview   GetStr(size_t n);
     bool    AddStr(size_t n, const Tview str);
     bool    AppendStr(const Tview str);
@@ -110,10 +119,9 @@ public:
 template <typename Tbuff, typename Tview>
 class StrBuff : public SBuff<Tbuff, Tview>
 {
-    //friend class TextBuff;
-    //friend class MStrBuff;
+    friend class MemStrBuff<std::string, std::string_view>;
 
-    std::shared_ptr<BuffPool<Tbuff>> m_buffPool;
+    //std::shared_ptr<BuffPool<Tbuff>> m_buffPool;
 
     //we save string in buffer as in file
     hbuff_t     m_buffHandle{0};
@@ -121,11 +129,48 @@ class StrBuff : public SBuff<Tbuff, Tview>
     bool        m_lostData{false};
 
 public:
-    StrBuff(std::shared_ptr<BuffPool<Tbuff>> pool) : m_buffPool{ pool } {};
+    StrBuff() = default;// std::shared_ptr<BuffPool<Tbuff>> pool) : m_buffPool{ pool } {};
     ~StrBuff();
 
-    Tview   GetBuff();
+    std::shared_ptr<Tbuff> GetBuff();
     bool    ReleaseBuff();
     bool    Clear();
     bool    ClearModifyFlag();
+};
+
+/////////////////////////////////////////////////////////////////////////////
+template <typename Tbuff, typename Tview>
+class MemStrBuff
+{
+protected:
+    std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>> m_buffList;
+    size_t  m_strCount{};
+    bool    m_changed{};
+
+    typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator m_curBuff;
+    size_t  m_curBuffLine{};
+
+    virtual bool LoadBuff([[maybe_unused]]size_t offset, [[maybe_unused]] size_t size, [[maybe_unused]] std::shared_ptr<Tbuff> buff)
+    {
+        return true;
+    }
+
+    std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator> GetBuff(size_t& line);
+    bool    ReleaseBuff();
+    bool    SplitBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator& buff, size_t line);
+    bool    DelBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator& buff);
+
+public:
+    bool    IsChanged() { return m_changed; }
+    size_t  GetSize();
+
+    bool    Clear();
+    size_t  GetStrCount() { return m_strCount; }
+    Tview   GetStr(size_t n);
+    bool    AddStr(size_t n, const Tview str);
+    bool    AppendStr(const Tview str) {return AddStr(m_strCount, str);}
+    bool    ChangeStr(size_t n, const Tview str);
+    bool    DelStr(size_t n);
+
+    std::pair<size_t, bool> FindStr(const std::string& str);
 };
