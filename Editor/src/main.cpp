@@ -170,12 +170,13 @@ void CheckDirectoryFunc()
 void BuffTest()
 {
     LOG(DEBUG) << "Test: " << __FUNC__;
-    auto pool = std::make_shared<BuffPool<std::string>>();
-    auto b = pool->GetFreeBuff();
-    auto ptr = pool->GetBuffPointer(b);
-    pool->ReleaseBuffPointer(b);
-    pool->ReleaseBuff(b);
-
+    {
+        auto pool = std::make_shared<BuffPool<std::string>>();
+        auto b = pool->GetFreeBuff();
+        auto ptr = pool->GetBuffPointer(b);
+        pool->ReleaseBuffPointer(b);
+        pool->ReleaseBuff(b);
+    }
     {
         auto sbuff = std::make_unique<StrBuff<std::string, std::string_view>>();
         sbuff->GetBuff();
@@ -187,8 +188,34 @@ void BuffTest()
         sbuff->ChangeStr(0, "!!!Hello!!!");
         sbuff->DelStr(1);
 
-        LOG(DEBUG) << sbuff->GetStr(0) << sbuff->GetStr(1) << sbuff->GetStr(2);
+        std::stringstream sstr;
+        sstr << sbuff->GetStr(0) << sbuff->GetStr(1) << sbuff->GetStr(2);
+
+        LOG(DEBUG) << sstr.str();
         LOG(DEBUG) << *(sbuff->GetBuff());
+        _assert(sstr.str() == *(sbuff->GetBuff()));
+    }
+    {
+        auto genStr = [](int i) ->std::string {
+            std::stringstream sstr;
+            sstr << "str" << i << std::endl;
+            return sstr.str();
+        };
+
+        int n = 100000;
+        LOG(DEBUG) << "gen str " << n;
+        MemStrBuff<std::string, std::string_view> mbuff;
+        for (int i = 0; i < n; ++i)
+        {
+            mbuff.AddStr(0, genStr(i));
+        }
+        LOG(DEBUG) << "check";
+        for (int i = 0; i < n; ++i)
+        {
+            [[maybe_unused]]auto str = mbuff.GetStr(n - i - 1);
+            _assert(str == genStr(i));
+        }
+        LOG(DEBUG) << "ok";
     }
 }
 

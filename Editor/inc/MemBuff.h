@@ -38,18 +38,18 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////
 //#define MEM_DEBUG
 #ifdef  MEM_DEBUG
-  #define BUFF_SIZE       1024
-  #define STEP_BLOCKS       10
-  #define MAXBLOCKS_NUM     64
-  #define STR_NUM          256
-  //#define MAX_STRLEN       256
+  #define BUFF_SIZE      0x4000
+  #define STEP_BLOCKS      0x10
+  #define MAXBLOCKS_NUM   0x100
+  #define STR_NUM         0x400
 #else
-  #define BUFF_SIZE    0x10000 //64k max
-  #define STEP_BLOCKS     0x40
-  #define MAXBLOCKS_NUM  0x400
-  #define STR_NUM       0x1000
-  //#define MAX_STRLEN    0x8000
+  #define BUFF_SIZE     0x10000 //64k max
+  #define STEP_BLOCKS      0x40
+  #define MAXBLOCKS_NUM   0x400
+  #define STR_NUM        0x1000
 #endif
+
+#define MAX_STRLEN (BUFF_SIZE / 2)
 
 /////////////////////////////////////////////////////////////////////////////
 struct _hbuff
@@ -70,7 +70,7 @@ class BuffPool
     //in blocksPool used blocks are in the begin and free blocks are in the end
     std::list<hbuff_t>  m_blockPool;
     size_t              m_usedBlocks{};
-    size_t              m_stepBlocks{};
+    size_t              m_stepBlocks{1};
 
 public:
     static BuffPool     s_pool;
@@ -157,10 +157,12 @@ protected:
 
     std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator> GetBuff(size_t& line);
     bool    ReleaseBuff();
-    bool    SplitBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator& buff, size_t line);
+    bool    SplitBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator buff, size_t line);
     bool    DelBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator& buff);
 
 public:
+    MemStrBuff();
+
     bool    IsChanged() { return m_changed; }
     size_t  GetSize();
 

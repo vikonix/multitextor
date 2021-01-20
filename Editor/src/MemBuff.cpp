@@ -35,6 +35,8 @@ BuffPool<Tbuff> BuffPool<Tbuff>::s_pool;
 template <typename Tbuff>
 BuffPool<Tbuff>::BuffPool(size_t n)
 {
+    m_stepBlocks = n;
+
     if (n > m_blockArray.size())
         n = m_blockArray.size();
 
@@ -83,7 +85,7 @@ bool BuffPool<Tbuff>::ReleaseBuff(hbuff_t hbuff)
         if (*it == hbuff)
         {
             m_blockPool.erase(it);
-            m_blockPool.push_back(hbuff);
+            m_blockPool.push_front(hbuff);
             break;
         }
     }
@@ -340,6 +342,15 @@ bool StrBuff<Tbuff, Tview>::ClearModifyFlag()
     return rc;
 }
 
+/////////////////////////////////////////////////////////////////////////////
+template <typename Tbuff, typename Tview>
+MemStrBuff<Tbuff, Tview>::MemStrBuff()
+{
+    auto newBuff = std::make_shared<StrBuff<Tbuff, Tview>>();
+    m_buffList.push_back(newBuff);
+    m_curBuff = m_buffList.begin();
+}
+
 template <typename Tbuff, typename Tview>
 std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator> MemStrBuff<Tbuff, Tview>::GetBuff(size_t& line)
 {
@@ -351,7 +362,7 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
 
     if (line < m_curBuffLine)
     {
-        LOG(DEBUG) << "GetBuff prev l=" << line;
+        //LOG(DEBUG) << "GetBuff prev l=" << line;
         while (m_curBuff != m_buffList.begin())
         {
             --m_curBuff;
@@ -362,11 +373,17 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
     }
     else if (line >= m_curBuffLine + (*m_curBuff)->m_strCount)
     {
-        LOG(DEBUG) << "GetBuff next l=" << line;
+        //LOG(DEBUG) << "GetBuff next l=" << line;
         while (m_curBuff != m_buffList.end())
         {
-            m_curBuffLine += (*m_curBuff)->m_strCount;
+            auto count = (*m_curBuff)->m_strCount;
             ++m_curBuff;
+            if (m_curBuff == m_buffList.end())
+            {
+                --m_curBuff;
+                break;
+            }
+            m_curBuffLine += count;
             if (line < m_curBuffLine + (*m_curBuff)->m_strCount)
                 break;
         }
@@ -447,15 +464,16 @@ Tview MemStrBuff<Tbuff, Tview>::GetStr(size_t n)
 }
 
 template <typename Tbuff, typename Tview>
-bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator& buff, size_t line)
+bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator buff, size_t line)
 {
-    LOG(DEBUG) << "SplitBuff n=" << line;
-    size_t offset = (*buff)->m_strOffsets[line];
+    auto oldBuff = *buff;
+    size_t offset = oldBuff->m_strOffsets[line];
     size_t split = 0;
 
-    if ((*buff)->m_strCount == STR_NUM)
+    LOG(DEBUG) << "SplitBuff with lines=" << oldBuff->m_strCount << " for line=" << line;
+    if (oldBuff->m_strCount == STR_NUM)
     {
-        //all string filled
+        //all string entry filled
         if (line < STR_NUM / 3)
             // 1/3
             split = STR_NUM / 3;
@@ -466,10 +484,10 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
             // 2/3
             split = (STR_NUM / 3) * 2;
 
-        if ((*buff)->m_strOffsets[split] > (BUFF_SIZE / 3) * 2)
+        if (oldBuff->m_strOffsets[split] > (BUFF_SIZE / 3) * 2)
             //long strings
             // 2/3
-            for (split = 0; (*buff)->m_strOffsets[split] < (BUFF_SIZE / 3) * 2; ++split);
+            for (split = 0; oldBuff->m_strOffsets[split] < (BUFF_SIZE / 3) * 2; ++split);
     }
     else
     {
@@ -484,47 +502,63 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
             // 2/3
             limit = (BUFF_SIZE / 3) * 2;
 
-        for (split = 0; (*buff)->m_strOffsets[split] < limit; ++split);
+        for (split = 0; oldBuff->m_strOffsets[split] < limit; ++split);
     }
 
     auto newBuff = std::make_shared<StrBuff<Tbuff, Tview>>();
-    
-    auto buffData = (*buff)->GetBuff();
+
+    auto oldBuffData = oldBuff->GetBuff();
     auto newBuffData = newBuff->GetBuff();
-    if (!buffData || !newBuffData)
+    if (!oldBuffData || !newBuffData)
     {
-        (*buff)->ReleaseBuff();
+        oldBuff->ReleaseBuff();
         newBuff->ReleaseBuff();
 
         LOG(ERROR) << "ERROR GetBuff";
         return false;
     }
 
-    (*buff)->m_mod = true;
     newBuff->m_mod = true;
+    oldBuff->m_mod = true;
 
-    size_t begin = (*buff)->m_strOffsets[split];
-    size_t end = (*buff)->m_strOffsets[(*buff)->m_strCount];
+    size_t begin = oldBuff->m_strOffsets[split];
+    size_t end = oldBuff->m_strOffsets[oldBuff->m_strCount];
 
     newBuffData->resize(end - begin);
-    memcpy(newBuffData->data(), buffData->c_str() + begin, end - begin);
+    memcpy(newBuffData->data(), oldBuffData->c_str() + begin, end - begin);
 
-    for (size_t i = 0; i + split <= (*buff)->m_strCount; ++i)
-        newBuff->m_strOffsets[i] = (*buff)->m_strOffsets[i + split] - begin;
+    for (size_t i = 0; i + split <= oldBuff->m_strCount; ++i)
+        newBuff->m_strOffsets[i] = oldBuff->m_strOffsets[i + split] - begin;
 
-    newBuff->m_strCount = (*buff)->m_strCount - split;
-    (*buff)->m_strCount = split;
+    newBuff->m_strCount = oldBuff->m_strCount - split;
+    oldBuff->m_strCount = split;
 
-    m_buffList.insert(buff, newBuff);
-    LOG(DEBUG) << "n=" << (*buff)->m_strCount << " n1=" << split << " n2=" << newBuff->m_strCount; 
+    if (buff == m_buffList.end())
+        m_buffList.push_back(newBuff);
+    else if (buff != m_buffList.begin())
+        m_buffList.insert(--buff, newBuff);
+    else
+    {
+        //buff == begin
+        if (m_curBuff == buff)
+            m_curBuff = m_buffList.end();
+        m_buffList.pop_front();
+        m_buffList.push_front(newBuff);
+        m_buffList.push_front(oldBuff);
+    }
 
-    (*buff)->ReleaseBuff();
-    newBuff->ReleaseBuff();
+    //LOG(DEBUG) << "n=" << oldBuff->m_strCount << " old=" << split << " new=" << newBuff->m_strCount;
 
     if (line < split)
-        LOG(DEBUG) << "SplitBuff at n=" << split << " same buff";
+    {
+        LOG(DEBUG) << "SplitBuff at n=" << split << " use old buff";
+        newBuff->ReleaseBuff();
+    }
     else
-        LOG(DEBUG) << "SplitBuff at n=" << split << " new buff";
+    {
+        LOG(DEBUG) << "SplitBuff at n=" << split << " use new buff";
+        oldBuff->ReleaseBuff();
+    }
     
     return true;
 }
@@ -532,13 +566,76 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::DelBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator& buff)
 {
+    //TPRINT(("DelBuff\n"));
+    if (buff == m_curBuff)
+        m_curBuff = m_buffList.end();
+
+    m_buffList.erase(buff);
     return true;
 }
 
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 {
-    return true;
+    if (n > m_strCount)
+        return false;
+
+    size_t _n = n;
+
+    //LOG(DEBUG) << "AddStr n=" << n << " '" << str << "'";
+
+    auto buff = GetBuff(n);
+    if (!buff)
+    {
+        _assert(0);
+        return false;
+    }
+        
+    bool rc = (**buff)->AddStr(n, str);
+    if (!rc)
+    {
+        if (n == (**buff)->m_strCount)
+        {
+            //LOG(DEBUG) << "Last line " << _n << ". Create new buff=" << m_buffList.size();
+            auto newBuff = std::make_shared<StrBuff<Tbuff, Tview>>();
+            m_buffList.push_back(newBuff);
+            n = _n;
+            buff = GetBuff(n);
+            if (!buff)
+            {
+                _assert(0);
+                return false;
+            }
+
+            rc = (**buff)->AddStr(n, str);
+        }
+        else
+        {
+            rc = SplitBuff(*buff, n);
+            if (rc)
+            {
+                n = _n;
+                buff = GetBuff(n);
+                if (!buff)
+                {
+                    _assert(0);
+                    return false;
+                }
+                rc = (**buff)->AddStr(n, str);
+            }
+        }
+    }
+
+    if (rc)
+        ++m_strCount;
+
+    if (buff)
+        (**buff)->ReleaseBuff();
+
+    m_changed = true;
+
+    //LOG(DEBUG) << "rc=" << rc << " strcount=" << m_strCount;
+    return rc;
 }
 
 template <typename Tbuff, typename Tview>
@@ -605,102 +702,6 @@ int MStrBuff::ChangeStr(size_t str, const char* pStr, size_t len)
 int MStrBuff::AddStr(size_t str, const char* pStr, size_t len)
 {
     int rc;
-    if (str > m_nStrCount)
-        return 0;
-
-    size_t n = str;
-    if (len == -1)
-        len = strlen(pStr) + 1;
-
-    //TPRINT(("AddStr n=%d l=%d\n", n, len));
-
-    StrBuff* pSBuff = GetBuff(&n);
-    if (!pSBuff)
-    {
-        //TPRINT(("Str not found\n"));
-        pSBuff = m_pSBuff;
-        size_t count = 0;
-        while (pSBuff && pSBuff->m_next)
-        {
-            count += pSBuff->m_StrCount;
-            pSBuff = pSBuff->m_next;
-        }
-
-        //    if(!ASSERT(n <= count + STR_NUM))
-        //    {
-        //      return -1;
-        //    }
-
-        if (!pSBuff)
-        {
-            StrBuff* pNewBuff = new StrBuff;
-            if (!ASSERT(pNewBuff != NULL))
-            {
-                return -1;
-            }
-
-            if (pSBuff)
-            {
-                pSBuff->m_next = pNewBuff;
-                pNewBuff->m_prev = pSBuff;
-            }
-            else
-            {
-                m_pSBuff = pNewBuff;
-            }
-
-            pSBuff = GetBuff(&n);
-            if (!ASSERT(pSBuff != NULL))
-                return -1;
-        }
-    }
-
-    rc = pSBuff->AddStr(n, pStr, len);
-    if (rc < 0)
-    {
-        if (n == pSBuff->m_StrCount)
-        {
-            //TPRINT(("Last line %d. Create new buff\n", n));
-            StrBuff* pNewBuff = new StrBuff;
-            if (!ASSERT(pNewBuff != NULL))
-                return -1;
-
-            pSBuff->m_next = pNewBuff;
-            pNewBuff->m_prev = pSBuff;
-
-            n = str;
-            pSBuff = GetBuff(&n);
-            if (!ASSERT(pSBuff != NULL))
-                return -1;
-
-            rc = pSBuff->AddStr(n, pStr, len);
-        }
-        else
-        {
-            rc = SplitBuff(pSBuff, n);
-            if (!rc)
-            {
-                rc = -1;
-                n = str;
-                pSBuff = GetBuff(&n);
-                if (pSBuff)
-                    rc = pSBuff->AddStr(n, pStr, len);
-            }
-        }
-        if (rc < 0)
-            TPRINT(("Error %d\n", rc));
-    }
-
-    if (rc >= 0)
-        ++m_nStrCount;
-
-    if (pSBuff)
-        pSBuff->ReleaseBuff();
-
-    m_fChanged = 1;
-
-    //TPRINT(("rc=%d count=%d\n", rc, m_nStrCount));
-    return rc;
 }
 
 
@@ -729,114 +730,10 @@ int MStrBuff::DelStr(size_t n)
 }
 
 
-int MStrBuff::SplitBuff(StrBuff* pBuff, size_t nline)
-{
-    TPRINT(("SplitBuff n=%d\n", nline));
-    size_t off = (!nline) ? 0 : pBuff->m_pStrOffset[nline - 1];
-    size_t l = 0;
-    if (pBuff->m_StrCount == STR_NUM)
-    {
-        //все строки уже заняты
-        if (nline < STR_NUM / 3)
-            // 1/3
-            l = STR_NUM / 3;
-        else if (nline < (STR_NUM / 3) * 2)
-            // 1/2
-            l = STR_NUM / 2;
-        else
-            // 2/3
-            l = (STR_NUM / 3) * 2;
-
-        if (pBuff->m_pStrOffset[l] > (BUFF_SIZE / 3) * 2)
-            //здесь очень длинные строки
-            // 2/3
-            for (l = 0; pBuff->m_pStrOffset[l] < (BUFF_SIZE / 3) * 2; ++l);
-    }
-    else
-    {
-        if (off < BUFF_SIZE / 3)
-            // 1/3
-            for (l = 0; pBuff->m_pStrOffset[l] < BUFF_SIZE / 3; ++l);
-        else if (off < (BUFF_SIZE / 3) * 2)
-            // 1/2
-            for (l = 0; pBuff->m_pStrOffset[l] < BUFF_SIZE / 2; ++l);
-        else
-            // 2/3
-            for (l = 0; pBuff->m_pStrOffset[l] < (BUFF_SIZE / 3) * 2; ++l);
-    }
-
-    StrBuff* pNewBuff = new StrBuff;
-    if (!ASSERT(pNewBuff != NULL))
-        return -1;
-
-    pNewBuff->m_next = pBuff->m_next;
-    pNewBuff->m_prev = pBuff;
-    pBuff->m_next = pNewBuff;
-    if (pNewBuff->m_next)
-        pNewBuff->m_next->m_prev = pNewBuff;
-
-    char* pMBuff = pBuff->GetBuff();
-    char* pnewBuffData = pNewBuff->GetBuff();
-    if (!pMBuff || !pnewBuffData)
-    {
-        pBuff->ReleaseBuff();
-        pNewBuff->ReleaseBuff();
-
-        TPRINT(("ERROR GetBuff\n"));
-        return -1;
-    }
-
-    pBuff->m_fMod = 1;
-    pNewBuff->m_fMod = 1;
-
-    size_t begin = pBuff->m_pStrOffset[l - 1];
-    size_t end = pBuff->m_pStrOffset[pBuff->m_StrCount - 1];
-    memcpy(pnewBuffData, pMBuff + begin, end - begin);
-
-    for (size_t i = 0; i + l < pBuff->m_StrCount; ++i)
-        pNewBuff->m_pStrOffset[i] = pBuff->m_pStrOffset[i + l] - begin;
-
-    pNewBuff->m_StrCount = pBuff->m_StrCount - l;
-    pBuff->m_StrCount = l;
-    TPRINT(("n=%d n1=%d n2=%d\n", pBuff->m_StrCount, l, pNewBuff->m_StrCount));
-
-    pBuff->ReleaseBuff();
-    pNewBuff->ReleaseBuff();
-
-    if (nline < l)
-        TPRINT(("SplitBuff at n=%d same buff\n", l));
-    else
-        TPRINT(("SplitBuff at n=%d new buff\n", l));
-
-    return 0;
-}
 
 
 int MStrBuff::DelBuff(StrBuff* pBuff)
 {
-    //TPRINT(("DelBuff\n"));
-    if (pBuff == m_pCurBuff)
-        m_pCurBuff = NULL;
-
-    if (!pBuff->m_prev)
-    {
-        //del first
-        if (pBuff->m_next)
-        {
-            //not most last block
-            m_pSBuff = pBuff->m_next;
-            m_pSBuff->m_prev = NULL;
-            delete pBuff;
-        }
-    }
-    else
-    {
-        pBuff->m_prev->m_next = pBuff->m_next;
-        if (pBuff->m_next)
-            pBuff->m_next->m_prev = pBuff->m_prev;
-        delete pBuff;
-    }
-    return 0;
 }
 
 

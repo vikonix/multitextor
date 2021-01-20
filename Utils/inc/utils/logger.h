@@ -35,10 +35,10 @@ void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogS
 std::string CastEscString(const std::string& string);
 
 #ifdef WIN32
-#define _assert(v) _ASSERT(v)
 #define __FUNC__ __FUNCTION__
+#define _assert(v) _ASSERT(v)
 #else
-#define _assert(v)
 #define __FUNC__ __PRETTY_FUNCTION__ 
+#define _assert(v) if(!(v)){LOG(ERROR) << __FUNC__ << ":" << __LINE__ << " '" << #v << "'";}
 #endif
 
