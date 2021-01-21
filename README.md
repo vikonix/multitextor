@@ -4,7 +4,7 @@ Cross Platform console mode library and text editor.
 This project is attempt of recreating my old text editor.
 
 ## Tested on:
- - Windows 10 - Microsoft Visual Studio Community 2019
+ - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Linux Ubuntu 20.04 - gcc version 9.3.0
 
 Need compiler with C++ 0x17 full support.
@@ -25,6 +25,7 @@ Minimal requirenment: gcc 8.0 or MSVS 2017
 ## What is ready now:
  - Third party library (easyloggingpp, utfcpp, termdb).
  - Console input/output library.
+ - Console windows library.
  
 ## In progress:
- - Windows library.
+ - Editor components.
