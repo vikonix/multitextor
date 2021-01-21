@@ -354,7 +354,7 @@ MemStrBuff<Tbuff, Tview>::MemStrBuff()
 template <typename Tbuff, typename Tview>
 std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator> MemStrBuff<Tbuff, Tview>::GetBuff(size_t& line)
 {
-    if (line > m_strCount)
+    if (line > m_totalStrCount)
         return std::nullopt;
 
     if (m_curBuff == m_buffList.end())
@@ -443,7 +443,7 @@ bool MemStrBuff<Tbuff, Tview>::Clear()
 {
     m_buffList.clear();
     m_curBuff = m_buffList.end();
-    m_strCount = 0;
+    m_totalStrCount = 0;
     m_changed = false;
     m_curBuffLine = 0;
     
@@ -453,14 +453,14 @@ bool MemStrBuff<Tbuff, Tview>::Clear()
 template <typename Tbuff, typename Tview>
 Tview MemStrBuff<Tbuff, Tview>::GetStr(size_t n)
 {
-    if (n >= m_strCount)
+    if (n >= m_totalStrCount)
         return {};
 
     auto buff = GetBuff(n);
-    if (!buff || n > (*buff.value())->m_strCount)
+    if (!buff || n > (**buff)->m_strCount)
         return {};
 
-    return (*buff.value())->GetStr(n);
+    return (**buff)->GetStr(n);
 }
 
 template <typename Tbuff, typename Tview>
@@ -470,7 +470,7 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
     size_t offset = oldBuff->m_strOffsets[line];
     size_t split = 0;
 
-    LOG(DEBUG) << "SplitBuff with lines=" << oldBuff->m_strCount << " for line=" << line;
+    //LOG(DEBUG) << "SplitBuff with lines=" << oldBuff->m_strCount << " for line=" << line;
     if (oldBuff->m_strCount == STR_NUM)
     {
         //all string entry filled
@@ -577,7 +577,7 @@ bool MemStrBuff<Tbuff, Tview>::DelBuff(typename std::list<std::shared_ptr<StrBuf
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 {
-    if (n > m_strCount)
+    if (n > m_totalStrCount)
         return false;
 
     size_t _n = n;
@@ -627,7 +627,7 @@ bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
     }
 
     if (rc)
-        ++m_strCount;
+        ++m_totalStrCount;
 
     if (buff)
         (**buff)->ReleaseBuff();
@@ -641,123 +641,74 @@ bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
 {
-    return true;
+    LOG(DEBUG) << "ChangeStr " << n;
+    if (n >= m_totalStrCount)
+        return false;
+
+    auto buff = GetBuff(n);
+    if (!buff)
+        return false;
+    size_t _n = n;
+
+    bool rc = (**buff)->ChangeStr(n, str);
+    if (!rc)
+    {
+        rc = SplitBuff(*buff, n);
+        if (!rc)
+        {
+            n = _n;
+            buff = GetBuff(n);
+            if (!buff)
+                rc = false;
+            else
+                rc = (**buff)->ChangeStr(n, str);
+        }
+        if (!rc)
+        {
+            LOG(ERROR) << __FUNC__;
+            _assert(0);
+        }
+    }
+
+    if (buff)
+        (**buff)->ReleaseBuff();
+
+    m_changed = true;
+
+    return rc;
 }
 
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::DelStr(size_t n)
 {
+    LOG(DEBUG) << "DelStr " << n;
+
+    auto buff = GetBuff(n);
+    if (!buff)
+        return false;
+
+    bool rc = (**buff)->DelStr(n);
+    if (!rc)
+    {
+        _assert(0);
+        (**buff)->ReleaseBuff();
+        return false;
+    }
+    
+    --m_totalStrCount;
+    m_changed = true;
+
+    if (0 == (**buff)->m_strCount)
+    {
+        LOG(DEBUG) << "EmptyBlock";
+        DelBuff(*buff);
+    }
+    else
+        (**buff)->ReleaseBuff();
+
     return true;
 }
 
-template <typename Tbuff, typename Tview>
-std::pair<size_t, bool> MemStrBuff<Tbuff, Tview>::FindStr(const std::string& str)
-{
-    size_t line{};
-    return { line, true };
-}
-
-
-#if 0
-/////////////////////////////////////////////////////////////////////////////
-int MStrBuff::ChangeStr(size_t str, const char* pStr, size_t len)
-{
-    size_t n = str;
-    //TPRINT(("ChangeStr %d\n", n));
-    int rc;
-
-    if (n >= m_nStrCount)
-        return 0;
-
-    StrBuff* pSBuff = GetBuff(&n);
-    if (!ASSERT(pSBuff != NULL))
-    {
-        return 0;
-    }
-
-    rc = pSBuff->ChangeStr(n, pStr, len);
-    if (rc < 0)
-    {
-        rc = SplitBuff(pSBuff, n);
-        if (!rc)
-        {
-            n = str;
-            rc = -1;
-            pSBuff = GetBuff(&n);
-            if (pSBuff)
-                rc = pSBuff->ChangeStr(n, pStr, len);
-        }
-        if (rc < 0)
-            TPRINT(("Error %d\n", rc));
-    }
-
-    if (pSBuff)
-        rc = pSBuff->ReleaseBuff();
-
-    m_fChanged = 1;
-    return 0;
-}
-
-
-int MStrBuff::AddStr(size_t str, const char* pStr, size_t len)
-{
-    int rc;
-}
-
-
-int MStrBuff::DelStr(size_t n)
-{
-    //TPRINT(("DelStr %d\n", n));
-
-    StrBuff* pSBuff = GetBuff(&n);
-    if (!pSBuff)
-        return 0;
-    int rc = pSBuff->DelStr(n);
-    if (rc >= 0)
-        --m_nStrCount;
-
-    if (!pSBuff->m_StrCount)
-    {
-        //TPRINT(("EmptyBlock\n"));
-        DelBuff(pSBuff);
-    }
-    else
-        pSBuff->ReleaseBuff();
-
-    m_fChanged = 1;
-
-    return 0;
-}
-
-
-
-
-int MStrBuff::DelBuff(StrBuff* pBuff)
-{
-}
-
-
-int MStrBuff::Find(const char* pStr)
-{
-    size_t len = strlen(pStr);
-
-    for (size_t i = 0; i < m_nStrCount; ++i)
-    {
-        size_t l;
-        char* p = GetStr(i, &l);
-        if (p && l && l >= len)
-        {
-            int rc = strncmp(p, pStr, len);
-
-            if (!rc)
-                return (int)i;
-        }
-    }
-
-    return -1;
-}
-
-#endif
 
 template class BuffPool<std::string>;
 template class SBuff<std::string, std::string_view>;

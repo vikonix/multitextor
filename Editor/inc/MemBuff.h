@@ -144,13 +144,13 @@ class MemStrBuff
 {
 protected:
     std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>> m_buffList;
-    size_t  m_strCount{};
+    size_t  m_totalStrCount{};
     bool    m_changed{};
 
     typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator m_curBuff;
     size_t  m_curBuffLine{};
 
-    virtual bool LoadBuff([[maybe_unused]]size_t offset, [[maybe_unused]] size_t size, [[maybe_unused]] std::shared_ptr<Tbuff> buff)
+    virtual bool LoadBuff([[maybe_unused]]uint64_t offset, [[maybe_unused]] size_t size, [[maybe_unused]] std::shared_ptr<Tbuff> buff)
     {
         return true;
     }
@@ -167,12 +167,12 @@ public:
     size_t  GetSize();
 
     bool    Clear();
-    size_t  GetStrCount() { return m_strCount; }
+    size_t  GetStrCount() { return m_totalStrCount; }
     Tview   GetStr(size_t n);
     bool    AddStr(size_t n, const Tview str);
-    bool    AppendStr(const Tview str) {return AddStr(m_strCount, str);}
+    bool    AppendStr(const Tview str) {return AddStr(m_totalStrCount, str);}
     bool    ChangeStr(size_t n, const Tview str);
     bool    DelStr(size_t n);
 
-    std::pair<size_t, bool> FindStr(const std::string& str);
+    //std::pair<size_t, bool> FindStr(const std::string& str);
 };
