@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "App.h"
 #include "DlgControls.h"
 #include "Dialogs/StdDialogs.h"
-#include "MemBuff.h"
+#include "utils/MemBuff.h"
 
 #include <iostream>
 
@@ -143,83 +143,6 @@ public:
 MyApp app;
 Application& Application::s_app{app};
 
-void CheckDirectoryFunc()
-{
-    LOG(DEBUG) << "Test: " << __FUNC__;
-
-    LOG(DEBUG) << "run path=" << Directory::RunPath();
-    LOG(DEBUG) << "cur path=" << Directory::CurPath();
-    LOG(DEBUG) << "tmp path=" << Directory::TmpPath();
-    LOG(DEBUG) << "cfg path=" << Directory::CfgPath();
-    LOG(DEBUG) << "sys cfg path=" << Directory::SysCfgPath();
-    LOG(DEBUG) << "user=" << Directory::UserName();
-
-    _assert( Directory::Match<std::string>("geeks", "g*ks")); // Yes 
-    _assert( Directory::Match<std::string>("geeksforgeeks", "ge?ks*")); // Yes 
-    _assert(!Directory::Match<std::string>("gee", "g*k"));  // No because 'k' is not in second 
-    _assert(!Directory::Match<std::string>("pqrst", "*pqrs")); // No because 't' is not in first 
-    _assert( Directory::Match<std::string>("abcdhghgbcd", "abc*bcd")); // Yes 
-    _assert(!Directory::Match<std::string>("abcd", "abc*c?d")); // No because second must have 2 instances of 'c' 
-    _assert( Directory::Match<std::string>("abcd", "*c*d")); // Yes 
-    _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
-    _assert( Directory::Match<std::string>("acd", "*?c*d")); // Yes 
-    _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
-    _assert( Directory::Match<std::u16string>(u"abcd", u"*?c*d")); // Yes 
-}
-
-void BuffTest()
-{
-    LOG(DEBUG) << "Test: " << __FUNC__;
-    {
-        auto pool = std::make_shared<BuffPool<std::string>>();
-        auto b = pool->GetFreeBuff();
-        auto ptr = pool->GetBuffPointer(b);
-        pool->ReleaseBuffPointer(b);
-        pool->ReleaseBuff(b);
-    }
-    {
-        auto sbuff = std::make_unique<StrBuff<std::string, std::string_view>>();
-        sbuff->GetBuff();
-
-        sbuff->AppendStr("Hello");
-        sbuff->AppendStr(" world");
-        sbuff->AddStr(1, " our ");
-        sbuff->AddStr(1, " my ");
-        sbuff->ChangeStr(0, "!!!Hello!!!");
-        sbuff->DelStr(1);
-
-        std::stringstream sstr;
-        sstr << sbuff->GetStr(0) << sbuff->GetStr(1) << sbuff->GetStr(2);
-
-        LOG(DEBUG) << sstr.str();
-        LOG(DEBUG) << *(sbuff->GetBuff());
-        _assert(sstr.str() == *(sbuff->GetBuff()));
-    }
-    {
-        auto genStr = [](int i) ->std::string {
-            std::stringstream sstr;
-            sstr << "str" << i << std::endl;
-            return sstr.str();
-        };
-
-        int n = 100000;
-        LOG(DEBUG) << "gen str " << n;
-        MemStrBuff<std::string, std::string_view> mbuff;
-        for (int i = 0; i < n; ++i)
-        {
-            mbuff.AddStr(0, genStr(i));
-        }
-        LOG(DEBUG) << "check";
-        for (int i = 0; i < n; ++i)
-        {
-            [[maybe_unused]]auto str = mbuff.GetStr(n - i - 1);
-            _assert(str == genStr(i));
-        }
-        LOG(DEBUG) << "ok";
-    }
-}
-
-
 int main()
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log", 0x200000, false);
@@ -244,10 +167,6 @@ int main()
 
     app.Deinit();
 
-    BuffTest();
-    CheckDirectoryFunc();
-
     LOG(INFO) << "End";
-
     return 0;
 }

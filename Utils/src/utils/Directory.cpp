@@ -142,8 +142,11 @@ std::string Directory::CutPath(const path_t& path, size_t len)
 bool DirectoryList::AddMask(const path_t& mask)
 {
     //LOG(DEBUG) << "AddMask " << mask;
-    
-    m_mask = mask.u8string();
+    std::string u8mask = mask.u8string();
+    if(u8mask == "." || u8mask == "..")
+        return false;
+        
+    m_mask = u8mask;
     m_single = true;
     m_maskList.clear();
 
@@ -187,7 +190,8 @@ bool DirectoryList::SetMask(const path_t& mask)
     {
         auto file = path.filename();
         path.remove_filename();
-        AddMask(file);
+        if(!AddMask(file))
+            path = "/";
     }
 
     if (!std::filesystem::is_directory(path, ec))

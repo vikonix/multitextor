@@ -1,30 +1,20 @@
 cmake_minimum_required(VERSION 3.9)
 
-set(PROJECT_NAME Multitextor)
+set(PROJECT_NAME TestUtils)
 project(${PROJECT_NAME})
 
-file(GLOB_RECURSE _EDITOR_INC "inc/*.h*")
-file(GLOB_RECURSE _EDITOR_SRC "src/*.c*")
+file(GLOB_RECURSE _TEST_SRC "*")
 
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_EDITOR_INC})
-source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_EDITOR_SRC})
+source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_TEST_SRC})
 
 add_executable(${PROJECT_NAME}
-    ${_EDITOR_INC}
-    ${_EDITOR_SRC}
+    ${_TEST_SRC}
 )
 
 target_link_libraries(${PROJECT_NAME}
     PRIVATE
         ThirdPartyLib
         UtilsLib
-        ConsoleLib
-        WndManagerLib
-)
-
-target_include_directories(${PROJECT_NAME}
-    PUBLIC
-        "${CMAKE_CURRENT_SOURCE_DIR}/inc"
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -59,4 +49,3 @@ else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
 endif()
-
