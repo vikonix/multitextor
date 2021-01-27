@@ -52,6 +52,15 @@ public:
     template<typename T>
     static bool Match(const T& name, const T& mask, bool nametoupper = false)
     {
+        T mm;
+        if constexpr (sizeof(*name.cbegin()) == 1)
+            mm = "*.*";
+        else
+            mm = u"*.*";
+
+        if (mask == mm)
+            return true;
+
         // Based at algorithm written by Jack Handy - <A href="mailto:jakkhandy@hotmail.com">jakkhandy@hotmail.com</A>
         auto nameIt = name.cbegin();
         auto maskIt = mask.cbegin();
@@ -119,7 +128,7 @@ class DirectoryList
     std::vector<std::u16string> m_maskList;
     bool                        m_single{false};
 
-    path_t                      m_path;
+    path_t                      m_path{"."};
     std::vector<std::string>    m_drvList;
     std::vector<std::string>    m_dirList;
     std::vector<direntry_t>     m_fileList;

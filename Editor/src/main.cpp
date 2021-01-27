@@ -28,12 +28,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #include <vld.h>
 #endif
 
+#include "Editor.h"
+
 #include "utils/logger.h"
 #include "utils/Directory.h"
 #include "App.h"
 #include "DlgControls.h"
 #include "Dialogs/StdDialogs.h"
-#include "utils/MemBuff.h"
+#include "Editor.h"
 
 #include <iostream>
 
@@ -118,8 +120,15 @@ public:
         {
             //code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK_CANCEL_IGNORE);
             FileDialog dlg{ FileDlgMode::Open };
-            dlg.Activate();
+            auto rc = dlg.Activate();
             code = 0;
+            if (rc == ID_OK)
+            {
+                std::filesystem::path path{dlg.s_vars.path};
+                path /= dlg.s_vars.file;
+                Editor ed{ path };
+                ed.Load();
+            }
         }
 
         return code; 

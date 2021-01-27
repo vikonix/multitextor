@@ -109,11 +109,11 @@ public:
     bool    SetAccessMenu(const menu_list& menu);
     void    SetClock(clock_pos set = clock_pos::off) {m_clock = set;}
     bool    SetStatusLine(const sline_list& line);
-    bool    ChangeStatusLine(size_t n, std::optional<std::reference_wrapper<const std::string>> text = std::nullopt, stat_color color = stat_color::normal);
+    bool    ChangeStatusLine(size_t n, std::optional<const std::string> text = std::nullopt, stat_color color = stat_color::normal);
     bool    ChangeStatusLine(size_t n, stat_color color);
     bool    SwapStatusLine(size_t n);
-    bool    ShowProgressBar(uint16_t n = 100);
-    bool    SetHelpLine(std::optional<std::reference_wrapper<const std::string>> help = std::nullopt, stat_color color = stat_color::normal) {return ChangeStatusLine(0, help, color);}
+    bool    ShowProgressBar(size_t n = 100);
+    bool    SetHelpLine(std::optional<const std::string> help = std::nullopt, stat_color color = stat_color::normal) {return ChangeStatusLine(0, help, color);}
     bool    SetErrorLine(const std::string& error) {return ChangeStatusLine(0, error, stat_color::error);}
     bool    PrintClock(bool print = false);
     bool    PrintStatusLine();

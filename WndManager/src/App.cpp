@@ -108,12 +108,12 @@ bool Application::SetAccessMenu(const menu_list& menu)
     return rc;
 }
 
-bool Application::ChangeStatusLine(size_t n, std::optional<std::reference_wrapper<const std::string>> text, stat_color color)
+bool Application::ChangeStatusLine(size_t n, std::optional<const std::string> text, stat_color color)
 {
     if (m_sLine.empty())
         return true;
 
-    auto& msg = text.has_value() ? text.value().get() : "";
+    auto& msg = text.has_value() ? text.value() : "";
     LOG(DEBUG) << " A::ChangeStatusLine n=" << n << " '" << msg << "' c=" << static_cast<int>(color);
 
     if (n >= m_sLine.size())
@@ -162,15 +162,15 @@ bool Application::SwapStatusLine(size_t n)
     return true;
 }
 
-bool Application::ShowProgressBar(uint16_t n)
+bool Application::ShowProgressBar(size_t n)
 {
     n /= 2;
-    if (n <= 0 || n > 50)
+    if (n == 0 || n > 50)
         return true;
 
     pos_t y = m_wndManager.m_sizey - 1;
 
-    bool rc = m_wndManager.ColorRect(0, y, n, 1, ColorStatusLineB)
+    bool rc = m_wndManager.ColorRect(0, y, (pos_t)n, 1, ColorStatusLineB)
     && PrintClock();
 
     return rc;

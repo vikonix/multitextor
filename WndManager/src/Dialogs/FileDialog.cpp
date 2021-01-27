@@ -43,40 +43,31 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ID_OF_LOG       (ID_USER + 10)
 #define ID_OF_INFO      (ID_USER + 11)
 
-struct FileDialogVars
-{
-    std::string mask{"*.*"};
-    size_t type{};
-    size_t cp{};
-    bool ro{};
-    bool log{};
-};
-
-FileDialogVars fdVars;
+FileDialogVars FileDialog::s_vars;
 
 std::list<control> fileDialog {
-  {CTRL_TITLE,                      "",             0,              nullptr,           1,  0, 70, 21},
+  {CTRL_TITLE,                      "",             0,              nullptr,                    1,  0, 70, 21},
 
-  {CTRL_STATIC,                     "File &name:",  0,              nullptr,           1,  1, 14},
-  {CTRL_EDITDROPLIST,               "",             ID_OF_NAME,     &fdVars.mask,     15,  1, 52,  7, "Input file name or mask"},
+  {CTRL_STATIC,                     "File &name:",  0,              nullptr,                    1,  1, 14},
+  {CTRL_EDITDROPLIST,               "",             ID_OF_NAME,     &FileDialog::s_vars.file,  15,  1, 52,  7, "Input file name or mask"},
 
-  {CTRL_STATIC | CTRL_NOCOLOR,      "",             ID_OF_PATH,     nullptr,           1,  3, 66},
+  {CTRL_STATIC | CTRL_NOCOLOR,      "",             ID_OF_PATH,     nullptr,                    1,  3, 66},
 
-  {CTRL_LIST,                       "&Directories", ID_OF_DIRLIST,  (size_t*)nullptr,  0,  4, 19, 14, "Select directory"},
-  {CTRL_LIST,                       "&Files",       ID_OF_FILELIST, (size_t*)nullptr, 19,  4, 34, 14, "Select file name"},
+  {CTRL_LIST,                       "&Directories", ID_OF_DIRLIST,  (size_t*)nullptr,           0,  4, 19, 14, "Select directory"},
+  {CTRL_LIST,                       "&Files",       ID_OF_FILELIST, (size_t*)nullptr,          19,  4, 34, 14, "Select file name"},
 
-  {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT,"",             ID_OK,          nullptr,          54,  5},
-  {CTRL_BUTTON | CTRL_ALIGN_LEFT,   "Cancel",       ID_CANCEL,      nullptr,          54,  7},
+  {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT,"",             ID_OK,          nullptr,                   54,  5},
+  {CTRL_BUTTON | CTRL_ALIGN_LEFT,   "Cancel",       ID_CANCEL,      nullptr,                   54,  7},
 
-  {CTRL_STATIC,                     "File &type:",  ID_OF_STAT_TYPE,nullptr,          54,  9, 14},
-  {CTRL_DROPLIST,                   "",             ID_OF_TYPE,     &fdVars.type,     54, 10, 13,  6, "Select file type"},
-  {CTRL_STATIC,                     "Code &page:",  ID_OF_STAT_CP,  nullptr,          54, 12, 14},
-  {CTRL_DROPLIST,                   "",             ID_OF_CP,       &fdVars.cp,       54, 13, 13,  6, "Select file code page"},
+  {CTRL_STATIC,                     "File &type:",  ID_OF_STAT_TYPE,nullptr,                   54,  9, 14},
+  {CTRL_DROPLIST,                   "",             ID_OF_TYPE,     &FileDialog::s_vars.type,  54, 10, 13,  6, "Select file type"},
+  {CTRL_STATIC,                     "Code &page:",  ID_OF_STAT_CP,  nullptr,                   54, 12, 14},
+  {CTRL_DROPLIST,                   "",             ID_OF_CP,       &FileDialog::s_vars.cp,    54, 13, 13,  6, "Select file code page"},
 
-  {CTRL_CHECK,                      "&Read only",   ID_OF_RO,       &fdVars.ro,       54, 15,  0,  0, "Open file as read only"},
-  {CTRL_CHECK,                      "&Log file",    ID_OF_LOG,      &fdVars.log,      54, 16,  0,  0, "Open file that can grow"},
-  {CTRL_STATIC,                     "",             ID_OF_INFO,     nullptr,          20, 18, 34},
-  {CTRL_LINE,                       "",             0,              nullptr,          54, 17, 13}
+  {CTRL_CHECK,                      "&Read only",   ID_OF_RO,       &FileDialog::s_vars.ro,    54, 15,  0,  0, "Open file as read only"},
+  {CTRL_CHECK,                      "&Log file",    ID_OF_LOG,      &FileDialog::s_vars.log,   54, 16,  0,  0, "Open file that can grow"},
+  {CTRL_STATIC,                     "",             ID_OF_INFO,     nullptr,                   20, 18, 34},
+  {CTRL_LINE,                       "",             0,              nullptr,                   54, 17, 13}
 };
 
 FileDialog::FileDialog(FileDlgMode mode, pos_t x, pos_t y)
@@ -118,48 +109,36 @@ bool FileDialog::OnActivate()
         GetItem(ID_OF_RO)->SetMode(CTRL_HIDE);
         GetItem(ID_OF_LOG)->SetMode(CTRL_HIDE);
     }
-
-    auto cp = GetItem(ID_OF_CP);
-    auto ctrlCp = std::dynamic_pointer_cast<CtrlDropList>(cp);
-    if (ctrlCp)
+    else
     {
-        for (const std::string& str : { "437", "866", "1251" })
-            ctrlCp->AppendStr(str);
-        ctrlCp->SetSelect(fdVars.cp);
+        auto cp = GetItem(ID_OF_CP);
+        auto ctrlCp = std::dynamic_pointer_cast<CtrlDropList>(cp);
+        if (ctrlCp)
+        {
+            for (const std::string& str : s_vars.cpList)
+                ctrlCp->AppendStr(str);
+            ctrlCp->SetSelect(s_vars.cp);
+        }
+
+        auto type = GetItem(ID_OF_TYPE);
+        auto ctrlType = std::dynamic_pointer_cast<CtrlDropList>(type);
+        if (ctrlType)
+        {
+            for (const std::string& str : s_vars.typeList)
+                ctrlType->AppendStr(str);
+            ctrlType->SetSelect(s_vars.type);
+        }
     }
 
-    auto type = GetItem(ID_OF_TYPE);
-    auto ctrlType = std::dynamic_pointer_cast<CtrlDropList>(type);
-    if (ctrlType)
-    {
-        for (const std::string& str : { "Text", "C++" })
-            ctrlType->AppendStr(str);
-        ctrlType->SetSelect(fdVars.type);
-    }
+    auto type = GetItem(ID_OF_NAME);
+    auto ctrlType = std::dynamic_pointer_cast<CtrlEditDropList>(type);
+    if (s_vars.maskList.empty())
+        s_vars.maskList.push_front("*.*");
+    for (const std::string& str : s_vars.maskList)
+        ctrlType->AppendStr(str);
 
-/*
-    char buff[MAX_PATH + 1];
-    char* pMask = SaveFileM.GetStr(0);
-    if (!pMask)
-        pMask = "*.*";
-
-    if (m_nMode == DIALOG_NEWSESS || m_nMode == DIALOG_OPENSESS)
-        pMask = SESSION_MASK;
-    else if (!strcmp(pMask, SESSION_MASK))
-    {
-        SaveFileM.DelStr(0);
-        pMask = SaveFileM.GetStr(0);
-        if (!pMask)
-            pMask = "*.*";
-    }
-
-    SDir::AppendName(sFilePath, pMask, buff);
-
-    TPRINT(("OnActivate %s\n", buff));
-    m_DList.SetFullPath(buff);
-*/
-    ScanDir(".");
-    //ScanDir("c:/work/MyProjects/*.c*;*.h;*.m*");
+    m_list.SetMask(s_vars.maskList.front());
+    ScanDir(s_vars.path);
 
     return true;
 }
@@ -297,19 +276,27 @@ input_t FileDialog::DialogProc(input_t code)
                 auto name = GetItem(ID_OF_NAME)->GetName();
                 auto found = ScanDir(std::string(name));
 
-                //сохраняем тип разбора
-                //???CtrlSList* pCtrl = (CtrlSList*)GetItem(ID_OF_TYPE);
-                //int parse = pCtrl->GetSelect();
-
-                if (!found)//(!m || (n != 0 && n != 1))
+                if (!found)
                 {
                     //if not simple mask or found many files
+                    auto mask = m_list.GetMask();
+                    LOG(DEBUG) << "Mask " << mask;
+
+                    s_vars.maskList.remove(mask);
+                    s_vars.maskList.push_front(mask);
+                    if (s_vars.maskList.size() > MAX_MASK_LIST)
+                        s_vars.maskList.pop_back();
+
+                    auto type = GetItem(ID_OF_NAME);
+                    auto ctrlType = std::dynamic_pointer_cast<CtrlEditDropList>(type);
+                    ctrlType->Clear();
+                    for (const std::string& str : s_vars.maskList)
+                        ctrlType->AppendStr(str);
+
                     code = 0;
                 }
                 else
                 {
-                    //восстанавливаем тип разбора
-                    //???pCtrl->SetSelect(parse);
                     LOG(DEBUG) << "Found";
                 }
             }
@@ -334,7 +321,8 @@ bool FileDialog::OnClose(int id)
     {
         auto path = m_list.GetPath();
         auto name = GetItem(ID_OF_NAME)->GetName();
-        LOG(DEBUG) << "path=" << path << " file=" << name;
+        LOG(DEBUG) << "path=" << path.u8string() << " file=" << name;
+        s_vars.path = path.u8string();
     }
     return true;
 }

@@ -25,45 +25,70 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include "Dialog.h"
-#include "utils/Directory.h"
 
+#include <string>
+#include <list>
 
-enum class FileDlgMode
+enum class cmd_t
 {
-    Open,
-    Load,
-    Save
+    CMD_END,             //end of command sequence
+    CMD_BEGIN,           //begin fo command sequence
+    CMD_SET_POS,
+
+    CMD_ADD_LINE,
+    CMD_DEL_LINE,
+    CMD_MERGE_LINE,
+    CMD_SPLIT_LINE,
+    CMD_ADD_SUBSTR,
+    CMD_CHANGE_SUBSTR,
+    CMD_CLEAR_SUBSTR,
+    CMD_DEL_SUBSTR,
+    CMD_REPLACE_SUBSTR,
+    CMD_INDENT,
+    CMD_UNDENT,
+    CMD_CORRECT_TAB,
+    CMD_SAVE_TAB,
+    CMD_RESTORE_TAB,
+    CMD_MARK
 };
 
-#define MAX_MASK_LIST 16
-struct FileDialogVars
+#define MAX_UNDO_SIZE 100000
+
+
+struct EditCmd
 {
-    std::list<std::string> typeList{ "Text", "C++" };
-    std::list<std::string> cpList{ "utf8", "437", "866", "1251" };
-    std::list<std::string> maskList;
-    std::string path{"."};
-    std::string file{ "*.*" };
-    size_t type{};
-    size_t cp{};
-    bool ro{};
-    bool log{};
+  cmd_t             command;
+  size_t            line;
+  size_t            pos;
+  size_t            len;
+  size_t            count;
+
+  std::u16string    str;
+  std::string       remark;
 };
 
-class FileDialog : public Dialog
+
+class UndoList
 {
-    FileDlgMode     m_mode;
-    DirectoryList   m_list;
+    std::string m_rem;
+
+    std::list<EditCmd> m_editList;
+    std::list<EditCmd> m_undoList;
+    std::list<EditCmd>::iterator m_editIt;
+    std::list<EditCmd>::iterator m_undoIt;
 
 public:
-    static FileDialogVars s_vars;
+  UndoList()  {}
+  ~UndoList() {}
 
-    FileDialog(FileDlgMode mode = FileDlgMode::Open, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+  void SetRemark(const std::string& rem) { m_rem = rem; }
 
-    virtual input_t DialogProc(input_t code) override;
-    virtual bool OnActivate() override;
-    virtual bool OnClose(int id) override;
+  bool Clear();
+  bool AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str);
+  bool AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str);
 
-protected:
-    bool ScanDir(const std::string& mask);
+  EditCmd GetEditCmd();
+  EditCmd PeekEditCmd();
+  EditCmd GetUndoCmd();
+  EditCmd PeekUndoCmd();
 };
