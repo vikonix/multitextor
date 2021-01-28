@@ -45,8 +45,15 @@ bool Editor::Clear()
 
 bool Editor::Load()
 {
-    if (!std::filesystem::exists(m_file) || !std::filesystem::is_regular_file(m_file))
+    try
+    {
+        if (!std::filesystem::exists(m_file) || !std::filesystem::is_regular_file(m_file))
+            return false;
+    }
+    catch (...)
+    {
         return false;
+    }
 
     Clear();
 
@@ -68,7 +75,8 @@ bool Editor::Load()
     size_t percent = 0;
     auto step = fileSize / 100;
 
-    auto buff = std::make_unique<std::array<char, 0x100000>>();
+    const size_t buffsize = 0x200000;
+    auto buff = std::make_unique<std::array<char, buffsize>>();
     while(!file.eof())
     {
         file.read(buff->data(), buff->size());
@@ -81,7 +89,7 @@ bool Editor::Load()
         if (t1 != t2 && step)
         {
             t1 = t2;
-            size_t pr = (offset / step);
+            size_t pr = (size_t)(offset / step);
             if (pr != percent)
             {
                 percent = pr;
@@ -89,6 +97,17 @@ bool Editor::Load()
             }
         }
 
+        auto strBuff = m_buffer.GetNewBuff();
+        auto strBuffData = strBuff->GetBuff();
+        if (!strBuffData)
+        {
+            //no memory
+            _assert(0);
+            return false;
+        }
+        std::memcpy(strBuffData->data(), buff->data(), BUFF_SIZE);
+
+        strBuff->ReleaseBuff();
     }
 /*    
     while (curpos < size)

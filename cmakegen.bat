@@ -1,1 +1,1 @@
-cmake -B _build -S .
+cmake -B _build -Ax64 -S .

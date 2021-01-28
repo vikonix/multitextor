@@ -174,5 +174,7 @@ public:
     bool    ChangeStr(size_t n, const Tview str);
     bool    DelStr(size_t n);
 
+    std::shared_ptr<StrBuff<Tbuff, Tview>> GetNewBuff();
+
     //std::pair<size_t, bool> FindStr(const std::string& str);
 };

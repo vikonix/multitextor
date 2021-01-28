@@ -346,14 +346,19 @@ bool StrBuff<Tbuff, Tview>::ClearModifyFlag()
 template <typename Tbuff, typename Tview>
 MemStrBuff<Tbuff, Tview>::MemStrBuff()
 {
-    auto newBuff = std::make_shared<StrBuff<Tbuff, Tview>>();
-    m_buffList.push_back(newBuff);
-    m_curBuff = m_buffList.begin();
+    m_curBuff = m_buffList.end();
 }
 
 template <typename Tbuff, typename Tview>
 std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator> MemStrBuff<Tbuff, Tview>::GetBuff(size_t& line)
 {
+    if (m_buffList.empty())
+    {
+        auto newBuff = std::make_shared<StrBuff<Tbuff, Tview>>();
+        m_buffList.push_back(newBuff);
+        m_curBuff = m_buffList.begin();
+    }
+
     if (line > m_totalStrCount)
         return std::nullopt;
 
@@ -415,6 +420,14 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
 }
 
 template <typename Tbuff, typename Tview>
+std::shared_ptr<StrBuff<Tbuff, Tview>> MemStrBuff<Tbuff, Tview>::GetNewBuff()
+{ 
+    auto newBuff = std::make_shared<StrBuff<Tbuff, Tview>>();
+    m_buffList.push_back(newBuff);
+    return newBuff;
+}
+
+template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::ReleaseBuff()
 {
     if (m_curBuff != m_buffList.end())
@@ -446,7 +459,7 @@ bool MemStrBuff<Tbuff, Tview>::Clear()
     m_totalStrCount = 0;
     m_changed = false;
     m_curBuffLine = 0;
-    
+
     return true;
 }
 
