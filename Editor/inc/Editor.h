@@ -83,8 +83,8 @@ private:
     bool            m_curChanged{};
     std::u16string  m_curStrBuff;
 
-    bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> buff, size_t size, bool end, size_t& rest);
-    bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> buff);
+    bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);
+    bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff);
 
     bool    GetStr(size_t n, size_t offset, std::u16string& buff, size_t len);
     bool    _AddStr(size_t n, const std::u16string& str);

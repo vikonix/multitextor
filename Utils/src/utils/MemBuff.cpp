@@ -180,7 +180,7 @@ bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 
     ++m_strCount;
     for (size_t i = m_strCount; i > n; --i)
-        m_strOffsets[i] = m_strOffsets[i - 1] + dl;
+        m_strOffsets[i] = (uint32_t)(m_strOffsets[i - 1] + dl);
 
     m_mod = true;
     return true;
@@ -204,7 +204,7 @@ bool SBuff<Tbuff, Tview>::AppendStr(const Tview str)
     m_buff->append(str);
 
     ++m_strCount;
-    m_strOffsets[m_strCount] = offset_end + dl;
+    m_strOffsets[m_strCount] = (uint32_t)(offset_end + dl);
 
     m_mod = true;
     return true;
@@ -252,7 +252,7 @@ bool SBuff<Tbuff, Tview>::DelStr(size_t n)
     m_buff->erase(offset_n, dl);
 
     for (size_t i = n + 1; i < m_strCount; ++i)
-        m_strOffsets[i] = m_strOffsets[i + 1] - dl;
+        m_strOffsets[i] = (uint32_t)(m_strOffsets[i + 1] - dl);
     --m_strCount;
 
     m_mod = true;
@@ -541,7 +541,7 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
     memcpy(newBuffData->data(), oldBuffData->c_str() + begin, end - begin);
 
     for (size_t i = 0; i + split <= oldBuff->m_strCount; ++i)
-        newBuff->m_strOffsets[i] = oldBuff->m_strOffsets[i + split] - begin;
+        newBuff->m_strOffsets[i] = (uint32_t)(oldBuff->m_strOffsets[i + split] - begin);
 
     newBuff->m_strCount = oldBuff->m_strCount - split;
     oldBuff->m_strCount = split;

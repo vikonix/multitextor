@@ -41,12 +41,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #define BUFF_SIZE      0x4000
   #define STEP_BLOCKS      0x10
   #define MAXBLOCKS_NUM   0x100
-  #define STR_NUM         0x400
+  #define STR_NUM         0x100
 #else
   #define BUFF_SIZE     0x10000 //64k max
   #define STEP_BLOCKS      0x40
   #define MAXBLOCKS_NUM   0x400
-  #define STR_NUM        0x1000
+  #define STR_NUM         0x400
 #endif
 
 #define MAX_STRLEN (BUFF_SIZE / 2)
@@ -96,7 +96,7 @@ class SBuff
 
 protected:
     //we use last element as 'end of buffer' offset
-    std::array<size_t, STR_NUM + 1> m_strOffsets{};
+    std::array<uint32_t, STR_NUM + 1> m_strOffsets{};
     size_t                          m_strCount{0};
     bool                            m_mod{false};
 
@@ -120,6 +120,7 @@ template <typename Tbuff, typename Tview>
 class StrBuff : public SBuff<Tbuff, Tview>
 {
     friend class MemStrBuff<std::string, std::string_view>;
+    friend class Editor;
 
     //std::shared_ptr<BuffPool<Tbuff>> m_buffPool;
 
@@ -142,6 +143,8 @@ public:
 template <typename Tbuff, typename Tview>
 class MemStrBuff
 {
+    friend class Editor;
+
 protected:
     std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>> m_buffList;
     size_t  m_totalStrCount{};

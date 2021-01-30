@@ -58,7 +58,7 @@ bool Editor::Load()
     Clear();
 
     auto fileSize = std::filesystem::file_size(m_file);
-    decltype(fileSize) offset{};
+    decltype(fileSize) fileOffset{};
     if (0 == fileSize)
         return true;
 
@@ -77,101 +77,77 @@ bool Editor::Load()
 
     const size_t buffsize = 0x200000;
     auto buff = std::make_unique<std::array<char, buffsize>>();
-    while(!file.eof())
-    {
-        file.read(buff->data(), buff->size());
+    size_t buffOffset{0};
+
+    auto readFile = [&]() -> size_t {
+        buffOffset = 0;
+        if (file.eof())
+            return 0;
+        file.read(buff->data(), buffsize);
         auto read = file.gcount();
         if (0 == read)
-            break;
+            return 0;
 
         time_t t2 = time(NULL);
-        offset += read;
         if (t1 != t2 && step)
         {
             t1 = t2;
-            size_t pr = (size_t)(offset / step);
+            size_t pr = (size_t)((fileOffset + read) / step);
             if (pr != percent)
             {
                 percent = pr;
                 Application::getInstance().ShowProgressBar(pr);
             }
         }
+        return read;
+    };
 
-        auto strBuff = m_buffer.GetNewBuff();
-        auto strBuffData = strBuff->GetBuff();
-        if (!strBuffData)
-        {
-            //no memory
-            _assert(0);
-            return false;
-        }
-        std::memcpy(strBuffData->data(), buff->data(), BUFF_SIZE);
-
-        strBuff->ReleaseBuff();
-    }
-/*    
-    while (curpos < size)
+    std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
+    size_t strOffset{};
+    size_t read;
+    while (0 != (read = readFile()))
     {
-
-        StrBuff* p_str = new StrBuff;
-        if (!ASSERT(p_str != NULL))
+        while (read)
         {
-            rc = -1;
-            break;
-        }
-        if (!p_last_str)
-        {
-            m_pSBuff = p_str;
-            p_last_str = p_str;
-        }
-        else
-        {
-            p_last_str->m_next = p_str;
-            p_str->m_prev = p_last_str;
-            p_last_str = p_str;
-        }
+            if (!strBuff)
+            {
+                strBuff = m_buffer.GetNewBuff();
+                strOffset = 0;
+            }
+            auto strBuffData = strBuff->GetBuff();
+            if (!strBuffData)
+            {
+                //no memory
+                _assert(0);
+                return false;
+            }
+            size_t tocopy = std::min((size_t)BUFF_SIZE - strOffset, read);
+            std::memcpy(strBuffData->data() + strOffset, buff->data() + buffOffset, tocopy);
+            strBuff->ReleaseBuff();
 
-        char* pBuff = p_str->GetBuff();
-        if (!ASSERT(pBuff != NULL))
-        {
-            rc = -1;
-            break;
+            if (strOffset + tocopy < BUFF_SIZE && !file.eof())
+                strOffset += tocopy;
+            else
+            {
+                //now fill string offset table
+                strBuff->m_fileOffset = fileOffset;
+                size_t rest;
+                [[maybe_unused]]bool rc = FillStrOffset(strBuff, tocopy, fileSize == fileOffset + tocopy, rest);
+                _assert(rc);
+
+                strOffset = 0;
+                m_buffer.m_totalStrCount += strBuff->m_strCount;
+                strBuff = nullptr;
+            }
+
+            buffOffset += tocopy;
+            fileOffset += tocopy;
+            read -= tocopy;
         }
-
-        size_t r;
-        //we reserv some space for editing
-        rc = m_pDObject->Read(pBuff, curpos, (BUFF_SIZE / 16) * 15, &r);
-        if (rc < 0)
-        {
-            p_str->ReleaseBuff();
-            break;
-        }
-        p_str->m_nBuffBeginOffset = curpos;
-
-        //now fill string offset table
-        rc = FillStrOffset(p_str, r, size == curpos + r);
-        //TPRINT(("FillStr %d\n", p_str->m_StrCount));
-        if (rc < 0)
-        {
-            p_str->ReleaseBuff();
-            break;
-        }
-        if (rc)
-        {
-            //rest of buffer is not parsed
-            //??? todo more effective algoritm
-            r -= rc;
-        }
-
-        m_strCount += p_str->m_StrCount;
-
-        p_str->ReleaseBuff();
-
-        curpos += r;
     }
-    //???m_changed = false;
-*/
+
     LOG(DEBUG) << "loadtime=" << time(NULL) - start;
+    LOG(DEBUG) << "num str=" << m_buffer.m_totalStrCount;
 
     Application::getInstance().ShowProgressBar();
     Application::getInstance().SetHelpLine("Ready", stat_color::grayed);
@@ -179,169 +155,129 @@ bool Editor::Load()
     return true;
 }
 
+bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest)
+{
+    auto str = strBuff->GetBuff();
+    if (!str)
+        return false;
+
+    //1 byte is reserved for 0xA so 0D and 0A EOL will go to same buffers
+    //and we not get left empty string
+    const size_t maxsize = !last ? size - 1 : size;
+    const size_t maxtab = 10;
+    size_t cr = 0;
+    size_t crlf = 0;
+    size_t lf = 0;
+    size_t cut = 0;
+
+    size_t len = 0;
+    size_t i;
+    const char* buff = str->c_str();
+
+    for (i = 0; i < maxsize; ++i)
+    {
+        ++len;
+        if (buff[i] == 0x9)//TAB
+        {
+            --len;
+            //calc len with max tabulation for possible changing in future
+            len = (len + maxtab) - (len + maxtab) % maxtab;
+        }
+        else if (buff[i] == 0xd)//CR
+        {
+            if (buff[i + 1] == 0xa)//LF
+            {
+                ++i;
+                ++crlf;
+            }
+            else
+                ++cr;
+
+            //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+            //pCurStr = pBuff + i + 1;
+            strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            len = 0;
+            cut = 0;
+        }
+        else if (buff[i] == 0xa)
+        {
+            ++lf;
+            //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+            //pCurStr = pBuff + i + 1;
+            strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            len = 0;
+            cut = 0;
+        }
+        else if (buff[i] > 0)
+        {
+            //check symbol type
+            //???if (GetSymbolType(buff[i]) != 6)
+            if(buff[i] == ' ')
+                cut = i;
+        }
+
+        if (len >= m_maxStrlen)
+        {
+            //wrap for long string
+            if (buff[i + 1] == 0xd)
+            {
+                if (buff[i + 2] == 0xa)
+                {
+                    ++i;
+                    ++crlf;
+                }
+                else
+                    ++cr;
+                ++i;
+            }
+            else if (buff[i + 1] == 0xa)
+            {
+                ++i;
+                ++lf;
+            }
+            else if (cut)
+            {
+                //cut str by last word
+                i = cut;
+            }
+
+            //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+            //pCurStr = pBuff + i + 1;
+            strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            len = 0;
+            cut = 0;
+        }
+
+        if (strBuff->m_strCount == STR_NUM)
+            break;
+    }
+
+    if (len && last)
+    {
+        //parse last string in file
+        //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+        strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)i;
+    }
+
+    if (0 == strBuff->m_fileOffset)
+    {
+        LOG(DEBUG) << "cr=" << cr << " lf=" << lf << " crlf=" << crlf;
+        auto m = std::max({lf, crlf, cr});
+        if(m == lf)
+            m_eol = eol_t::unix_eol; //unix
+        else if(m == crlf)
+            m_eol = eol_t::win_eol; //windows
+        else
+            m_eol = eol_t::mac_eol; //apple
+    }
+
+    rest = size - strBuff->m_strOffsets[strBuff->m_strCount];
+    strBuff->ReleaseBuff();
+
+    return true;
+}
+
 #if 0
-int TextBuff::s_fileCP = g_textCP;
-//int TextBuff::s_nEditCount = 0;
-
-
-/////////////////////////////////////////////////////////////////////////////
-TextBuff::TextBuff(DataObject* pObj, const char* pParseMode, int cp)
-{
-  m_pSBuff       = NULL;//list of strings
-  m_pDObject     = pObj;
-  m_pDObject->AddLock();
-
-  m_nMaxStrLen   = MAX_STRLEN;
-
-  if(cp)
-    m_nCP        = cp;
-  else
-    m_nCP        = s_fileCP;
-
-  m_nTab         = 4;//tab position
-  m_fSaveTab     = 0;
-
-#ifdef _WIN32
-  m_nCrLf        = 1;//dos
-#else
-  m_nCrLf        = 0;//unix
-#endif
-  //m_fConvert     = 0;//del tab and end of str
-  m_fShowTab     = 0;
-
-  m_CurStr       = -1;
-  m_fCurChanged  = 0;
-  m_pRem         = NULL;
-
-  memset(m_pLinkedWnd, 0, sizeof(m_pLinkedWnd));
-
-  m_LexBuff.SetParseMode(m_nCP, pParseMode);
-  m_nTab     = m_LexBuff.GetTabSize();
-  m_fSaveTab = m_LexBuff.GetSaveTab();
-  Load();
-}
-
-
-TextBuff::~TextBuff()
-{
-  Clear();
-
-  if(m_pDObject)
-    if(m_pDObject->DelLock() == 0)
-      delete m_pDObject;
-}
-
-
-int TextBuff::SetDataObject(char* pName)
-{
-  if(m_pDObject)
-    if(m_pDObject->DelLock() == 0)
-      delete m_pDObject;
-
-  m_pDObject = new FileObject(pName);
-  m_pDObject->AddLock();
-  return 0;
-}
-
-
-int TextBuff::SetDataObject(DataObject* pObj)
-{
-  if(m_pDObject)
-    if(m_pDObject->DelLock() == 0)
-      delete m_pDObject;
-
-  m_pDObject = pObj;
-  m_pDObject->AddLock();
-
-  m_LexBuff.SetParseMode(m_nCP);//???
-  m_nTab     = m_LexBuff.GetTabSize();
-  m_fSaveTab = m_LexBuff.GetSaveTab();
-  int rc = Load();
-
-  return rc;
-}
-
-
-int TextBuff::SetParseMode(const char* mode)
-{
-  if(strcmp(mode, GetParseMode()))
-  {
-    TPRINT(("Change parse mode to %s\n", mode));
-
-    m_LexBuff.SetParseMode(m_nCP, mode);
-    m_nTab     = m_LexBuff.GetTabSize();
-    m_fSaveTab = m_LexBuff.GetSaveTab();
-
-    if(m_fCurChanged)
-    {
-      int rc = ChangeStr(m_CurStr, m_sCurStrBuff);
-      if(rc < 0)
-      {
-        //что то не так, возможно нет свободных буферов
-        return rc;
-      }
-      m_fCurChanged = 0;
-    }
-
-    int rc = 0;
-    if(m_pDObject->GetSize())
-      rc = m_pDObject->OpenObject();
-    if(rc < 0)
-      return rc;
-
-    int str = 0;
-    StrBuff* pSBuff = m_pSBuff;
-
-    while(pSBuff)
-    {
-      char* pBuff = pSBuff->GetBuff();
-      if(!ASSERT(pBuff != NULL))
-      {
-        rc = -1;
-        break;
-      }
-
-      size_t size = pSBuff->m_StrCount ? pSBuff->m_pStrOffset[pSBuff->m_StrCount - 1] : 0;
-      //TPRINT(("n=%d size=%d\n", pSBuff->m_StrCount, size));
-      if(!size)
-      {
-        pSBuff->ReleaseBuff();
-        pSBuff = pSBuff->m_next;
-        continue;
-      }
-
-      if(pSBuff->m_fLostData)
-      {
-        size_t r;
-        rc = m_pDObject->Read(pBuff, pSBuff->m_nBuffBeginOffset, size, &r);
-        if(rc < 0)
-          break;
-        pSBuff->m_fLostData = 0;
-      }
-
-      //parse all strings
-      for(int i = 0; i < pSBuff->m_StrCount; ++i)
-      {
-        size_t begin = (!i) ? 0 : pSBuff->m_pStrOffset[i - 1];
-        size_t end   = pSBuff->m_pStrOffset[i];
-        size_t len = end - begin;
-
-        char* pStr = pBuff + begin;
-        m_LexBuff.ScanStr(str++, pStr, len);
-      }
-
-      pSBuff->ReleaseBuff();
-
-      pSBuff = pSBuff->m_next;
-    }
-
-    m_pDObject->CloseObject();
-    m_pDObject->CheckAccess(1);
-    return 0;
-  }
-  else
-    return 0;
-}
 
 
 int TextBuff::SetShowTab(int show)
@@ -450,153 +386,6 @@ int TextBuff::CheckAccess()
   return m_pDObject->CheckAccess(1);
 }
 
-
-int TextBuff::LoadBuff(char* pBuff, long long offset, size_t size, size_t* pRead)
-//int TextBuff::LoadBuff(char* pBuff, int offset, int size, int* pRead)
-{
-  int rc = m_pDObject->OpenObject();
-  if(rc < 0)
-    return -1;
-
-  //size_t r;
-  rc = m_pDObject->Read(pBuff, offset, size, pRead);
-  if(rc < 0)
-    return -1;
-  //*pRead = r;
-
-  rc = m_pDObject->CloseObject();
-
-  return 0;
-}
-
-
-
-
-int TextBuff::FillStrOffset(StrBuff* pStr, size_t size, bool end)
-{
-  char* pBuff = pStr->m_pBuff;
-  if(!pBuff)
-    return -1;
-
-  size_t len = 0;
-  size_t i;
-  char* pCurStr = pBuff;
-
-  //1 байт резервируем для 0xa, чтобы 0D и 0A не оказались в разных буферах
-  //и не появились лишние строки
-  size_t maxsize = !end ? size - 1 : size;
-  size_t maxtab  = 10;
-  size_t nCR   = 0;
-  size_t nCRLF = 0;
-  size_t nLF   = 0;
-  size_t nCut  = 0;
-
-  for(i = 0; i < maxsize; ++i)
-  {
-    ++len;
-    if(pBuff[i] == 0x9)
-    {
-      --len;
-      //строку считаем по максимальной длинне табуляции
-      //чтобы при изменении табуляции не перечитывать файл
-      len = (len + maxtab) - (len + maxtab) % maxtab;
-    }
-    else if(pBuff[i] == 0xd)
-    {
-      if(pBuff[i + 1] == 0xa)
-      {
-        ++i;
-        ++nCRLF;
-      }
-      else
-        ++nCR;
-
-      m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-      pStr->m_pStrOffset[pStr->m_StrCount++] = i + 1;
-      pCurStr = pBuff + i + 1;
-      len  = 0;
-      nCut = 0;
-    }
-    else if(pBuff[i] == 0xa)
-    {
-      ++nLF;
-      m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-      pStr->m_pStrOffset[pStr->m_StrCount++] = i + 1;
-      pCurStr = pBuff + i + 1;
-      len  = 0;
-      nCut = 0;
-    }
-    else if(pBuff[i] > 0)
-    {
-      //check symbol type
-      if(GetSymbolType(pBuff[i]) != 6)
-        nCut = i;
-    }
-
-    if(len >= m_nMaxStrLen)
-    {
-      //wrap for long string
-      if(pBuff[i + 1] == 0xd)
-      {
-        if(pBuff[i + 2] == 0xa)
-        {
-          ++i;
-          ++nCRLF;
-        }
-        else
-          ++nCR;
-        ++i;
-      }
-      else if(pBuff[i + 1] == 0xa)
-      {
-        ++i;
-        ++nLF;
-      }
-      else if(nCut)
-      {
-        //cut str by last word
-        i = nCut;
-      }
-
-      m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-      pStr->m_pStrOffset[pStr->m_StrCount++] = i + 1;
-      pCurStr = pBuff + i + 1;
-      len  = 0;
-      nCut = 0;
-    }
-
-    if(pStr->m_StrCount == STR_NUM)
-      return size - i - 1;
-  }
-
-  if(len && end)
-  {
-    //parse last string in file
-    m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-    pStr->m_pStrOffset[pStr->m_StrCount++] = i;
-  }
-
-  if(!pStr->m_nBuffBeginOffset)
-  {
-    TPRINT(("cr=%d lf=%d crlf=%d\n", nCR, nLF, nCRLF));
-    if(nLF > nCRLF)
-    {
-      if(nLF >= nCR)
-        m_nCrLf = 0; //unix
-      else
-        m_nCrLf = 2; //apple
-    }
-    else if(nLF + nCRLF + nCR)
-    {
-      if(nCRLF >= nCR)
-        m_nCrLf = 1; //dos
-      else
-        m_nCrLf = 2; //apple
-    }
-  }
-
-  return size - pStr->m_pStrOffset[pStr->m_StrCount - 1];
-}
 
 
 int TextBuff::GetStr(size_t n, size_t offset, wchar* pBuff, size_t len)
