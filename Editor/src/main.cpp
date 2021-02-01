@@ -154,7 +154,7 @@ Application& Application::s_app{app};
 
 int main()
 {
-    ConfigureLogger("m-%datetime{%Y%M%d}.log", 0x200000, false);
+    ConfigureLogger("m-%datetime{%Y%M%d}.log");
     LOG(INFO);
     LOG(INFO) << "Winman test";
 

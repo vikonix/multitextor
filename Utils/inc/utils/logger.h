@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "easyloggingpp/easylogging++.h"
 
-void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize, const bool logScreen);
+void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize = 0x1000000, const bool logScreen = false);
 std::string CastEscString(const std::string& string);
 
 #ifdef WIN32

@@ -62,7 +62,7 @@ bool Editor::Load()
     if (0 == fileSize)
         return true;
 
-    LOG(DEBUG) << __FUNC__ << " path=" << m_file << " size=" << fileSize;
+    LOG(DEBUG) << __FUNC__ << " path=" << m_file << " size=" << std::hex << fileSize << std::dec;
     time_t start = time(NULL);
 
     std::ifstream file{m_file, std::ios::binary};
@@ -131,21 +131,28 @@ bool Editor::Load()
             {
                 //now fill string offset table
                 strBuff->m_fileOffset = fileOffset;
-                size_t rest;
-                [[maybe_unused]]bool rc = FillStrOffset(strBuff, tocopy, fileSize == fileOffset + tocopy, rest);
-                _assert(rc);
 
-                strOffset = 0;
-                m_buffer.m_totalStrCount += strBuff->m_strCount;
+                size_t rest;
+                LOG(DEBUG) << std::hex << "file offset=" << fileOffset << " read=" << read << " strOffset=" << strOffset << " tocopy=" << tocopy << std:: dec;
+                [[maybe_unused]]bool rc = FillStrOffset(strBuff, strOffset + tocopy, fileSize == fileOffset + strOffset + tocopy, rest);
+                LOG(DEBUG) << std::hex << "rest=" << rest << std::dec;
+
+                _assert(rc);
+                _assert(tocopy > rest);
+
+                tocopy -= rest;
+                fileOffset += tocopy + strOffset;
+                m_buffer.m_totalStrCount += strBuff->GetStrCount();//strBuff->m_strCount;
                 strBuff = nullptr;
+                strOffset = 0;
             }
 
             buffOffset += tocopy;
-            fileOffset += tocopy;
             read -= tocopy;
         }
     }
-
+    _assert(fileSize == fileOffset);
+    
     LOG(DEBUG) << "loadtime=" << time(NULL) - start;
     LOG(DEBUG) << "num str=" << m_buffer.m_totalStrCount;
 
@@ -195,7 +202,8 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
             //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
-            strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             len = 0;
             cut = 0;
         }
@@ -204,7 +212,8 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             ++lf;
             //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
-            strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             len = 0;
             cut = 0;
         }
@@ -243,20 +252,22 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
             //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
-            strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
+            strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             len = 0;
             cut = 0;
         }
 
-        if (strBuff->m_strCount == STR_NUM)
-            break;
+//        if (strBuff->m_strCount == STR_NUM)
+//            break;
     }
 
     if (len && last)
     {
         //parse last string in file
         //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-        strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)i;
+        //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)i;
+        strBuff->m_strOffsetList.push_back((uint32_t)i);
     }
 
     if (0 == strBuff->m_fileOffset)
@@ -271,7 +282,8 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             m_eol = eol_t::mac_eol; //apple
     }
 
-    rest = size - strBuff->m_strOffsets[strBuff->m_strCount];
+    //rest = size - strBuff->m_strOffsets[strBuff->m_strCount];
+    rest = size - strBuff->m_strOffsetList.back();
     strBuff->ReleaseBuff();
 
     return true;
