@@ -34,8 +34,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 class ScreenWin32 final : public ConsoleScreen
 {
     HANDLE  m_hStdout { INVALID_HANDLE_VALUE };
-    pos_t   m_scrSizeX {80};
-    pos_t   m_scrSizeY {25};
+    pos_t   m_scrSizeX {0};
+    pos_t   m_scrSizeY {0};
 
     pos_t   m_savex {0};
     pos_t   m_savey {0};

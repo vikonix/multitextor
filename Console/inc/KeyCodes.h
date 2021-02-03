@@ -97,10 +97,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define K_MODMASK   0x00ff0000
 #define K_CODEMASK  0x0000ffff
 
-#define K_X_MASK    0x0000ff00 //mouse x coord/ window x size
-#define K_Y_MASK    0x000000ff //mouse y coord/ window y size
+#define K_X_MASK    0x0000ff00 //mouse x coord/ window sizex - 1
+#define K_Y_MASK    0x000000ff //mouse y coord/ window sizey - 1
 
-#define K_MAKE_COORD_CODE(k, x, y) ((k) | ((x) << 8) | (y))
+#define K_MAKE_COORD_CODE(k, x, y) ((k) | (((x) & 0xff) << 8) | ((y) & 0xff))
 #define K_GET_X(k)      (pos_t)(((k) & K_X_MASK) >> 8)
 #define K_GET_Y(k)      (pos_t)((k) & K_Y_MASK)
 #define K_GET_CODE(k)   (char16_t)((k) & K_CODEMASK)

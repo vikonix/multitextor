@@ -660,11 +660,11 @@ void InputTTY::ProcessSignals()
         pos_t x = 0;
         pos_t y = 0;
         //read screen size
-        //resise screen
+        //resize screen
         if(m_ResizeCallback)
             m_ResizeCallback(x, y);
 
-        PutInput(K_MAKE_COORD_CODE(K_RESIZE, x, y));
+        PutInput(K_MAKE_COORD_CODE(K_RESIZE, x - 1, y - 1));
     }
 
     if(s_fCtrlC)

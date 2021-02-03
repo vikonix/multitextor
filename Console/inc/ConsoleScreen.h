@@ -139,7 +139,7 @@ public:
         //LOG(DEBUG) << "set x=" << x << " y=" << y << " c=" << std::hex << c << std::dec;
         if (x >= m_sizex || y >= m_sizey)
         {
-            LOG(ERROR) << __FUNC__;
+            LOG(ERROR) << __FUNC__ << " x=" << x << " y=" << y;
             return false;
         }
         m_buffer[x + y * m_sizex] = c;
