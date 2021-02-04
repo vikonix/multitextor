@@ -664,7 +664,7 @@ void InputTTY::ProcessSignals()
         if(m_ResizeCallback)
             m_ResizeCallback(x, y);
 
-        PutInput(K_MAKE_COORD_CODE(K_RESIZE, x - 1, y - 1));
+        PutInput(K_MAKE_COORD_CODE(K_RESIZE, x, y));
     }
 
     if(s_fCtrlC)

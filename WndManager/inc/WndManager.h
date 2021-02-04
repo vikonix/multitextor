@@ -112,7 +112,7 @@ public:
 
     bool    Init();
     bool    Deinit();
-    bool    SetScreenSize(pos_t sizex = MAX_COORD + 1, pos_t sizey = MAX_COORD + 1) { return m_console.SetScreenSize(sizex, sizey); }
+    bool    SetScreenSize(pos_t sizex = MAX_COORD, pos_t sizey = MAX_COORD) { return m_console.SetScreenSize(sizex, sizey); }
     bool    Resize(pos_t sizex, pos_t sizey);
 
     bool    CheckInput(const std::chrono::milliseconds& waitTime);

@@ -291,7 +291,7 @@ input_t _ReadMouse()
                     k = K_MOUSEWDN;
             }
             if(k)
-                return k | (x << 8) | y;
+                return K_MAKE_COORD_CODE(k, x, y);
         }
     }
 #endif

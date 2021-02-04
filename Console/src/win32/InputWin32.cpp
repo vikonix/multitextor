@@ -543,11 +543,11 @@ void InputWin32::ProcessResizeEvent(WINDOW_BUFFER_SIZE_RECORD* pWindowBufferSize
 //*/
     pos_t x = pWindowBufferSizeEvent->dwSize.X;
     pos_t y = pWindowBufferSizeEvent->dwSize.Y;
-    if (x == 256 && y == 256)
+    if (x == MAX_COORD && y == MAX_COORD)
         //special case for screen size calculating
         return;
     
-    input_t iKey = K_MAKE_COORD_CODE(K_RESIZE, x - 1, y - 1);
+    input_t iKey = K_MAKE_COORD_CODE(K_RESIZE, x, y);
     PutInput(iKey);
 }
 

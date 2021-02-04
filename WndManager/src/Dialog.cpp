@@ -537,7 +537,7 @@ input_t Dialog::EventProc(input_t code)
                         //LOG(DEBUG) << "mouse select " << control->m_pos;
                         n = control->m_pos;
 
-                        code = control->EventProc((code & ~K_CODEMASK) | ((x & 0xff) << 8) | (y & 0xff));
+                        code = control->EventProc(K_MAKE_COORD_CODE((code & ~K_CODEMASK), x, y));
                         break;
                     }
                 }

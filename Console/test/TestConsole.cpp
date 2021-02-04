@@ -43,6 +43,7 @@ void ConsoleTest()
     Console console;
 
     console.Init();
+    console.SetScreenSize(MAX_COORD, MAX_COORD);
 
     auto waitKey = [&console]() {
         console.Flush();

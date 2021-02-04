@@ -65,7 +65,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define K_RESIZE    0x20000000 //window resized
 #define K_FOCUSSET  0x21000000 //set focus
 #define K_FOCUSLOST 0x22000000 //lost focus
-#define K_TIME      0x23000000 //time puls
+#define K_TIME      0x23000000 //time pulse
 #define K_EXIT      0x24000000 //exit command
 #define K_CLOSE     0x25000000 //close window
 #define K_SELECT    0x26000000 //select some item
@@ -76,7 +76,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define K_MOUSE     0x40000000 //mouse moved
 #define K_MOUSEKL   0x41000000 //left button
-#define K_MOUSEKM   0x42000000 //middle buton
+#define K_MOUSEKM   0x42000000 //middle button
 #define K_MOUSEKR   0x43000000 //right button
 #define K_MOUSEKUP  0x44000000 //button released
 #define K_MOUSEWUP  0x45000000 //wheel up
@@ -84,24 +84,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define K_USER      0x80000000 //creating user defined codes
 
-#define K_SHIFT     0x00010000
-#define K_CTRL      0x00020000
-#define K_ALT       0x00040000
+#define K_SHIFT     0x00040000
+#define K_CTRL      0x00080000
+#define K_ALT       0x00100000
 
 #define K_MOUSE2    0x00200000 //double click
 #define K_MOUSE3    0x00400000 //triple click
 #define K_MOUSEW    0x00800000 //wheeled
 
-
 #define K_TYPEMASK  0xff000000
-#define K_MODMASK   0x00ff0000
-#define K_CODEMASK  0x0000ffff
+#define K_MODMASK   0x00fc0000
+#define K_CODEMASK  0x0003ffff
 
-#define K_X_MASK    0x0000ff00 //mouse x coord/ window sizex - 1
-#define K_Y_MASK    0x000000ff //mouse y coord/ window sizey - 1
+#define K_X_MASK    0x0003fe00 //mouse x coord/ window sizex
+#define K_Y_MASK    0x000001ff //mouse y coord/ window sizey
+#define K_MASK_SIZE 9
+//sync with MAX_COORD !!!
 
-#define K_MAKE_COORD_CODE(k, x, y) ((k) | (((x) & 0xff) << 8) | ((y) & 0xff))
-#define K_GET_X(k)      (pos_t)(((k) & K_X_MASK) >> 8)
+#define K_MAKE_COORD_CODE(k, x, y) ((k) | (((input_t)(x) & MAX_COORD) << K_MASK_SIZE) | ((y) & MAX_COORD))
+#define K_GET_X(k)      (pos_t)(((k) & K_X_MASK) >> K_MASK_SIZE)
 #define K_GET_Y(k)      (pos_t)((k) & K_Y_MASK)
 #define K_GET_CODE(k)   (char16_t)((k) & K_CODEMASK)
 

@@ -354,8 +354,8 @@ bool WndManager::Resize(pos_t sizex, pos_t sizey)
     LOG(INFO) << "  M::Resize x=" << sizex << " y=" << sizey;
     _assert(sizex > 0 && sizey > 0);
 
-    m_sizex = sizex + 1;
-    m_sizey = sizey + 1;
+    m_sizex = sizex;
+    m_sizey = sizey;
     CalcView();
 
     m_screenBuff.SetSize(m_sizex, m_sizey);

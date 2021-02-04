@@ -81,7 +81,7 @@ void ScreenWin32::Deinit()
     if(INVALID_HANDLE_VALUE == m_hStdout)
         return;
 
-    if(m_savex < 256 && m_savey < 256)
+    if(m_savex <= MAX_COORD && m_savey <= MAX_COORD)
     {
         m_scrSizeX = m_savex;
         m_scrSizeY = m_savey;
@@ -109,7 +109,7 @@ bool ScreenWin32::Resize()
         << " pos=" << sbInfo.srWindow.Left << "/" << sbInfo.srWindow.Top << "/" << sbInfo.srWindow.Right << "/" << sbInfo.srWindow.Bottom
         << " max=" << sbInfo.dwMaximumWindowSize.X << "/" << sbInfo.dwMaximumWindowSize.Y;
 
-    COORD sizeM {256, 256};
+    COORD sizeM { MAX_COORD, MAX_COORD };
     rc = SetConsoleScreenBufferSize(m_hStdout, sizeM);
     if(!rc)
         LOG(ERROR) << "ERROR SetConsoleScreenBufferSizeM err=" << GetLastError();
@@ -120,11 +120,11 @@ bool ScreenWin32::Resize()
 
     LOG(DEBUG) << "max=" << sbInfo.dwMaximumWindowSize.X << "/" << sbInfo.dwMaximumWindowSize.Y;
 
-    if(m_scrSizeX > sbInfo.dwMaximumWindowSize.X)
-        m_scrSizeX = sbInfo.dwMaximumWindowSize.X;
+    if(m_scrSizeX >= sbInfo.dwMaximumWindowSize.X)
+        m_scrSizeX = sbInfo.dwMaximumWindowSize.X - 1;
 
-    if(m_scrSizeY >= sbInfo.dwMaximumWindowSize.Y)
-        m_scrSizeY = sbInfo.dwMaximumWindowSize.Y - 1;
+    if(m_scrSizeY >= sbInfo.dwMaximumWindowSize.Y - 1)
+        m_scrSizeY = sbInfo.dwMaximumWindowSize.Y - 2;
 
     SMALL_RECT rect {0, 0, m_scrSizeX - 1, m_scrSizeY - 1};
     rc = SetConsoleWindowInfo(m_hStdout, TRUE, &rect);
