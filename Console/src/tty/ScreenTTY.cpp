@@ -222,7 +222,7 @@ bool ScreenTTY::WriteConsoleTitle(const std::wstring& title)
     if(m_fXTERMconsole)
     {
         std::string _title;
-        for(auto& c : title)
+        for(const char32_t c : title)
             utf8::append(c, _title);
 
         std::string str {"\x1b]0;" + _title + "\7"};

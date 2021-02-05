@@ -99,7 +99,7 @@ bool Editor::Load()
                 Application::getInstance().ShowProgressBar(pr);
             }
         }
-        return read;
+        return static_cast<size_t>(read);
     };
 
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
