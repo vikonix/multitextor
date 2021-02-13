@@ -163,16 +163,16 @@ bool FrameWnd::CheckWndPos(pos_t x, pos_t y) const
 
 pos_t FrameWnd::GetWSizeX() const
 {
-    if (m_sizex < 0)
-        return WndManager::getInstance().GetView(this).sizex + m_sizex + 1 - m_left;
+    if (m_sizex <= 0)
+        return WndManager::getInstance().GetView(this).sizex + m_sizex - m_left;
     else
         return m_sizex;
 }
 
 pos_t FrameWnd::GetWSizeY() const
 {
-    if (m_sizey < 0)
-        return WndManager::getInstance().GetView(this).sizey + m_sizey + 1 - m_top;
+    if (m_sizey <= 0)
+        return WndManager::getInstance().GetView(this).sizey + m_sizey - m_top;
     else
         return m_sizey;
 }
@@ -180,8 +180,8 @@ pos_t FrameWnd::GetWSizeY() const
 pos_t FrameWnd::GetCSizeX() const
 {
     pos_t size;
-    if (m_sizex < 0)
-        size = WndManager::getInstance().GetView(this).sizex + m_sizex + 1 - m_left;
+    if (m_sizex <= 0)
+        size = WndManager::getInstance().GetView(this).sizex + m_sizex - m_left;
     else
         size = m_sizex;
     if (m_border & BORDER_LEFT)  --size;
@@ -192,8 +192,8 @@ pos_t FrameWnd::GetCSizeX() const
 pos_t FrameWnd::GetCSizeY() const
 {
     pos_t size;
-    if (m_sizey < 0)
-        size = WndManager::getInstance().GetView(this).sizey + m_sizey + 1 - m_top;
+    if (m_sizey <= 0)
+        size = WndManager::getInstance().GetView(this).sizey + m_sizey - m_top;
     else
         size = m_sizey;
     if (m_border & (BORDER_TOP | BORDER_TITLE)) --size;
@@ -311,7 +311,6 @@ bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
     return rc;
 }
 
-
 bool FrameWnd::WriteStr(pos_t x, pos_t y, const std::string& str, color_t color)
 {
     if (!m_visible)
@@ -340,7 +339,7 @@ bool FrameWnd::WriteWStr(pos_t x, pos_t y, const std::u16string& str, color_t co
     ClientToScreen(x, y);
 
     bool rc = WndManager::getInstance().GotoXY(x, y);
-    rc = WndManager::getInstance().SetTextAttr(color);
+    rc = WndManager::getInstance().SetTextAttr(color ? color : m_color);
     rc = WndManager::getInstance().WriteWStr(str);
 
     return rc;
@@ -400,3 +399,39 @@ bool FrameWnd::ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
     return WndManager::getInstance().ShowBuff(left, top, sizex, sizey);
 }
 
+bool FrameWnd::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color)
+{
+    if (!m_visible)
+        return true;
+
+    ClientToScreen(left, top);
+
+    bool rc = WndManager::getInstance().ColorRect(left, top, sizex, sizey, color);
+    return rc;
+}
+
+bool FrameWnd::WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color)
+{
+    if (!m_visible)
+        return 0;
+
+    ClientToScreen(x, y);
+
+    bool rc = WndManager::getInstance().WriteColor(x, y, color);
+    return rc;
+}
+
+bool FrameWnd::WriteColorStr(pos_t x, pos_t y, const std::u16string& str, const std::vector<color_t>& color)
+{
+    if (!m_visible)
+        return true;
+
+    if (x < 0 || y < 0 || x > GetCSizeX() || y > GetCSizeY())
+        return 0;
+
+    ClientToScreen(x, y);
+
+    bool rc = WndManager::getInstance().GotoXY(x, y);
+    rc = WndManager::getInstance().WriteColorWStr(str, color);
+    return rc;
+}

@@ -144,7 +144,7 @@ public:
     bool    Hide(Wnd* wnd, bool refresh = true);
 
     bool    SetView(pos_t x = 40, pos_t y = 11, split_t type = split_t::no_split);
-    bool    ChangeViewMode(int type = 0);//0-create/del 1-horiz/vert
+    bool    ChangeViewMode(int mode = 0);//0-create/del 1-horiz/vert
     bool    CalcView();
     bool    CloneView(const Wnd* wnd = nullptr);
     bool    SetActiveView(int n = -1);
@@ -163,13 +163,13 @@ public:
     bool    WriteChar(char c = ' ');
     bool    WriteWChar(char16_t c = ' ');
     bool    WriteWStr(const std::u16string& str);
-    bool    WriteColorWStr(std::u16string& str, const std::vector<color_t>& color);
+    bool    WriteColorWStr(const std::u16string& str, const std::vector<color_t>& color);
 
     bool    Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode);
     bool    FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color);
     bool    ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color);
     bool    InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey);
-    bool    WriteColor(pos_t x, pos_t y, std::vector<color_t>& color);
+    bool    WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color);
 
     bool    ShowBuff();
     bool    ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey);

@@ -47,13 +47,13 @@ enum enum_border_t
     BORDER_TITLE  = 0x20
 };
 
-enum class invrect_t
+enum class invalidate_t
 {
-    invFind   = 0,
-    invChange = 1,
-    invDelete = 2,
-    invInsert = 3,
-    invFull   = 4
+    find,
+    change,
+    del,
+    insert,
+    full
 };
 
 enum class wnd_t
@@ -146,8 +146,8 @@ public:
 
     virtual bool                Repaint() { return true; }
     virtual bool                Invalidate(
-        [[maybe_unused]] size_t nline, [[maybe_unused]] invrect_t type, 
-        [[maybe_unused]] pos_t pos = 0, [[maybe_unused]] pos_t size = 0)
+        [[maybe_unused]] size_t line, [[maybe_unused]] invalidate_t type, 
+        [[maybe_unused]] size_t pos = 0, [[maybe_unused]] size_t size = 0)
         {return true;}
 
     bool  SetCmdParser(const input_t* cmdMap);
@@ -156,7 +156,7 @@ public:
 
     bool  WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color);
     bool  WriteStr(pos_t x, pos_t y, const std::string& str, color_t color);
-    bool  WriteWStr(pos_t x, pos_t y, const std::u16string& str, color_t color);
+    bool  WriteWStr(pos_t x, pos_t y, const std::u16string& str, color_t color = 0);
     bool  WriteChar(pos_t x, pos_t y, char c, color_t color);
     bool  WriteWChar(pos_t x, pos_t y, char16_t c, color_t color);
 
@@ -168,8 +168,8 @@ public:
     bool  Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, short n, scroll_t mode);
     bool  FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, int c, color_t color);
     bool  ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color);
-    bool  WriteColor(pos_t x, pos_t y, color_t* pColor);
-    bool  WriteColorStr(pos_t x, pos_t y, const std::u16string str, color_t* pColor);
+    bool  WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color);
+    bool  WriteColorStr(pos_t x, pos_t y, const std::u16string& str, const std::vector<color_t>& color);
     bool  ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey);
 
     void  GetWindowSize(pos_t& sizeX, pos_t& sizeY) const;

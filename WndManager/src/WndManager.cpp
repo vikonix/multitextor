@@ -335,7 +335,7 @@ bool WndManager::WriteWStr(const std::u16string& wstr)
     return rc;
 }
 
-bool WndManager::WriteColorWStr(std::u16string& str, const std::vector<color_t>& color)
+bool WndManager::WriteColorWStr(const std::u16string& str, const std::vector<color_t>& color)
 {
     HideCursor();
 
@@ -344,6 +344,21 @@ bool WndManager::WriteColorWStr(std::u16string& str, const std::vector<color_t>&
     pos_t len = static_cast<pos_t>(str.size());
     for(pos_t i = 0; i < len; ++i)
         m_screenBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, color[i], str[i]));
+
+    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff));
+    return rc;
+}
+
+bool WndManager::WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color)
+{
+    HideCursor();
+    pos_t len = static_cast<pos_t>(color.size());
+
+    for (pos_t i = 0; i < len; ++i)
+    {
+        cell_t cl = MAKE_CELL(0, color[i], m_screenBuff.GetCell(x + i, y));
+        m_screenBuff.SetCell(x + i, y, cl);
+    }
 
     bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff));
     return rc;
@@ -422,7 +437,7 @@ bool WndManager::WriteWChar(char16_t c)
 bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color)
 {
     LOG(DEBUG) << "  M::FillRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey 
-        << " ch=" << std::hex << c << " c=" << static_cast<int>(color) << std::dec;
+        << " ch=" << std::hex << c << " color=" << static_cast<int>(color) << std::dec;
 
     HideCursor();
     cell_t cl = MAKE_CELL(0, color, c);
@@ -440,7 +455,7 @@ bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input
 
 bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color)
 {
-    LOG(DEBUG) << "  M::ColorRect l=" << left << " t=" << top << " x=" << sizex << " y=" << sizey << " c=" << color;
+    LOG(DEBUG) << "  M::ColorRect l=" << left << " t=" << top << " x=" << sizex << " y=" << sizey << " color=" << color;
 
     HideCursor();
     for (pos_t y = 0; y < sizey; ++y)
@@ -477,9 +492,9 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
 
 bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 {
-    LOG(DEBUG) << __FUNC__ << " w=" << wnd << " r=" << refresh << " v=" << view;
+    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " refresh=" << refresh << " view=" << view;
 
-    if (!view)
+    if (0 == view)
     {
         m_activeView = 0;
         AddWnd(wnd);
@@ -496,7 +511,7 @@ bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 
 bool WndManager::Hide(Wnd* wnd, bool refresh)
 {
-    LOG(DEBUG) << __FUNC__ << " w=" << wnd << " r=" << refresh;
+    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " refresh=" << refresh;
 
     if (wnd == m_view[2].wnd)
     {
@@ -536,7 +551,7 @@ const View& WndManager::GetView(const Wnd* wnd) const
 
 bool WndManager::CloneView(const Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
 
     if (m_view[2].wnd)
     {
@@ -567,7 +582,7 @@ bool WndManager::CloneView(const Wnd* wnd)
 
 bool WndManager::AddWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
 
     //add to top
     m_wndList.push_front(wnd);
@@ -578,7 +593,7 @@ bool WndManager::AddWnd(Wnd* wnd)
 
 bool WndManager::AddLastWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
     //add to bottom
     if (m_wndList.empty())
     {
@@ -592,7 +607,7 @@ bool WndManager::AddLastWnd(Wnd* wnd)
 
 bool WndManager::DelWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " w=" << wnd;
+    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
 
     //del from list
     if (wnd == m_view[2].wnd)
@@ -635,7 +650,7 @@ Wnd* WndManager::GetWnd(int n, int view)
 
 bool WndManager::SetTopWnd(int n, int view)
 {
-    LOG(DEBUG) << __FUNC__ << " n=" << n << " v=" <<view;
+    LOG(DEBUG) << __FUNC__ << " n=" << n << " view=" <<view;
 
     if ((n == 0 && view == 0) || (n < 0 && view != 0))
         return true;
@@ -650,11 +665,14 @@ bool WndManager::SetTopWnd(int n, int view)
 
 bool WndManager::SetTopWnd(Wnd* wnd, int view)
 {
-    LOG(DEBUG) << __FUNC__ << " w=" << wnd << " view=" << view;
-    LOG(DEBUG) << "top=" << m_wndList[0] << " v2=" << m_view[2].wnd << " av=" << m_activeView;
-
     if (!wnd)
         return true;
+
+    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " view=" << view;
+    if (!m_wndList.empty())
+    {
+        LOG(DEBUG) << "top=" << m_wndList[0] << " view2=" << m_view[2].wnd << " aview=" << m_activeView;
+    }
 
     if (split_t::no_split == m_splitType)
         view = 0;
@@ -663,7 +681,7 @@ bool WndManager::SetTopWnd(Wnd* wnd, int view)
 
     if (!view)
     {
-        if (wnd == m_wndList[0])
+        if (!m_wndList.empty() && wnd == m_wndList[0])
             return true;
 
         if (m_view[2].wnd && m_view[2].wnd->IsClone())
@@ -827,9 +845,9 @@ bool WndManager::SetActiveView(int n)
     return WriteConsoleTitle(true);
 }
 
-bool WndManager::ChangeViewMode(int type)//0-create/del 1-horiz/vert
+bool WndManager::ChangeViewMode(int mode)//0-create/del 1-horiz/vert
 {
-    LOG(DEBUG) << "ChangeViewMode st=" << static_cast<int>(m_splitType) << " t=" << type;
+    LOG(DEBUG) << "ChangeViewMode split type=" << static_cast<int>(m_splitType) << " mode=" << mode;
 
     if (m_wndList.empty())
         return true;
@@ -840,7 +858,7 @@ bool WndManager::ChangeViewMode(int type)//0-create/del 1-horiz/vert
         m_splitY = m_sizey / 2;
     }
 
-    if (type == 0)
+    if (mode == 0)
     {
         //create/del
         if (m_splitType != split_t::no_split)
@@ -875,7 +893,7 @@ bool WndManager::ChangeViewMode(int type)//0-create/del 1-horiz/vert
 
 bool WndManager::SetView(pos_t x, pos_t y, split_t type)
 {
-    LOG(DEBUG) << "SetView x=" << x << " y=" << y << " t=" << static_cast<int>(type);
+    LOG(DEBUG) << "SetView x=" << x << " y=" << y << " type=" << static_cast<int>(type);
 
     if (!x || !y)
         return true;

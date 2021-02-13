@@ -172,7 +172,7 @@ public:
     size_t  GetSize();
 
     bool    Clear();
-    size_t  GetStrCount() { return m_totalStrCount; }
+    size_t  GetStrCount() const { return m_totalStrCount; }
     Tview   GetStr(size_t n);
     bool    AddStr(size_t n, const Tview str);
     bool    AppendStr(const Tview str) {return AddStr(m_totalStrCount, str);}

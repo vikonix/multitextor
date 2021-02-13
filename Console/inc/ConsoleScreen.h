@@ -44,7 +44,7 @@ enum class cursor_t
     CURSOR_OVERWRITE    = 5
 };
 
-enum invalidate_t : uint32_t
+enum invalidateScreen_t : uint32_t
 {
     INVALIDATE_NO       = 0,
     INVALIDATE_LEFT     = 1,

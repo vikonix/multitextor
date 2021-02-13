@@ -28,14 +28,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #include <vld.h>
 #endif
 
-#include "Editor.h"
-
 #include "utils/logger.h"
 #include "utils/Directory.h"
 #include "App.h"
 #include "DlgControls.h"
 #include "Dialogs/StdDialogs.h"
-#include "Editor.h"
+
+#include "EditorWnd.h"
 
 #include <iostream>
 
@@ -126,8 +125,11 @@ public:
             {
                 std::filesystem::path path{dlg.s_vars.path};
                 path /= dlg.s_vars.file;
-                Editor ed{ path };
-                ed.Load();
+                //Editor ed{ path };
+                //ed.Load();
+                EditorWnd editor;
+                editor.Show(true, -1);
+                editor.SetFileName(path);
             }
         }
 

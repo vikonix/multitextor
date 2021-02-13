@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/MemBuff.h"
 #include "Types.h"
 #include "UndoList.h"
+#include "Wnd.h"
 
 #include <unordered_set>
 #include <filesystem>
@@ -46,15 +47,6 @@ enum class eol_t
 #else
     #define DEF_EOL eol_t::unix_eol
 #endif
-
-enum class inv_t
-{
-    find,
-    change,
-    del,
-    insert,
-    full
-};
 
 class FrameWnd;
 
@@ -86,7 +78,7 @@ private:
     bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);
     bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff);
 
-    bool    GetStr(size_t n, size_t offset, std::u16string& buff, size_t len);
+    std::u16string  _GetStr(size_t line, size_t offset, size_t size);
     bool    _AddStr(size_t n, const std::u16string& str);
     bool    AddStr(size_t n, const std::u16string& str);
     bool    AppendStr(const std::u16string& str);
@@ -106,10 +98,10 @@ public:
     bool                    SetFilePath(const std::filesystem::path& file);
     std::filesystem::path   GetFilePath() const {return m_file;}
 
-    bool                    LinkWnd(FrameWnd* wnd);
-    bool                    UnlinkWnd(FrameWnd* wnd);
+    bool                    LinkWnd(FrameWnd* wnd) { m_wndList.insert(wnd); return true; }
+    bool                    UnlinkWnd(FrameWnd* wnd) { m_wndList.erase(wnd); return true; }
     std::list<FrameWnd*>    GetLinkedWnd(FrameWnd* wnd = nullptr) const;
-    bool                    InvalidateWnd(size_t line, inv_t type, pos_t pos = 0, pos_t size = MAX_COORD) const;
+    bool                    InvalidateWnd(size_t line, invalidate_t type, pos_t pos = 0, pos_t size = 0) const;
     bool                    RefreshAllWnd(FrameWnd* wnd) const;
 
     bool                    Clear();
@@ -133,7 +125,7 @@ public:
     bool                    GetShowTab() const      {return m_showTab;}
     void                    SetShowTab(bool show)   {m_showTab = show;}
 
-    size_t                  GetStrCount() const;// {return m_nStrCount; }
+    size_t                  GetStrCount() const {return m_buffer.GetStrCount(); }
     bool                    IsChanged() const;// {return m_fChanged | m_fCurChanged; }
     uint64_t                GetSize() const;// {return m_pDObject->GetSize(); }
     time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
@@ -177,9 +169,11 @@ public:
 
     //lexical API
     //const char* GetParseMode() { return m_LexBuff.GetParseMode(); }
-    //bool           SetParseMode(const char* mode);
-    //bool           GetColor(size_t line, const std::u16string& str, color_t* pBuff, size_t len);
+    bool                    SetParseMode(const std::string& mode);
+    bool                    GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len);
     //bool           GetFuncList(List* pList, int* pLine);
     //bool           CheckLexPair(size_t* pLine, int* pX);
 };
+
+using EditorPtr = std::shared_ptr<Editor>;
 

@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Editor.h"
 #include "utils/logger.h"
+#include "utfcpp/utf8.h"
 #include "App.h"
 
 
@@ -200,7 +201,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             else
                 ++cr;
 
-            //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+            //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
             //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
@@ -210,7 +211,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
         else if (buff[i] == 0xa)
         {
             ++lf;
-            //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+            //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
             //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
@@ -250,7 +251,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
                 i = cut;
             }
 
-            //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+            //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
             //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
@@ -289,8 +290,67 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     return true;
 }
 
-#if 0
+std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)
+{
+    if (line == m_curStr && !m_curStrBuff.empty())
+        return m_curStrBuff.substr(offset, size);
+    else
+        return _GetStr(line, offset, size);
+}
 
+std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
+{
+    if (line >= m_buffer.GetStrCount())
+        return {};
+
+    std::u16string outstr(size, ' ');
+    
+    auto str = m_buffer.GetStr(line);
+    std::u16string wstr = utf8::utf8to16(std::string(str));//???Convert char with cp
+
+    //go from begin of string for right tabulation calculating 
+    size_t pos{ 0 };
+    for (auto c : wstr)
+    {
+        if (c > ' ')
+        {
+            if (pos >= offset)
+            {
+                outstr[pos - offset] = c;
+            }
+        }
+        if (c == 0x9)//tab
+        {
+            auto tab = (pos + m_tab) - (pos + m_tab) % m_tab;
+            if (m_saveTab || m_showTab)
+                while (pos < tab)
+                {
+                    if (pos < offset + size)
+                        outstr[pos++ - offset] = 0x9;
+                }
+            pos = tab;
+        }
+        else if (c == 0xd || c == 0x0a || c == 0x1a)//cr/lf/eof
+            break;
+        else
+            ++pos;
+
+        if (pos >= offset + size)
+            break;
+    }
+
+    m_buffer.ReleaseBuff();
+
+    return outstr;
+}
+
+bool Editor::GetColor(size_t nline, const std::u16string& str, std::vector<color_t>& buff, size_t len)
+{
+    return false;//??? m_LexBuff.GetColor(nline, pStr, pBuff, len);
+}
+
+#if 0
+/////////////////////////////////////////////////////////////////////////////
 
 int TextBuff::SetShowTab(int show)
 {
@@ -400,68 +460,6 @@ int TextBuff::CheckAccess()
 
 
 
-int TextBuff::GetStr(size_t n, size_t offset, wchar* pBuff, size_t len)
-{
-  size_t i;
-  //fill dest buffer with space
-  for(i = 0; i < len; ++i)
-    pBuff[i] = ' ';
-  pBuff[i] = 0;
-
-  if(n >= m_nStrCount)
-    return 0;
-
-  size_t size;
-  char* pStr = MStrBuff::GetStr(n, &size);
-  int s = 0;
-
-  //всегда идем с начала строки чтобы учесть все табуляции
-  i = 0;
-  for(int j = 0; j < offset + len && i < size;)
-  {
-    unsigned char c = pStr[i++];
-    if(c == ' ')
-      ++j;
-    else if(c > ' ')
-    {
-      if(j >= offset)
-      {
-        wchar wc = char2wchar(m_nCP, c);
-        pBuff[j - offset] = wc;
-      }
-      s = ++j;
-    }
-    else if(c == 0x9)//tab
-    {
-      //TPRINT(("tab size=%d from=%d\n", m_nTab, j));
-      int t = (j + m_nTab) - (j + m_nTab) % m_nTab;
-      if(m_fSaveTab || m_fShowTab)
-        while(j < t)
-          pBuff[j++ - offset] = 0x9;
-      else
-        while(j < t)
-          pBuff[j++ - offset] = ' ';
-    }
-    else if(c == 0xd || c == 0x0a || c == 0x1a)//cr/lf/eof
-      break;
-    else
-    {
-#if 0
-      break;
-#else
-      if(j >= offset)
-      {
-        pBuff[j - offset] = ' ';
-      }
-      ++j;
-#endif
-    }
-  }
-
-  MStrBuff::ReleaseBuff();
-
-  return s - offset;//real size
-}
 
 
 int TextBuff::ConvertStr(wchar* pStr, char* pOutStr, int len)
@@ -851,10 +849,6 @@ char* TextBuff::ConvertBuff(StrBuff* pBuff, size_t* pSize)
 
 
 /////////////////////////////////////////////////////////////////////////////
-int TextBuff::GetColor(size_t nline, wchar* pStr, color_t* pBuff, size_t len)
-{
-  return m_LexBuff.GetColor(nline, pStr, pBuff, len);
-}
 
 
 int TextBuff::CheckLexPair(size_t* pLine, int* pX)
@@ -912,25 +906,6 @@ int TextBuff::GetFuncList(List* pList, int* pLine)
   //assert(cur >= 0);
   *pLine = cur;
   return count;
-}
-
-
-/////////////////////////////////////////////////////////////////////////////
-wchar* TextBuff::GetStr(size_t nline, size_t offset, size_t size)
-{
-  wchar* pStr = m_sStrBuff;
-  if(nline == m_CurStr)
-  {
-    memcpy(pStr, m_sCurStrBuff + offset, size * 2);
-    pStr[size]    = 0;
-    m_nStrBuffLen = -1;
-  }
-  else
-  {
-    m_nStrBuffLen = GetStr(nline, offset, pStr, size);
-  }
-
-  return pStr;
 }
 
 
