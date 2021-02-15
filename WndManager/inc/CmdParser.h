@@ -31,20 +31,25 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <vector>
 
+enum class scancmd_t
+{
+    not_found = 0,
+    wait_next,
+    collected
+};
 
 class CmdParser final
 {
-    std::vector<std::list<input_t>> m_keyMap;
-    std::vector<std::list<input_t>> m_cmdMap;
+    std::list<std::vector<input_t>> m_keyMap;
+    std::list<std::vector<input_t>> m_cmdMap;
 
-    std::list<input_t>  m_outCommands;
-    std::list<input_t>  m_savedKeys;
+    std::vector<input_t>            m_savedKeys;
+    time_t                          m_time;
 
 public:
     CmdParser() = default;
 
-    bool    IsInited() const;
-    bool    SetCmdMap(const input_t* cmdMap);
-    int     ScanKey(input_t key);
-    input_t GetCommand();
+    bool        SetCmdMap(const CmdMap& cmdMap);
+    scancmd_t   ScanKey(input_t key);
+    std::vector<input_t>    GetCommand();
 };

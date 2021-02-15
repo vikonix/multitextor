@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 #include <optional>
+#include <functional>
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -145,9 +146,11 @@ public:
 template <typename Tbuff, typename Tview>
 class MemStrBuff
 {
+    using LoadBuffFunc = std::function<bool(uint64_t offset, size_t size, std::shared_ptr<Tbuff> buff)>;
     friend class Editor;
 
 protected:
+    LoadBuffFunc    m_loadBuffFunc;
     std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>> m_buffList;
     size_t  m_totalStrCount{};
     bool    m_changed{};
@@ -155,8 +158,10 @@ protected:
     typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator m_curBuff;
     size_t  m_curBuffLine{};
 
-    virtual bool LoadBuff([[maybe_unused]]uint64_t offset, [[maybe_unused]] size_t size, [[maybe_unused]] std::shared_ptr<Tbuff> buff)
+    bool LoadBuff(uint64_t offset, size_t size, std::shared_ptr<Tbuff> buff)
     {
+        if (m_loadBuffFunc)
+            return m_loadBuffFunc(offset, size, buff);
         return true;
     }
 
@@ -168,7 +173,8 @@ protected:
 public:
     MemStrBuff();
 
-    bool    IsChanged() { return m_changed; }
+    bool    SetLoadBuffFunc(LoadBuffFunc func) { m_loadBuffFunc = func; return true; };
+    bool    IsChanged() const { return m_changed; }
     size_t  GetSize();
 
     bool    Clear();

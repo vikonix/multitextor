@@ -164,7 +164,7 @@ bool FrameWnd::CheckWndPos(pos_t x, pos_t y) const
 pos_t FrameWnd::GetWSizeX() const
 {
     if (m_sizex <= 0)
-        return WndManager::getInstance().GetView(this).sizex + m_sizex - m_left;
+        return WndManager::getInstance().GetView(this).sizex - m_left;
     else
         return m_sizex;
 }
@@ -172,7 +172,7 @@ pos_t FrameWnd::GetWSizeX() const
 pos_t FrameWnd::GetWSizeY() const
 {
     if (m_sizey <= 0)
-        return WndManager::getInstance().GetView(this).sizey + m_sizey - m_top;
+        return WndManager::getInstance().GetView(this).sizey - m_top;
     else
         return m_sizey;
 }
@@ -181,11 +181,14 @@ pos_t FrameWnd::GetCSizeX() const
 {
     pos_t size;
     if (m_sizex <= 0)
-        size = WndManager::getInstance().GetView(this).sizex + m_sizex - m_left;
+        size = WndManager::getInstance().GetView(this).sizex - m_left;
     else
         size = m_sizex;
-    if (m_border & BORDER_LEFT)  --size;
-    if (m_border & BORDER_RIGHT) --size;
+
+    if (m_border & BORDER_LEFT)  
+        --size;
+    if (m_border & BORDER_RIGHT) 
+        --size;
     return size;
 }
 
@@ -193,11 +196,14 @@ pos_t FrameWnd::GetCSizeY() const
 {
     pos_t size;
     if (m_sizey <= 0)
-        size = WndManager::getInstance().GetView(this).sizey + m_sizey - m_top;
+        size = WndManager::getInstance().GetView(this).sizey - m_top;
     else
         size = m_sizey;
-    if (m_border & (BORDER_TOP | BORDER_TITLE)) --size;
-    if (m_border & BORDER_BOTTOM) --size;
+
+    if (m_border & (BORDER_TOP | BORDER_TITLE)) 
+        --size;
+    if (m_border & BORDER_BOTTOM) 
+        --size;
     return size;
 }
 
@@ -300,13 +306,10 @@ bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
 
     bool rc = WndManager::getInstance().GotoXY(wleft, wtop);
     rc = WndManager::getInstance().SetTextAttr(color);
-    if((pos_t)str.size() < m_sizex - (wleft - m_left))
+    if((pos_t)str.size() <= GetWSizeX() - (wleft - m_left))
         rc = WndManager::getInstance().WriteStr(str);
     else
-    {
-        std::string shortStr(str, (size_t)m_sizex - wleft + m_left);
-        rc = WndManager::getInstance().WriteStr(shortStr);
-    }
+        rc = WndManager::getInstance().WriteStr(str.substr(0, (size_t)GetWSizeX() - (wleft - m_left)));
 
     return rc;
 }

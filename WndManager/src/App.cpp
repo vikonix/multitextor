@@ -409,22 +409,21 @@ input_t Application::MainProc(input_t exit_code)
 input_t  Application::EventProc(input_t code)
 {
     //2 check convert
-    //if (!m_pKeyConv) //???
+    auto scan = m_cmdParser.ScanKey(code);
+    if(scan == scancmd_t::not_found)
         return ParseCommand(code);
-/*
-    int rc = m_pKeyConv->ScanKey(code);
-    if (rc < 0)
-        code = ParseCommand(code);
-    else if (rc > 0)
-        while ((code = m_pKeyConv->GetCommand()) != 0)
+    else if (scan == scancmd_t::collected)
+    {
+        auto cmdlist = m_cmdParser.GetCommand();
+        for (auto cmd : cmdlist)
         {
-            code = ParseCommand(code);
+            code = ParseCommand(cmd);
             if (code == K_EXIT)
                 break;
         }
+    }
 
     return code;
-*/
 }
 
 input_t  Application::CheckMouse(input_t code)

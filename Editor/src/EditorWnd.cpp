@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorWnd.h"
 #include "WndManager.h"
 
+#include <algorithm>
+
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode)
 {
@@ -113,16 +115,53 @@ bool EditorWnd::Refresh()
 
 bool EditorWnd::UpdateAccessInfo()
 {
+    std::stringstream stream;
+    stream << "[ " << GetAccessInfo() << "]";
+    
+    pos_t x = 0;
+    if (m_border & BORDER_TOP)
+        x += 2;
+
+    WriteWnd(x, 0, stream.str(), ColorWindowInfo);
     return true;
 }
 
 bool EditorWnd::UpdateNameInfo()
 {
+    if (m_sizeX / 2 - 2 > 5)
+    {
+        pos_t x = 5;
+        if (m_border & BORDER_TOP)
+            x += 2;
+
+        auto path = m_editor->GetFilePath().filename().u8string();
+        path.resize(m_sizeX / 2 - 2, ' ');
+        WriteWnd(x, 0, path, *m_pColorWindowTitle);
+    }
     return true;
 }
 
 bool EditorWnd::UpdatePosInfo()
 {
+    size_t x = m_xOffset + m_cursorx + 1;
+    size_t y = m_firstLine + m_cursory + 1;
+
+    std::stringstream stream;
+
+    //15 spaces
+    if (m_sizeX > 40)
+        stream << "               [" << m_editor->GetStrCount() << "] L:" << y << " C:" << x;
+    else
+        stream << "               L:" << y << " C:" << x;
+
+    auto str = stream.str();
+
+    size_t len = std::max(str.size(), m_infoStrSize);
+    len = std::min({len, static_cast<size_t>(32), static_cast<size_t>(m_sizeX / 2 + 3)});
+
+    m_infoStrSize = str.size() - 14;
+
+    WriteWnd(m_sizeX - (pos_t)len, 0, str.substr(str.size() - len), *m_pColorWindowTitle);
     return true;
 }
 
@@ -326,7 +365,8 @@ bool EditorWnd::Repaint()
     UpdateAccessInfo();
     UpdatePosInfo();
     BeginPaint();
-    rc = ShowBuff(0, 0, m_sizeX, 1);//???
+    //-1 for updating window caption
+    rc = ShowBuff(0, static_cast<pos_t>(-1), m_sizeX, 1);
 
     return rc;
 }

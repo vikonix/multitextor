@@ -28,89 +28,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Wnd.h"
 #include "Editor.h"
+#include "EditorCmd.h"
 
 #include <functional>
-
-enum class EditorCmd
-{
-    E_MOVE_LEFT,
-    E_MOVE_RIGHT,
-    E_MOVE_S_LEFT,
-    E_MOVE_S_RIGHT,
-    E_MOVE_UP,
-    E_MOVE_DOWN,
-    E_MOVE_PAGE_UP,
-    E_MOVE_PAGE_DOWN,
-    E_MOVE_FILE_BEGIN,
-    E_MOVE_FILE_END,
-    E_MOVE_STR_BEGIN,
-    E_MOVE_STR_END,
-    E_MOVE_TAB_LEFT,
-    E_MOVE_TAB_RIGHT,
-    E_MOVE_WORD_LEFT,
-    E_MOVE_WORD_RIGHT,
-    E_MOVE_POS,
-    E_MOVE_CENTER,
-
-    E_SELECT_WORD,
-    E_SELECT_LINE,
-    E_SELECT_ALL,
-    E_SELECT_BEGIN,
-    E_SELECT_END,
-    E_SELECT_UNSELECT,
-    E_SELECT_MODE,
-
-    E_EDIT_C,
-    E_EDIT_DEL_C,
-    E_EDIT_BS,
-    E_EDIT_TAB,
-    E_EDIT_ENTER,
-    E_EDIT_DEL_STR,
-    E_EDIT_DEL_BEGIN,
-    E_EDIT_DEL_END,
-    E_EDIT_BLOCK_CLEAR,
-    E_EDIT_BLOCK_COPY,
-    E_EDIT_BLOCK_MOVE,
-    E_EDIT_BLOCK_DEL,
-    E_EDIT_BLOCK_INDENT,
-    E_EDIT_BLOCK_UNDENT,
-    E_EDIT_CB_COPY,
-    E_EDIT_CB_CUT,
-    E_EDIT_CB_PASTE,
-    E_EDIT_UNDO,
-    E_EDIT_REDO,
-
-    E_CTRL_DATA,
-    E_CTRL_GOTOX,
-    E_CTRL_GOTOY,
-    E_CTRL_FIND,
-    E_CTRL_FINDUP,
-    E_CTRL_FINDDN,
-    E_CTRL_FINDUPW,
-    E_CTRL_FINDDNW,
-    E_CTRL_REPLACE,
-    E_CTRL_AGAIN,
-    E_DLG_GOTO,
-    E_DLG_FIND,
-    E_DLG_REPLACE,
-
-    E_CTRL_GETSUBSTR,
-    E_CTRL_REFRESH,
-    E_CTRL_RELOAD,
-    E_CTRL_SAVE,
-    E_CTRL_SAVEAS,
-    E_CTRL_CLOSE,
-
-    E_MOVE_LEX_MATCH,
-    E_CTRL_FLIST,
-    E_CTRL_PROPERTIES,
-    E_CTRL_CHANGE_CP,
-    E_POPUP_MENU
-};
-
-
-#define E_CMD   K_USER
-#define K_ED(n) (E_CMD + ((n) << 16))
 
 
 class EditorWnd : public FrameWnd
@@ -210,6 +130,7 @@ public:
     virtual bool    Refresh() override;
     virtual bool    Repaint() override;
     virtual bool    Invalidate(size_t line, invalidate_t type, size_t pos = 0, size_t size = 0) override;
+    virtual char    GetAccessInfo() const override { return m_editor->GetAccessInfo(); }
 
     /*
 
@@ -223,7 +144,6 @@ public:
 
   virtual int           IsUsedTimer() override  {return 1;}
   virtual int           IsUsedView() override   {return 1;}
-  virtual char          GetAccessInfo() override{return m_pTBuff->GetAccessInfo();}
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
 
 

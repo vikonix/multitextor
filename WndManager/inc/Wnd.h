@@ -150,7 +150,7 @@ public:
         [[maybe_unused]] size_t pos = 0, [[maybe_unused]] size_t size = 0)
         {return true;}
 
-    bool  SetCmdParser(const input_t* cmdMap);
+    bool  SetCmdParser(const CmdMap& cmdMap);
     bool  SetBorder(border_t border = NO_BORDER);
     bool  DrawBorder();
 

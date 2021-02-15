@@ -75,8 +75,8 @@ protected:
     bool                        m_recordMacro{ false };
     time_t                      m_prevTime{};
 
+    CmdParser                   m_cmdParser;
     CaptureInput*               m_capturedInput{};
-    //    KeyConv*      m_pKeyConv;
 
     Application() : m_wndManager{ WndManager::getInstance() } {};
 
@@ -134,7 +134,7 @@ public:
         return prev;
     }
 
-    //int SetKeyConv(int* pConv);//???
+    bool SetCmdParser(const CmdMap& cmdMap);
     std::string GetKeyName(input_t code);
 };
 

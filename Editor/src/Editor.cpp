@@ -44,6 +44,29 @@ bool Editor::Clear()
     return true;
 }
 
+bool Editor::LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string> buff)
+{
+    std::ifstream file{ m_file, std::ios::binary };
+    if (!file)
+    {
+        _assert(0);
+        return false;
+    }
+    
+    file.seekg(offset);
+
+    file.read(buff->data(), size);
+    auto read = file.gcount();
+    if (size != read)
+    {
+        _assert(0);
+        return false;
+    }
+
+    return true;
+}
+
+
 bool Editor::Load()
 {
     try
@@ -69,6 +92,8 @@ bool Editor::Load()
     std::ifstream file{m_file, std::ios::binary};
     if (!file)
         return false;
+
+    m_buffer.SetLoadBuffFunc(std::bind(&Editor::LoadBuff, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
     Application::getInstance().SetHelpLine("Wait for file loading");
 
@@ -301,7 +326,7 @@ std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)
 std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
 {
     if (line >= m_buffer.GetStrCount())
-        return {};
+        return std::u16string(size, ' ');
 
     std::u16string outstr(size, ' ');
     
@@ -342,6 +367,25 @@ std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
     m_buffer.ReleaseBuff();
 
     return outstr;
+}
+
+char Editor::GetAccessInfo()
+{
+    std::error_code ec;
+
+    if (IsChanged())//modified
+        return 'M';
+    else if (std::filesystem::exists(m_file, ec))//exist
+    {
+        //???if (std::filesystem::is  m_pDObject->GetMode() == 1)//read only
+        //    return 'R';
+        //else
+            return ' ';//opened
+    }
+    else
+        return 'N';//new
+
+    return '?';
 }
 
 bool Editor::GetColor(size_t nline, const std::u16string& str, std::vector<color_t>& buff, size_t len)

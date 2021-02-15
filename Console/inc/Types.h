@@ -28,12 +28,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cstdint>
 #include <chrono>
+#include <list>
+#include <vector>
 
 using color_t = uint16_t;
-using input_t = uint32_t;
 using pos_t = int16_t;
 using cell_t = uint32_t;
 using cp_t = uint32_t;
+
+using input_t = uint32_t;
+using CmdMap = std::list<std::vector<input_t>>;
 
 using namespace std::chrono_literals;
 

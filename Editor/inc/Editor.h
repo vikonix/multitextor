@@ -84,7 +84,9 @@ private:
     bool    AppendStr(const std::u16string& str);
     bool    ChangeStr(size_t n, const std::u16string& str);
     bool    ConvertStr(const std::u16string& str, std::string& buff) const;
-    
+
+    bool    LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string> buff);
+
 public:
     Editor(const Editor&) = delete;
     void operator= (const Editor&) = delete;
@@ -126,7 +128,7 @@ public:
     void                    SetShowTab(bool show)   {m_showTab = show;}
 
     size_t                  GetStrCount() const {return m_buffer.GetStrCount(); }
-    bool                    IsChanged() const;// {return m_fChanged | m_fCurChanged; }
+    bool                    IsChanged() const {return m_curChanged || m_buffer.IsChanged(); }
     uint64_t                GetSize() const;// {return m_pDObject->GetSize(); }
     time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
