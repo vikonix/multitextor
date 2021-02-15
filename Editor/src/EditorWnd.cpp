@@ -192,13 +192,13 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
 
     if (x == 0)
         m_cursorx = 0;
-    else if (x < m_sizeX - 1)
+    else if (x < static_cast<size_t>(m_sizeX - 1))
         m_cursorx = static_cast<pos_t>(x);
     else
     {
         m_cursorx = m_sizeX - 5;//we will see 4 symbols
         pos = x - m_cursorx;
-        if (pos >= MAX_STRLEN - m_sizeX)
+        if (pos >= static_cast<size_t>(MAX_STRLEN - m_sizeX))
         {
             pos = MAX_STRLEN - m_sizeX;
             m_cursorx = static_cast<pos_t>(x - pos);
@@ -214,7 +214,7 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
             line = m_firstLine;
             m_cursory = static_cast<pos_t>(y - line);
         }
-        else if (y < m_sizeY / 2)
+        else if (y < static_cast<size_t>(m_sizeY / 2))
             m_cursory = static_cast<pos_t>(y);
         else
         {
@@ -391,7 +391,7 @@ bool EditorWnd::IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey)
 bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t offset, size_t len)
 {
     auto MarkFound = [this, y]() {
-        if (m_foundSize && y == m_foundY)
+        if (m_foundSize && static_cast<size_t>(y) == m_foundY)
             //mark found
             Mark(m_foundX, m_foundY, m_foundX + m_foundSize - 1, m_foundY, ColorWindowFound);
     };
@@ -920,12 +920,12 @@ input_t EditorWnd::ParseCommand(input_t cmd)
 
 bool EditorWnd::HideFound()
 {
-    bool rc;
+    bool rc = true;
     if (m_lexX >= 0 && m_lexY >= 0)
     {
         LOG(DEBUG) << "    HideLex x=" << m_lexX << " y=" << m_lexY;
-        if ( m_lexY >= m_firstLine && m_lexY < m_firstLine + m_sizeY
-          && m_lexX >= m_xOffset   && m_lexX < m_xOffset + m_sizeX)
+        if ( static_cast<size_t>(m_lexY) >= m_firstLine && static_cast<size_t>(m_lexY) < m_firstLine + m_sizeY
+          && static_cast<size_t>(m_lexX) >= m_xOffset   && static_cast<size_t>(m_lexX) < m_xOffset + m_sizeX)
         {
             //if visible
             auto str = m_editor->GetStr(m_lexY);
@@ -953,7 +953,7 @@ bool EditorWnd::HideFound()
                 x = 0;
             }
 
-            if (x + size > m_sizeX)
+            if (static_cast<size_t>(x + size) > static_cast<size_t>(m_sizeX))
             {
                 size -= x + size - m_sizeX;
             }
@@ -962,5 +962,5 @@ bool EditorWnd::HideFound()
                 rc = PrintStr(static_cast<pos_t>(x), static_cast<pos_t>(m_foundY - m_firstLine), str, x + m_xOffset, size);
         }
     }
-    return 0;
+    return rc;
 }

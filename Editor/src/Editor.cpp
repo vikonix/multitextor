@@ -346,14 +346,14 @@ std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
         }
         if (c == 0x9)//tab
         {
-            auto tab = (pos + m_tab) - (pos + m_tab) % m_tab;
+            size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
             if (m_saveTab || m_showTab)
-                while (pos < tab)
+                while (pos < tabpos)
                 {
                     if (pos < offset + size)
                         outstr[pos++ - offset] = 0x9;
                 }
-            pos = tab;
+            pos = tabpos;
         }
         else if (c == 0xd || c == 0x0a || c == 0x1a)//cr/lf/eof
             break;

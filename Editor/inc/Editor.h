@@ -122,7 +122,7 @@ public:
     eol_t                   GetEol() const          {return m_eol;}
     void                    SetEol(eol_t eol)       {m_eol = eol;}
     size_t                  GetTab() const          {return m_tab;}
-    void                    SetTab(size_t tab)      {m_tab = tab;}
+    void                    SetTab(size_t tabsize)      {m_tab = tabsize;}
     bool                    GetSaveTab() const      {return m_saveTab;}
     void                    SetSaveTab(bool save)   {m_saveTab = save;}
     bool                    GetShowTab() const      {return m_showTab;}

@@ -4,6 +4,7 @@ Cross Platform console mode library and text editor.
 This project is attempt of recreating my old text editor.
 
 ## Tested on:
+ - Windows 7 - Microsoft Visual Studio Community 2017
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Linux Ubuntu 20.04 - gcc version 9.3.0
 
