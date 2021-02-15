@@ -101,6 +101,8 @@ menu_list mAccess {
   {MENU_ITEM, "&F&1&0"}
 };
 
+std::unordered_map<std::string, std::shared_ptr<EditorWnd>> g_editors;
+
 class MyApp : public Application
 {
 public:
@@ -110,7 +112,11 @@ public:
         if (code != K_TIME)
             LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
 
-        if (code == K_F2)
+        if (code == K_F1)
+        {
+            g_editors.clear();
+        }
+        else if (code == K_F2)
         {
             WndManager::getInstance().PutInput(K_MENU);
             code = 0;
@@ -127,9 +133,11 @@ public:
                 path /= dlg.s_vars.file;
                 //Editor ed{ path };
                 //ed.Load();
-                EditorWnd editor;
-                editor.Show(true, -1);
-                editor.SetFileName(path);
+                auto editor = std::make_shared<EditorWnd>();
+                editor->Show(true, -1);
+                editor->SetFileName(path);
+                
+                g_editors[path.u8string()] = editor;
             }
         }
 
