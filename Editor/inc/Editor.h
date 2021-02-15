@@ -69,6 +69,7 @@ private:
     size_t          m_tab{8};   //tab position
     bool            m_saveTab{};//save tab or not
     bool            m_showTab{};
+    bool            m_ro{};
 
     //editor variables
     size_t          m_curStr{};

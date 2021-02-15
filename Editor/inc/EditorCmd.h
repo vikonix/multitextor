@@ -107,7 +107,7 @@ enum EditorCmd
     E_POPUP_MENU
 };
 
-#define E_CMD   K_USER
-#define K_ED(n) (E_CMD + ((n) << 16))
+#define EDITOR_CMD   K_USER
+#define K_ED(n) (EDITOR_CMD + ((n) << 16))
 
 extern CmdMap g_defaultEditKeyMap;

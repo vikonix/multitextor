@@ -48,7 +48,7 @@ bool EditorWnd::SetEditor(EditorPtr editor)
     LOG(DEBUG) << "    SetTextBuff";
     if (m_editor)
     {
-        //???Save(K_ED(E_CTRL_SAVE));
+        Save(K_ED(E_CTRL_SAVE));
         m_editor->UnlinkWnd(this);
         m_editor = nullptr;
     }
@@ -671,4 +671,296 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
     }
 
     return true;
+}
+
+input_t EditorWnd::EventProc(input_t code)
+{
+    LOG(DEBUG) << "    WndEdit:WndProc " << std::hex << code << std::dec;
+/* //???
+    if (code == K_TIME)
+    {
+        if (!m_Timer)
+        {
+            m_Timer = 5 * 2;//2 sec
+            int rc = m_pTBuff->CheckAccess();
+            if (rc)
+            {
+                int mode = m_pTBuff->GetAccessInfo();
+                long long size = m_pTBuff->GetSize();
+
+                TPRINT(("File was changed mode=%c size=%lld\n", mode, size));
+                if (mode == 'N' || !size)
+                {
+                    //файл удален
+                    if (!m_fDeleted)
+                    {
+                        //еще одно ожидание
+                        //многие программы сначала удал€ют файл
+                        //а потом восстанавливают
+                        TPRINT(("Check deleted\n"));
+                        m_fDeleted = 1;
+                    }
+                    else
+                    {
+                        m_fDeleted = 0;
+                        //нужно проверить изменен ли файл
+                        //если изменен, весь ли он в пам€ти
+                        FLoadDialog Dlg(GetObjPath(), 1);
+                        int code1 = Dlg.Activate();
+                        if (code1 == ID_OK)
+                        {
+                            //TPRINT(("...Save1\n"));
+                            Save(1);
+                        }
+                    }
+                }
+                else
+                {
+                    m_fDeleted = 0;
+                    if (!m_fLog)
+                    {
+                        FLoadDialog Dlg(GetObjPath());
+                        int code1 = Dlg.Activate();
+                        if (code1 == ID_OK)
+                        {
+                            //TPRINT(("...Reload1\n"));
+                            Reload(0);
+                        }
+                    }
+                    else
+                    {
+                        //???
+                        //TPRINT(("...Reload2\n"));
+                        Reload(0);
+                    }
+                }
+            }
+            else if (m_fDeleted)
+            {
+                m_fDeleted = 0;
+                //нужно проверить изменен ли файл
+                //если изменен, весь ли он в пам€ти
+                FLoadDialog Dlg(GetObjPath(), 1);
+                int code1 = Dlg.Activate();
+                if (code1 == ID_OK)
+                {
+                    //TPRINT(("...Save2\n"));
+                    Save(1);
+                }
+            }
+        }
+        --m_Timer;
+    }
+*/
+
+    if ( code != K_TIME
+      && code != K_EXIT
+      && code != K_RELEASE + K_SHIFT
+      && code != (K_ED(E_CTRL_FIND) | 1) 
+      && !m_close)
+        //hide search if Dialog window is visible
+        HideFound();
+
+    auto scan = m_cmdParser.ScanKey(code);
+    if (scan == scancmd_t::wait_next)
+        InputCapture();
+    else if (scan == scancmd_t::not_found)
+        ParseCommand(code);
+    else
+    {
+        InputRelease();
+        auto cmdlist = m_cmdParser.GetCommand();
+        for(auto cmd : cmdlist)
+            ParseCommand(cmd);
+    }
+
+    if (code != K_TIME)
+    {
+        Repaint();
+
+        UpdateLexPair();
+        m_editor->SetUndoRemark("");
+
+        //refresh all view
+        m_editor->RefreshAllWnd(this);
+    }
+
+    if (m_close)
+        Wnd::Destroy();
+
+    return 0;
+}
+
+
+input_t EditorWnd::ParseCommand(input_t cmd)
+{
+    if (cmd == K_TIME)
+        return 0;
+    else if (0 != (cmd & K_MOUSE))
+    {
+        pos_t x = K_GET_X(cmd);
+        pos_t y = K_GET_Y(cmd);
+        ScreenToClient(x, y);
+        cmd = K_MAKE_COORD_CODE((cmd & ~K_CODEMASK), x, y);
+
+        //mouse event
+        if ((cmd & K_TYPEMASK) == K_MOUSEKUP)
+        {
+            m_selectMouse = false;
+            InputRelease();
+            MovePos(cmd);
+            SelectEnd(cmd);
+
+            if (m_popupMenu)
+            {
+                m_popupMenu = true;
+                TrackPopupMenu(0);
+            }
+        }
+        else
+        {
+            InputCapture();
+            m_selectMouse = true;
+            if ((cmd & K_TYPEMASK) == K_MOUSEKL)
+            {
+                //mouse left key
+                if ((cmd & K_MODMASK) == K_MOUSE2)
+                {
+                    SelectWord(cmd);
+                }
+                else if ((cmd & K_MODMASK) == K_MOUSE3)
+                {
+                    SelectLine(cmd);
+                }
+                else
+                {
+                    MovePos(cmd);
+                    SelectBegin(0);
+                    if ((cmd & K_CTRL) && m_selectState == 1)
+                        m_selectType = select_t::line;
+                    else if ((cmd & K_SHIFT) && m_selectState == 1)
+                        m_selectType = select_t::column;
+                }
+            }
+            else if ((cmd & K_TYPEMASK) == K_MOUSEKR && (cmd & (K_SHIFT | K_CTRL | K_ALT)) == 0)
+            {
+                m_popupMenu = true;
+            }
+        }
+    }
+    else if ((cmd & K_TYPEMASK) == 0 && ((cmd & K_MODMASK) & ~K_SHIFT) == 0)
+    {
+        if (m_selectMouse)
+            return 0;
+
+        PutMacro(cmd);
+
+        SelectEnd(cmd);
+        switch (cmd & K_CODEMASK)
+        {
+        case K_ESC:
+            break;
+        case K_ENTER:
+            EditEnter(cmd);
+            break;
+        case K_TAB:
+            EditTab(cmd);
+            break;
+        case K_BS:
+            EditBS(cmd);
+            break;
+        default:
+            EditC(cmd);
+            break;
+        }
+    }
+    else
+    {
+        EditorCmd ecmd = static_cast<EditorCmd>((cmd - EDITOR_CMD) >> 16);
+
+        if (m_selectMouse)
+        {
+            LOG(DEBUG) << "Mouse select for " << ecmd;
+            if (ecmd == E_SELECT_MODE)
+            {
+                m_selectMouse = false;
+                SelectEnd(cmd);
+            }
+            return 0;
+        }
+
+        auto it = s_funcMap.find(ecmd);
+        if(it == s_funcMap.end())
+        {
+            LOG(ERROR) << "    ??? editor cmd=" << std::hex << cmd << std::dec;
+        }
+        else
+        {
+            PutMacro(cmd);
+
+            auto& [func, select] = it->second;
+
+            if (select == Select::end)
+            {
+                SelectEnd(cmd);
+            }
+
+            [[maybe_unused]]bool rc = func(this, cmd);
+
+            if (select == Select::begin
+                && (m_selectState & 0xff) == 1)
+            {
+                SelectBegin(cmd);
+            }
+        }
+    }
+
+    return 0;
+}
+
+bool EditorWnd::HideFound()
+{
+    bool rc;
+    if (m_lexX >= 0 && m_lexY >= 0)
+    {
+        LOG(DEBUG) << "    HideLex x=" << m_lexX << " y=" << m_lexY;
+        if ( m_lexY >= m_firstLine && m_lexY < m_firstLine + m_sizeY
+          && m_lexX >= m_xOffset   && m_lexX < m_xOffset + m_sizeX)
+        {
+            //if visible
+            auto str = m_editor->GetStr(m_lexY);
+            rc = PrintStr(static_cast<pos_t>(m_lexX - m_xOffset), static_cast<pos_t>(m_lexY - m_firstLine), str, m_lexX, 1);
+        }
+
+        m_lexX = -1;
+        m_lexY = -1;
+    }
+
+    if (m_foundSize)
+    {
+        //TPRINT(("    HideFound x=%d y=%d s=%d\n", m_nFoundX, m_nFoundY, m_nFoundSize));
+        size_t size = m_foundSize;
+        m_foundSize = 0;
+
+        if (m_foundY >= m_firstLine && m_foundY < m_firstLine + m_sizeY)
+        {
+            auto str = m_editor->GetStr(m_foundY);
+
+            int x = static_cast<int>(m_foundX) - static_cast<int>(m_xOffset);
+            if (x < 0)
+            {
+                size += x;
+                x = 0;
+            }
+
+            if (x + size > m_sizeX)
+            {
+                size -= x + size - m_sizeX;
+            }
+
+            if (size > 0)
+                rc = PrintStr(static_cast<pos_t>(x), static_cast<pos_t>(m_foundY - m_firstLine), str, x + m_xOffset, size);
+        }
+    }
+    return 0;
 }

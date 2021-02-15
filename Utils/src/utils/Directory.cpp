@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef WIN32
     #include <windows.h>
     static const size_t c_BuffLen = 0x800;
+    #include <io.h>
+#else
+    #include <unistd.h>
 #endif
 
 
@@ -137,6 +140,28 @@ std::string Directory::CutPath(const path_t& path, size_t len)
     size_t offset = wstr.size() - (len - shortPath.u16string().size());
     shortPath += wstr.substr(offset, std::string::npos);
     return shortPath.u8string();
+}
+
+access_t Directory::GetAccessMode(const path_t& path)
+{
+    std::error_code ec;
+    if (!std::filesystem::exists(path, ec))
+        return notexists;
+        
+    access_t mode{ exists };
+    auto file = path.u8string();
+#ifdef WIN32
+    if (_access(file.c_str(), 4) == 0)
+        mode = readonly;
+    if (_access(file.c_str(), 6) == 0)
+        mode = readwrite;
+#else
+    if (access(file.c_str(), R_OK) == 0)
+        mode = readonly;
+    if (access(file.c_str(), R_OK | W_OK) == 0)
+        mode = readwrite;
+#endif
+    return mode;
 }
 
 bool DirectoryList::AddMask(const path_t& mask)

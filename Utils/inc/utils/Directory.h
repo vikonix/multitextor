@@ -33,6 +33,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 using path_t = std::filesystem::path;
 using direntry_t = std::filesystem::directory_entry;
 
+enum access_t
+{
+    notexists,
+    exists,
+    readonly,
+    readwrite
+};
+
 class Directory
 {
     static path_t   m_runPath;
@@ -48,6 +56,7 @@ public:
     static path_t   SysCfgPath();
     static path_t   UserName();
     static std::string CutPath(const path_t& path, size_t len);
+    static access_t GetAccessMode(const path_t& path);
 
     template<typename T>
     static bool Match(const T& name, const T& mask, bool nametoupper = false)

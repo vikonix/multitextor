@@ -49,7 +49,7 @@ class EditorWnd : public FrameWnd
         column
     };
     
-    using EditorFunc = std::function<bool(input_t)>;
+    using EditorFunc = std::function<bool(EditorWnd*, input_t)>;
 
     static std::unordered_map<EditorCmd, std::pair<EditorFunc, Select>> s_funcMap;
 
@@ -66,8 +66,8 @@ class EditorWnd : public FrameWnd
     //file position
     size_t      m_xOffset{};
     size_t      m_firstLine{};
-    pos_t       m_sizeX{};
-    pos_t       m_sizeY{};
+    pos_t       m_sizeX{};//???
+    pos_t       m_sizeY{};//???
 
     //select mode variables
     //select coord
@@ -98,8 +98,8 @@ class EditorWnd : public FrameWnd
     bool        m_popupMenu{};
 
     //lex pair
-    //int        m_LexX;
-    //int        m_LexY;
+    int        m_lexX{-1};
+    int        m_lexY{-1};
 
     //diff mode
     //Diff*      m_pDiff;
@@ -126,6 +126,10 @@ public:
 
     bool        Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, select_t selectType = select_t::stream);
     bool        IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey);
+    bool        HideFound();
+
+    input_t     ParseCommand(input_t cmd);
+    virtual input_t EventProc(input_t code) override;
 
     virtual bool    Refresh() override;
     virtual bool    Repaint() override;
@@ -156,9 +160,6 @@ public:
   int       IsMarked()               {return m_nSelectState;}
   int       IsChanged()              {return m_pTBuff->IsChanged();}
   long long GetSize()                {return m_pTBuff->GetSize();}
-
-  int       EventProc(int code);
-  int       ParseCommand(int cmd);
 
   int       SetTextBuff(TextBuff* pTBuff);
   TextBuff* GetTextBuff() {return m_pTBuff;}
@@ -199,83 +200,83 @@ public:
   int       FindDown(int fSilence = 0);
   int       IsWord(wchar* pStr, size_t offset, size_t len);
 */
-  ///////////////////////////////////////////////////////////////////////////
-  //edit func
-  int MoveLeft(int cmd);
-  int MoveRight(int cmd);
-  int MoveScrollLeft(int cmd);
-  int MoveScrollRight(int cmd);
-  int MoveUp(int cmd);
-  int MoveDown(int cmd);
-  int MovePageUp(int cmd);
-  int MovePageDown(int cmd);
-  int MoveFileBegin(int cmd);
-  int MoveFileEnd(int cmd);
-  int MoveStrBegin(int cmd);
-  int MoveStrEnd(int cmd);
-  int MoveTabLeft(int cmd);
-  int MoveTabRight(int cmd);
-  int MoveWordLeft(int cmd);
-  int MoveWordRight(int cmd);
-  int MovePos(int cmd);
-  int MoveCenter(int cmd);
+    ///////////////////////////////////////////////////////////////////////////
+    //editor functions
+    bool MoveLeft(input_t cmd);
+    bool MoveRight(input_t cmd);
+    bool MoveScrollLeft(input_t cmd);
+    bool MoveScrollRight(input_t cmd);
+    bool MoveUp(input_t cmd);
+    bool MoveDown(input_t cmd);
+    bool MovePageUp(input_t cmd);
+    bool MovePageDown(input_t cmd);
+    bool MoveFileBegin(input_t cmd);
+    bool MoveFileEnd(input_t cmd);
+    bool MoveStrBegin(input_t cmd);
+    bool MoveStrEnd(input_t cmd);
+    bool MoveTabLeft(input_t cmd);
+    bool MoveTabRight(input_t cmd);
+    bool MoveWordLeft(input_t cmd);
+    bool MoveWordRight(input_t cmd);
+    bool MovePos(input_t cmd);
+    bool MoveCenter(input_t cmd);
 
-  int SelectWord(int cmd);
-  int SelectLine(int cmd);
-  int SelectAll(int cmd);
-  int SelectBegin(int cmd);
-  int SelectEnd(int cmd);
-  int SelectUnselect(int cmd);
-  int SelectMode(int cmd);
+    bool SelectWord(input_t cmd);
+    bool SelectLine(input_t cmd);
+    bool SelectAll(input_t cmd);
+    bool SelectBegin(input_t cmd);
+    bool SelectEnd(input_t cmd);
+    bool SelectUnselect(input_t cmd);
+    bool SelectMode(input_t cmd);
 
-  int EditC(int cmd);
-  int EditDelC(int cmd);
-  int EditBS(int cmd);
-  int EditTab(int cmd);
-  int EditEnter(int cmd);
-  int EditDelStr(int cmd);
-  int EditDelBegin(int cmd);
-  int EditDelEnd(int cmd);
+    bool EditC(input_t cmd);
+    bool EditDelC(input_t cmd);
+    bool EditBS(input_t cmd);
+    bool EditTab(input_t cmd);
+    bool EditEnter(input_t cmd);
+    bool EditDelStr(input_t cmd);
+    bool EditDelBegin(input_t cmd);
+    bool EditDelEnd(input_t cmd);
 
-  int EditBlockClear(int cmd);
-  int EditBlockCopy(int cmd);
-  int EditBlockMove(int cmd);
-  int EditBlockDel(int cmd);
-  int EditBlockIndent(int cmd);
-  int EditBlockUndent(int cmd);
-  int EditCopyToClipboard(int cmd);
-  int EditCutToClipboard(int cmd);
-  int EditPasteFromClipboard(int cmd);
-  int EditUndo(int cmd);
-  int EditRedo(int cmd);
+    bool EditBlockClear(input_t cmd);
+    bool EditBlockCopy(input_t cmd);
+    bool EditBlockMove(input_t cmd);
+    bool EditBlockDel(input_t cmd);
+    bool EditBlockIndent(input_t cmd);
+    bool EditBlockUndent(input_t cmd);
+    bool EditCopyToClipboard(input_t cmd);
+    bool EditCutToClipboard(input_t cmd);
+    bool EditPasteFromClipboard(input_t cmd);
+    bool EditUndo(input_t cmd);
+    bool EditRedo(input_t cmd);
 
-  int Data(int cmd);
-  int GotoX(int cmd);
-  int GotoY(int cmd);
+    bool Data(input_t cmd);
+    bool GotoX(input_t cmd);
+    bool GotoY(input_t cmd);
 
-  int CtrlFind(int cmd);
-  int CtrlFindUp(int cmd);
-  int CtrlFindDown(int cmd);
-  int FindUpWord(int cmd);
-  int FindDownWord(int cmd);
-  int Replace(int cmd);
-  int Again(int cmd);
+    bool CtrlFind(input_t cmd);
+    bool CtrlFindUp(input_t cmd);
+    bool CtrlFindDown(input_t cmd);
+    bool FindUpWord(input_t cmd);
+    bool FindDownWord(input_t cmd);
+    bool Replace(input_t cmd);
+    bool Again(input_t cmd);
 
-  int DlgGoto(int cmd);
-  int DlgFind(int cmd);
-  int DlgReplace(int cmd);
+    bool DlgGoto(input_t cmd);
+    bool DlgFind(input_t cmd);
+    bool DlgReplace(input_t cmd);
 
-  int CtrlGetSubstr(int cmd);
-  int CtrlRefresh(int cmd);
-  int Reload(int cmd);
-  int Save(int cmd);
-  int SaveAs(int cmd);
-  int Close(int cmd);
+    bool CtrlGetSubstr(input_t cmd);
+    bool CtrlRefresh(input_t cmd);
+    bool Reload(input_t cmd);
+    bool Save(input_t cmd);
+    bool SaveAs(input_t cmd);
+    bool Close(input_t cmd);
 
-  int MoveLexMatch(int cmd);
-  int CtrlFList(int cmd);
-  int CtrlProperties(int cmd);
-  int CtrlChangeCP(int cmd);
-  int TrackPopupMenu(int cmd);
+    bool MoveLexMatch(input_t cmd);
+    bool CtrlFList(input_t cmd);
+    bool CtrlProperties(input_t cmd);
+    bool CtrlChangeCP(input_t cmd);
+    bool TrackPopupMenu(input_t cmd);
 };
 

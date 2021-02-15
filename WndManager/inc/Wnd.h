@@ -81,7 +81,7 @@ protected:
 public:
     Wnd() = default;
     virtual ~Wnd() {Hide();}
-    virtual input_t                 Destroy() { return K_CLOSE; };
+    virtual input_t                 Destroy()               { return K_CLOSE; };
 
 
     virtual wnd_t                   GetWndType() const      {return wnd_t::wnd;}

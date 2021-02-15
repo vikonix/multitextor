@@ -438,3 +438,8 @@ bool FrameWnd::WriteColorStr(pos_t x, pos_t y, const std::u16string& str, const 
     rc = WndManager::getInstance().WriteColorWStr(str, color);
     return rc;
 }
+
+bool FrameWnd::PutMacro(input_t cmd) 
+{ 
+    return Application::getInstance().PutMacro(cmd);
+}

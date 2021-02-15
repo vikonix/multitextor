@@ -25,6 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Editor.h"
+#include "utils/Directory.h"
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
 #include "App.h"
@@ -57,7 +58,7 @@ bool Editor::LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string>
 
     file.read(buff->data(), size);
     auto read = file.gcount();
-    if (size != read)
+    if (size != static_cast<size_t>(read))
     {
         _assert(0);
         return false;
@@ -65,7 +66,6 @@ bool Editor::LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string>
 
     return true;
 }
-
 
 bool Editor::Load()
 {
@@ -371,26 +371,33 @@ std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
 
 char Editor::GetAccessInfo()
 {
-    std::error_code ec;
-
     if (IsChanged())//modified
         return 'M';
-    else if (std::filesystem::exists(m_file, ec))//exist
-    {
-        //???if (std::filesystem::is  m_pDObject->GetMode() == 1)//read only
-        //    return 'R';
-        //else
-            return ' ';//opened
-    }
-    else
+    
+    auto mode = Directory::GetAccessMode(m_file);
+    if (mode == notexists)
         return 'N';//new
-
-    return '?';
+    else if (m_ro || mode == readonly)
+        return 'R';
+    else
+        return ' ';
 }
 
 bool Editor::GetColor(size_t nline, const std::u16string& str, std::vector<color_t>& buff, size_t len)
 {
     return false;//??? m_LexBuff.GetColor(nline, pStr, pBuff, len);
+}
+
+bool Editor::RefreshAllWnd(FrameWnd* wnd) const
+{
+    for (auto w : m_wndList)
+    {
+        if (w == wnd)
+            continue;
+        w->Repaint();
+    }
+
+    return true;
 }
 
 #if 0
