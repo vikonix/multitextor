@@ -128,7 +128,7 @@ public:
         if (x >= m_sizex || y >= m_sizey)
         {
             LOG(ERROR) << __FUNC__ << " x=" << x << " y=" << y;
-            _assert(!"x,y");
+            _assert(!"pos");
             return 0;
         }
         //LOG(DEBUG) << "get x=" << x << " y=" << y << " c=" << std::hex << m_buffer[x + y * m_sizex] << std::dec;
@@ -140,9 +140,45 @@ public:
         if (x >= m_sizex || y >= m_sizey)
         {
             LOG(ERROR) << __FUNC__ << " x=" << x << " y=" << y;
+            _assert(!"pos");
             return false;
         }
         m_buffer[x + y * m_sizex] = c;
+        return true;
+    }
+    bool ScrollBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode)
+    {
+        if (left >= m_sizex || right >= m_sizex || top >= m_sizey || bottom >= m_sizey)
+        {
+            LOG(ERROR) << __FUNC__ << " l=" << left << " t=" << top << " r=" << right << " b=" << bottom;
+            _assert(!"pos");
+            return false;
+        }
+
+        pos_t y;
+        switch (mode)
+        {
+        case scroll_t::SCROLL_UP:
+            for (y = top; y <= bottom - n; ++y)
+                std::memcpy(m_buffer.data() + left + y * m_sizex, m_buffer.data() + left + (y + n) * m_sizex, (right - left + n) * sizeof(cell_t));
+            break;
+
+        case scroll_t::SCROLL_DOWN:
+            for (y = bottom; y >= top + n; --y)
+                std::memcpy(m_buffer.data() + left + y * m_sizex, m_buffer.data() + left + (y - n) * m_sizex, (right - left + n) * sizeof(cell_t));
+            break;
+
+        case scroll_t::SCROLL_LEFT:
+            for (y = top; y <= bottom; ++y)
+                std::memmove(m_buffer.data() + left + y * m_sizex, m_buffer.data() + left + n + y * m_sizex, (right - left + 1 - n) * sizeof(cell_t));
+            break;
+
+        case scroll_t::SCROLL_RIGHT:
+            for (y = top; y <= bottom; ++y)
+                std::memmove(m_buffer.data() + left + n + y * m_sizex, m_buffer.data() + left + y * m_sizex, (right - left + 1 - n) * sizeof(cell_t));
+            break;
+        }
+
         return true;
     }
 };

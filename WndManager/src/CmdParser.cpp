@@ -74,24 +74,27 @@ scancmd_t CmdParser::ScanKey(input_t key)
     m_savedKeys.push_back(key);
     auto savedptr = m_savedKeys.data();
     
+    auto cmdit = m_cmdMap.cbegin();
     for (auto keylist : m_keyMap)
     {
+        ++cmdit;
         if (keylist.size() > m_savedKeys.size())
             continue;
         
         auto keyptr = keylist.data();
         if (keylist.size() == m_savedKeys.size())
         {
-            if (!std::memcmp(savedptr, keyptr, m_savedKeys.size()))
+            if (!std::memcmp(savedptr, keyptr, m_savedKeys.size() * sizeof(input_t)))
             {
-                m_savedKeys = keylist;
+                --cmdit;
+                m_savedKeys = *cmdit;
                 //StatusWaitKey(false);
                 return scancmd_t::collected;
             }
         }
         else
         {
-            if (!std::memcmp(savedptr, keyptr, m_savedKeys.size()))
+            if (!std::memcmp(savedptr, keyptr, m_savedKeys.size() * sizeof(input_t)))
             {
                 m_time = time(NULL);
                 //if(m_savedKeys.size() == 1) StatusWaitKey(true);
@@ -100,7 +103,13 @@ scancmd_t CmdParser::ScanKey(input_t key)
         }
     }
 
-    return scancmd_t::not_found;
+    if (m_savedKeys.size() == 1)
+    {
+        m_savedKeys.clear();
+        return scancmd_t::not_found;
+    }
+    else
+        return scancmd_t::collected;
 }
 
 std::vector<input_t> CmdParser::GetCommand()

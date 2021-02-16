@@ -164,9 +164,9 @@ public:
     bool  Clr();
     bool  GotoXY(pos_t x, pos_t y);
     bool  WriteStr(pos_t x, pos_t y, const std::u16string& str);
-    bool  Scroll(pos_t n, int mode);
-    bool  Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, short n, scroll_t mode);
-    bool  FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, int c, color_t color);
+    bool  Scroll(pos_t n, scroll_t mode);
+    bool  Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode);
+    bool  FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color);
     bool  ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color);
     bool  WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color);
     bool  WriteColorStr(pos_t x, pos_t y, const std::u16string& str, const std::vector<color_t>& color);

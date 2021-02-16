@@ -1017,3 +1017,19 @@ bool WndManager::CheckInput(const std::chrono::milliseconds& waitTime)
     return true;
 }
 
+bool WndManager::Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode)
+{
+    uint32_t invalidate{};
+
+    HideCursor();
+    bool rc = CallConsole(ScrollBlock(left, top, right, bottom, n, mode, &invalidate));
+    rc = m_screenBuff.ScrollBlock(left, top, right, bottom, n, mode);
+
+    if ((invalidate & INVALIDATE_LEFT) && left > 0)
+        rc = WriteBlock(0, top, left - 1, bottom, m_screenBuff);
+
+    if ((invalidate & INVALIDATE_RIGHT) && right < m_sizex - 1)
+        rc = WriteBlock(right + 1, top, m_sizex - 1, bottom, m_screenBuff);
+
+    return rc;
+}

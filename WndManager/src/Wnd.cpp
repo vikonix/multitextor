@@ -382,7 +382,7 @@ bool FrameWnd::WriteWChar(pos_t x, pos_t y, char16_t c, color_t color)
     return rc;
 }
 
-bool FrameWnd::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, int c, color_t color)
+bool FrameWnd::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color)
 {
     if (!m_visible)
         return true;
@@ -442,4 +442,22 @@ bool FrameWnd::WriteColorStr(pos_t x, pos_t y, const std::u16string& str, const 
 bool FrameWnd::PutMacro(input_t cmd) 
 { 
     return Application::getInstance().PutMacro(cmd);
+}
+
+bool FrameWnd::Scroll(pos_t n, scroll_t mode)
+{
+    if (!m_visible)
+        return true;
+
+    pos_t left = 0;
+    pos_t top = 0;
+    pos_t right = GetCSizeX() - 1;
+    pos_t bottom = GetCSizeY() - 1;
+
+    ClientToScreen(left, top);
+    ClientToScreen(right, bottom);
+
+    bool rc = WndManager::getInstance().SetTextAttr(*m_pColorWindow)
+           && WndManager::getInstance().Scroll(left, top, right, bottom, n, mode);
+    return rc;
 }

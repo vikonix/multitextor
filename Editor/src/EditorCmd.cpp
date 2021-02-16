@@ -33,12 +33,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //second array is cmd array
 CmdMap g_defaultEditKeyMap
 {
-    {K_UP},                     {K_ED(E_MOVE_UP)},
-    {K_MOUSEWUP | K_MOUSEW},    {K_ED(E_MOVE_UP) + 3},
-    {K_DOWN},                   {K_ED(E_MOVE_DOWN)},
-    {K_MOUSEWDN | K_MOUSEW},    {K_ED(E_MOVE_DOWN) + 3},
     {K_LEFT},                   {K_ED(E_MOVE_LEFT)},
     {K_RIGHT},                  {K_ED(E_MOVE_RIGHT)},
+    {K_UP},                     {K_ED(E_MOVE_UP)},
+    {K_DOWN},                   {K_ED(E_MOVE_DOWN)},
+    {K_MOUSEWUP | K_MOUSEW},    {K_ED(E_MOVE_UP) + 3},
+    {K_MOUSEWDN | K_MOUSEW},    {K_ED(E_MOVE_DOWN) + 3},
     {K_PAGEUP},                 {K_ED(E_MOVE_PAGE_UP)},
     {K_PAGEDN},                 {K_ED(E_MOVE_PAGE_DOWN)},
     {K_HOME},                   {K_ED(E_MOVE_STR_BEGIN)},
@@ -64,8 +64,8 @@ CmdMap g_defaultEditKeyMap
 
     {K_UP | K_ALT},             {K_ED(E_MOVE_UP) + 1},
     {K_DOWN | K_ALT},           {K_ED(E_MOVE_DOWN) + 1},
-    {K_LEFT | K_ALT},           {K_ED(E_MOVE_S_LEFT)},
-    {K_RIGHT | K_ALT},          {K_ED(E_MOVE_S_RIGHT)},
+    {K_LEFT | K_ALT},           {K_ED(E_MOVE_SCROLL_LEFT)},
+    {K_RIGHT | K_ALT},          {K_ED(E_MOVE_SCROLL_RIGHT)},
 
     {K_DELETE},                 {K_ED(E_EDIT_DEL_C)},
     {K_ESC, K_BS},              {K_ED(E_EDIT_DEL_C)},

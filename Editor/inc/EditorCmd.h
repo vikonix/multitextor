@@ -30,14 +30,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "KeyCodes.h"
 
 
-enum EditorCmd
+enum EditorCmd : input_t
 {
     E_MOVE_LEFT,
     E_MOVE_RIGHT,
-    E_MOVE_S_LEFT,
-    E_MOVE_S_RIGHT,
     E_MOVE_UP,
     E_MOVE_DOWN,
+    E_MOVE_SCROLL_LEFT,
+    E_MOVE_SCROLL_RIGHT,
     E_MOVE_PAGE_UP,
     E_MOVE_PAGE_DOWN,
     E_MOVE_FILE_BEGIN,

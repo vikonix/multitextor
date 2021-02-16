@@ -27,16 +27,23 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "EditorWnd.h"
 #include "EditorCmd.h"
+#include "WndManager.h"
+
+#define USE_SCROLL
+
+#ifndef WIN32
+    #define ONLY_SCREEN_SCROLL
+#endif
 
 
 std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::Select>> EditorWnd::s_funcMap =
 {
     {E_MOVE_LEFT,           {&EditorWnd::MoveLeft,               EditorWnd::Select::begin}},
     {E_MOVE_RIGHT,          {&EditorWnd::MoveRight,              EditorWnd::Select::begin}},
-    {E_MOVE_S_LEFT,         {&EditorWnd::MoveScrollLeft,         EditorWnd::Select::begin}},
-    {E_MOVE_S_RIGHT,        {&EditorWnd::MoveScrollRight,        EditorWnd::Select::begin}},
     {E_MOVE_UP,             {&EditorWnd::MoveUp,                 EditorWnd::Select::begin}},
     {E_MOVE_DOWN,           {&EditorWnd::MoveDown,               EditorWnd::Select::begin}},
+    {E_MOVE_SCROLL_LEFT,    {&EditorWnd::MoveScrollLeft,         EditorWnd::Select::begin}},
+    {E_MOVE_SCROLL_RIGHT,   {&EditorWnd::MoveScrollRight,        EditorWnd::Select::begin}},
     {E_MOVE_PAGE_UP,        {&EditorWnd::MovePageUp,             EditorWnd::Select::begin}},
     {E_MOVE_PAGE_DOWN,      {&EditorWnd::MovePageDown,           EditorWnd::Select::begin}},
     {E_MOVE_FILE_BEGIN,     {&EditorWnd::MoveFileBegin,          EditorWnd::Select::begin}},
@@ -124,71 +131,427 @@ bool EditorWnd::MovePos(input_t cmd)
 
 bool EditorWnd::MoveLeft(input_t cmd)
 {
+    size_t step = K_GET_CODE(cmd);
+    size_t offset = m_xOffset;
+
+    if (!step)
+    {
+        if (m_cursorx)
+            --m_cursorx;
+        else if (offset)
+            --offset;
+    }
+    else
+    {
+        if (m_cursorx >= step)
+            m_cursorx -= static_cast<pos_t>(step);
+        else
+        {
+            step -= m_cursorx;
+            m_cursorx = 0;
+            if (offset > step)
+                offset -= step;
+            else
+                offset = 0;
+        }
+    }
+
+    if (offset != m_xOffset)
+    {
+        size_t dx = m_xOffset - offset;
+        m_xOffset = offset;
+
+#ifdef USE_SCROLL
+        if (dx <= 8
+#ifdef ONLY_SCREEN_SCROLL
+            && m_sizeX > WndManager::getInstance().m_sizex - 8
+#endif
+            )
+        {
+            Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_RIGHT);
+            InvalidateRect(0, 0, static_cast<pos_t>(dx), m_sizeY);
+        }
+        else
+#endif
+            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
 bool EditorWnd::MoveRight(input_t cmd)
 {
-    return true;
-}
+    size_t step = K_GET_CODE(cmd);
+    size_t offset = m_xOffset;
 
-bool EditorWnd::MoveScrollLeft(input_t cmd)
-{
-    return true;
-}
+    if (!step)
+    {
+        if (m_cursorx < m_sizeX - 1)
+            ++m_cursorx;
+        else if (offset < MAX_STRLEN - m_sizeX)
+            ++offset;
+    }
+    else
+    {
+        if (m_cursorx < m_sizeX - step)
+            m_cursorx += static_cast<pos_t>(step);
+        else
+        {
+            step -= m_sizeX - 1 - m_cursorx;
+            m_cursorx = m_sizeX - 1;
 
-bool EditorWnd::MoveScrollRight(input_t cmd)
-{
+            if (offset < MAX_STRLEN - m_sizeX - step)
+                offset += step;
+            else
+                offset = MAX_STRLEN - m_sizeX;
+        }
+    }
+
+    if (offset != m_xOffset)
+    {
+        size_t dx = offset - m_xOffset;
+        m_xOffset = offset;
+
+#ifdef USE_SCROLL
+        if (dx <= 8
+#ifdef ONLY_SCREEN_SCROLL
+            && m_sizeX > WndManager::getInstance().m_sizex - 8
+#endif
+            )
+        {
+            Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_LEFT);
+            InvalidateRect(static_cast<pos_t>(m_sizeX - dx), 0, static_cast<pos_t>(dx), m_sizeY);
+        }
+        else
+#endif
+            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
 bool EditorWnd::MoveUp(input_t cmd)
 {
+    size_t step = K_GET_CODE(cmd);
+    size_t line = m_firstLine;
+
+    if (!step)
+    {
+        if (m_cursory)
+            --m_cursory;
+        else if (line)
+            --line;
+    }
+    else
+    {
+        if (line > step)
+            line -= step;
+        else if (line)
+            line = 0;
+        else if (m_cursory > step)
+            m_cursory -= static_cast<pos_t>(step);
+        else
+            m_cursory = 0;
+    }
+
+    if (m_firstLine != line)
+    {
+        size_t dy = m_firstLine - line;
+        m_firstLine = line;
+
+#ifdef USE_SCROLL
+        if (dy <= 8
+#ifdef ONLY_SCREEN_SCROLL
+            && m_sizeX > WndManager::getInstance().m_sizex - 8
+#endif
+            )
+        {
+            Scroll(static_cast<pos_t>(dy), scroll_t::SCROLL_DOWN);
+            InvalidateRect(0, 0, m_sizeX, static_cast<pos_t>(dy));
+        }
+        else
+#endif
+            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
     return true;
 }
 
 bool EditorWnd::MoveDown(input_t cmd)
 {
+    size_t step = K_GET_CODE(cmd);
+    size_t line = m_firstLine;
+
+    if (!step)
+    {
+        if (m_cursory < m_sizeY - 1)
+            ++m_cursory;
+        else
+            ++line;
+    }
+    else
+    {
+        line += step;
+    }
+
+    if (m_firstLine != line)
+    {
+        size_t numLine = m_editor->GetStrCount();
+        if (line < numLine - m_sizeY / 4)
+        {
+            size_t dy = line - m_firstLine;
+            m_firstLine = line;
+
+#ifdef USE_SCROLL
+            if (dy <= 8
+#ifdef ONLY_SCREEN_SCROLL
+                && m_sizeX > WndManager::getInstance().m_sizex - 8
+#endif
+                )
+            {
+                Scroll(static_cast<pos_t>(dy), scroll_t::SCROLL_UP);
+                InvalidateRect(0, static_cast<pos_t>(m_sizeY - dy), m_sizeX, static_cast<pos_t>(dy));
+            }
+            else
+#endif
+                InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        }
+        else if (m_cursory < m_sizeY - 1)
+        {
+            if (m_cursory + step < m_sizeY - 1)
+                m_cursory += static_cast<pos_t>(step);
+            else
+                m_cursory = m_sizeY - 1;
+        }
+    }
+    
     return true;
 }
 
-bool EditorWnd::MovePageUp(input_t cmd)
+bool EditorWnd::MoveScrollLeft(input_t cmd)
 {
+    size_t step = K_GET_CODE(cmd);
+    if (!m_xOffset)
+        return MoveLeft(cmd);
+
+    size_t offset = m_xOffset - (step ? step : 1);
+    if (offset < 0)
+        offset = 0;
+
+    if (offset != m_xOffset)
+    {
+        size_t dx = m_xOffset - offset;
+        m_xOffset = offset;
+
+#ifdef USE_SCROLL
+        if (dx <= 8
+#ifdef ONLY_SCREEN_SCROLL
+            && m_sizeX > WndManager::getInstance().m_sizex - 8
+#endif
+            )
+        {
+            Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_RIGHT);
+            InvalidateRect(0, 0, static_cast<pos_t>(dx), m_sizeY);
+        }
+        else
+#endif
+            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
-bool EditorWnd::MovePageDown(input_t cmd)
+bool EditorWnd::MoveScrollRight(input_t cmd)
 {
+    size_t step = K_GET_CODE(cmd);
+
+    if (m_xOffset >= MAX_STRLEN - m_sizeX)
+        return MoveRight(cmd);
+
+    size_t offset = m_xOffset + (step ? step : 1);
+    if (offset > MAX_STRLEN - m_sizeX)
+        offset = MAX_STRLEN - m_sizeX;
+
+    if (offset != m_xOffset)
+    {
+        size_t dx = offset - m_xOffset;
+        m_xOffset = offset;
+
+#ifdef USE_SCROLL
+        if (dx <= 8
+#ifdef ONLY_SCREEN_SCROLL
+            && m_sizeX > WndManager::getInstance().m_sizex - 8
+#endif
+            )
+        {
+            Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_LEFT);
+            InvalidateRect(static_cast<pos_t>(m_sizeX - dx), 0, static_cast<pos_t>(dx), m_sizeY);
+        }
+        else
+#endif
+            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
-bool EditorWnd::MoveFileBegin(input_t cmd)
+bool EditorWnd::MovePageUp([[maybe_unused]]input_t cmd)
 {
+    size_t line = m_firstLine;
+
+    if (line >= m_sizeY - 1)
+        line -= m_sizeY - 1;
+    else
+    {
+        line = 0;
+        m_cursory = 0;
+    }
+
+    if (m_firstLine != line)
+    {
+        m_firstLine = line;
+        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
-bool EditorWnd::MoveFileEnd(input_t cmd)
+bool EditorWnd::MovePageDown([[maybe_unused]]input_t cmd)
 {
+    size_t numLine = m_editor->GetStrCount();
+    if (m_firstLine + m_sizeY - 1 < numLine)
+    {
+        m_firstLine += m_sizeY - 1;
+        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+    else
+    {
+        MoveDown(m_sizeY - 1);
+    }
+
     return true;
 }
 
-bool EditorWnd::MoveStrBegin(input_t cmd)
+bool EditorWnd::MoveFileBegin([[maybe_unused]]input_t cmd)
 {
+    m_cursorx = 0;
+    m_cursory = 0;
+
+    if (m_xOffset != 0 || m_firstLine != 0)
+    {
+        m_xOffset = 0;
+        m_firstLine = 0;
+        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
-bool EditorWnd::MoveStrEnd(input_t cmd)
+bool EditorWnd::MoveFileEnd([[maybe_unused]]input_t cmd)
 {
+    size_t numLine = m_editor->GetStrCount();
+
+    size_t x = 0;
+    size_t line = 0;
+    m_cursorx = 0;
+    if (numLine >= m_sizeY)
+    {
+        line = numLine - m_sizeY + 1;
+        m_cursory = m_sizeY - 1;
+    }
+    else
+    {
+        m_cursory = (numLine) ? static_cast<pos_t>(numLine) : 0;
+    }
+
+    if (m_xOffset != x || m_firstLine != line)
+    {
+        m_xOffset = x;
+        m_firstLine = line;
+        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
-bool EditorWnd::MoveTabLeft(input_t cmd)
+bool EditorWnd::MoveStrBegin([[maybe_unused]]input_t cmd)
 {
+    size_t curx = m_xOffset + m_cursorx;
+
+    auto str = m_editor->GetStr(m_firstLine + m_cursory);
+    size_t x;
+    for (x = 0; x < str.size(); ++x)
+        if (str[x] > ' ')
+            break;
+
+    size_t offset = 0;
+
+    if (x >= curx)
+        m_cursorx = 0;
+    else if (x < m_sizeX)
+        m_cursorx = static_cast<pos_t>(x);
+    else
+    {
+        m_cursorx = 0;
+        offset = x;
+    }
+
+    if (m_xOffset != offset)
+    {
+        m_xOffset = offset;
+        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
     return true;
 }
 
-bool EditorWnd::MoveTabRight(input_t cmd)
+bool EditorWnd::MoveStrEnd([[maybe_unused]]input_t cmd)
 {
+    size_t x;
+
+    auto str = m_editor->GetStr(m_firstLine + m_cursory);
+    size_t len = Editor::UStrLen(str);
+    if (len >= m_sizeX)
+    {
+        m_cursorx = m_sizeX - 1;
+        if (len == MAX_STRLEN)
+            x = len - m_cursorx - 1;
+        else
+            x = len - m_cursorx;
+    }
+    else
+    {
+        m_cursorx = static_cast<pos_t>(len);
+        x = 0;
+    }
+
+    if (m_xOffset != x)
+    {
+        m_xOffset = x;
+        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
+
+    return true;
+}
+
+bool EditorWnd::MoveTabLeft([[maybe_unused]]input_t cmd)
+{
+    size_t x = m_xOffset + m_cursorx;
+    size_t x1 = x - x % 8;
+    if (x1 == x)
+        x1 -= 8;
+
+    MoveLeft(K_ED(E_MOVE_TAB_LEFT) + static_cast<input_t>(x - x1));
+
+    return true;
+}
+
+bool EditorWnd::MoveTabRight([[maybe_unused]]input_t cmd)
+{
+    size_t x = m_xOffset + m_cursorx;
+    size_t x1 = (x + 8) - (x + 8) % 8;
+
+    MoveRight(K_ED(E_MOVE_TAB_RIGHT) + static_cast<input_t>(x1 - x));
+
     return true;
 }
 

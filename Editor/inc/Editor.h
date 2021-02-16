@@ -98,6 +98,15 @@ public:
         , m_cp{cp}
     {}
 
+    static size_t UStrLen(const std::u16string& str) 
+    {
+        auto pos = str.find_last_not_of(' ');
+        if (pos = std::string::npos)
+            return str.size();
+        else
+            return pos;
+    };
+
     bool                    SetFilePath(const std::filesystem::path& file);
     std::filesystem::path   GetFilePath() const {return m_file;}
 
@@ -122,7 +131,7 @@ public:
     eol_t                   GetEol() const          {return m_eol;}
     void                    SetEol(eol_t eol)       {m_eol = eol;}
     size_t                  GetTab() const          {return m_tab;}
-    void                    SetTab(size_t tabsize)      {m_tab = tabsize;}
+    void                    SetTab(size_t tabsize)  {m_tab = tabsize;}
     bool                    GetSaveTab() const      {return m_saveTab;}
     void                    SetSaveTab(bool save)   {m_saveTab = save;}
     bool                    GetShowTab() const      {return m_showTab;}

@@ -874,7 +874,7 @@ input_t EditorWnd::ParseCommand(input_t cmd)
             break;
         }
     }
-    else
+    else if(0 != (cmd &  EDITOR_CMD))
     {
         EditorCmd ecmd = static_cast<EditorCmd>((cmd - EDITOR_CMD) >> 16);
 
@@ -913,6 +913,10 @@ input_t EditorWnd::ParseCommand(input_t cmd)
                 SelectBegin(cmd);
             }
         }
+    }
+    else
+    {
+        LOG(DEBUG) << "    ??? editor code=" << std::hex << cmd << std::dec;
     }
 
     return 0;

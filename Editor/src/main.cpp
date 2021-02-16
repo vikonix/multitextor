@@ -171,7 +171,7 @@ int main()
     //Application& app = Application::getInstance();
     //MyApp app;
     app.Init();
-    WndManager::getInstance().SetScreenSize();
+    WndManager::getInstance().SetScreenSize(80,25);
 
     app.SetLogo(g_Logo);
     app.WriteAppName(L"TestApp");
