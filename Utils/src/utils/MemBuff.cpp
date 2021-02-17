@@ -135,8 +135,6 @@ bool BuffPool<Tbuff>::ReleaseBuffPointer(hbuff_t hbuff)
 template <typename Tbuff, typename Tview>
 bool SBuff<Tbuff, Tview>::Clear()
 {
-    //m_strOffsets.fill(0);
-    //m_strCount = 0;
     m_strOffsetList.clear();
     m_mod = false;
     return true;
@@ -148,12 +146,9 @@ Tview SBuff<Tbuff, Tview>::GetStr(size_t n)
     if (!m_buff)
         return {};
 
-    //if(!m_strCount || n >= m_strCount)
     if(m_strOffsetList.empty() || n >= GetStrCount())
         return {};
 
-//    size_t begin = m_strOffsets[n];
-//    size_t end = m_strOffsets[n + 1];
     auto begin = GetStrOffset(n);
     auto end = GetStrOffset(n + 1);
 
@@ -167,15 +162,9 @@ bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
     if (!m_buff)
         return false;
 
-//    if (m_strCount == STR_NUM)
-//        return false;
-
-//    if (n > m_strCount)
     if (n > GetStrCount())
         return false;
 
-//    size_t offset_n = m_strOffsets[n];
-//    size_t offset_end = m_strOffsets[m_strCount];
     auto offset_n = GetStrOffset(n);
     auto offset_end = m_strOffsetList.back();
     size_t dl = str.size();
@@ -185,9 +174,6 @@ bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 
     m_buff->insert(offset_n, str);
 
-    //++m_strCount;
-    //for (size_t i = m_strCount; i > n; --i)
-//        m_strOffsets[i] = (uint32_t)(m_strOffsets[i - 1] + dl);
     m_strOffsetList.push_back(0);
     for (size_t i = GetStrCount() - 1; i > n; --i)
         m_strOffsetList[i] = GetStrOffset(i - 1) + (uint32_t)dl;
@@ -202,10 +188,6 @@ bool SBuff<Tbuff, Tview>::AppendStr(const Tview str)
     if (!m_buff)
         return false;
 
-//    if (m_strCount == STR_NUM)
-//        return false;
-
-//    size_t offset_end = m_strOffsets[m_strCount];
     auto offset_end = m_strOffsetList.back();
     size_t dl = str.size();
 
@@ -214,8 +196,6 @@ bool SBuff<Tbuff, Tview>::AppendStr(const Tview str)
 
     m_buff->append(str);
 
-    //++m_strCount;
-    //m_strOffsets[m_strCount] = (uint32_t)(offset_end + dl);
     m_strOffsetList.push_back((uint32_t)(offset_end + dl));
 
     m_mod = true;
@@ -228,13 +208,9 @@ bool SBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
     if (!m_buff)
         return false;
 
-//    if (n > m_strCount)
     if (n >= GetStrCount())
         return false;
 
-//    size_t offset_n = m_strOffsets[n];
-//    size_t offset_n1 = m_strOffsets[n + 1];
-//    size_t offset_end = m_strOffsets[m_strCount];
     auto offset_n = GetStrOffset(n);
     auto offset_n1 = GetStrOffset(n + 1);
     auto offset_end = m_strOffsetList.back();
@@ -245,7 +221,6 @@ bool SBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
 
     m_buff->replace(offset_n, offset_n1, str);
 
-//    for (size_t i = n + 1; i <= m_strCount; ++i)
     for (size_t i = n + 1; i <= GetStrCount(); ++i)
         m_strOffsetList[i] += dl;
 
@@ -259,21 +234,15 @@ bool SBuff<Tbuff, Tview>::DelStr(size_t n)
     if (!m_buff)
         return false;
 
-//    if (n > m_strCount)
     if (n >= GetStrCount())
         return false;
 
-//    size_t offset_n = m_strOffsets[n];
-//    size_t offset_n1 = m_strOffsets[n + 1];
     auto offset_n = GetStrOffset(n);
     auto offset_n1 = GetStrOffset(n + 1);
     auto dl = offset_n1 - offset_n;
 
     m_buff->erase(offset_n, dl);
 
-//    for (size_t i = n + 1; i < m_strCount; ++i)
-//        m_strOffsets[i] = (uint32_t)(m_strOffsets[i + 1] - dl);
-//    --m_strCount;
     for (size_t i = n + 1; i < GetStrCount(); ++i)
         m_strOffsetList[i] = GetStrOffset(i + 1) - dl;
     m_strOffsetList.pop_back();
@@ -385,8 +354,11 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
     if (line > m_totalStrCount)
         return std::nullopt;
 
-    if (m_curBuff == m_buffList.end())
+    if (m_curBuff == m_buffList.end() && m_curBuffLine == 0)
+    {
         m_curBuff = m_buffList.begin();
+        m_curBuffLine = 0;
+    }
 
     if (line < m_curBuffLine)
     {
@@ -400,13 +372,11 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
                 break;
         }
     }
-//    else if (line >= m_curBuffLine + (*m_curBuff)->m_strCount)
     else if (line >= m_curBuffLine + (*m_curBuff)->GetStrCount())
     {
         //LOG(DEBUG) << "GetBuff next l=" << line;
         while (m_curBuff != m_buffList.end())
         {
-            //auto count = (*m_curBuff)->m_strCount;
             auto count = (*m_curBuff)->GetStrCount();
             ++m_curBuff;
             if (m_curBuff == m_buffList.end())
@@ -415,7 +385,6 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
                 break;
             }
             m_curBuffLine += count;
-//            if (line < m_curBuffLine + (*m_curBuff)->m_strCount)
             if (line < m_curBuffLine + (*m_curBuff)->GetStrCount())
                 break;
         }
@@ -430,10 +399,8 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
 
     if ((*m_curBuff)->m_lostData)
     {
-//        LOG(DEBUG) << "curBuff->m_lostData first=" << m_curBuffLine << " last=" << m_curBuffLine + (*m_curBuff)->m_strCount - 1;
         LOG(DEBUG) << "curBuff->m_lostData first=" << m_curBuffLine << " last=" << m_curBuffLine + (*m_curBuff)->GetStrCount() - 1;
 
-//        bool rc = LoadBuff((*m_curBuff)->m_fileOffset, (*m_curBuff)->m_strOffsets[(*m_curBuff)->m_strCount], (*m_curBuff)->GetBuff());
         bool rc = LoadBuff((*m_curBuff)->m_fileOffset, (*m_curBuff)->m_strOffsetList.back(), (*m_curBuff)->GetBuff());
         if (!rc)
             return std::nullopt;
@@ -462,7 +429,6 @@ bool MemStrBuff<Tbuff, Tview>::ReleaseBuff()
     if (m_curBuff != m_buffList.end())
     {
         (*m_curBuff)->ReleaseBuff();
-        m_curBuff = m_buffList.end();
     }
     return true;
 }
@@ -474,7 +440,6 @@ size_t MemStrBuff<Tbuff, Tview>::GetSize()
 
     for (const auto& buff: m_buffList)
     {
-//        size += buff->m_strOffsets[buff->m_strCount];
         size += buff->m_strOffsetList.back();
     }
 
@@ -500,7 +465,6 @@ Tview MemStrBuff<Tbuff, Tview>::GetStr(size_t n)
         return {};
 
     auto buff = GetBuff(n);
-//    if (!buff || n > (**buff)->m_strCount)
     if (!buff || n > (**buff)->GetStrCount())
         return {};
 
@@ -511,47 +475,21 @@ template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator buff, size_t line)
 {
     auto oldBuff = *buff;
-//    size_t offset = oldBuff->m_strOffsets[line];
     size_t offset = oldBuff->GetStrOffset(line);
     size_t split = 0;
 
-    //LOG(DEBUG) << "SplitBuff with lines=" << oldBuff->m_strCount << " for line=" << line;
-/*    
-    if (oldBuff->m_strCount == STR_NUM)
-    {
-        //all string entry filled
-        if (line < STR_NUM / 3)
-            // 1/3
-            split = STR_NUM / 3;
-        else if (line < (STR_NUM / 3) * 2)
-            // 1/2
-            split = STR_NUM / 2;
-        else
-            // 2/3
-            split = (STR_NUM / 3) * 2;
-
-        if (oldBuff->m_strOffsets[split] > (BUFF_SIZE / 3) * 2)
-            //long strings
-            // 2/3
-            for (split = 0; oldBuff->m_strOffsets[split] < (BUFF_SIZE / 3) * 2; ++split);
-    }
+    size_t limit;
+    if (offset < BUFF_SIZE / 3)
+        // 1/3
+        limit = BUFF_SIZE / 3;
+    else if (offset < (BUFF_SIZE / 3) * 2)
+        // 1/2
+        limit = BUFF_SIZE / 2;
     else
-*/
-    {
-        size_t limit;
-        if (offset < BUFF_SIZE / 3)
-            // 1/3
-            limit = BUFF_SIZE / 3;
-        else if (offset < (BUFF_SIZE / 3) * 2)
-            // 1/2
-            limit = BUFF_SIZE / 2;
-        else
-            // 2/3
-            limit = (BUFF_SIZE / 3) * 2;
+        // 2/3
+        limit = (BUFF_SIZE / 3) * 2;
 
-//        for (split = 0; oldBuff->m_strOffsets[split] < limit; ++split);
-        for (split = 0; oldBuff->GetStrOffset(split) < limit; ++split);
-    }
+    for (split = 0; oldBuff->GetStrOffset(split) < limit; ++split);
 
     auto newBuff = std::make_shared<StrBuff<Tbuff, Tview>>();
 
@@ -569,21 +507,15 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
     newBuff->m_mod = true;
     oldBuff->m_mod = true;
 
-//    size_t begin = oldBuff->m_strOffsets[split];
     uint32_t begin = oldBuff->GetStrOffset(split);
-//    size_t end = oldBuff->m_strOffsets[oldBuff->m_strCount];
     uint32_t end = oldBuff->m_strOffsetList.back();
 
     newBuffData->resize(end - begin);
     memcpy(newBuffData->data(), oldBuffData->c_str() + begin, end - begin);
 
-//    for (size_t i = 0; i + split <= oldBuff->m_strCount; ++i)
     for (size_t i = 0; i + split <= oldBuff->GetStrCount(); ++i)
-//        newBuff->m_strOffsets[i] = (uint32_t)(oldBuff->m_strOffsets[i + split] - begin);
         newBuff->m_strOffsetList.push_back((oldBuff->GetStrOffset(i + split) - begin));
 
-//    newBuff->m_strCount = oldBuff->m_strCount - split;
-//    oldBuff->m_strCount = split;
     oldBuff->m_strOffsetList.erase(oldBuff->m_strOffsetList.begin() + split);
 
     if (buff == m_buffList.end())
@@ -647,7 +579,6 @@ bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
     bool rc = (**buff)->AddStr(n, str);
     if (!rc)
     {
-//        if (n == (**buff)->m_strCount)
         if (n == (**buff)->GetStrCount())
         {
             //LOG(DEBUG) << "Last line " << _n << ". Create new buff=" << m_buffList.size();
@@ -752,7 +683,6 @@ bool MemStrBuff<Tbuff, Tview>::DelStr(size_t n)
     --m_totalStrCount;
     m_changed = true;
 
-//    if (0 == (**buff)->m_strCount)
     if ((**buff)->m_strOffsetList.empty())
     {
         LOG(DEBUG) << "EmptyBlock";

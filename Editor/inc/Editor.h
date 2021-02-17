@@ -101,10 +101,14 @@ public:
     static size_t UStrLen(const std::u16string& str) 
     {
         auto pos = str.find_last_not_of(' ');
-        if (pos = std::string::npos)
+        if (pos == std::string::npos)
+        {
+            if (!str.empty() && str[0] <= ' ')
+                return 0;
             return str.size();
+        }
         else
-            return pos;
+            return pos + 1;
     };
 
     bool                    SetFilePath(const std::filesystem::path& file);

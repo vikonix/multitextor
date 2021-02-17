@@ -42,12 +42,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #define BUFF_SIZE      0x4000
   #define STEP_BLOCKS      0x10
   #define MAXBLOCKS_NUM   0x100
-//  #define STR_NUM         0x100
 #else
   #define BUFF_SIZE     0x10000 //64k max
   #define STEP_BLOCKS      0x40
   #define MAXBLOCKS_NUM   0x400
-//  #define STR_NUM         0x400
 #endif
 
 #define MAX_STRLEN (BUFF_SIZE / 2)
@@ -97,12 +95,10 @@ class SBuff
 
 protected:
     //we use last element as 'end of buffer' offset
-    //std::array<uint32_t, STR_NUM + 1> m_strOffsets{};
     std::vector<uint32_t>           m_strOffsetList{};
-//    size_t                          m_strCount{0};
     bool                            m_mod{false};
-
     std::shared_ptr<Tbuff>          m_buff;
+
     uint32_t GetStrOffset(size_t n) { return n == 0 ? 0 : m_strOffsetList[n - 1]; }
 
 public:
@@ -110,7 +106,7 @@ public:
     ~SBuff() = default;
 
     bool    Clear();
-    size_t  GetStrCount() { return m_strOffsetList.size(); }//{return m_strCount;}
+    size_t  GetStrCount() { return m_strOffsetList.size(); }
     Tview   GetStr(size_t n);
     bool    AddStr(size_t n, const Tview str);
     bool    AppendStr(const Tview str);
@@ -125,15 +121,13 @@ class StrBuff : public SBuff<Tbuff, Tview>
     friend class MemStrBuff<std::string, std::string_view>;
     friend class Editor;
 
-    //std::shared_ptr<BuffPool<Tbuff>> m_buffPool;
-
     //we save string in buffer as in file
     hbuff_t     m_buffHandle{0};
     uint64_t    m_fileOffset{};//offset from begin of file
     bool        m_lostData{false};
 
 public:
-    StrBuff() = default;// std::shared_ptr<BuffPool<Tbuff>> pool) : m_buffPool{ pool } {};
+    StrBuff() = default;
     ~StrBuff();
 
     std::shared_ptr<Tbuff> GetBuff();
