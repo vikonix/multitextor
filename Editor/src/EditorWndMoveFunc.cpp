@@ -553,7 +553,7 @@ bool EditorWnd::MoveTabRight([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool EditorWnd::MoveWordLeft(input_t cmd)
+bool EditorWnd::MoveWordLeft([[maybe_unused]]input_t cmd)
 {
     size_t x = m_xOffset + m_cursorx;
     size_t line = m_firstLine + m_cursory;
@@ -613,7 +613,7 @@ bool EditorWnd::MoveWordLeft(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::MoveWordRight(input_t cmd)
+bool EditorWnd::MoveWordRight([[maybe_unused]]input_t cmd)
 {
     size_t x = m_xOffset + m_cursorx;
     size_t line = m_firstLine + m_cursory;
@@ -652,7 +652,7 @@ bool EditorWnd::MoveWordRight(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::MoveCenter(input_t cmd)
+bool EditorWnd::MoveCenter([[maybe_unused]]input_t cmd)
 {
     size_t line = m_firstLine + m_cursory;
     if (line > m_sizeY / 2)
@@ -917,202 +917,7 @@ bool EditorWnd::SelectAll(input_t cmd)
     return true;
 }
 
-bool EditorWnd::EditC(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditDelC(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditBS(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditTab(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditEnter(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditDelStr(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditDelBegin(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditDelEnd(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditBlockClear(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditBlockCopy(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditBlockMove(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditBlockDel(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditBlockIndent(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditBlockUndent(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditCopyToClipboard(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditCutToClipboard(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditPasteFromClipboard(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditUndo(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::EditRedo(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlFind(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlFindUp(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlFindDown(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::FindUpWord(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::FindDownWord(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Replace(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Repeat(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::DlgGoto(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::DlgFind(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::DlgReplace(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlGetSubstr(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlRefresh(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Reload(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Save(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::SaveAs(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Close(input_t cmd)
-{
-    return true;
-}
-
 bool EditorWnd::MoveLexMatch(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlFuncList(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlProperties(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlChangeCP(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::TrackPopupMenu(input_t cmd)
 {
     return true;
 }
