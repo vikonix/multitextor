@@ -32,15 +32,21 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <functional>
 
-
 class EditorWnd : public FrameWnd
 {
-    enum class Select
+    enum select_state : int
     {
-        no,
-        begin,
-        end
+        no          = 0,
+        begin       = 1,
+        end         = 2,
+        visible     = 4,
+        begin_vis   = 5,
+        complete    = 6
     };
+    bool IsSelectStarted()  { return (m_selectState & select_state::begin) != 0; }
+    bool IsSelectFinished() { return (m_selectState & select_state::end) != 0; }
+    bool IsSelectVisible()  { return (m_selectState & select_state::visible) != 0; }
+    bool IsSelectComplete() { return m_selectState == select_state::complete; }
 
     enum class select_t
     {
@@ -51,55 +57,55 @@ class EditorWnd : public FrameWnd
     
     using EditorFunc = std::function<bool(EditorWnd*, input_t)>;
 
-    static std::unordered_map<EditorCmd, std::pair<EditorFunc, Select>> s_funcMap;
+    static std::unordered_map<EditorCmd, std::pair<EditorFunc, select_state>> s_funcMap;
 
-    EditorPtr   m_editor;
+    EditorPtr       m_editor;
 
-    bool        m_close{};    //close window at EventProc return
-    bool        m_deleted{};  //file was deleted by external program
-    bool        m_saved{};    //file was saved
-    bool        m_clone{};
-    bool        m_untitled{true};
-    bool        m_readOnly{};
-    bool        m_log{};
+    bool            m_close{};    //close window at EventProc return
+    bool            m_deleted{};  //file was deleted by external program
+    bool            m_saved{};    //file was saved
+    bool            m_clone{};
+    bool            m_untitled{true};
+    bool            m_readOnly{};
+    bool            m_log{};
 
     //file position
-    size_t      m_xOffset{};
-    size_t      m_firstLine{};
-    pos_t       m_sizeX{};//???
-    pos_t       m_sizeY{};//???
+    size_t          m_xOffset{};
+    size_t          m_firstLine{};
+    pos_t           m_sizeX{};//???
+    pos_t           m_sizeY{};//???
 
     //select mode variables
     //select coord
-    select_t    m_selectType{select_t::stream};
-    int         m_selectState{};    //current selection state
-    bool        m_selectKeyShift{}; //select with shift key pressed
-    bool        m_selectMouse{};    //mouse selection
-    size_t      m_beginX{};
-    size_t      m_beginY{};
-    size_t      m_endX{};
-    size_t      m_endY{};
+    select_t        m_selectType{select_t::stream};
+    select_state    m_selectState{select_state::no};    //current selection state
+    bool            m_selectKeyShift{};                 //select with shift key pressed
+    bool            m_selectMouse{};                    //select by mouse
+    size_t          m_beginX{};
+    size_t          m_beginY{};
+    size_t          m_endX{};
+    size_t          m_endY{};
 
     //search coord
-    size_t      m_foundX{};
-    size_t      m_foundY{};
-    size_t      m_foundSize{};
+    size_t          m_foundX{};
+    size_t          m_foundY{};
+    size_t          m_foundSize{};
 
     //file position info
-    size_t      m_infoStrSize{};
+    size_t          m_infoStrSize{};
 
     //invalidate
-    bool        m_invalidate{};
-    pos_t       m_invBeginX{};
-    pos_t       m_invBeginY{};
-    pos_t       m_invEndX{};
-    pos_t       m_invEndY{};
+    bool            m_invalidate{};
+    pos_t           m_invBeginX{};
+    pos_t           m_invBeginY{};
+    pos_t           m_invEndX{};
+    pos_t           m_invEndY{};
 
-    bool        m_popupMenu{};
+    bool            m_popupMenu{};
 
     //lex pair
-    int        m_lexX{-1};
-    int        m_lexY{-1};
+    int             m_lexX{-1};
+    int             m_lexY{-1};
 
     //diff mode
     //Diff*      m_pDiff;
@@ -127,6 +133,10 @@ public:
     bool        Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, select_t selectType = select_t::stream);
     bool        IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey);
     bool        HideFound();
+    bool        SelectClear();
+    bool        FindWord(const std::u16string& str, size_t& begin, size_t& end);
+
+    //bool        IsSelected() { return m_selectState != select_state::no; }
 
     input_t     ParseCommand(input_t cmd);
     virtual input_t EventProc(input_t code) override;
@@ -190,7 +200,6 @@ public:
   int       CopySelected(WStrBuff* pBuff, int* pSelType);
   int       PasteSelected(WStrBuff* pBuff, int SelType);
   int       DelSelected();
-  int       SelectClear();
 
   int       EditWndCopy(WndEdit* pWFrom);
   int       EditWndMove(WndEdit* pWFrom);
@@ -249,10 +258,6 @@ public:
     bool EditPasteFromClipboard(input_t cmd);
     bool EditUndo(input_t cmd);
     bool EditRedo(input_t cmd);
-
-    bool Data(input_t cmd);
-    bool GotoX(input_t cmd);
-    bool GotoY(input_t cmd);
 
     bool CtrlFind(input_t cmd);
     bool CtrlFindUp(input_t cmd);

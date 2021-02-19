@@ -25,6 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "utils/logger.h"
+#include "utils/SymbolType.h"
 #include "EditorWnd.h"
 #include "WndManager.h"
 
@@ -66,7 +67,7 @@ bool EditorWnd::SetEditor(EditorPtr editor)
     m_sizeX = 0;
     m_sizeY = 0;
 
-    m_selectState = 0;
+    m_selectState = select_state::no;
     m_beginX = 0;
     m_beginY = 0;
     m_endX = 0;
@@ -167,6 +168,7 @@ bool EditorWnd::UpdatePosInfo()
 
 bool EditorWnd::UpdateProgress(size_t d)
 {
+    //???
     return true;
 }
 
@@ -414,12 +416,12 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
         if (m_pDiff->IsDiff(m_nDiffBuff, m_nFirstLine + y))
             SetTextAttr(ColorWindowDiff);
         else
-            SetTextAttr(ColorWindowNotDiff);
+            SetTextAttr(ColorWindowNotDiff);//???
         rc = WriteWStr(x, y, pStr + offset);
     }
 */
 
-    if (!m_selectState || (m_selectState & 0xff00) == 0)
+    if (!IsSelectVisible())
     {
         //not selected
         MarkFound();
@@ -836,10 +838,13 @@ input_t EditorWnd::ParseCommand(input_t cmd)
                 {
                     MovePos(cmd);
                     SelectBegin(0);
-                    if ((cmd & K_CTRL) && m_selectState == 1)
-                        m_selectType = select_t::line;
-                    else if ((cmd & K_SHIFT) && m_selectState == 1)
-                        m_selectType = select_t::column;
+                    if (m_selectState == select_state::begin)
+                    {
+                        if (0 != (cmd & K_CTRL))
+                            m_selectType = select_t::line;
+                        else if (0 != (cmd & K_SHIFT))
+                            m_selectType = select_t::column;
+                    }
                 }
             }
             else if ((cmd & K_TYPEMASK) == K_MOUSEKR && (cmd & (K_SHIFT | K_CTRL | K_ALT)) == 0)
@@ -900,15 +905,14 @@ input_t EditorWnd::ParseCommand(input_t cmd)
 
             auto& [func, select] = it->second;
 
-            if (select == Select::end)
+            if (select == select_state::end)
             {
                 SelectEnd(cmd);
             }
 
             [[maybe_unused]]bool rc = func(this, cmd);
 
-            if (select == Select::begin
-                && (m_selectState & 0xff) == 1)
+            if (select == select_state::begin && IsSelectStarted())
             {
                 SelectBegin(cmd);
             }
@@ -968,3 +972,45 @@ bool EditorWnd::HideFound()
     }
     return rc;
 }
+
+bool EditorWnd::SelectClear()
+{
+    if (m_selectState != select_state::no)
+    {
+        //???StatusMark(0);
+
+        m_selectState = select_state::no;
+        m_beginX = m_endX = 0;
+        m_beginY = m_endY = 0;
+        m_selectType = select_t::stream;
+    }
+
+    return 0;
+}
+
+bool EditorWnd::FindWord(const std::u16string& str, size_t& begin, size_t& end)
+{
+    size_t x = m_xOffset + m_cursorx;
+    if (str[x] == ' ')
+        return false;
+
+    auto type = GetSymbolType(str[x]);
+
+    int b = static_cast<int>(x);
+    for (; b >= 0; --b)
+        if (GetSymbolType(str[b]) != type)
+            break;
+    ++b;
+
+    size_t e;
+    for (e = x; e < MAX_STRLEN; ++e)
+        if (GetSymbolType(str[e]) != type)
+            break;
+    --e;
+
+    begin = static_cast<size_t>(b);
+    end = e;
+    
+    return true;
+}
+
