@@ -28,14 +28,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum class symbol_t : int
 {
-    eol,        //0
-    blank,      //1
-    quote,      //2
-    backslash,  //3
-    punct,      //5
-    alnum,      //6
-    other,      //7
-    cntrl       //9
+    eol         = 0,
+    blank       = 1,
+    quote       = 2,
+    backslash   = 3,
+    cntrl       = 4,
+    punct       = 5,
+    alnum       = 6,
+    other       = 7
 };
 
 symbol_t  GetSymbolType(char16_t wc);

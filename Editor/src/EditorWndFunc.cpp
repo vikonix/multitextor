@@ -25,6 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
+#include "utils/SymbolType.h"
 #include "EditorWnd.h"
 #include "EditorCmd.h"
 #include "WndManager.h"
@@ -86,16 +87,13 @@ std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::Select
     {E_EDIT_UNDO,           {&EditorWnd::EditUndo,               EditorWnd::Select::end}},
     {E_EDIT_REDO,           {&EditorWnd::EditRedo,               EditorWnd::Select::end}},
 
-    {E_CTRL_DATA,           {&EditorWnd::Data,                   EditorWnd::Select::no}},
-    {E_CTRL_GOTOX,          {&EditorWnd::GotoX,                  EditorWnd::Select::begin}},
-    {E_CTRL_GOTOY,          {&EditorWnd::GotoY,                  EditorWnd::Select::begin}},
     {E_CTRL_FIND,           {&EditorWnd::CtrlFind,               EditorWnd::Select::begin}},
     {E_CTRL_FINDUP,         {&EditorWnd::CtrlFindUp,             EditorWnd::Select::begin}},
     {E_CTRL_FINDDN,         {&EditorWnd::CtrlFindDown,           EditorWnd::Select::begin}},
     {E_CTRL_FINDUPW,        {&EditorWnd::FindUpWord,             EditorWnd::Select::begin}},
     {E_CTRL_FINDDNW,        {&EditorWnd::FindDownWord,           EditorWnd::Select::begin}},
     {E_CTRL_REPLACE,        {&EditorWnd::Replace,                EditorWnd::Select::end}},
-    {E_CTRL_AGAIN,          {&EditorWnd::Again,                  EditorWnd::Select::end}},
+    {E_CTRL_REPEAT,         {&EditorWnd::Repeat,                 EditorWnd::Select::end}},
 
     {E_DLG_GOTO,            {&EditorWnd::DlgGoto,                EditorWnd::Select::end}},
     {E_DLG_FIND,            {&EditorWnd::DlgFind,                EditorWnd::Select::end}},
@@ -109,7 +107,7 @@ std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::Select
     {E_CTRL_CLOSE,          {&EditorWnd::Close,                  EditorWnd::Select::end}},
 
     {E_MOVE_LEX_MATCH,      {&EditorWnd::MoveLexMatch,           EditorWnd::Select::begin}},
-    {E_CTRL_FLIST,          {&EditorWnd::CtrlFList,              EditorWnd::Select::end}},
+    {E_CTRL_FLIST,          {&EditorWnd::CtrlFuncList,           EditorWnd::Select::end}},
     {E_CTRL_PROPERTIES,     {&EditorWnd::CtrlProperties,         EditorWnd::Select::end}},
     {E_CTRL_CHANGE_CP,      {&EditorWnd::CtrlChangeCP,           EditorWnd::Select::no}},
     {E_POPUP_MENU,          {&EditorWnd::TrackPopupMenu,         EditorWnd::Select::end}}
@@ -557,16 +555,112 @@ bool EditorWnd::MoveTabRight([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::MoveWordLeft(input_t cmd)
 {
-    return true;
+    size_t x = m_xOffset + m_cursorx;
+    size_t line = m_firstLine + m_cursory;
+    auto str = m_editor->GetStr(line);
+
+    bool rc{true};
+
+    if (x)
+    {
+        size_t p = x - 1;//prev char
+        auto type = GetSymbolType(str[p]);
+        if (type == symbol_t::alnum)
+        {
+            if (p)
+                //goto begin of word
+                for (--p; p > 0; --p)
+                    if (GetSymbolType(str[p]) != type)
+                    {
+                        ++p;
+                        break;
+                    }
+        }
+        else
+        {
+            if (p)
+                //goto end of word
+                for (--p; p > 0; --p)
+                {
+                    type = GetSymbolType(str[p]);
+                    if (type == symbol_t::alnum)
+                        break;
+                }
+
+            if (p)
+            {
+                type = GetSymbolType(str[p]);
+                //goto begin of word
+                for (--p; p > 0; --p)
+                {
+                    if (GetSymbolType(str[p]) != type)
+                    {
+                        ++p;
+                        break;
+                    }
+                }
+            }
+        }
+
+        MoveLeft(K_ED(E_MOVE_LEFT) + static_cast<input_t>(x - p));
+    }
+    else if (line)
+    {
+        rc = MoveUp(0);
+        rc = MoveStrEnd(0);
+    }
+
+    return rc;
 }
 
 bool EditorWnd::MoveWordRight(input_t cmd)
 {
-    return true;
+    size_t x = m_xOffset + m_cursorx;
+    size_t line = m_firstLine + m_cursory;
+    auto str = m_editor->GetStr(line);
+
+    size_t len = Editor::UStrLen(str);
+    bool rc{true};
+
+    if (len > 0 && x < len - 1)
+    {
+        auto type = GetSymbolType(str[x]);
+        size_t p = x;
+        if (type == symbol_t::alnum)
+        {
+            //goto end of word
+            for (++p; p < len; ++p)
+                if (GetSymbolType(str[p]) != type)
+                    break;
+        }
+        if (p < len)
+            //goto begin of word
+            for (++p; p < len; ++p)
+            {
+                type = GetSymbolType(str[p]);
+                if (type == symbol_t::alnum)
+                    break;
+            }
+
+        MoveRight(K_ED(E_MOVE_RIGHT) + static_cast<input_t>(p - x));
+    }
+    else
+    {
+        rc = MoveDown(0);
+        rc = MoveStrBegin(0);
+    }
+    return rc;
 }
 
 bool EditorWnd::MoveCenter(input_t cmd)
 {
+    size_t line = m_firstLine + m_cursory;
+    if (line > m_sizeY / 2)
+    {
+        m_cursory = m_sizeY / 2;
+        m_firstLine = line - m_cursory;
+        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    }
     return true;
 }
 
@@ -700,21 +794,6 @@ bool EditorWnd::EditRedo(input_t cmd)
     return true;
 }
 
-bool EditorWnd::Data(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::GotoX(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::GotoY(input_t cmd)
-{
-    return true;
-}
-
 bool EditorWnd::CtrlFind(input_t cmd)
 {
     return true;
@@ -745,7 +824,7 @@ bool EditorWnd::Replace(input_t cmd)
     return true;
 }
 
-bool EditorWnd::Again(input_t cmd)
+bool EditorWnd::Repeat(input_t cmd)
 {
     return true;
 }
@@ -800,7 +879,7 @@ bool EditorWnd::MoveLexMatch(input_t cmd)
     return true;
 }
 
-bool EditorWnd::CtrlFList(input_t cmd)
+bool EditorWnd::CtrlFuncList(input_t cmd)
 {
     return true;
 }

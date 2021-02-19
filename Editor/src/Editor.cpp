@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Editor.h"
 #include "utils/Directory.h"
 #include "utils/logger.h"
+#include "utils/SymbolType.h"
 #include "utfcpp/utf8.h"
 #include "App.h"
 
@@ -99,9 +100,9 @@ bool Editor::Load()
 
     time_t t1 = time(nullptr);
     size_t percent = 0;
-    auto step = fileSize / 100;
+    auto step = fileSize / 100;//1%
 
-    const size_t buffsize = 0x200000;
+    const size_t buffsize = 0x200000;//2MB
     auto buff = std::make_unique<std::array<char, buffsize>>();
     size_t buffOffset{0};
 
@@ -168,7 +169,7 @@ bool Editor::Load()
 
                 tocopy -= rest;
                 fileOffset += tocopy + strOffset;
-                m_buffer.m_totalStrCount += strBuff->GetStrCount();//strBuff->m_strCount;
+                m_buffer.m_totalStrCount += strBuff->GetStrCount();
                 strBuff = nullptr;
                 strOffset = 0;
             }
@@ -228,7 +229,6 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
             //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
-            //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             len = 0;
             cut = 0;
@@ -238,7 +238,6 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             ++lf;
             //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
-            //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             len = 0;
             cut = 0;
@@ -246,8 +245,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
         else if (buff[i] > 0)
         {
             //check symbol type
-            //???if (GetSymbolType(buff[i]) != 6)
-            if(buff[i] == ' ')
+            if (GetSymbolType(buff[i]) != symbol_t::alnum)
                 cut = i;
         }
 
@@ -278,21 +276,16 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
             //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
             //pCurStr = pBuff + i + 1;
-            //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)(i + 1);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             len = 0;
             cut = 0;
         }
-
-//        if (strBuff->m_strCount == STR_NUM)
-//            break;
     }
 
     if (len && last)
     {
         //parse last string in file
         //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-        //strBuff->m_strOffsets[++strBuff->m_strCount] = (uint32_t)i;
         strBuff->m_strOffsetList.push_back((uint32_t)i);
     }
 
@@ -308,7 +301,6 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             m_eol = eol_t::mac_eol; //apple
     }
 
-    //rest = size - strBuff->m_strOffsets[strBuff->m_strCount];
     rest = size - strBuff->m_strOffsetList.back();
     strBuff->ReleaseBuff();
 

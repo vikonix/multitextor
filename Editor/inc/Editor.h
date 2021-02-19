@@ -184,7 +184,7 @@ public:
     EditCmd                 PeekRedo();
 
     //lexical API
-    //const char* GetParseMode() { return m_LexBuff.GetParseMode(); }
+    //const char* GetParseMode() const { return m_LexBuff.GetParseMode(); }
     bool                    SetParseMode(const std::string& mode);
     bool                    GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len);
     //bool           GetFuncList(List* pList, int* pLine);

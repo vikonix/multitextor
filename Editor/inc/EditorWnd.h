@@ -260,7 +260,7 @@ public:
     bool FindUpWord(input_t cmd);
     bool FindDownWord(input_t cmd);
     bool Replace(input_t cmd);
-    bool Again(input_t cmd);
+    bool Repeat(input_t cmd);
 
     bool DlgGoto(input_t cmd);
     bool DlgFind(input_t cmd);
@@ -274,7 +274,7 @@ public:
     bool Close(input_t cmd);
 
     bool MoveLexMatch(input_t cmd);
-    bool CtrlFList(input_t cmd);
+    bool CtrlFuncList(input_t cmd);
     bool CtrlProperties(input_t cmd);
     bool CtrlChangeCP(input_t cmd);
     bool TrackPopupMenu(input_t cmd);
