@@ -78,7 +78,7 @@ scancmd_t CmdParser::ScanKey(input_t key)
     for (auto keylist : m_keyMap)
     {
         ++cmdit;
-        if (keylist.size() > m_savedKeys.size())
+        if (keylist.size() < m_savedKeys.size())
             continue;
         
         auto keyptr = keylist.data();
