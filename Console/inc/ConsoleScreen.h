@@ -146,7 +146,7 @@ public:
         m_buffer[x + y * m_sizex] = c;
         return true;
     }
-    bool ScrollBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode)
+    bool ScrollBlock(size_t left, size_t top, size_t right, size_t bottom, size_t n, scroll_t mode)
     {
         if (left >= m_sizex || right >= m_sizex || top >= m_sizey || bottom >= m_sizey)
         {
@@ -155,7 +155,7 @@ public:
             return false;
         }
 
-        pos_t y;
+        size_t y;
         switch (mode)
         {
         case scroll_t::SCROLL_UP:

@@ -129,7 +129,7 @@ bool EditorWnd::MovePos(input_t cmd)
 
 bool EditorWnd::MoveLeft(input_t cmd)
 {
-    size_t step = K_GET_CODE(cmd);
+    pos_t step = K_GET_CODE(cmd);
     size_t offset = m_xOffset;
 
     if (!step)
@@ -147,7 +147,7 @@ bool EditorWnd::MoveLeft(input_t cmd)
         {
             step -= m_cursorx;
             m_cursorx = 0;
-            if (offset > step)
+            if (offset > static_cast<size_t>(step))
                 offset -= step;
             else
                 offset = 0;
@@ -179,14 +179,14 @@ bool EditorWnd::MoveLeft(input_t cmd)
 
 bool EditorWnd::MoveRight(input_t cmd)
 {
-    size_t step = K_GET_CODE(cmd);
+    pos_t step = K_GET_CODE(cmd);
     size_t offset = m_xOffset;
 
     if (!step)
     {
         if (m_cursorx < m_sizeX - 1)
             ++m_cursorx;
-        else if (offset < MAX_STRLEN - m_sizeX)
+        else if (offset < static_cast<size_t>(MAX_STRLEN - m_sizeX))
             ++offset;
     }
     else
@@ -198,7 +198,7 @@ bool EditorWnd::MoveRight(input_t cmd)
             step -= m_sizeX - 1 - m_cursorx;
             m_cursorx = m_sizeX - 1;
 
-            if (offset < MAX_STRLEN - m_sizeX - step)
+            if (offset < static_cast<size_t>(MAX_STRLEN - m_sizeX - step))
                 offset += step;
             else
                 offset = MAX_STRLEN - m_sizeX;
@@ -230,7 +230,7 @@ bool EditorWnd::MoveRight(input_t cmd)
 
 bool EditorWnd::MoveUp(input_t cmd)
 {
-    size_t step = K_GET_CODE(cmd);
+    pos_t step = K_GET_CODE(cmd);
     size_t line = m_firstLine;
 
     if (!step)
@@ -242,7 +242,7 @@ bool EditorWnd::MoveUp(input_t cmd)
     }
     else
     {
-        if (line > step)
+        if (line > static_cast<size_t>(step))
             line -= step;
         else if (line)
             line = 0;
@@ -276,7 +276,7 @@ bool EditorWnd::MoveUp(input_t cmd)
 
 bool EditorWnd::MoveDown(input_t cmd)
 {
-    size_t step = K_GET_CODE(cmd);
+    pos_t step = K_GET_CODE(cmd);
     size_t line = m_firstLine;
 
     if (!step)
@@ -331,11 +331,11 @@ bool EditorWnd::MoveScrollLeft(input_t cmd)
     if (!m_xOffset)
         return MoveLeft(cmd);
 
-    size_t offset = m_xOffset - (step ? step : 1);
+    int offset = static_cast<int>(m_xOffset) - static_cast<int>((step ? step : 1));
     if (offset < 0)
         offset = 0;
 
-    if (offset != m_xOffset)
+    if (m_xOffset != static_cast<size_t>(offset))
     {
         size_t dx = m_xOffset - offset;
         m_xOffset = offset;
@@ -362,11 +362,11 @@ bool EditorWnd::MoveScrollRight(input_t cmd)
 {
     size_t step = K_GET_CODE(cmd);
 
-    if (m_xOffset >= MAX_STRLEN - m_sizeX)
+    if (m_xOffset >= static_cast<size_t>(MAX_STRLEN - m_sizeX))
         return MoveRight(cmd);
 
     size_t offset = m_xOffset + (step ? step : 1);
-    if (offset > MAX_STRLEN - m_sizeX)
+    if (offset > static_cast<size_t>(MAX_STRLEN - m_sizeX))
         offset = MAX_STRLEN - m_sizeX;
 
     if (offset != m_xOffset)
@@ -396,7 +396,7 @@ bool EditorWnd::MovePageUp([[maybe_unused]]input_t cmd)
 {
     size_t line = m_firstLine;
 
-    if (line >= m_sizeY - 1)
+    if (line >= static_cast<size_t>(m_sizeY - 1))
         line -= m_sizeY - 1;
     else
     {
@@ -451,7 +451,7 @@ bool EditorWnd::MoveFileEnd([[maybe_unused]]input_t cmd)
     size_t x = 0;
     size_t line = 0;
     m_cursorx = 0;
-    if (numLine >= m_sizeY)
+    if (numLine >= static_cast<size_t>(m_sizeY))
     {
         line = numLine - m_sizeY + 1;
         m_cursory = m_sizeY - 1;
@@ -485,7 +485,7 @@ bool EditorWnd::MoveStrBegin([[maybe_unused]]input_t cmd)
 
     if (x >= curx)
         m_cursorx = 0;
-    else if (x < m_sizeX)
+    else if (x < static_cast<size_t>(m_sizeX))
         m_cursorx = static_cast<pos_t>(x);
     else
     {
@@ -508,7 +508,7 @@ bool EditorWnd::MoveStrEnd([[maybe_unused]]input_t cmd)
 
     auto str = m_editor->GetStr(m_firstLine + m_cursory);
     size_t len = Editor::UStrLen(str);
-    if (len >= m_sizeX)
+    if (len >= static_cast<size_t>(m_sizeX))
     {
         m_cursorx = m_sizeX - 1;
         if (len == MAX_STRLEN)
@@ -655,7 +655,7 @@ bool EditorWnd::MoveWordRight([[maybe_unused]]input_t cmd)
 bool EditorWnd::MoveCenter([[maybe_unused]]input_t cmd)
 {
     size_t line = m_firstLine + m_cursory;
-    if (line > m_sizeY / 2)
+    if (line > static_cast<size_t>(m_sizeY / 2))
     {
         m_cursory = m_sizeY / 2;
         m_firstLine = line - m_cursory;
