@@ -135,7 +135,8 @@ public:
                 //ed.Load();
                 auto editor = std::make_shared<EditorWnd>();
                 editor->Show(true, -1);
-                editor->SetFileName(path);
+                std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
+                editor->SetFileName(path, false, type);
                 
                 g_editors[path.u8string()] = editor;
             }

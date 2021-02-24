@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "KeyCodes.h"
 #include "ColorMap.h"
 #include "CmdParser.h"
+#include "Invalidate.h"
 
 #include <string>
 
@@ -45,15 +46,6 @@ enum enum_border_t
     BORDER_LINE   = 0x10,
     BORDER_FULL   = 0x1f,
     BORDER_TITLE  = 0x20
-};
-
-enum class invalidate_t
-{
-    find,
-    change,
-    del,
-    insert,
-    full
 };
 
 enum class wnd_t

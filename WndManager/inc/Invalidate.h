@@ -26,19 +26,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-enum class symbol_t : int
+enum class invalidate_t
 {
-    eol         = 0,
-    blank       = 1,
-    quote       = 2,
-    backslash   = 3,
-    cntrl       = 4,
-    punct       = 5,
-    alnum       = 6,
-    other       = 7,
-
-    max         = 8
+    find,
+    change,
+    del,
+    insert,
+    full
 };
-
-symbol_t  GetSymbolType(char16_t wc);
-

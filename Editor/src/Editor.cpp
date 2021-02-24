@@ -37,7 +37,7 @@ bool Editor::Clear()
     m_buffer.Clear();
     m_undoList.Clear();
     m_wndList.clear();
-    //m_LexBuff.Clear();
+    m_lexParser.Clear();
 
     m_curStr = 0;
     m_curChanged = false;
@@ -203,8 +203,9 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     size_t crlf = 0;
     size_t lf = 0;
     size_t cut = 0;
-
     size_t len = 0;
+
+    size_t begin = 0;
     size_t i;
     const char* buff = str->c_str();
 
@@ -227,18 +228,18 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             else
                 ++cr;
 
-            //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-            //pCurStr = pBuff + i + 1;
+            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), {buff + begin, i - begin});
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
+            begin = i + 1;
             len = 0;
             cut = 0;
         }
         else if (buff[i] == 0xa)
         {
             ++lf;
-            //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-            //pCurStr = pBuff + i + 1;
+            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin });
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
+            begin = i + 1;
             len = 0;
             cut = 0;
         }
@@ -274,9 +275,9 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
                 i = cut;
             }
 
-            //???m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
-            //pCurStr = pBuff + i + 1;
+            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin });
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
+            begin = i + 1;
             len = 0;
             cut = 0;
         }
@@ -285,7 +286,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     if (len && last)
     {
         //parse last string in file
-        //m_LexBuff.ScanStr(m_nStrCount + pStr->m_StrCount, pCurStr, i - (pCurStr - pBuff));
+        m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin });
         strBuff->m_strOffsetList.push_back((uint32_t)i);
     }
 
@@ -375,9 +376,9 @@ char Editor::GetAccessInfo()
         return ' ';
 }
 
-bool Editor::GetColor(size_t nline, const std::u16string& str, std::vector<color_t>& buff, size_t len)
+bool Editor::GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len)
 {
-    return false;//??? m_LexBuff.GetColor(nline, pStr, pBuff, len);
+    return m_lexParser.GetColor(line, str, buff, len);
 }
 
 bool Editor::RefreshAllWnd(FrameWnd* wnd) const

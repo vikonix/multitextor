@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Types.h"
 #include "UndoList.h"
 #include "Wnd.h"
+#include "LexParser.h"
 
 #include <unordered_set>
 #include <filesystem>
@@ -60,7 +61,7 @@ private:
     std::unordered_set<FrameWnd*>               m_wndList;
 
     UndoList        m_undoList;
-    //LexBuff       m_lexBuff;
+    LexParser       m_lexParser;
 
     //config variables
     int             m_cp{};
@@ -93,10 +94,12 @@ public:
     void operator= (const Editor&) = delete;
     
     Editor() = default;
-    Editor(const std::filesystem::path& file, const std::string& parseMode = "", int cp = 0)
+    Editor(const std::filesystem::path& file, const std::string& parseStyle = "", int cp = 0)
         : m_file{file}
         , m_cp{cp}
-    {}
+    {
+        m_lexParser.SetParseStyle(cp, parseStyle);
+    }
 
     static size_t UStrLen(const std::u16string& str) 
     {
@@ -184,11 +187,11 @@ public:
     EditCmd                 PeekRedo();
 
     //lexical API
-    //const char* GetParseMode() const { return m_LexBuff.GetParseMode(); }
-    bool                    SetParseMode(const std::string& mode);
+    bool                    SetParseStyle(const std::string& style);
+    std::string             GetParseStyle() const { return m_lexParser.GetParseStyle(); }
     bool                    GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len);
-    //bool           GetFuncList(List* pList, int* pLine);
-    //bool           CheckLexPair(size_t* pLine, int* pX);
+    bool                    CheckLexPair(size_t& line, size_t& pos);
+    //bool                    GetFuncList(List* pList, int* pLine);
 };
 
 using EditorPtr = std::shared_ptr<Editor>;
