@@ -94,7 +94,7 @@ CtrlStatic::CtrlStatic(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlStatic::Refresh([[maybe_unused]]CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlStatic::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlStatic::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
     color_t color;
 
     if((m_type & CTRL_TYPE_MASK) == CTRL_TITLE)
@@ -180,7 +180,7 @@ CtrlButton::CtrlButton(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlButton::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlButton::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlButton::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
     std::u16string name;
     if((m_type & CTRL_TYPE_MASK) == CTRL_BUTTON)
         name = u"[ " + m_name + u" ]";
@@ -223,7 +223,7 @@ CtrlCheck::CtrlCheck(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlCheck::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlCheck::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlCheck::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
     std::u16string name;
     
     if(!m_checked)
@@ -294,7 +294,7 @@ CtrlRadio::CtrlRadio(Dialog& dialog, const control& control, size_t pos, size_t 
 
 bool CtrlRadio::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlRadio::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlRadio::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
     std::u16string name;
     if(!m_checked)
         name = u"( ) " + m_name;
@@ -363,7 +363,7 @@ CtrlGroup::CtrlGroup(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlGroup::Refresh(CtrlState)
 {
-    LOG(DEBUG) << "    CtrlGroup::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlGroup::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
     color_t color = *m_dialog.m_pColorWindow;
 
     size_t size = m_sizex;
@@ -401,7 +401,7 @@ CtrlEdit::CtrlEdit(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlEdit::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlEdit::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlEdit::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
 
     color_t color;
     if(0 != (m_type & CTRL_DISABLED))
@@ -655,7 +655,7 @@ CtrlList::CtrlList(Dialog& dialog, const control& control, size_t pos)
 
 bool CtrlList::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlList::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlList::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
     m_dialog.StopPaint();
     
     color_t color;
@@ -1020,7 +1020,7 @@ input_t CtrlDropList::EventProc(input_t code)
 
 bool CtrlDropList::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlDropList::Refresh pos=" << m_pos;
+    //LOG(DEBUG) << "    CtrlDropList::Refresh pos=" << m_pos;
 
     auto n = GetSelected();
     std::u16string buff{ utf8::utf8to16(std::string(GetStr(n))) };
@@ -1213,7 +1213,7 @@ input_t CtrlEditDropList::EventProc(input_t code)
 
 bool CtrlEditDropList::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlEditDropList::Refresh pos=" << m_pos;
+    //LOG(DEBUG) << "    CtrlEditDropList::Refresh pos=" << m_pos;
 
     m_edit.Refresh(state);
 
@@ -1340,7 +1340,7 @@ bool CtrlColor::PaintSelect(bool visible, bool selected)
 
 bool CtrlColor::Refresh(CtrlState state)
 {
-    LOG(DEBUG) << "    CtrlColor::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
+    //LOG(DEBUG) << "    CtrlColor::Refresh pos=" << m_pos;// << " name='" << utf8::utf16to8(m_name) << "'";
 
     color_t color;
     if(0 != (m_type & CTRL_DISABLED))

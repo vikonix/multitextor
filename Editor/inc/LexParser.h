@@ -84,6 +84,7 @@ class LexParser
 {
     static std::list<LexConfig> s_lexConfig;
 
+    bool        m_scan{};
     std::string m_parseStyle;
 
     static const inline size_t lexTabSize = 0x80;

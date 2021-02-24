@@ -664,7 +664,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             bool rc = m_editor->GetColor(y, str, colorBuff, ex + 1);
             if (rc)
             {
-                LOG(DEBUG) << "WriteColor bx=" << bx << " ex=" << ex << " y=" << y;
+                //LOG(DEBUG) << "WriteColor bx=" << bx << " ex=" << ex << " y=" << y;
                 WriteColor(static_cast<pos_t>(bx - m_xOffset), static_cast<pos_t>(y - m_firstLine), std::vector<color_t>(colorBuff.cbegin() + bx, colorBuff.cend()));
             }
             else

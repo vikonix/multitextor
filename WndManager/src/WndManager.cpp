@@ -360,7 +360,7 @@ bool WndManager::WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color)
         m_screenBuff.SetCell(x + i, y, cl);
     }
 
-    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff));
+    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff, x, y));
     return rc;
 }
 
@@ -436,8 +436,8 @@ bool WndManager::WriteWChar(char16_t c)
 
 bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input_t c, color_t color)
 {
-    LOG(DEBUG) << "  M::FillRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey 
-        << " ch=" << std::hex << c << " color=" << static_cast<int>(color) << std::dec;
+    //LOG(DEBUG) << "  M::FillRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey 
+    //    << " ch=" << std::hex << c << " color=" << static_cast<int>(color) << std::dec;
 
     HideCursor();
     cell_t cl = MAKE_CELL(0, color, c);
@@ -455,7 +455,7 @@ bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input
 
 bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_t color)
 {
-    LOG(DEBUG) << "  M::ColorRect l=" << left << " t=" << top << " x=" << sizex << " y=" << sizey << " color=" << color;
+    //LOG(DEBUG) << "  M::ColorRect l=" << left << " t=" << top << " x=" << sizex << " y=" << sizey << " color=" << color;
 
     HideCursor();
     for (pos_t y = 0; y < sizey; ++y)

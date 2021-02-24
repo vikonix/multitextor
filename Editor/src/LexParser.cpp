@@ -87,6 +87,7 @@ bool LexParser::SetParseStyle(int cp, const std::string& style)
 {
     m_cp = cp;
 
+    m_scan = false;
     m_parseStyle.clear();
     m_lexPosition.clear();
 
@@ -127,6 +128,9 @@ bool LexParser::SetParseStyle(int cp, const std::string& style)
 
             m_showTab = false;
 
+            if (!m_openComment.empty() || !m_closeComment.empty())
+                m_scan = true;
+
             return true;
         }
     }
@@ -137,17 +141,17 @@ bool LexParser::SetParseStyle(int cp, const std::string& style)
 //////////////////////////////////////////////////////////////////////////////
 bool LexParser::ScanStr(size_t line, std::string_view str)
 {
-    if (m_parseStyle.empty())
+    if (!m_scan)
         return true;
 
-    LOG(DEBUG) << "ScanStr(" << line << ") '" << std::string(str) << "'";
+    //LOG(DEBUG) << "ScanStr(" << line << ") '" << std::string(str) << "'";
 
     std::string lexem;
     bool rc = LexicalParse(str, lexem);
 
     if (rc && !lexem.empty())
     {
-        LOG(DEBUG) << "  collected lex types=" << lexem;
+        //LOG(DEBUG) << "  collected lex types=" << lexem;
 
         for (auto lex : lexem)
             m_lexPosition.emplace(line, lex);
@@ -158,9 +162,6 @@ bool LexParser::ScanStr(size_t line, std::string_view str)
 
 bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<color_t>& color, size_t len)
 {
-    if (m_parseStyle.empty())
-        return false;
-
     size_t strLen = Editor::UStrLen(wstr);
     if (strLen == 0)
     {
@@ -192,13 +193,13 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
         m_stringSymbol = 0;
     }
 
-    LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
+    //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
 
     CheckForOpenComments(line, it);
 
     std::string lex;
     LexicalParse(str, lex, true);
-    LOG(DEBUG) << "  color='" << lex << "'";
+    //LOG(DEBUG) << "  color='" << lex << "'";
 
     for (size_t i = 0; i < lex.size(); ++i)
         switch (lex[i])
@@ -265,7 +266,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
     lex_t type;
     while ((type = LexicalScan(str, begin, end)) != lex_t::END)
     {
-        LOG(DEBUG) << "  lexem[" << end - begin + 1 << "]='" << std::string(str.substr(begin, end - begin + 1)) << "'";
+        //LOG(DEBUG) << "  lexem[" << end - begin + 1 << "]='" << std::string(str.substr(begin, end - begin + 1)) << "'";
 
         if (color)
         {
@@ -289,7 +290,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
             {
                 if (str[end] == '$')
                 {
-                    LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin));
+                    //LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin));
                     //bash var test
                     if (str[end + 1] == '(')
                         skipComment = ')';
@@ -307,13 +308,13 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
             }
             else if ((comment = ScanCommentFromBegin(str.substr(begin), e)) != lex_t::END)
             {
-                LOG(DEBUG) << "    Comment from begin";
+                //LOG(DEBUG) << "    Comment from begin";
                 if (type != lex_t::SYMBOL || e == end - begin)
                 {
-                    LOG(DEBUG) << "    comment 1 t=" << static_cast<int>(comment);
+                    //LOG(DEBUG) << "    comment 1 t=" << static_cast<int>(comment);
                     if (!m_commentOpen && comment == lex_t::COMMENT_LINE && !skipComment)
                     {
-                        LOG(DEBUG) << "    COMMENT_LINE";
+                        //LOG(DEBUG) << "    COMMENT_LINE";
                         if (!m_commentLine)
                             m_commentLine = 1;
                         else if (m_toggledComment)
@@ -322,13 +323,13 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
 
                     if (!m_commentLine && comment == lex_t::COMMENT_OPEN)
                     {
-                        LOG(DEBUG) << "    COMMENT_OPEN";
+                        //LOG(DEBUG) << "    COMMENT_OPEN";
                         ++m_commentOpen;
                     }
 
                     if (comment == lex_t::COMMENT_CLOSE)
                     {
-                        LOG(DEBUG) << "    COMMENT_CLOSE";
+                        //LOG(DEBUG) << "    COMMENT_CLOSE";
                         if (m_commentLine && m_commentOpen != 0)
                             m_commentLine = 0;
                         if (m_recursiveComment)
@@ -363,7 +364,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
                     char c = str[begin];
                     if (!color)
                     {
-                        if (/*!m_fROpen &&*/ type == lex_t::DELIMITER)
+                        if (type == lex_t::DELIMITER)
                         {
                             if (c == '('
                              || c == '{'
@@ -399,7 +400,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
                                     buff.pop_back();
                             }
                         }
-                        else if (/*!m_fROpen &&*/ type == lex_t::STRING)
+                        else if (type == lex_t::STRING)
                         {
                             if (str[end] == '\\')
                             {
@@ -454,10 +455,10 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
             size_t r1, r2;
             while (begin + offset <= end && (comment = ScanComment(str.substr(begin + offset, end - begin - offset), r1, r2)) != lex_t::END)
             {
-                LOG(DEBUG) << "    Comment inside";
+                //LOG(DEBUG) << "    Comment inside";
                 if (offset && begin + offset + r2 == end)
                 {
-                    LOG(DEBUG) << "    OUT comment r1=" << r1 << " r2=" << r2 << " =" << std::string(str.substr(begin + offset));
+                    //LOG(DEBUG) << "    OUT comment r1=" << r1 << " r2=" << r2 << " =" << std::string(str.substr(begin + offset));
                     break;
                 }
 
@@ -466,19 +467,19 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
 
                 if (!m_commentOpen && comment == lex_t::COMMENT_LINE)
                 {
-                    LOG(DEBUG) << "    COMMENT_LINE1";
+                    //LOG(DEBUG) << "    COMMENT_LINE1";
                     m_commentLine = true;
                 }
 
                 if (!m_commentLine && comment == lex_t::COMMENT_OPEN)
                 {
-                    LOG(DEBUG) << "    COMMENT_OPEN1";
+                    //LOG(DEBUG) << "    COMMENT_OPEN1";
                     ++m_commentOpen;
                 }
 
                 if (comment == lex_t::COMMENT_CLOSE)
                 {
-                    LOG(DEBUG) << "    COMMENT_CLOSE1";
+                    //LOG(DEBUG) << "    COMMENT_CLOSE1";
                     if (m_commentOpen && m_commentLine)
                         m_commentLine = false;
                     if (m_recursiveComment)
@@ -749,7 +750,7 @@ bool LexParser::CheckForOpenComments(size_t line, std::multimap<size_t, char>::i
     if(m_lexPosition.empty() || it == m_lexPosition.begin())
         return m_commentOpen = 0;
 
-    LOG(DEBUG) << "  CheckForOpenRem line=" << line;
+    //LOG(DEBUG) << "  CheckForOpenRem line=" << line;
 
     if (!m_recursiveComment)
     {
@@ -761,7 +762,7 @@ bool LexParser::CheckForOpenComments(size_t line, std::multimap<size_t, char>::i
             {
                 if (it->second == 'O')
                 {
-                    LOG(DEBUG) << "  OpenComment for line=" << line << " at line=" << it->first;
+                    //LOG(DEBUG) << "  OpenComment for line=" << line << " at line=" << it->first;
                     return m_commentOpen = 1;
                 }
                 else if (it->second == 'C')

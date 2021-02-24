@@ -412,7 +412,8 @@ bool ScreenWin32::WriteBlock(
     if (INVALID_HANDLE_VALUE == m_hStdout)
         return false;
 
-    //LOG(DEBUG) << "WriteBlock l=" << left << " t=" << top << " r=" << right << " b=" << bottom;
+    //LOG(DEBUG) << "WriteBlock l=" << left << " t=" << top << " r=" << right << " b=" << bottom << " xoffset=" << xoffset << " yoffset=" << yoffset;
+    _assert(left == xoffset && top == yoffset);
 
     size_t sizex = (size_t)right - left + 1;
     size_t sizey = (size_t)bottom - top + 1;
@@ -421,7 +422,7 @@ bool ScreenWin32::WriteBlock(
 
     for (size_t y = 0; y < sizey; ++y)
         for (size_t x = 0; x < sizex; ++x)
-{
+        {
             cell_t c = block.GetCell(xoffset + x,  yoffset + y);
             if (GET_CTEXT(c) < ACS_MAX)
             {

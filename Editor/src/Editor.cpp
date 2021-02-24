@@ -160,12 +160,12 @@ bool Editor::Load()
                 strBuff->m_fileOffset = fileOffset;
 
                 size_t rest;
-                LOG(DEBUG) << std::hex << "file offset=" << fileOffset << " read=" << read << " strOffset=" << strOffset << " tocopy=" << tocopy << std:: dec;
+                //LOG(DEBUG) << std::hex << "file offset=" << fileOffset << " read=" << read << " strOffset=" << strOffset << " tocopy=" << tocopy << std:: dec;
                 [[maybe_unused]]bool rc = FillStrOffset(strBuff, strOffset + tocopy, fileSize == fileOffset + strOffset + tocopy, rest);
-                LOG(DEBUG) << std::hex << "rest=" << rest << std::dec;
+                //LOG(DEBUG) << std::hex << "rest=" << rest << std::dec;
 
                 _assert(rc);
-                _assert(tocopy > rest);
+                _assert(tocopy > rest);//???
 
                 tocopy -= rest;
                 fileOffset += tocopy + strOffset;
