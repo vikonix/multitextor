@@ -316,9 +316,9 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
                     {
                         //LOG(DEBUG) << "    COMMENT_LINE";
                         if (!m_commentLine)
-                            m_commentLine = 1;
+                            m_commentLine = true;
                         else if (m_toggledComment)
-                            m_commentLine = 0;
+                            m_commentLine = false;
                     }
 
                     if (!m_commentLine && comment == lex_t::COMMENT_OPEN)
@@ -331,7 +331,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
                     {
                         //LOG(DEBUG) << "    COMMENT_CLOSE";
                         if (m_commentLine && m_commentOpen != 0)
-                            m_commentLine = 0;
+                            m_commentLine = false;
                         if (m_recursiveComment)
                             --m_commentOpen;
                         else
@@ -651,7 +651,7 @@ lex_t LexParser::ScanCommentFromBegin(std::string_view lexem, size_t& end)
         {
             if (lexem.find(comment) == 0)
             {
-                end = comment.size();
+                end = comment.size() - 1;
                 return lex_t::COMMENT_LINE;
             }
         }
@@ -662,7 +662,7 @@ lex_t LexParser::ScanCommentFromBegin(std::string_view lexem, size_t& end)
         {
             if (lexem.find(comment) == 0)
             {
-                end = comment.size();
+                end = comment.size() - 1;
                 return lex_t::COMMENT_OPEN;
             }
         }
@@ -672,7 +672,7 @@ lex_t LexParser::ScanCommentFromBegin(std::string_view lexem, size_t& end)
     {
         if (lexem.find(comment) == 0)
         {
-            end = comment.size();
+            end = comment.size() - 1;
             return lex_t::COMMENT_CLOSE;
         }
     }

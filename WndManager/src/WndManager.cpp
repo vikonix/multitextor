@@ -345,7 +345,7 @@ bool WndManager::WriteColorWStr(const std::u16string& str, const std::vector<col
     for(pos_t i = 0; i < len; ++i)
         m_screenBuff.SetCell(m_cursorx++, m_cursory, MAKE_CELL(0, color[i], str[i]));
 
-    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff));
+    bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff, x, y));
     return rc;
 }
 
@@ -449,7 +449,7 @@ bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input
         }
     }
 
-    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff));
+    bool rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff, left, top));
     return rc;
 }
 
@@ -467,7 +467,7 @@ bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, colo
         }
     }
 
-    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff);
+    int rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff, left, top));
     return rc;
 }
 
@@ -486,7 +486,7 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
         }
     }
 
-    int rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff);
+    int rc = CallConsole(WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff, left, top));
     return rc;
 }
 

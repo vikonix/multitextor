@@ -91,7 +91,7 @@ bool EditorWnd::Refresh()
 
     m_sizeX = GetCSizeX();
     m_sizeY = GetCSizeY();
-    LOG(DEBUG) << "sx=" << m_sizeX << " sy=" << m_sizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
+    //LOG(DEBUG) << "sx=" << m_sizeX << " sy=" << m_sizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
 
     if (m_sizeX <= m_cursorx || m_sizeY <= m_cursory)
         _GotoXY(m_xOffset + m_cursorx, m_firstLine + m_cursory);
@@ -920,7 +920,8 @@ input_t EditorWnd::ParseCommand(input_t cmd)
     }
     else
     {
-        LOG(DEBUG) << "    ??? editor code=" << std::hex << cmd << std::dec;
+        if(cmd != K_FOCUSLOST && cmd != K_FOCUSSET)
+            LOG(DEBUG) << "    ??? editor code=" << std::hex << cmd << std::dec;
     }
 
     return 0;
