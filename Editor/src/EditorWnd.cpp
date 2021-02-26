@@ -519,7 +519,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
 
 bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, select_t selectType)
 {
-    LOG(DEBUG) << "    Mark bx=" << bx << " by=" << by << " ex=" << ex << " ey=" << ey << " color=" << color << " select=" << static_cast<int>(selectType);
+    //LOG(DEBUG) << "    Mark bx=" << bx << " by=" << by << " ex=" << ex << " ey=" << ey << " color=" << color << " select=" << static_cast<int>(selectType);
 
     //check begin and end of selection
     size_t x1, x2;
@@ -593,7 +593,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             y2 = m_firstLine + m_sizeY - 1;
     }
 
-    LOG(DEBUG) << "    Mark1 bx=" << x1 << " by=" << y1 << " ex=" << x2 << " ey=" << y2;
+    //LOG(DEBUG) << "    Mark1 bx=" << x1 << " by=" << y1 << " ex=" << x2 << " ey=" << y2;
 
     for (size_t y = y1; y <= y2; ++y)
     {

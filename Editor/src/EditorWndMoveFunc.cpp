@@ -666,7 +666,7 @@ bool EditorWnd::MoveCenter([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::SelectBegin(input_t cmd)
 {
-    LOG(DEBUG) << "    SelectBegin code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
+    //LOG(DEBUG) << "    SelectBegin code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
     if ((m_selectState & select_state::end) != 0)
         SelectUnselect(cmd);
 
@@ -683,7 +683,7 @@ bool EditorWnd::SelectBegin(input_t cmd)
         if (K_GET_CODE(cmd) == 1)
         {
             //select key arrow with key shift
-            LOG(DEBUG) << "    ShiftSelect";
+            //LOG(DEBUG) << "    ShiftSelect";
             m_selectKeyShift = true;
         }
         else
@@ -792,7 +792,7 @@ bool EditorWnd::SelectEnd(input_t cmd)
     if (m_selectState == select_state::no || IsSelectFinished())
         return 0;
 
-    LOG(DEBUG) << "    SelectEnd code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
+    //LOG(DEBUG) << "    SelectEnd code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
     InputRelease();
     //???StatusMark(0);
 
@@ -822,9 +822,9 @@ bool EditorWnd::SelectEnd(input_t cmd)
     return true;
 }
 
-bool EditorWnd::SelectUnselect(input_t cmd)
+bool EditorWnd::SelectUnselect([[maybe_unused]]input_t cmd)
 {
-    LOG(DEBUG) << "    SelectUnselect " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    SelectUnselect " << std::hex << cmd << std::dec;
     if (IsSelectVisible() || m_beginX != m_endX || m_beginY != m_endY)
     {
         //hide selection

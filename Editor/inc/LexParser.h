@@ -57,22 +57,22 @@ enum class lex_t
 
 struct LexConfig 
 {
-    const std::string   langName;
-    const std::string   fileExt;
+    std::string langName;
+    std::string fileExt;
 
-    const std::string   delimiters;
-    const std::string   nameSymbols;
+    std::string delimiters;
+    std::string nameSymbols;
     
-    const std::list<std::string> special;            //some special symbols combination like $# /# perl sh bash
-    const std::list<std::string> lineComment;
-    const std::list<std::string> openComment;
-    const std::list<std::string> closeComment;
+    std::list<std::string> special;            //some special symbols combination like $# /# perl sh bash
+    std::list<std::string> lineComment;
+    std::list<std::string> openComment;
+    std::list<std::string> closeComment;
   
-    bool                recursiveComment{}; //like pascal
-    bool                toggledComment{};   //like asn1 -- comment --
-    bool                notCase{};          //key words not case sensitive
-    bool                saveTab{};
-    size_t              tabSize{8};
+    bool        recursiveComment{}; //like pascal
+    bool        toggledComment{};   //like asn1 -- comment --
+    bool        notCase{};          //key words not case sensitive
+    bool        saveTab{};
+    size_t      tabSize{8};
 
     std::unordered_set<std::string> keyWords;
 };
@@ -121,7 +121,7 @@ protected:
     bool    CorrectLine(size_t pos, int delta);
     bool    DumpLexPos();
 
-    lex_t   SymbolType(char c);
+    lex_t   SymbolType(int c);
     lex_t   ScanCommentFromBegin(std::string_view lexem, size_t& end);
     lex_t   ScanComment(std::string_view lexem, size_t& begin, size_t& end);
     bool    ScanSpecial(std::string_view lexem, size_t& end);

@@ -104,9 +104,9 @@ bool LexParser::SetParseStyle(int cp, const std::string& style)
 
             for (char16_t i = 0; i < lexTabSize; ++i)
                 m_lexTab[i] = static_cast<lex_t>(GetSymbolType(i));
-            for (auto d : cfg.delimiters)
+            for (int d : cfg.delimiters)
                 m_lexTab[d] = lex_t::DELIMITER;
-            for (auto s : cfg.nameSymbols)
+            for (int s : cfg.nameSymbols)
                 m_lexTab[s] = lex_t::SYMBOL;
 
             for (auto special : cfg.special)
@@ -527,7 +527,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
     return true;
 }
 
-lex_t LexParser::SymbolType(char c)
+lex_t LexParser::SymbolType(int c)
 {
     if (c & 0x80)
         return lex_t::OTHER;//??? GetSymbolType (char2wchar(m_nCP, c));
@@ -556,6 +556,7 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
         m_cutLine = true;
     case lex_t::END:
     case lex_t::DELIMITER:
+    default:
         //along symbol
         break;
 
@@ -563,6 +564,7 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
     case lex_t::SYMBOL:
     case lex_t::OTHER:
     case lex_t::ERROR:
+    case lex_t::SPACE:
         //connected symbols
         while (end < strSize - 1 && type == SymbolType(str[end + 1]))
             ++end;
@@ -748,7 +750,7 @@ lex_t LexParser::ScanComment(std::string_view lexem, size_t& begin, size_t& end)
 bool LexParser::CheckForOpenComments(size_t line, std::multimap<size_t, char>::iterator it)
 {
     if(m_lexPosition.empty() || it == m_lexPosition.begin())
-        return m_commentOpen = 0;
+        return 0 != (m_commentOpen = 0);
 
     //LOG(DEBUG) << "  CheckForOpenRem line=" << line;
 
@@ -763,14 +765,14 @@ bool LexParser::CheckForOpenComments(size_t line, std::multimap<size_t, char>::i
                 if (it->second == 'O')
                 {
                     //LOG(DEBUG) << "  OpenComment for line=" << line << " at line=" << it->first;
-                    return m_commentOpen = 1;
+                    return 0 != (m_commentOpen = 1);
                 }
                 else if (it->second == 'C')
-                    return m_commentOpen = 0;
+                    return 0 != (m_commentOpen = 0);
             }
         } while (it != m_lexPosition.begin());
 
-        return m_commentOpen = 0;
+        return 0 != (m_commentOpen = 0);
     }
     else
     {
@@ -788,7 +790,7 @@ bool LexParser::CheckForOpenComments(size_t line, std::multimap<size_t, char>::i
             }
         } while (it != m_lexPosition.begin());
 
-        return m_commentOpen;
+        return 0 != (m_commentOpen);
     }
 }
 
