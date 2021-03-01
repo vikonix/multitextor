@@ -146,15 +146,14 @@ bool LexParser::ScanStr(size_t line, std::string_view str)
 
     //LOG(DEBUG) << "ScanStr(" << line << ") '" << std::string(str) << "'";
 
-    std::string lexem;
-    bool rc = LexicalParse(str, lexem);
+    std::string lexstr;
+    bool rc = LexicalParse(str, lexstr);
 
-    if (rc && !lexem.empty())
+    if (rc && !lexstr.empty())
     {
-        //LOG(DEBUG) << "  collected lex types=" << lexem;
+        //LOG(DEBUG) << "  collected lex types=" << lexstr;
 
-        for (auto lex : lexem)
-            m_lexPosition.emplace(line, lex);
+        m_lexPosition.emplace(line, lexstr);
     }
 
     return rc;
@@ -169,40 +168,18 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
         return true;
     }
 
+    CheckForConcatenatedLine(line);
+    CheckForOpenComments(line);
+
     std::string str = utf8::utf16to8(wstr.substr(0, strLen));
-
-    bool cutLine{};
-    auto it = m_lexPosition.find(line);
-    if (it != m_lexPosition.end() && it != m_lexPosition.begin())
-    {
-        //check for concatenated string literal with '\\'
-        auto prevIt = it;
-        --prevIt;
-        auto[prevLine, prevCh] = *prevIt;
-        if (prevIt != m_lexPosition.begin() && prevLine == line && prevCh == '\\')
-        {
-            --prevIt;
-            cutLine = m_cutLine = true;
-            m_stringSymbol = prevIt->second;
-        }
-    }
-
-    if(!cutLine)
-    {
-        m_cutLine = false;
-        m_stringSymbol = 0;
-    }
+    std::string lexstr;
+    LexicalParse(str, lexstr, true);
 
     //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
-
-    CheckForOpenComments(line, it);
-
-    std::string lex;
-    LexicalParse(str, lex, true);
     //LOG(DEBUG) << "  color='" << lex << "'";
 
-    for (size_t i = 0; i < lex.size(); ++i)
-        switch (lex[i])
+    for (size_t i = 0; i < lexstr.size(); ++i)
+        switch (lexstr[i])
         {
         case '3'://back slash
         case '5'://operator
@@ -250,6 +227,32 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
 }
 
 //////////////////////////////////////////////////////////////////////////////
+bool LexParser::CheckForConcatenatedLine(size_t line)
+{
+    bool cutLine{};
+    if (line)
+    {
+        auto prevIt = m_lexPosition.find(line - 1);
+        if (prevIt != m_lexPosition.end())
+        {
+            //check for concatenated string with '\\' 
+            auto[prevLine, prevLex] = *prevIt;
+            if (prevLex.back() == '\\')
+            {
+                cutLine = m_cutLine = true;
+                m_stringSymbol = prevLex[prevLex.size() - 2];
+            }
+        }
+    }
+    if (!cutLine)
+    {
+        m_cutLine = false;
+        m_stringSymbol = 0;
+    }
+    
+    return true;
+}
+
 bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color)
 {
     if (!m_cutLine)
@@ -556,7 +559,6 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
         m_cutLine = true;
     case lex_t::END:
     case lex_t::DELIMITER:
-    default:
         //along symbol
         break;
 
@@ -565,6 +567,7 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
     case lex_t::OTHER:
     case lex_t::ERROR:
     case lex_t::SPACE:
+    default:
         //connected symbols
         while (end < strSize - 1 && type == SymbolType(str[end + 1]))
             ++end;
@@ -578,8 +581,8 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
             {
                 //begin of the string
                 m_stringSymbol = str[begin];
+                ++end;
             }
-            ++end;
 
             lex_t t;
             while (end < strSize && (t = SymbolType(str[end])) != lex_t::END)
@@ -747,645 +750,214 @@ lex_t LexParser::ScanComment(std::string_view lexem, size_t& begin, size_t& end)
     return type;
 }
 
-bool LexParser::CheckForOpenComments(size_t line, std::multimap<size_t, char>::iterator it)
+bool LexParser::CheckForOpenComments(size_t line)
 {
-    if(m_lexPosition.empty() || it == m_lexPosition.begin())
-        return 0 != (m_commentOpen = 0);
+    if (m_lexPosition.empty())
+        return true;
+
+    auto it = m_lexPosition.upper_bound(line);
 
     //LOG(DEBUG) << "  CheckForOpenRem line=" << line;
-
     if (!m_recursiveComment)
     {
         //C style
-        do
+        while(--it != m_lexPosition.end())
         {
-            --it;
-            if (it->first <= line)
+            auto[l, str] = *it;
+            for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
             {
-                if (it->second == 'O')
+                if (*strIt == 'O')
                 {
                     //LOG(DEBUG) << "  OpenComment for line=" << line << " at line=" << it->first;
                     return 0 != (m_commentOpen = 1);
                 }
-                else if (it->second == 'C')
+                else if (*strIt == 'C')
                     return 0 != (m_commentOpen = 0);
             }
-        } while (it != m_lexPosition.begin());
-
-        return 0 != (m_commentOpen = 0);
+        } 
     }
     else
     {
         //pascal style
         m_commentOpen = 0;
-        do
+        while (--it != m_lexPosition.end())
         {
-            --it;
-            if (it->first <= line)
+            auto[l, str] = *it;
+            for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
             {
-                if (it->second == 'O')
+                if (*strIt == 'O')
                     ++m_commentOpen;
-                else if (it->second == 'C' && m_commentOpen > 0)
+                else if (*strIt == 'C' && m_commentOpen > 0)
                     --m_commentOpen;
             }
-        } while (it != m_lexPosition.begin());
-
-        return 0 != (m_commentOpen);
+        }
     }
+
+    return 0 != (m_commentOpen = 0);
 }
+
+bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t& inv)
+{
+    if (!m_scan)
+        return true;
+
+    LOG(DEBUG) << "LexParser::ChangeStr l=" << line;
+
+    CheckForConcatenatedLine(line);
+    CheckForOpenComments(line);
+
+    std::string str = utf8::utf16to8(wstr);
+    std::string lexstr;
+    LexicalParse(str, lexstr);
+
+    std::string prevLex;
+    auto it = m_lexPosition.find(line);
+    if (it != m_lexPosition.end())
+        prevLex = it->second;
+
+    if (lexstr != prevLex)
+    {
+        if (!lexstr.empty())
+            m_lexPosition[line] = lexstr;
+        else if (it != m_lexPosition.end())
+            m_lexPosition.erase(it);
+
+        bool comment{};
+        bool backslashPrev{};
+        bool backslashNew{};
+
+        if (!prevLex.empty())
+        {
+            if (prevLex.find('O') != std::string::npos
+                || prevLex.find('C') != std::string::npos)
+            {
+                comment = true;
+            }
+            if (prevLex.find('\\') != std::string::npos)
+                backslashPrev = true;
+        }
+        if (!lexstr.empty())
+        {
+            if (lexstr.find('O') != std::string::npos
+                || lexstr.find('C') != std::string::npos)
+            {
+                comment = true;
+            }
+            if (prevLex.find('\\') != std::string::npos)
+                backslashNew = true;
+        }
+
+        if (comment || backslashPrev != backslashNew)
+            //if comment changed or string Concatenated then invalidate full screen
+            inv = invalidate_t::full;
+    }
+    else
+        inv = invalidate_t::change;
+
+    return true;
+}
+
+bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& inv)
+{
+    if (!m_scan)
+        return true;
+
+    LOG(DEBUG) << "LexParser::AddStr l=" << line;
+    
+    CheckForOpenComments(line);
+
+    std::string str = utf8::utf16to8(wstr);
+    std::string lexstr;
+    LexicalParse(str, lexstr);
+
+    if (!lexstr.empty())
+    {
+        if (lexstr.find('O') != std::string::npos
+            || lexstr.find('C') != std::string::npos)
+        {
+            //if comment changed then invalidate full screen
+            inv = invalidate_t::full;
+        }
+        AddLexem(line, lexstr);
+    }
+    else
+        inv = invalidate_t::insert;
+
+    return true;
+}
+
+
+bool LexParser::DelStr(size_t line, invalidate_t& inv)
+{
+    if (!m_scan)
+        return true;
+
+    LOG(DEBUG) << "LexParser::DelStr l=" << line;
+
+    auto it = m_lexPosition.find(line);
+    if (it != m_lexPosition.end())
+    {
+        const std::string& prevLex = it->second;
+        if (prevLex.find('O') != std::string::npos
+            || prevLex.find('C') != std::string::npos)
+        {
+            //if comment changed then invalidate full screen
+            inv = invalidate_t::full;
+        }
+        DeleteLexem(line);
+    }
+    else
+        inv = invalidate_t::del;
+
+    return true;
+}
+
+bool LexParser::AddLexem(size_t line, const std::string& lexstr)
+{
+    for (auto it = m_lexPosition.rbegin(); it != m_lexPosition.rend();)
+    {
+        if (it->first < line)
+            break;
+
+        auto next = std::next(it);
+        auto pos = m_lexPosition.extract(it->first);
+        ++pos.key();
+        auto[i, rc, node] = m_lexPosition.insert(std::move(pos));
+        if (!rc)
+        {
+            _assert(0);
+            return false;
+        }
+        
+        it = next;
+    }
+
+    m_lexPosition[line] = lexstr;
+    return true;
+}
+
+bool LexParser::DeleteLexem(size_t line)
+{
+    auto it = m_lexPosition.find(line);
+    it = m_lexPosition.erase(it);
+    for (; it != m_lexPosition.end(); ++it)
+    {
+        auto pos = m_lexPosition.extract(it);
+        --pos.key();
+        auto [i, rc, node] = m_lexPosition.insert(std::move(pos));
+        if (!rc)
+        {
+            _assert(0);
+            return false;
+        }
+        it = i;
+    }
+
+    return true;
+}
+
 
 #if 0
-
-
-//////////////////////////////////////////////////////////////////////////////
-int LexBuff::LexicalParse(size_t nline, char* pStr, char* pColor, char* pLex)
-{
-  (void) nline;
-
-  if(!m_fCutLine)
-    m_fString = 0;
-
-  m_fCutLine  = 0;
-  m_fRLine    = 0;
-
-  int cpos    = 0;
-  int lpos    = 0;
-
-  size_t begin   = 0;
-  size_t end     = 0;
-  int type;
-
-  int cSkipRem   = 0;
-  int nSkipCount = 0;
-
-  while((type = LexicalScan(pStr, &begin, &end)) != LEX_END)
-  {
-    TPRINT((" skip r=%x count=%d [%d]='%s\n", cSkipRem, nSkipCount, end - begin + 1, pStr + begin));
-
-    if(pColor)
-    {
-      if(m_fRLine || m_fROpen)
-        while(cpos < begin)
-          pColor[cpos++] = 'R';
-      else
-        while(cpos < begin)
-          pColor[cpos++] = ' ';
-    }
-
-    size_t off = 0;
-    if(type == LEX_STRING
-    || type == LEX_DELIMIT
-    || type == LEX_SYMBOL
-    || type == LEX_OPERATOR
-    )
-    {
-      //для символов нужно точное соответствие
-      //для стороки если нужно то проверяем только начальные символы
-      //для разделителя сначала проверяем первый символ коментария
-      //если он совпал тогда проверяем начальные символы как для строки
-      if(type == LEX_OPERATOR)
-      {
-        TPRINT(("  Check skip rem b=%d e=%d ='%s\n", begin, end, pStr + begin));
-        if(pStr[end] == '$')
-        {
-          //bash var test
-          if(pStr[end + 1] == '(')
-            cSkipRem   = ')';
-          else if(pStr[end + 1] == '{')
-            cSkipRem   = '}';
-        }
-      }
-
-      int rem = 0;
-      size_t e;
-      if(ScanSpecial(pStr + begin, &e))
-      {
-        end = begin + e;
-        off = end;
-      }
-      else if((rem = ScanRemFromBegin(pStr + begin, &e)) != 0)
-      {
-        TPRINT((" Rem from begin\n"));
-        if(type != LEX_SYMBOL || e == end - begin)
-        {
-          TPRINT((" Rem 1 t=%d\n", rem));
-          if(!m_fROpen && rem == REM_LINE && !cSkipRem)
-          {
-            TPRINT((" REM_LINE\n"));
-            if(!m_fRLine)
-              m_fRLine = 1;
-            else if(m_fToggledRem)
-              m_fRLine = 0;
-          }
-
-          if(!m_fRLine && rem == REM_OPEN)
-            ++m_fROpen;
-
-          if(rem == REM_CLOSE)
-          {
-            if(m_fROpen && m_fRLine)
-              m_fRLine = 0;
-            if(m_fRecursRem)
-              --m_fROpen;
-            else
-              m_fROpen = 0;
-          }
-
-          end = begin + e;
-          off = end;
-
-          if(pColor)
-            while(cpos <= end)
-              pColor[cpos++] = 'R';
-
-          if(pLex)
-          {
-            if(!m_fRLine && rem == REM_OPEN)
-            {
-              if(pLex[lpos - 1] != 'O')
-                pLex[lpos++] = 'O';
-            }
-            else if(rem == REM_CLOSE)
-              pLex[lpos++] = 'C';
-          }
-        }
-      }
-      else
-      {
-        if(!m_fRLine)
-        {
-          char c = pStr[begin];
-          if(pLex)
-          {
-            if(/*!m_fROpen &&*/ type == LEX_DELIMIT)
-            {
-              if(c == '(')
-                pLex[lpos++] = '(';
-              else if(c == '{')
-                pLex[lpos++] = '{';
-              else if(c == '[')
-                pLex[lpos++] = '[';
-              else if(c == '<')
-                pLex[lpos++] = '<';
-              else if(c == ')')
-              {
-                if(!lpos || pLex[lpos - 1] != '(')
-                  pLex[lpos++] = ')';
-                else
-                  --lpos;
-              }
-              else if(c == '}')
-              {
-                if(!lpos || pLex[lpos - 1] != '{')
-                  pLex[lpos++] = '}';
-                else
-                  --lpos;
-              }
-              else if(c == ']')
-              {
-                if(!lpos || pLex[lpos - 1] != '[')
-                  pLex[lpos++] = ']';
-                else
-                  --lpos;
-              }
-              else if(c == '>')
-              {
-                if(!lpos || pLex[lpos - 1] != '<')
-                  pLex[lpos++] = '>';
-                else
-                  --lpos;
-              }
-            }
-            else if(/*!m_fROpen &&*/ type == LEX_STRING)
-            {
-              if(pStr[end] == '\\')
-              {
-                pLex[lpos++] = (char)m_fString;
-                pLex[lpos++] = '\\';
-              }
-            }
-          }
-
-          if(c == '(')
-          {
-            if(cSkipRem == ')')
-              ++nSkipCount;
-          }
-          else if(c == '{')
-          {
-            if(cSkipRem == '}')
-              ++nSkipCount;
-          }
-          else if(c == ')')
-          {
-            if(cSkipRem == ')' && !--nSkipCount)
-              cSkipRem = 0;
-          }
-          else if(c == '}')
-          {
-            if(cSkipRem == '}' && !--nSkipCount)
-              cSkipRem = 0;
-          }
-        }
-
-        if(pColor && !m_fRLine && !m_fROpen)
-          if(type == LEX_SYMBOL)
-          {
-            int fill = '0' + type;
-            if(IsNumeric(pStr + begin))
-              fill = 'N';
-            else
-            {
-              char c = pStr[end + 1];
-              pStr[end + 1] = 0;
-              if(IsKeyWord(pStr + begin))
-                fill = 'K';
-              pStr[end + 1] = c;
-            }
-
-            while(cpos <= end)
-              pColor[cpos++] = (char)fill;
-          }
-      }
-    }
-
-    if(type == LEX_OPERATOR)
-    {
-      int rem;
-      size_t r1, r2;
-      while(begin + off <= end && (rem = ScanRem(pStr + begin + off, end - begin - off, &r1, &r2)) != 0)
-      {
-        TPRINT((" Rem inside\n"));
-        if(off && begin + off + r2 == end)
-        {
-          TPRINT((" OUT rem r1=%d r2=%d str=%s\n", r1, r2, pStr + begin + off));
-          break;
-        }
-
-        if(pColor && !m_fRLine && !m_fROpen && r1)
-          while(cpos < begin + off + r1)
-            pColor[cpos++] = (char)('0' + type);
-
-        if(!m_fROpen && rem == REM_LINE)
-        {
-          TPRINT((" REM_LINE1\n"));
-          m_fRLine = 1;
-        }
-
-        if(!m_fRLine && rem == REM_OPEN)
-          ++m_fROpen;
-
-        if(rem == REM_CLOSE)
-        {
-          if(m_fROpen && m_fRLine)
-            m_fRLine = 0;
-          if(m_fRecursRem)
-            --m_fROpen;
-          else
-            m_fROpen = 0;
-        }
-
-        off += r2 + 1;
-
-        if(pColor)
-          while(cpos < begin + off)
-            pColor[cpos++] = 'R';
-
-        if(pLex)
-        {
-          if(!m_fRLine && rem == REM_OPEN)
-          {
-            if(pLex[lpos - 1] != 'O')
-              pLex[lpos++] = 'O';
-          }
-          else if(rem == REM_CLOSE)
-            pLex[lpos++] = 'C';
-        }
-      }
-    }
-
-    if(pColor)
-    {
-      if(m_fRLine || m_fROpen)
-        while(cpos <= end)
-          pColor[cpos++] = 'R';
-      else
-        while(cpos <= end)
-          pColor[cpos++] = (char)('0' + type);
-    }
-
-    if(!pStr[end])
-      break;
-
-    begin = end + 1;
-  }
-
-  if(pColor)
-    pColor[cpos] = 0;
-
-  if(pLex)
-    pLex[lpos] = 0;
-
-  return 0;
-}
-
-
-int LexBuff::ScanStr(size_t nline, char* pStr, size_t len)
-{
-  if(!m_pLPos || !m_pParse)
-    return 0;
-
-  char c = pStr[len];
-  pStr[len] = 0;
-  TPRINT(("ScanStr l=%d len=%d %s\n", nline, len, pStr));
-
-  char lex[MAX_PARSE_STR];
-  LexicalParse(nline, pStr, NULL, lex);
-
-  if(lex[0])
-  {
-    TPRINT(("ScanStr l=%d len=%d %s\n", nline, len, pStr));
-    TPRINT(("lex1='%s.\n\n", lex));
-    size_t n = strlen(lex);
-    if(m_nPos + n > m_nLSize)
-      if(Enlarge(n) != 0)
-        return -1;
-
-    for(int i = 0; lex[i] && m_nPos < m_nLSize; ++i)
-    {
-      m_pLPos[m_nPos].nline = nline;
-      m_pLPos[m_nPos].type  = lex[i];
-      ++m_nPos;
-    }
-    TPRINT(("++ lex2[%d]='%s.\n", m_nPos, lex));
-  }
-
-  pStr[len] = c;
-  return 0;
-}
-
-
-
-
-int LexBuff::Enlarge(size_t n)
-{
-  TPRINT(("Enlarge LexPosTab %d\n", n));
-  assert(0);
-  size_t size = m_nLSize + MAX_LPOS;
-  assert(size >= m_nPos + n);
-
-  LexPos* pNewPos = new LexPos[size];
-  if(!pNewPos)
-  {
-    TPRINT(("ERROR out of memory 1 for LEX\n"));
-    if(m_pParse)
-    {
-      delete m_pParse;
-      m_pParse = NULL;
-    }
-    return -1;
-  }
-  else
-  {
-    memcpy(pNewPos, m_pLPos, m_nPos * sizeof(LexPos));
-    memset(pNewPos + m_nPos, 0, (size - m_nPos) * sizeof(LexPos));
-    m_nLSize = size;
-    delete m_pLPos;
-    m_pLPos = pNewPos;
-  }
-  return 0;
-}
-
-
-int LexBuff::CheckForOpenRem(size_t nline, size_t pos)
-{
-  (void) nline;
-  TPRINT(("  CheckForOpenRem line=%d pos=%d pl=%d pt=%c\n", nline, pos, m_pLPos[pos].nline, m_pLPos[pos].type));
-
-  if(!m_fRecursRem)
-  {
-    //C style
-    for(int i = (int)pos - 1; i >= 0; --i)
-      if(m_pLPos[i].type == 'O')
-      {
-        TPRINT(("OpenRem for line=%d at[%d]=%d\n", nline, i, m_pLPos[i].nline));
-        return m_fROpen = 1;
-      }
-      else if(m_pLPos[i].type == 'C')
-        return m_fROpen = 0;
-
-    return m_fROpen = 0;
-  }
-  else
-  {
-    //pascal style
-    m_fROpen = 0;
-    for(int i = (int)pos - 1; i >= 0; --i)
-      if(m_pLPos[i].type == 'O')
-        ++m_fROpen;
-      else if(m_pLPos[i].type == 'C')
-        --m_fROpen;
-
-    if(m_fROpen > 0)
-      return m_fROpen;
-    else
-      return m_fROpen = 0;
-  }
-}
-
-
-size_t LexBuff::GetLexPos(size_t nline)
-{
-  if(!m_pLPos)
-    return 0;
-
-  for(size_t i = 0; i < m_nPos; ++i)
-    if(m_pLPos[i].nline >= nline)
-      return i;
-
-  return m_nPos;
-}
-
-
-size_t LexBuff::DelLPos(size_t pos, size_t n)
-{
-  memmove(m_pLPos + pos, m_pLPos + pos + n, sizeof(LexPos) * (m_nPos - pos - n));
-  return m_nPos -= n;
-}
-
-
-size_t LexBuff::AddLPos(size_t pos, size_t n)
-{
-  if(m_nPos + n > m_nLSize)
-    if(Enlarge(n) != 0)
-      return 0;
-
-  memmove(m_pLPos + pos + n, m_pLPos + pos, sizeof(LexPos) * (m_nPos - pos));
-
-  return m_nPos += n;
-}
-
-
-int LexBuff::CorrectLine(size_t pos, int d)
-{
-  for(size_t i = pos; i < m_nPos; ++i)
-    m_pLPos[i].nline += d;
-  return 0;
-}
-
-
-int LexBuff::ChangeStr(size_t nline, const wchar* pStr, int* pInv)
-{
-  if(!m_pLPos || !m_pParse)
-    return 0;
-
-  TPRINT(("LBuff::ChangeStr l=%d\n", nline));
-  //DumpLPos();
-
-  size_t pos = GetLexPos(nline);
-  CheckForOpenRem(nline, pos);
-
-  if(pos && m_pLPos[pos - 1].nline == nline - 1 && m_pLPos[pos - 1].type == '\\')
-  {
-    m_fCutLine = 1;
-    m_fString  = m_pLPos[pos - 2].type;
-  }
-  else
-  {
-    m_fCutLine = 0;
-    m_fString  = 0;
-  }
-
-  size_t i;
-  char str[MAX_PARSE_STR];
-  for(i = 0; pStr[i] && i < MAX_PARSE_STR; ++i)
-    str[i] = wchar2char(m_nCP, pStr[i]);
-  str[i] = 0;
-  //TPRINT(("%s\n", str));
-
-  char lex[MAX_PARSE_STR];
-  LexicalParse(nline, str, NULL, lex);
-  //TPRINT(("%s.new\n", lex));
-
-  char curlex[MAX_PARSE_STR];
-  size_t lpos = 0;
-  int rem = 0;
-  for(i = pos; i < m_nPos && m_pLPos[i].nline == nline; ++i)
-  {
-    curlex[lpos++] = m_pLPos[i].type;
-    if(m_pLPos[i].type == 'O' || m_pLPos[i].type == 'C')
-      rem = 1;
-  }
-  curlex[lpos] = 0;
-  //TPRINT(("%s.prew\n", curlex));
-
-  if(strcmp(curlex, lex))
-  {
-    //lex pattern changed
-    size_t n = strlen(lex); //new len
-    if(n > lpos)
-      AddLPos(pos, n - lpos);
-    if(n < lpos)
-      DelLPos(pos, lpos - n);
-
-    for(i = 0; i < n; ++i, ++pos)
-    {
-      m_pLPos[pos].nline = nline;
-      m_pLPos[pos].type = lex[i];
-      if(lex[i] == 'O' || lex[i] == 'C')
-        rem = 1;
-    }
-
-    if(pInv)
-    {
-      if(rem)
-        //при изменении расклада коментариев перерисовать весь экран
-        *pInv = 4;
-      else //if(m_fString)
-      {
-        if((  n && lex[n - 1] == '\\'  && (!lpos || curlex[lpos - 1] != '\\'))
-        || ((!n || lex[n - 1] != '\\') &&   lpos && curlex[lpos - 1] == '\\'))
-          //при изменении конца строки перерисовать весь экран
-          *pInv = 4;
-      }
-    }
-
-    //DumpLPos();
-  }
-
-  return 0;
-}
-
-
-int LexBuff::AddStr(size_t nline, const wchar* pStr, int* pInv)
-{
-  if(!m_pLPos || !m_pParse)
-    return 0;
-
-  TPRINT(("LBuff::AddStr l=%d\n", nline));
-  size_t pos = GetLexPos(nline);
-  CheckForOpenRem(nline, pos);
-
-  size_t i;
-  char str[MAX_PARSE_STR];
-  for(i = 0; pStr[i] && i < MAX_PARSE_STR; ++i)
-    str[i] = wchar2char(m_nCP, pStr[i]);
-  str[i] = 0;
-  //TPRINT(("%s\n", str));
-
-  char lex[MAX_PARSE_STR];
-  LexicalParse(nline, str, NULL, lex);
-  //TPRINT(("%s.new\n", lex));
-
-  size_t n = strlen(lex); //new len
-  if(n)
-  {
-    AddLPos(pos, n);
-
-    for(i = 0; i < n; ++i, ++pos)
-    {
-      m_pLPos[pos].nline = nline;
-      m_pLPos[pos].type = lex[i];
-      //при изменении расклада коментариев перерисовать весь экран
-      if(pInv && (lex[i] == 'O' || lex[i] == 'C'))
-        *pInv = 4;
-    }
-  }
-
-  CorrectLine(pos, 1);
-
-  return 0;
-}
-
-
-int LexBuff::DelStr(size_t nline, int* pInv)
-{
-  if(!m_pLPos || !m_pParse)
-    return 0;
-
-  TPRINT(("LBuff::DelStr l=%d\n", nline));
-  size_t pos = GetLexPos(nline);
-
-  char curlex[MAX_PARSE_STR];
-  size_t lpos = 0;
-  for(size_t i = pos; i < m_nPos && m_pLPos[i].nline == nline; ++i)
-  {
-    curlex[lpos++] = m_pLPos[i].type;
-    //при изменении расклада коментариев перерисовать весь экран
-    if(pInv && (m_pLPos[i].type == 'O' || m_pLPos[i].type == 'C'))
-      *pInv = 4;
-  }
-  curlex[lpos] = 0;
-  //TPRINT(("%s.prew\n", curlex));
-
-  if(lpos)
-    DelLPos(pos, lpos);
-
-  CorrectLine(pos, -1);
-
-  return 0;
-}
-
 
 int LexBuff::DumpLPos()
 {
@@ -1393,11 +965,6 @@ int LexBuff::DumpLPos()
 //  for(int i = 0; i < m_nPos; ++i)
 //    TPRINT(("LP%5d line=%04d t=%c\n", i, m_pLPos[i].nline, m_pLPos[i].type));
   return 0;
-}
-
-
-int LexBuff::GetColor(size_t nline, const wchar* pStr, color_t* pColor, size_t len)
-{
 }
 
 

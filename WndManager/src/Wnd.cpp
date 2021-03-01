@@ -461,3 +461,8 @@ bool FrameWnd::Scroll(pos_t n, scroll_t mode)
            && WndManager::getInstance().Scroll(left, top, right, bottom, n, mode);
     return rc;
 }
+
+bool FrameWnd::Beep()
+{
+    return WndManager::getInstance().Beep();
+}

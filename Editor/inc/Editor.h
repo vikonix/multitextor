@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <unordered_set>
 #include <filesystem>
+#include <limits>
 
 
 enum class eol_t
@@ -52,6 +53,8 @@ enum class eol_t
 class FrameWnd;
 
 /////////////////////////////////////////////////////////////////////////////
+#define STR_NOTDEFINED std::numeric_limits<size_t>::max()
+
 class Editor
 {
 private:
@@ -73,7 +76,7 @@ private:
     bool            m_ro{};
 
     //editor variables
-    size_t          m_curStr{};
+    size_t          m_curStr{STR_NOTDEFINED};
     bool            m_curChanged{};
     std::u16string  m_curStrBuff;
 
@@ -154,13 +157,13 @@ public:
     bool                    SetCurStr(size_t line);
     size_t                  CalcStrLen(const std::u16string& str);
 
-    bool                    CorrectTab(bool save, size_t line, const std::u16string& str);
+    bool                    CorrectTab(bool save, size_t line, std::u16string& str);
     bool                    SaveTab(bool save, size_t line);
     bool                    RestoreTab(bool save, size_t line, const std::u16string& str, size_t len);
 
     bool                    AddLine(bool save, size_t line, const std::u16string& str);
     bool                    DelLine(bool save, size_t line, size_t count = 1);
-    bool                    MergeLine(bool save, size_t line, size_t pos, size_t indent = 0);//merge with next
+    bool                    MergeLine(bool save, size_t line, size_t pos = MAX_STRLEN + 1, size_t indent = 0);//merge with next
     bool                    SplitLine(bool save, size_t line, size_t pos, size_t indent = 0);
 
     bool                    AddSubstr(bool save, size_t line, size_t pos, const std::u16string& substr);
@@ -171,11 +174,11 @@ public:
     bool                    Indent(bool save, size_t line, size_t pos, size_t len, size_t n);
     bool                    Undent(bool save, size_t line, size_t pos, size_t len, size_t n);
 
-    bool                    AddCh(bool save, size_t line, int pos, char16_t ch);
-    bool                    ChangeCh(bool save, size_t line, int pos, char16_t ch);
-    bool                    DelCh(bool save, size_t line, int pos)    {return DelSubstr(save, line, pos, 1);}
-    bool                    DelBegin(bool save, size_t line, int pos) {return DelSubstr(save, line, 0, pos);}
-    bool                    DelEnd(bool save, size_t line, int pos)   {return ClearSubstr(save, line, pos, MAX_STRLEN);}
+    bool                    AddCh(bool save, size_t line, size_t pos, char16_t ch);
+    bool                    ChangeCh(bool save, size_t line, size_t pos, char16_t ch);
+    bool                    DelCh(bool save, size_t line, size_t pos)    {return DelSubstr(save, line, pos, 1);}
+    bool                    DelBegin(bool save, size_t line, size_t pos) {return DelSubstr(save, line, 0, pos);}
+    bool                    DelEnd(bool save, size_t line, size_t pos)   {return ClearSubstr(save, line, pos, MAX_STRLEN);}
 
     //undo control
     void                    SetUndoRemark(const std::string& rem) {m_undoList.SetRemark(rem);}

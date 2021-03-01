@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <functional>
 
+
 class EditorWnd : public FrameWnd
 {
     enum select_state : int
@@ -53,6 +54,17 @@ class EditorWnd : public FrameWnd
         stream,
         line,
         column
+    };
+
+    enum class select_change
+    {
+        clear,
+        insert_line,
+        delete_line,
+        insert_ch,
+        delete_ch,
+        split_line,
+        merge_line
     };
     
     using EditorFunc = std::function<bool(EditorWnd*, input_t)>;
@@ -120,6 +132,9 @@ class EditorWnd : public FrameWnd
     bool    UpdatePosInfo();
     bool    UpdateProgress(size_t d);
     bool    UpdateLexPair();
+    bool    ChangeSelected(select_change type, size_t line = 0, size_t pos = 0, size_t size = 1);
+    bool    CorrectSelection();
+
 
 public:
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
@@ -186,8 +201,6 @@ public:
   int       SelectAndGoto(int nline, int size);
   int       Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, int SelectType = 0);
   int       IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey);
-  int       ChangeSelected(int cmd, int nline = 0, int pos = 0, int size = 1);
-  int       CorrectSelection();
   int       GetSelectedLines(int* pBegin, int* pEnd);
 
   int       HideFound();

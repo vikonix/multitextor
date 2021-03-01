@@ -105,7 +105,7 @@ class LexParser
     bool        m_showTab{};
     int         m_cp{};
 
-    std::multimap<size_t, char> m_lexPosition;
+    std::map<size_t, std::string> m_lexPosition;
     char16_t    m_stringSymbol{};
     bool        m_cutLine{};
     bool        m_commentLine{};
@@ -117,9 +117,12 @@ class LexParser
     size_t      m_curlyBracketCount{}; //{
 
 protected:
-    bool    CheckForOpenComments(size_t line, std::multimap<size_t, char>::iterator it);
-    bool    CorrectLine(size_t pos, int delta);
-    bool    DumpLexPos();
+    bool    CheckForOpenComments(size_t line);
+    bool    CheckForConcatenatedLine(size_t line);
+    
+    bool    AddLexem(size_t line, const std::string& lexstr);
+    bool    DeleteLexem(size_t line);
+    bool    DumpLexem();
 
     lex_t   SymbolType(int c);
     lex_t   ScanCommentFromBegin(std::string_view lexem, size_t& end);

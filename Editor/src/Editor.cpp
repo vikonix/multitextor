@@ -39,7 +39,7 @@ bool Editor::Clear()
     m_wndList.clear();
     m_lexParser.Clear();
 
-    m_curStr = 0;
+    m_curStr = STR_NOTDEFINED;
     m_curChanged = false;
     m_curStrBuff.clear();
 
@@ -393,6 +393,398 @@ bool Editor::RefreshAllWnd(FrameWnd* wnd) const
     return true;
 }
 
+bool Editor::ChangeStr(size_t n, const std::u16string& wstr)
+{
+    LOG(DEBUG) << "ChangeStr " << n << " total=" << GetStrCount();
+
+    if (n >= GetStrCount())
+    {
+        bool rc = AddStr(n, wstr);
+        return rc;
+    }
+
+    std::string str;
+    bool rc = ConvertStr(wstr, str);
+    rc = m_buffer.ChangeStr(n, str);
+
+    return rc;
+}
+
+bool Editor::AddStr(size_t n, const std::u16string& wstr)
+{
+    bool rc;
+    if (n > GetStrCount())
+    {
+        LOG(DEBUG) << "Fill end of file";
+
+        for (size_t i = GetStrCount(); i < n; ++i)
+            rc = _AddStr(i, {});
+    }
+
+    rc = _AddStr(n, wstr);
+    return rc;
+}
+
+bool Editor::_AddStr(size_t n, const std::u16string& wstr)
+{
+    LOG(DEBUG) << "AddStr n=" << n;
+
+    std::string str;
+    bool rc = ConvertStr(wstr, str);
+    rc = m_buffer.AddStr(n, str);
+
+    return rc;
+}
+
+bool Editor::InvalidateWnd(size_t line, invalidate_t type, pos_t pos, pos_t size) const
+{
+    for (auto wnd : m_wndList)
+        wnd->Invalidate(line, type, pos, size);
+
+    return true;
+}
+
+bool Editor::SetCurStr(size_t line)
+{
+    if (line != m_curStr)
+    {
+        if (m_curChanged)
+        {
+            ChangeStr(m_curStr, m_curStrBuff);
+            m_curChanged = false;
+        }
+
+        m_curStr = line;
+        m_curStrBuff = _GetStr(line, 0, MAX_STRLEN);
+    }
+
+    return true;
+}
+
+bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
+{
+    size_t len = UStrLen(str);
+
+    //convert string
+    for (size_t i = 0; i < len; ++i)
+    {
+        if (str[i] != 0x9)//tab
+            buff += (char)str[i];//??? wchar2char(m_nCP, pStr[i]);
+        else if (m_saveTab)
+        {
+            size_t first = i;
+            while (str[i] == 0x9)
+            {
+                ++i;
+                if (i % m_tab == 0)
+                {
+                    buff += 0x9;
+                    first = i;
+                }
+            }
+
+            if (i % m_tab < m_tab)
+            {
+                //fill as space
+                while (first++ < i)
+                    buff += ' ';
+            }
+
+            --i;
+        }
+        else
+            buff += ' ';
+    }
+
+    if (m_eol == eol_t::unix_eol)
+    {
+        buff += 0xa;
+    }
+    else if (m_eol == eol_t::win_eol)
+    {
+        buff += 0xd;
+        buff += 0xa;
+    }
+    else
+    {
+        //apple
+        buff += 0xd;
+    }
+
+    LOG(DEBUG) << "ConvertStr " << buff;
+
+    return true;
+}
+
+///////////////////////////////////////////////////////////////////////////////
+bool Editor::AddCh(bool save, size_t line, size_t pos, char16_t ch)
+{
+    if (line >= GetStrCount() && ch == ' ')
+        return true;
+
+    return AddSubstr(save, line, pos, {ch});
+}
+
+bool Editor::ChangeCh(bool save, size_t line, size_t pos, char16_t ch)
+{
+    if (line >= GetStrCount() && ch == ' ')
+        return true;
+
+    return ChangeSubstr(save, line, pos, {ch});
+}
+
+bool Editor::AddSubstr(bool save, size_t line, size_t pos, const std::u16string& substr)
+{
+    SetCurStr(line);
+    m_curStrBuff.insert(pos, substr);
+    m_curStrBuff.resize(MAX_STRLEN);
+
+    if (line >= GetStrCount())
+    {
+        //editing out of the end of file: add new line 
+        AddLine(save, line, m_curStrBuff.substr(0, pos + substr.size()));
+        m_curStr = STR_NOTDEFINED;
+    }
+    else
+    {
+        m_curChanged = true;
+        if (save)
+        {
+            m_undoList.AddEditCmd(cmd_t::CMD_ADD_SUBSTR, line, pos, 0, substr.size(), substr);
+            m_undoList.AddUndoCmd(cmd_t::CMD_DEL_SUBSTR, line, pos, 0, substr.size(), std::nullopt);
+        }
+
+        CorrectTab(save, line, m_curStrBuff);
+    }
+
+    invalidate_t inv;
+    m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+    InvalidateWnd(line, inv);
+
+    return true;
+}
+
+bool Editor::ChangeSubstr(bool save, size_t line, size_t pos, const std::u16string& substr)
+{
+    SetCurStr(line);
+    std::u16string prevStr{ m_curStrBuff.substr(pos, substr.size()) };
+    m_curStrBuff.replace(pos, substr.size(), substr);
+    m_curStrBuff.resize(MAX_STRLEN);
+
+    if (line >= GetStrCount())
+    {
+        //editing out of the end of file: add new line
+        AddLine(save, line, m_curStrBuff.substr(0, pos + substr.size()));
+        m_curStr = STR_NOTDEFINED;
+    }
+    else
+    {
+        m_curChanged = true;
+        if (save)
+        {
+            m_undoList.AddEditCmd(cmd_t::CMD_CHANGE_SUBSTR, line, pos, 0, substr.size(), substr);
+            m_undoList.AddUndoCmd(cmd_t::CMD_CHANGE_SUBSTR, line, pos, 0, substr.size(), prevStr);
+        }
+
+        CorrectTab(save, line, m_curStrBuff);
+    }
+
+    invalidate_t inv;
+    m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+    InvalidateWnd(line, inv);
+
+    return true;
+}
+
+bool Editor::CorrectTab(bool save, size_t line, std::u16string& str)
+{
+    if (!m_saveTab)
+        return true;
+
+    LOG(DEBUG) << "CorrectTab save=" << save << " line=" << line;
+
+    size_t len = UStrLen(str);
+    std::u16string tab;
+
+    for(size_t i= 0; i < len; ++i)
+    {
+        if (str[i] == 0x9)
+        {
+            size_t first = i;
+            while (str[i] == 0x9)
+            {
+                ++i;
+                if (i % m_tab == 0)
+                    first = i;
+            }
+
+            if (i % m_tab < m_tab)
+            {
+                //fill as space
+                while (first < i)
+                {
+                    tab += static_cast<char16_t>(first);
+                    str[first++] = ' ';
+                }
+            }
+
+            --i;
+        }
+    }
+
+    if (save && !tab.empty())
+    {
+        m_undoList.AddEditCmd(cmd_t::CMD_CORRECT_TAB, line, 0, 0, 0, std::nullopt);
+        m_undoList.AddUndoCmd(cmd_t::CMD_RESTORE_TAB, line, 0, 0, tab.size(), tab);
+    }
+
+    return true;
+}
+
+bool Editor::AddLine(bool save, size_t line, const std::u16string& str)
+{
+    if (m_curStr != STR_NOTDEFINED && line <= m_curStr)
+        ++m_curStr;
+
+    int rc;
+    size_t count = 0;
+    if (line >= GetStrCount())
+    {
+        LOG(DEBUG) << "Fill end of file";
+
+        count = line - GetStrCount();
+
+        for (size_t i = GetStrCount(); i < line; ++i)
+        {
+            rc = _AddStr(i, {});
+            invalidate_t inv;
+            m_lexParser.AddStr(i, {}, inv);
+            InvalidateWnd(i, invalidate_t::insert);
+        }
+    }
+
+    rc = _AddStr(line, str);
+    invalidate_t inv = invalidate_t::insert;
+    m_lexParser.AddStr(line, str, inv);
+    InvalidateWnd(line, inv);
+
+    if (save)
+    {
+        m_undoList.AddEditCmd(cmd_t::CMD_ADD_LINE, line, 0, 0, str.size(), str);
+        m_undoList.AddUndoCmd(cmd_t::CMD_DEL_LINE, line, 0, count, 0, std::nullopt);
+    }
+
+    return rc;
+}
+
+bool Editor::DelSubstr(bool save, size_t line, size_t pos, size_t len)
+{
+    if (line >= GetStrCount())
+        return true;
+
+    SetCurStr(line);
+    std::u16string prevStr{ m_curStrBuff.substr(pos, len) };
+    m_curStrBuff.erase(pos, len);
+    m_curStrBuff.resize(MAX_STRLEN);
+
+    m_curChanged = true;
+    invalidate_t inv;
+    m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+    InvalidateWnd(line, inv);
+
+    if (save)
+    {
+        m_undoList.AddEditCmd(cmd_t::CMD_DEL_SUBSTR, line, pos, 0, len, std::nullopt);
+        m_undoList.AddUndoCmd(cmd_t::CMD_ADD_SUBSTR, line, pos, 0, len, prevStr);
+    }
+
+    CorrectTab(save, line, m_curStrBuff);
+
+    return 0;
+}
+
+bool Editor::DelLine(bool save, size_t line, size_t count)
+{
+    if (line >= GetStrCount())
+        return true;
+
+    if (save)
+    {
+        auto str = GetStr(line);
+        size_t len = Editor::UStrLen(str);
+
+        m_undoList.AddEditCmd(cmd_t::CMD_DEL_LINE, line, 0, count, 0, std::nullopt);
+        m_undoList.AddUndoCmd(cmd_t::CMD_ADD_LINE, line, 0, 0, len, str);
+    }
+
+    if (line == m_curStr)
+    {
+        m_curStr = STR_NOTDEFINED;
+        m_curChanged = 0;
+    }
+    else if (line < m_curStr)
+        --m_curStr;
+
+    bool rc = m_buffer.DelStr(line);
+    invalidate_t inv;
+    m_lexParser.DelStr(line, inv);
+    InvalidateWnd(line, inv);
+
+    while (count-- > 1)
+    {
+        rc = m_buffer.DelStr(--line);
+        m_lexParser.DelStr(line, inv);
+        InvalidateWnd(line, invalidate_t::del);
+    }
+
+    return rc;
+}
+
+bool Editor::MergeLine(bool save, size_t line, size_t pos, size_t indent)
+{
+    if (line >= GetStrCount())
+        return true;
+
+    //merge current string with prev
+    SetCurStr(line);
+    if (pos > MAX_STRLEN)
+        pos = Editor::UStrLen(m_curStrBuff);
+
+    auto str = GetStr(line + 1);
+    size_t len1 = Editor::UStrLen(str);
+
+    if (len1 > indent)
+    {
+        if (pos + len1 > MAX_STRLEN)
+        {
+            //too long string
+            _assert(0);
+            return false;
+        }
+        m_curStrBuff.insert(pos, m_curStrBuff.substr(indent));
+        
+        m_curChanged = true;
+        invalidate_t inv;
+        m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+        InvalidateWnd(line, inv);
+    }
+
+    //del next line
+    bool rc = DelLine(0, line + 1);
+    InvalidateWnd(line, invalidate_t::del);
+
+    if (save)
+    {
+        m_undoList.AddEditCmd(cmd_t::CMD_MERGE_LINE, line, pos, indent, 0, std::nullopt);
+        m_undoList.AddUndoCmd(cmd_t::CMD_SPLIT_LINE, line, pos, indent, 0, std::nullopt);
+    }
+
+    CorrectTab(save, line, m_curStrBuff);
+
+    return rc;
+}
+
+
 #if 0
 /////////////////////////////////////////////////////////////////////////////
 
@@ -450,17 +842,6 @@ int TextBuff::WndLinkCount()
 }
 */
 
-int TextBuff::InvalidateWnd(size_t nline, int type, short pos, short size)
-{
-  for(int i = 0; i < WND_NUM; ++i)
-    if(m_pLinkedWnd[i])
-    {
-      m_pLinkedWnd[i]->Invalidate(nline, type, pos, size);
-    }
-
-  return 0;
-}
-
 
 int TextBuff::RefreshAllWnd(FWnd* pWnd)
 {
@@ -508,70 +889,6 @@ int TextBuff::CheckAccess()
 
 int TextBuff::ConvertStr(wchar* pStr, char* pOutStr, int len)
 {
-  //looking for end of string
-  int s = -1;
-  int i;
-  for(i = 0; i < len; ++i)
-    if(!pStr[i])
-      break;
-    else if(pStr[i] > ' ')
-      s = i;
-  len = s + 1;
-
-  int l = 0;
-  //convert string
-  for(i = 0; i < len; ++i)
-  {
-    if(pStr[i] != 0x9)
-      pOutStr[l++] = wchar2char(m_nCP, pStr[i]);
-    else if(m_fSaveTab)
-    {
-      int first = i;
-      while(pStr[i] == 0x9)
-      {
-        ++i;
-        if(i % m_nTab == 0)
-        {
-          pOutStr[l++] = 0x9;
-          first = i;
-        }
-      }
-
-      if(i % m_nTab < m_nTab)
-      {
-        //fill as space
-        while(first++ < i)
-          pOutStr[l++] = ' ';
-      }
-
-      --i;
-    }
-    else
-      pOutStr[l++] = ' ';
-  }
-
-  if(!m_nCrLf)
-  {
-    //unix
-    pOutStr[l++] = 0xa;
-  }
-  else if(m_nCrLf == 1)
-  {
-    //dos
-    pOutStr[l++] = 0xd;
-    pOutStr[l++] = 0xa;
-  }
-  else
-  {
-    //apple
-    pOutStr[l++] = 0xd;
-  }
-
-  pOutStr[l] = 0;
-
-  //TPRINT(("ConvertStr %s", pOutStr));
-
-  return l;
 }
 
 
@@ -615,33 +932,6 @@ int TextBuff::_AddStr(size_t str, wchar* pStr, int len)
 }
 
 
-int TextBuff::ChangeStr(size_t str, wchar* pStr, int len)
-{
-  size_t n = str;
-  //TPRINT(("ChangeStr %d all=%d\n", n, m_nStrCount));
-  int rc;
-
-  if(n >= m_nStrCount)
-  {
-    rc = AddStr(str, pStr, len);
-    return rc;
-  }
-
-  if(len == -1)
-    len = MAX_STRLEN;
-  char* pOutStr = new char[(len + 3) * 2];
-  if(!ASSERT(pOutStr != NULL))
-  {
-    return 0;
-  }
-
-  int l = ConvertStr(pStr, pOutStr, len);
-
-  rc = MStrBuff::ChangeStr(str, pOutStr, l);
-  delete pOutStr;
-
-  return 0;
-}
 
 
 int TextBuff::Save()
@@ -953,23 +1243,6 @@ int TextBuff::GetFuncList(List* pList, int* pLine)
 }
 
 
-int TextBuff::SetCurStr(size_t nline)
-{
-  int rc = 0;
-  if(nline != m_CurStr)
-  {
-    if(m_fCurChanged)
-    {
-      ChangeStr(m_CurStr, m_sCurStrBuff);
-      m_fCurChanged = 0;
-    }
-
-    m_CurStr = nline;
-    if(nline >= 0)
-      rc = GetStr(nline, 0, m_sCurStrBuff, MAX_STRLEN);
-  }
-  return rc;
-}
 
 
 int TextBuff::GetStrLen(wchar* pStr)
@@ -992,50 +1265,6 @@ int TextBuff::GetStrLen(wchar* pStr)
 
 
 /////////////////////////////////////////////////////////////////////////////
-int TextBuff::CorrectTab(int fSave, size_t nline, wchar* pStr)
-{
-  if(!m_fSaveTab)
-    return 0;
-
-  TPRINT(("CorrectTab save=%d line=%d\n", fSave, nline));
-
-  wchar tab[MAX_STRLEN];
-  int   tpos = 0;
-
-  for(int i = 0; pStr[i] && i < MAX_STRLEN; ++i)
-  {
-    if(pStr[i] == 0x9)
-    {
-      int first = i;
-      while(pStr[i] == 0x9)
-      {
-        ++i;
-        if(i % m_nTab == 0)
-          first = i;
-      }
-
-      if(i % m_nTab < m_nTab)
-      {
-        //fill as space
-        while(first < i)
-        {
-          tab[tpos++] = first;
-          pStr[first++] = ' ';
-        }
-      }
-
-      --i;
-    }
-  }
-
-  if(fSave && tpos)
-  {
-    m_UndoList.AddEditCmd(CMD_CORRECT_TAB, nline, 0, 0, 0,    NULL, m_pRem);
-    m_UndoList.AddUndoCmd(CMD_RESTORE_TAB, nline, 0, 0, tpos, tab,  m_pRem);
-  }
-
-  return 0;
-}
 
 
 int TextBuff::SaveTab(int fSave, size_t nline)
@@ -1081,135 +1310,6 @@ int TextBuff::RestoreTab(int /*fSave*/, size_t nline, wchar* pStr, size_t len)
 
 
 /////////////////////////////////////////////////////////////////////////////
-int TextBuff::AddLine(int fSave, size_t nline, wchar* pStr, int len)
-{
-  //len <= MAX_STRLEN
-  if(m_CurStr != -1 && nline <= m_CurStr)
-    ++m_CurStr;
-
-  int rc;
-  size_t count = 0;
-  if(nline >= m_nStrCount)
-  {
-    TPRINT(("Fill end of file\n"));
-
-    count = nline - m_nStrCount;
-
-    wchar new_str[] = {' ', 0};
-    for(size_t i = m_nStrCount; i < nline; ++i)
-    {
-      rc = _AddStr(i, new_str, 1);
-      m_LexBuff.AddStr(i, new_str);
-      InvalidateWnd(i, 3);
-    }
-  }
-
-  if(len == -1)
-    len = GetStrLen(pStr);
-
-  rc = _AddStr(nline, pStr, len);
-  int inv = 3;
-  m_LexBuff.AddStr(nline, pStr, &inv);
-  InvalidateWnd(nline, inv);
-
-  if(fSave)
-  {
-    m_UndoList.AddEditCmd(CMD_ADD_LINE, nline, 0, 0,     len, pStr, m_pRem);
-    m_UndoList.AddUndoCmd(CMD_DEL_LINE, nline, 0, count,   0, NULL, m_pRem);
-  }
-
-  //???CorrectTab(fSave, nline, pStr);
-
-  return rc;
-}
-
-
-int TextBuff::DelLine(int fSave, size_t nline, size_t count)
-{
-  if(nline >= m_nStrCount)
-    return 0;
-
-  if(fSave)
-  {
-    wchar* pStr = GetStr(nline);
-    int len = GetStrLen(pStr);
-
-    m_UndoList.AddEditCmd(CMD_DEL_LINE, nline, 0, count,   0, NULL, m_pRem);
-    m_UndoList.AddUndoCmd(CMD_ADD_LINE, nline, 0, 0,     len, pStr, m_pRem);
-  }
-
-  if(nline == m_CurStr)
-  {
-    m_CurStr     = -1;
-    m_fCurChanged = 0;
-  }
-  else if (nline < m_CurStr)
-    --m_CurStr;
-
-  int rc = DelStr(nline);
-  int inv = 2;
-  m_LexBuff.DelStr(nline, &inv);
-  InvalidateWnd(nline, inv);
-
-  while(count-- > 1)
-  {
-    rc = DelStr(--nline);
-    m_LexBuff.DelStr(nline, &inv);
-    InvalidateWnd(nline, 2);
-  }
-
-  return rc;
-}
-
-
-int TextBuff::MergeLine(int fSave, size_t nline, int pos, int unindent)
-{
-  if(nline >= m_nStrCount)
-    return 0;
-
-  //склеить текущую строку со следующей
-  SetCurStr(nline);
-  if(pos == -1)
-    pos = GetStrLen(m_sCurStrBuff);
-
-  wchar* pStr = GetStr(nline + 1, 0, MAX_STRLEN);
-  int len1 = GetStrLen(pStr);
-
-  if(len1 > unindent)
-  {
-    pStr += unindent;
-    len1 -= unindent;
-
-    if(pos + len1 > MAX_STRLEN)
-    {
-      //строка получилась длинее чем MAX_STRLEN ???
-      //len1 = MAX_STRLEN - pos;
-      assert(0);
-      return -1;
-    }
-    memcpy(m_sCurStrBuff + pos, pStr, len1 * 2);
-
-    m_fCurChanged = 1;
-    int inv = 1;
-    m_LexBuff.ChangeStr(nline, m_sCurStrBuff, &inv);
-    //InvalidateWnd(nline, 1, pos, len1);
-    InvalidateWnd(nline, inv);
-  }
-
-  //del next line
-  int rc = DelLine(0, nline + 1);
-  InvalidateWnd(nline, 2);
-
-  if(fSave)
-  {
-    m_UndoList.AddEditCmd(CMD_MERGE_LINE, nline, pos, unindent, 0, NULL, m_pRem);
-    m_UndoList.AddUndoCmd(CMD_SPLIT_LINE, nline, pos, unindent, 0, NULL, m_pRem);
-  }
-
-  CorrectTab(fSave, nline, m_sCurStrBuff);
-
-  return rc;
-}
 
 
 int TextBuff::SplitLine(int fSave, size_t nline, int pos, int indent)
@@ -1256,93 +1356,6 @@ int TextBuff::SplitLine(int fSave, size_t nline, int pos, int indent)
 }
 
 
-int TextBuff::AddSubstr(int fSave, size_t nline, int pos, wchar* pSubstr, size_t len)
-{
-  SetCurStr(nline);
-
-  //check for len > MAX_STRLEN ???
-  if(pos + len > MAX_STRLEN)
-    len = MAX_STRLEN - pos;
-
-  //make hole
-  memmove(m_sCurStrBuff + pos + len, m_sCurStrBuff + pos, (MAX_STRLEN - pos - len) * 2);
-  //copy substr
-  for(int i = 0; i < len; ++i)
-    m_sCurStrBuff[pos + i] = pSubstr[i];
-
-  if(nline >= m_nStrCount)
-  {
-    //мы редактируем за концом файла сохраняем изменение в буфере увеличивая размер файла
-    wchar buff[MAX_STRLEN + 1];
-    memset(buff, 0, sizeof(buff));
-    memcpy(buff, m_sCurStrBuff, (pos + len + 1) * 2);
-
-    m_CurStr = -1;
-    AddLine(fSave, nline, buff, pos + len);
-  }
-  else
-  {
-    m_fCurChanged = 1;
-    if(fSave)
-    {
-      m_UndoList.AddEditCmd(CMD_ADD_SUBSTR, nline, pos, 0, len, pSubstr, m_pRem);
-      m_UndoList.AddUndoCmd(CMD_DEL_SUBSTR, nline, pos, 0, len, NULL, m_pRem);
-    }
-
-    CorrectTab(fSave, nline, m_sCurStrBuff);
-  }
-
-  //InvalidateWnd(nline, 1, pos);
-  int inv = 1;
-  m_LexBuff.ChangeStr(nline, m_sCurStrBuff, &inv);
-  InvalidateWnd(nline, inv);
-
-  return 0;
-}
-
-
-int TextBuff::ChangeSubstr(int fSave, size_t nline, int pos, wchar* pSubstr, size_t len)
-{
-  SetCurStr(nline);
-  if(pos + len > MAX_STRLEN)
-    len = MAX_STRLEN - pos;
-
-  wchar prevstr[MAX_STRLEN];
-  //copy substr
-  for(int i = 0; i < len; ++i)
-  {
-    prevstr[i] = m_sCurStrBuff[pos + i];
-    m_sCurStrBuff[pos + i] = pSubstr[i];
-  }
-
-  if(nline >= m_nStrCount)
-  {
-    //мы редактируем за концом файла сохраняем изменение в буфере увеличивая размер файла
-    wchar buff[MAX_STRLEN + 1];
-    memcpy(buff, m_sCurStrBuff, (pos + len + 1) * 2);
-
-    m_CurStr = -1;
-    AddLine(fSave, nline, buff, pos + len);
-  }
-  else
-  {
-    m_fCurChanged = 1;
-    if(fSave)
-    {
-      m_UndoList.AddEditCmd(CMD_CHANGE_SUBSTR, nline, pos, 0, len, pSubstr, m_pRem);
-      m_UndoList.AddUndoCmd(CMD_CHANGE_SUBSTR, nline, pos, 0, len, prevstr, m_pRem);
-    }
-
-    CorrectTab(fSave, nline, m_sCurStrBuff);
-  }
-
-  //InvalidateWnd(nline, 1, pos, len);
-  int inv = 1;
-  m_LexBuff.ChangeStr(nline, m_sCurStrBuff, &inv);
-  InvalidateWnd(nline, inv);
-
-  return 0;
-}
 
 
 int TextBuff::ClearSubstr(int fSave, size_t nline, int pos, size_t len)
@@ -1380,41 +1393,6 @@ int TextBuff::ClearSubstr(int fSave, size_t nline, int pos, size_t len)
 }
 
 
-int TextBuff::DelSubstr(int fSave, size_t nline, int pos, size_t len)
-{
-  if(nline >= m_nStrCount)
-    return 0;
-
-  SetCurStr(nline);
-  if(pos + len > MAX_STRLEN)
-    len = MAX_STRLEN - pos;
-
-  wchar prevstr[MAX_STRLEN];
-  for(int j = 0; j < len; ++j)
-    prevstr[j] = m_sCurStrBuff[pos + j];
-
-  //del substr
-  memmove(m_sCurStrBuff + pos, m_sCurStrBuff + pos + len, (MAX_STRLEN - pos - len) * 2);
-  //clear end
-  for(int i = 0; i < len; ++i)
-    m_sCurStrBuff[MAX_STRLEN - 1 - i] = ' ';
-
-  m_fCurChanged = 1;
-  //InvalidateWnd(line, 1, pos);
-  int inv = 1;
-  m_LexBuff.ChangeStr(nline, m_sCurStrBuff, &inv);
-  InvalidateWnd(nline, inv);
-
-  if(fSave)
-  {
-    m_UndoList.AddEditCmd(CMD_DEL_SUBSTR, nline, pos, 0, len, NULL, m_pRem);
-    m_UndoList.AddUndoCmd(CMD_ADD_SUBSTR, nline, pos, 0, len, prevstr, m_pRem);
-  }
-
-  CorrectTab(fSave, nline, m_sCurStrBuff);
-
-  return 0;
-}
 
 
 int TextBuff::ReplaceSubstr(int fSave, size_t nline, int pos, int len, wchar* pSubstr, int size)
@@ -1554,23 +1532,6 @@ int TextBuff::Undent(int fSave, size_t nline, int pos, int len, size_t n)
   return 0;
 }
 
-
-int TextBuff::AddCh(int fSave, size_t nline, int pos, wchar ch)
-{
-  if(nline >= m_nStrCount && ch == ' ')
-    return 0;
-
-  return AddSubstr(fSave, nline, pos, &ch, 1);
-}
-
-
-int TextBuff::ChangeCh(int fSave, size_t nline, int pos, wchar ch)
-{
-  if(nline >= m_nStrCount && ch == ' ')
-    return 0;
-
-  return ChangeSubstr(fSave, nline, pos, &ch, 1);
-}
 
 
 /////////////////////////////////////////////////////////////////////////////

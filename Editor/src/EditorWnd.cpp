@@ -84,7 +84,7 @@ bool EditorWnd::SetEditor(EditorPtr editor)
 
 bool EditorWnd::Refresh()
 {
-    LOG(DEBUG) << "    WndEdit::Refresh " << this;
+    LOG(DEBUG) << "    EditorWnd::Refresh " << this;
 
     if (!WndManager::getInstance().IsVisible(this))
         return true;
@@ -677,10 +677,11 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
 
 input_t EditorWnd::EventProc(input_t code)
 {
-    LOG(DEBUG) << "    WndEdit:WndProc " << std::hex << code << std::dec;
-/* //???
+    LOG(DEBUG) << "    EditorWnd::WndProc " << std::hex << code << std::dec;
     if (code == K_TIME)
     {
+        //check for file changing by external program
+    /* //???
         if (!m_Timer)
         {
             m_Timer = 5 * 2;//2 sec
@@ -752,8 +753,8 @@ input_t EditorWnd::EventProc(input_t code)
             }
         }
         --m_Timer;
-    }
 */
+    }
 
     if ( code != K_TIME
       && code != K_EXIT
@@ -806,7 +807,9 @@ input_t EditorWnd::ParseCommand(input_t cmd)
         cmd = K_MAKE_COORD_CODE((cmd & ~K_CODEMASK), x, y);
 
         //mouse event
-        if ((cmd & K_TYPEMASK) == K_MOUSEKUP)
+        if ((cmd & K_TYPEMASK) == K_MOUSE)
+            return 0;
+        else if ((cmd & K_TYPEMASK) == K_MOUSEKUP)
         {
             m_selectMouse = false;
             InputRelease();
@@ -947,7 +950,7 @@ bool EditorWnd::HideFound()
 
     if (m_foundSize)
     {
-        //TPRINT(("    HideFound x=%d y=%d s=%d\n", m_nFoundX, m_nFoundY, m_nFoundSize));
+        LOG(DEBUG) << "    HideFound x=" << m_foundX << " y=" << m_foundY << " size=" << m_foundSize;
         size_t size = m_foundSize;
         m_foundSize = 0;
 
@@ -1015,3 +1018,193 @@ bool EditorWnd::FindWord(const std::u16string& str, size_t& begin, size_t& end)
     return true;
 }
 
+bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size_t size)
+{
+    if (m_selectState != select_state::complete)
+        return true;
+
+    LOG(DEBUG) << "    ChangeSelected type=" << static_cast<int>(type);
+    CorrectSelection();
+
+    switch (type)
+    {
+    case select_change::clear: //clear
+        m_beginX = m_endX = 0;
+        m_beginY = m_endY = 0;
+        m_selectType = select_t::stream;
+        m_selectState = select_state::no;
+        break;
+
+
+    case select_change::split_line:
+        if (line == m_beginY)
+        {
+            if (m_selectType != select_t::line)//stream column
+            {
+                if (pos <= m_beginX)
+                {
+                    ++m_beginY;
+                    if (m_selectType == select_t::stream)
+                        m_beginX += size - pos;
+                }
+            }
+        }
+        else if (line < m_beginY)
+            ++m_beginY;
+
+        if (line == m_endY)
+        {
+            if (m_selectType != select_t::line)//stream column
+            {
+                if (pos <= m_endX)
+                {
+                    ++m_endY;
+                    if (m_selectType == select_t::stream)
+                        m_endX += size - pos;
+                }
+            }
+            else
+                ++m_endY;
+        }
+        else if (line < m_endY)
+            ++m_endY;
+        break;
+
+
+    case select_change::merge_line:
+        if (line < m_beginY)
+            --m_beginY;
+
+        if (line < m_endY)
+            --m_endY;
+
+        if (m_selectType == select_t::stream)
+        {
+            size = m_endX - m_beginX;
+            m_beginX = pos;
+            m_endX = pos + size;
+        }
+        break;
+
+
+    case select_change::insert_line:
+        if (line <= m_beginY)
+            ++m_beginY;
+
+        if (line <= m_endY)
+            ++m_endY;
+        break;
+
+
+    case select_change::delete_line:
+        if (line == m_beginY && line == m_endY)
+        {
+            //delete marked line
+            m_beginX = m_endX = 0;
+            m_beginY = m_endY = 0;
+            m_selectType = select_t::stream;
+            m_selectState = select_state::no;
+            LOG(DEBUG) << "End mark";
+        }
+        else
+        {
+            if (line < m_beginY)
+                --m_beginY;
+
+            if (line <= m_endY)
+                --m_endY;
+        }
+        break;
+
+
+    case select_change::insert_ch:
+        if (m_selectType == select_t::stream)
+        {
+            if (line == m_beginY)
+                if (pos <= m_beginX)
+                    m_beginX += size;
+
+            if (line == m_endY)
+                if (pos <= m_endX)
+                    m_endX += size;
+        }
+        break;
+
+
+    case select_change::delete_ch:
+        if (m_selectType == select_t::stream)
+        {
+            if (line == m_beginY && line == m_endY
+                && pos <= m_beginX && pos + size >= m_endX)
+            {
+                //delete marked ch
+                m_beginX = m_endX = 0;
+                m_beginY = m_endY = 0;
+                m_selectType = select_t::stream;
+                m_selectState = select_state::no;
+                InvalidateRect();
+                LOG(DEBUG) << "End mark";
+            }
+            else
+            {
+                if (line == m_beginY && pos <= m_beginX)
+                {
+                    if (pos + size < m_beginX)
+                        m_beginX -= size;
+                    else
+                        m_beginX = pos;
+                }
+
+                if (line == m_endY && pos <= m_endX)
+                {
+                    if (pos + size <= m_endX)
+                        m_endX -= size;
+                    else
+                        m_endX = pos - 1;
+                }
+            }
+        }
+        break;
+    }
+
+    return true;
+}
+
+bool EditorWnd::CorrectSelection()
+{
+    bool rev{};
+    if (m_beginY > m_endY)
+    {
+        rev = true;
+        size_t y = m_beginY;
+        m_beginY = m_endY;
+        m_endY = y;
+    }
+
+    if (m_selectType == select_t::stream)
+    {
+        if (rev || (m_beginY == m_endY && m_beginX > m_endX))
+        {
+            size_t x = m_beginX;
+            m_beginX = m_endX;
+            m_endX = x;
+        }
+    }
+    else if (m_selectType == select_t::line)
+    {
+        m_beginX = 0;
+        m_endX = MAX_STRLEN;
+    }
+    else
+    {
+        //column
+        if (m_beginX > m_endX)
+        {
+            size_t x = m_beginX;
+            m_beginX = m_endX;
+            m_endX = x;
+        }
+    }
+
+    return true;
+}

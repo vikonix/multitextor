@@ -921,4 +921,3 @@ bool EditorWnd::MoveLexMatch(input_t cmd)
 {
     return true;
 }
-
