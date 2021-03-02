@@ -111,15 +111,99 @@ bool EditorWnd::EditDelC(input_t cmd)
 
 bool EditorWnd::EditBS(input_t cmd)
 {
-    return true;
-}
+    if (m_readOnly)
+        return true;
 
-bool EditorWnd::EditTab(input_t cmd)
-{
+    LOG(DEBUG) << "    EditBS " << std::hex << cmd << std::dec;
+
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+
+    bool rc{};
+
+    if (y > m_editor->GetStrCount())
+    {
+        if (x)
+            rc = MoveLeft(0);
+        else
+            rc = MoveUp(0);
+    }
+    else if (x)
+    {
+        //delete prev char
+        auto str = m_editor->GetStr(y);
+        size_t len = Editor::UStrLen(str);
+        rc = MoveLeft(0);
+        if (x <= len)
+        {
+            m_editor->SetUndoRemark("Del ch");
+            m_editor->DelCh(true, y, x - 1);
+            ChangeSelected(select_change::delete_ch, y, x - 1, 1);
+        }
+    }
+    else if (y)
+    {
+        //merge current line with prev
+        rc = MoveUp(0);
+        rc = MoveStrEnd(0);
+        m_editor->SetUndoRemark("Merge line");
+        rc = m_editor->MergeLine(1, y - 1);
+        if (!rc)
+        {
+            Beep();
+            //???SetErrorLine(STR_S(SS_StringTooLongForMerge));
+        }
+        else
+            ChangeSelected(select_change::merge_line, y - 1, m_xOffset + m_cursorx);
+    }
+    else if (m_editor->GetStrCount() == 1)
+    {
+        m_editor->SetUndoRemark("Del line");
+        rc = m_editor->DelLine(1, y);
+        ChangeSelected(select_change::delete_line, y);
+    }
     return true;
 }
 
 bool EditorWnd::EditEnter(input_t cmd)
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditEnter " << std::hex << cmd << std::dec;
+
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+
+    auto str = m_editor->GetStr(y);
+    auto first = str.find_first_not_of(' ');
+
+    if ((first != std::string::npos || str[first] > ' ') && x > first)
+        //if current string begins from spaces
+        _GotoXY(first, y);
+
+    bool rc = MoveDown(0);
+
+    if (Application::getInstance().IsInsertMode() && y < m_editor->GetStrCount())
+    {
+        m_editor->SetUndoRemark("Split line");
+        if (0 == x)
+        {
+            rc = InsertStr({}, y);
+            ChangeSelected(select_change::insert_line, y);
+        }
+        else
+        {
+            //cut string
+            m_editor->SplitLine(1, y, x, m_xOffset + m_cursorx);
+            ChangeSelected(select_change::split_line, y, x, m_xOffset + m_cursorx);
+        }
+    }
+
+    return true;
+}
+
+bool EditorWnd::EditTab(input_t cmd)
 {
     return true;
 }
@@ -249,9 +333,10 @@ bool EditorWnd::CtrlGetSubstr(input_t cmd)
     return true;
 }
 
-bool EditorWnd::CtrlRefresh(input_t cmd)
+bool EditorWnd::CtrlRefresh([[maybe_unused]]input_t cmd)
 {
-    return true;
+    m_editor->FlushCurStr();
+    return Refresh();
 }
 
 bool EditorWnd::Reload(input_t cmd)
@@ -274,17 +359,17 @@ bool EditorWnd::Close(input_t cmd)
     return true;
 }
 
-bool EditorWnd::CtrlFuncList(input_t cmd)
-{
-    return true;
-}
-
 bool EditorWnd::CtrlProperties(input_t cmd)
 {
     return true;
 }
 
 bool EditorWnd::CtrlChangeCP(input_t cmd)
+{
+    return true;
+}
+
+bool EditorWnd::CtrlFuncList(input_t cmd)
 {
     return true;
 }

@@ -144,6 +144,9 @@ CmdMap g_defaultEditKeyMap
 
     {'M' | K_ALT},              {K_ED(E_POPUP_MENU)},
     {K_ESC, 'm'},               {K_ED(E_POPUP_MENU)},
-    {K_ESC, 'M'},               {K_ED(E_POPUP_MENU)}
+    {K_ESC, 'M'},               {K_ED(E_POPUP_MENU)},
+
+    //for testing
+    { 'T' | K_ALT },            {K_ED(E_CTRL_REFRESH)}
 };
 

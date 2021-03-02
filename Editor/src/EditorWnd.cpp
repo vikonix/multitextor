@@ -1208,3 +1208,22 @@ bool EditorWnd::CorrectSelection()
 
     return true;
 }
+
+bool EditorWnd::InsertStr(const std::u16string& str, size_t y, bool save)
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    InsertStr";
+    if (y == STR_NOTDEFINED)
+        y = m_firstLine + m_cursory;
+
+    bool rc = m_editor->AddLine(save, y, str);
+    if (!rc)
+    {
+        //something wrong
+        Beep();
+    }
+
+    return rc;
+}

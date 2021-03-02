@@ -134,7 +134,7 @@ class EditorWnd : public FrameWnd
     bool    UpdateLexPair();
     bool    ChangeSelected(select_change type, size_t line = 0, size_t pos = 0, size_t size = 1);
     bool    CorrectSelection();
-
+    bool    InsertStr(const std::u16string& str, size_t y = STR_NOTDEFINED, bool save = true);
 
 public:
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
@@ -209,7 +209,6 @@ public:
   size_t    GetCurLine() {return m_nFirstLine + m_cursory;}
 
   int       ReplaceSubstr(int nline, int pos, int len, wchar* pSubstr, int size);
-  int       InsertStr(wchar* pStr, int y = -1, int fSave = 1);
   int       CopySelected(WStrBuff* pBuff, int* pSelType);
   int       PasteSelected(WStrBuff* pBuff, int SelType);
   int       DelSelected();

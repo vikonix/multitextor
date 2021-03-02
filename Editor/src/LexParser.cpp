@@ -540,11 +540,13 @@ lex_t LexParser::SymbolType(int c)
 
 lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
 {
+    size_t strSize{ str.size() };
     lex_t type{};
-    size_t strSize = str.size();
+    if (begin < strSize)
+        type = SymbolType(str[begin]);
 
     //skip leading space
-    while (begin < strSize && (type = SymbolType(str[begin])) == lex_t::SPACE)
+    while (begin < strSize - 1 && (type = SymbolType(str[begin])) == lex_t::SPACE)
         ++begin;
 
     end = begin;
@@ -585,7 +587,7 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
             }
 
             lex_t t;
-            while (end < strSize && (t = SymbolType(str[end])) != lex_t::END)
+            while (end < strSize - 1 && (t = SymbolType(str[end])) != lex_t::END)
             {
                 if (t == lex_t::STRING && str[end] == m_stringSymbol)
                 {

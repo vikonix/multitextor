@@ -157,6 +157,26 @@ Tview SBuff<Tbuff, Tview>::GetStr(size_t n)
 }
 
 template <typename Tbuff, typename Tview>
+bool SBuff<Tbuff, Tview>::AppendStr(const Tview str)
+{
+    if (!m_buff)
+        return false;
+
+    auto offset_end = m_strOffsetList.back();
+    size_t dl = str.size();
+
+    if (offset_end + dl > m_buff->capacity())
+        return false;
+
+    m_buff->append(str);
+
+    m_strOffsetList.push_back((uint32_t)(offset_end + dl));
+
+    m_mod = true;
+    return true;
+}
+
+template <typename Tbuff, typename Tview>
 bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 {
     if (!m_buff)
@@ -176,27 +196,7 @@ bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 
     m_strOffsetList.push_back(0);
     for (size_t i = GetStrCount() - 1; i > n; --i)
-        m_strOffsetList[i] = GetStrOffset(i - 1) + (uint32_t)dl;
-
-    m_mod = true;
-    return true;
-}
-
-template <typename Tbuff, typename Tview>
-bool SBuff<Tbuff, Tview>::AppendStr(const Tview str)
-{
-    if (!m_buff)
-        return false;
-
-    auto offset_end = m_strOffsetList.back();
-    size_t dl = str.size();
-
-    if (offset_end + dl > m_buff->capacity())
-        return false;
-
-    m_buff->append(str);
-
-    m_strOffsetList.push_back((uint32_t)(offset_end + dl));
+        m_strOffsetList[i] = m_strOffsetList[i - 1] + (uint32_t)dl;
 
     m_mod = true;
     return true;
@@ -219,9 +219,9 @@ bool SBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
     if(dl > 0 && (size_t)offset_end + dl > m_buff->capacity())
         return false;
 
-    m_buff->replace(offset_n, offset_n1, str);
+    m_buff->replace(offset_n, offset_n1 - offset_n, str);
 
-    for (size_t i = n + 1; i <= GetStrCount(); ++i)
+    for (size_t i = n; i < GetStrCount(); ++i)
         m_strOffsetList[i] += dl;
 
     m_mod = true;
@@ -243,8 +243,8 @@ bool SBuff<Tbuff, Tview>::DelStr(size_t n)
 
     m_buff->erase(offset_n, dl);
 
-    for (size_t i = n + 1; i < GetStrCount(); ++i)
-        m_strOffsetList[i] = GetStrOffset(i + 1) - dl;
+    for (size_t i = n; i < GetStrCount() - 1; ++i)
+        m_strOffsetList[i] = m_strOffsetList[i + 1] - dl;
     m_strOffsetList.pop_back();
 
     m_mod = true;

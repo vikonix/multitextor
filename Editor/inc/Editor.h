@@ -149,6 +149,7 @@ public:
 
     size_t                  GetStrCount() const {return m_buffer.GetStrCount(); }
     bool                    IsChanged() const {return m_curChanged || m_buffer.IsChanged(); }
+    bool                    FlushCurStr();
     uint64_t                GetSize() const;// {return m_pDObject->GetSize(); }
     time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
