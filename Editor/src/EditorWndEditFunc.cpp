@@ -59,7 +59,7 @@ bool EditorWnd::EditC(input_t cmd)
         rc = m_editor->ChangeCh(true, y, x, c);
     }
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::EditDelC(input_t cmd)
@@ -90,7 +90,7 @@ bool EditorWnd::EditDelC(input_t cmd)
         {
             m_editor->SetUndoRemark("Del line");
             rc = m_editor->DelLine(true, y);
-            ChangeSelected(select_change::delete_line, y);
+            ChangeSelected(select_change::delete_str, y);
         }
         else
         {
@@ -102,7 +102,7 @@ bool EditorWnd::EditDelC(input_t cmd)
                 //???SetErrorLine(STR_S(SS_StringTooLongForMerge));
             }
             else
-                ChangeSelected(select_change::merge_line, y, x);
+                ChangeSelected(select_change::merge_str, y, x);
         }
     }
 
@@ -154,14 +154,15 @@ bool EditorWnd::EditBS(input_t cmd)
             //???SetErrorLine(STR_S(SS_StringTooLongForMerge));
         }
         else
-            ChangeSelected(select_change::merge_line, y - 1, m_xOffset + m_cursorx);
+            ChangeSelected(select_change::merge_str, y - 1, m_xOffset + m_cursorx);
     }
     else if (m_editor->GetStrCount() == 1)
     {
         m_editor->SetUndoRemark("Del line");
         rc = m_editor->DelLine(1, y);
-        ChangeSelected(select_change::delete_line, y);
+        ChangeSelected(select_change::delete_str, y);
     }
+
     return true;
 }
 
@@ -190,17 +191,17 @@ bool EditorWnd::EditEnter(input_t cmd)
         if (0 == x)
         {
             rc = InsertStr({}, y);
-            ChangeSelected(select_change::insert_line, y);
+            ChangeSelected(select_change::insert_str, y);
         }
         else
         {
             //cut string
-            m_editor->SplitLine(1, y, x, m_xOffset + m_cursorx);
-            ChangeSelected(select_change::split_line, y, x, m_xOffset + m_cursorx);
+            rc = m_editor->SplitLine(1, y, x, m_xOffset + m_cursorx);
+            ChangeSelected(select_change::split_str, y, x, m_xOffset + m_cursorx);
         }
     }
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::EditTab(input_t cmd)

@@ -617,7 +617,7 @@ bool Editor::CorrectTab(bool save, size_t line, std::u16string& str)
     LOG(DEBUG) << "CorrectTab save=" << save << " line=" << line;
 
     size_t len = UStrLen(str);
-    std::u16string tab;
+    std::u16string tabs;
 
     for(size_t i= 0; i < len; ++i)
     {
@@ -636,7 +636,7 @@ bool Editor::CorrectTab(bool save, size_t line, std::u16string& str)
                 //fill as space
                 while (first < i)
                 {
-                    tab += static_cast<char16_t>(first);
+                    tabs += static_cast<char16_t>(first);
                     str[first++] = ' ';
                 }
             }
@@ -645,10 +645,10 @@ bool Editor::CorrectTab(bool save, size_t line, std::u16string& str)
         }
     }
 
-    if (save && !tab.empty())
+    if (save && !tabs.empty())
     {
         m_undoList.AddEditCmd(cmd_t::CMD_CORRECT_TAB, line, 0, 0, 0, std::nullopt);
-        m_undoList.AddUndoCmd(cmd_t::CMD_RESTORE_TAB, line, 0, 0, tab.size(), tab);
+        m_undoList.AddUndoCmd(cmd_t::CMD_RESTORE_TAB, line, 0, 0, tabs.size(), tabs);
     }
 
     return true;
@@ -841,16 +841,16 @@ bool Editor::SaveTab(bool save, size_t line)
     SetCurStr(line);
 
     //save tab offset as symbols;
-    std::u16string tab;
+    std::u16string tabs;
 
     for (size_t i = 0; i < m_curStrBuff.size(); ++i)
         if (m_curStrBuff[i] == 0x9)
-            tab += static_cast<char16_t>(i);
+            tabs += static_cast<char16_t>(i);
 
-    if (save && !tab.empty())
+    if (save && !tabs.empty())
     {
         m_undoList.AddEditCmd(cmd_t::CMD_SAVE_TAB, line, 0, 0, 0, std::nullopt);
-        m_undoList.AddUndoCmd(cmd_t::CMD_RESTORE_TAB, line, 0, 0, tab.size(), tab);
+        m_undoList.AddUndoCmd(cmd_t::CMD_RESTORE_TAB, line, 0, 0, tabs.size(), tabs);
     }
 
     return true;

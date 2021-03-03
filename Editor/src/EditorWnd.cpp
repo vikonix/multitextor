@@ -1035,8 +1035,7 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
         m_selectState = select_state::no;
         break;
 
-
-    case select_change::split_line:
+    case select_change::split_str:
         if (line == m_beginY)
         {
             if (m_selectType != select_t::line)//stream column
@@ -1070,8 +1069,7 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
             ++m_endY;
         break;
 
-
-    case select_change::merge_line:
+    case select_change::merge_str:
         if (line < m_beginY)
             --m_beginY;
 
@@ -1086,8 +1084,7 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
         }
         break;
 
-
-    case select_change::insert_line:
+    case select_change::insert_str:
         if (line <= m_beginY)
             ++m_beginY;
 
@@ -1095,8 +1092,7 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
             ++m_endY;
         break;
 
-
-    case select_change::delete_line:
+    case select_change::delete_str:
         if (line == m_beginY && line == m_endY)
         {
             //delete marked line
@@ -1116,7 +1112,6 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
         }
         break;
 
-
     case select_change::insert_ch:
         if (m_selectType == select_t::stream)
         {
@@ -1129,7 +1124,6 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
                     m_endX += size;
         }
         break;
-
 
     case select_change::delete_ch:
         if (m_selectType == select_t::stream)

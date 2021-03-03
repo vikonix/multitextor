@@ -59,12 +59,12 @@ class EditorWnd : public FrameWnd
     enum class select_change
     {
         clear,
-        insert_line,
-        delete_line,
         insert_ch,
         delete_ch,
-        split_line,
-        merge_line
+        insert_str,
+        delete_str,
+        split_str,
+        merge_str
     };
     
     using EditorFunc = std::function<bool(EditorWnd*, input_t)>;
