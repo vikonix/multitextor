@@ -178,7 +178,7 @@ bool EditorWnd::EditEnter(input_t cmd)
     auto str = m_editor->GetStr(y);
     auto first = str.find_first_not_of(' ');
 
-    if ((first != std::string::npos || str[first] > ' ') && x > first)
+    if (first != std::string::npos && x > first)
         //if current string begins from spaces
         _GotoXY(first, y);
 

@@ -128,7 +128,7 @@ bool LexParser::SetParseStyle(int cp, const std::string& style)
 
             m_showTab = false;
 
-            if (!m_openComment.empty() || !m_closeComment.empty())
+            if ((!m_openComment.empty() && !m_closeComment.empty()) || !cfg.delimiters.empty())
                 m_scan = true;
 
             return true;
@@ -260,6 +260,12 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
 
     m_cutLine = false;
     m_commentLine = false;
+
+    if (str.empty())
+    {
+        buff.clear();
+        return true;
+    }
 
     char skipComment{};
     size_t skipCount{};
@@ -805,6 +811,7 @@ bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t&
 
     LOG(DEBUG) << "LexParser::ChangeStr l=" << line;
 
+    inv = invalidate_t::change;
     CheckForConcatenatedLine(line);
     CheckForOpenComments(line);
 
@@ -853,8 +860,6 @@ bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t&
             //if comment changed or string Concatenated then invalidate full screen
             inv = invalidate_t::full;
     }
-    else
-        inv = invalidate_t::change;
 
     return true;
 }
@@ -866,6 +871,7 @@ bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& in
 
     LOG(DEBUG) << "LexParser::AddStr l=" << line;
     
+    inv = invalidate_t::insert;
     CheckForOpenComments(line);
 
     std::string str = utf8::utf16to8(wstr);
@@ -880,10 +886,9 @@ bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& in
             //if comment changed then invalidate full screen
             inv = invalidate_t::full;
         }
-        AddLexem(line, lexstr);
     }
-    else
-        inv = invalidate_t::insert;
+
+    AddLexem(line, lexstr);
 
     return true;
 }
@@ -896,6 +901,7 @@ bool LexParser::DelStr(size_t line, invalidate_t& inv)
 
     LOG(DEBUG) << "LexParser::DelStr l=" << line;
 
+    inv = invalidate_t::del;
     auto it = m_lexPosition.find(line);
     if (it != m_lexPosition.end())
     {
@@ -906,43 +912,44 @@ bool LexParser::DelStr(size_t line, invalidate_t& inv)
             //if comment changed then invalidate full screen
             inv = invalidate_t::full;
         }
-        DeleteLexem(line);
     }
-    else
-        inv = invalidate_t::del;
+
+    DeleteLexem(line);
 
     return true;
 }
 
 bool LexParser::AddLexem(size_t line, const std::string& lexstr)
 {
-    for (auto it = m_lexPosition.rbegin(); it != m_lexPosition.rend();)
+    for (auto itr = m_lexPosition.rbegin(); itr != m_lexPosition.rend(); ++itr)
     {
-        if (it->first < line)
+        if (itr->first < line)
             break;
 
-        auto next = std::next(it);
-        auto pos = m_lexPosition.extract(it->first);
-        ++pos.key();
-        auto[i, rc, node] = m_lexPosition.insert(std::move(pos));
+        auto pos = *itr;
+        auto it = m_lexPosition.erase(--itr.base());
+        itr = std::reverse_iterator(it);
+
+        auto[i, rc] = m_lexPosition.emplace(pos.first + 1, pos.second);
         if (!rc)
         {
             _assert(0);
             return false;
         }
-        
-        it = next;
     }
 
-    m_lexPosition[line] = lexstr;
+    if(!lexstr.empty())
+        m_lexPosition[line] = lexstr;
+
     return true;
 }
 
 bool LexParser::DeleteLexem(size_t line)
 {
     auto it = m_lexPosition.find(line);
-    it = m_lexPosition.erase(it);
-    for (; it != m_lexPosition.end(); ++it)
+    if(it != m_lexPosition.end())
+        m_lexPosition.erase(it);
+    for (it = m_lexPosition.upper_bound(line); it != m_lexPosition.end(); ++it)
     {
         auto pos = m_lexPosition.extract(it);
         --pos.key();

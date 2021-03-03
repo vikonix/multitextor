@@ -163,14 +163,14 @@ bool SBuff<Tbuff, Tview>::AppendStr(const Tview str)
         return false;
 
     auto offset_end = m_strOffsetList.back();
-    size_t dl = str.size();
+    uint32_t dl = static_cast<uint32_t>(str.size());
 
     if (offset_end + dl > m_buff->capacity())
         return false;
 
     m_buff->append(str);
 
-    m_strOffsetList.push_back((uint32_t)(offset_end + dl));
+    m_strOffsetList.push_back(offset_end + dl);
 
     m_mod = true;
     return true;
@@ -187,7 +187,7 @@ bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 
     auto offset_n = GetStrOffset(n);
     auto offset_end = m_strOffsetList.back();
-    size_t dl = str.size();
+    uint32_t dl = static_cast<uint32_t>(str.size());
 
     if (offset_end + dl > m_buff->capacity())
         return false;
@@ -195,8 +195,13 @@ bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
     m_buff->insert(offset_n, str);
 
     m_strOffsetList.push_back(0);
-    for (size_t i = GetStrCount() - 1; i > n; --i)
-        m_strOffsetList[i] = m_strOffsetList[i - 1] + (uint32_t)dl;
+    size_t i;
+    for (i = GetStrCount() - 1; i > n; --i)
+        m_strOffsetList[i] = m_strOffsetList[i - 1] + dl;
+    if (0 != i)
+        m_strOffsetList[i] = m_strOffsetList[i - 1] + dl;
+    else
+        m_strOffsetList[i] = dl;
 
     m_mod = true;
     return true;

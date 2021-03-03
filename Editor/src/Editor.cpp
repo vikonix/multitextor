@@ -510,6 +510,7 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
             buff += ' ';
     }
 
+    LOG(DEBUG) << "ConvertStr '" << buff << "'";
     if (m_eol == eol_t::unix_eol)
     {
         buff += 0xa;
@@ -524,8 +525,6 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
         //apple
         buff += 0xd;
     }
-
-    LOG(DEBUG) << "ConvertStr " << buff;
 
     return true;
 }
@@ -810,7 +809,7 @@ bool Editor::SplitLine(bool save, size_t line, size_t pos, size_t indent)
     str.resize(indent, ' ');
     //copy rest of current str to new buff
     str.append(m_curStrBuff.substr(pos));
-    str.resize(MAX_STRLEN, ' '); //???
+    //str.resize(MAX_STRLEN, ' '); //???
 
     //clear end of current str
     m_curStrBuff.replace(pos, m_curStrBuff.size() - pos, m_curStrBuff.size() - pos, ' ');
