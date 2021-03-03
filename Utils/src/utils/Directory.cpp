@@ -64,7 +64,7 @@ path_t Directory::m_runPath = [] {
         pid_t pid = getpid();
         int ret = proc_pidpath(pid, pathbuf, sizeof(pathbuf));
         if (ret > 0)
-            path = pathbuff;
+            path = pathbuf;
     }
 #endif
 #endif

@@ -237,7 +237,7 @@ bool LexParser::CheckForConcatenatedLine(size_t line)
         {
             //check for concatenated string with '\\' 
             auto[prevLine, prevLex] = *prevIt;
-            if (prevLex.back() == '\\')
+            if (!prevLex.empty() && prevLex.back() == '\\')
             {
                 cutLine = m_cutLine = true;
                 m_stringSymbol = prevLex[prevLex.size() - 2];
