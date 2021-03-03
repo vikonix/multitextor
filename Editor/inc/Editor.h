@@ -185,7 +185,7 @@ public:
 
     //undo control
     void                    SetUndoRemark(const std::string& rem) {m_undoList.SetRemark(rem);}
-    bool                    AddUndoCommand(EditCmd editCmd, EditCmd undoCmd);
+    bool                    AddUndoCommand(const EditCmd& editCmd, const EditCmd& undoCmd);
     bool                    Command(EditCmd cmd);
     EditCmd                 GetUndo();
     EditCmd                 GetRedo();

@@ -856,3 +856,36 @@ bool Editor::SaveTab(bool save, size_t line)
     return true;
 }
 
+bool Editor::ClearSubstr(bool save, size_t line, size_t pos, size_t len)
+{
+    if (line >= GetStrCount())
+        return true;
+
+    SetCurStr(line);
+
+    std::u16string prevstr = m_curStrBuff.substr(pos, len);
+    m_curStrBuff.replace(pos, len, len, ' ');
+
+    m_curChanged = true;
+    invalidate_t inv;
+    m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+    InvalidateWnd(line, inv);
+
+    if (save)
+    {
+        m_undoList.AddEditCmd(cmd_t::CMD_CLEAR_SUBSTR, line, pos, 0, len, std::nullopt);
+        m_undoList.AddUndoCmd(cmd_t::CMD_CHANGE_SUBSTR, line, pos, 0, len, prevstr);
+    }
+
+    CorrectTab(save, line, m_curStrBuff);
+
+    return true;
+}
+
+bool Editor::AddUndoCommand(const EditCmd& editCmd, const EditCmd& undoCmd)
+{
+    m_undoList.AddEditCmd(editCmd.command, editCmd.line, editCmd.pos, editCmd.count, editCmd.len, editCmd.str);
+    m_undoList.AddUndoCmd(undoCmd.command, undoCmd.line, undoCmd.pos, undoCmd.count, undoCmd.len, undoCmd.str);
+
+    return true;
+}

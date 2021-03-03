@@ -128,7 +128,7 @@ bool LexParser::SetParseStyle(int cp, const std::string& style)
 
             m_showTab = false;
 
-            if ((!m_openComment.empty() && !m_closeComment.empty()) || !cfg.delimiters.empty())
+            if ((!m_openComment.empty() && !m_closeComment.empty()))//??? || !cfg.delimiters.empty())
                 m_scan = true;
 
             return true;

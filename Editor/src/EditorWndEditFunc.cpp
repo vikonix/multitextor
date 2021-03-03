@@ -31,7 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager.h"
 #include "App.h"
 
-
 bool EditorWnd::EditC(input_t cmd)
 {
     if (m_readOnly)
@@ -217,7 +216,7 @@ bool EditorWnd::EditTab(input_t cmd)
     size_t x1 = (x + t) - (x + t) % t;
     size_t len = x1 - x;
     
-    MoveRight(len);
+    MoveRight(static_cast<input_t>(len));
 
     bool rc{true};
 
@@ -253,32 +252,103 @@ bool EditorWnd::EditDelStr(input_t cmd)
 
 bool EditorWnd::EditDelBegin(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditDelBegin " << std::hex << cmd << std::dec;
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+
+    if (0 == x)
+        return true;
+
+    bool rc = MoveStrBegin(0);
+
+    if (y < m_editor->GetStrCount())
+    {
+        m_editor->SetUndoRemark("Del begin");
+        rc = m_editor->DelBegin(true, y, x);
+        ChangeSelected(select_change::delete_ch, y, 0, x);
+    }
+
+    return rc;
 }
 
 bool EditorWnd::EditDelEnd(input_t cmd)
 {
-    return true;
-}
+    if (m_readOnly)
+        return true;
 
-bool EditorWnd::EditBlockClear(input_t cmd)
-{
-    return true;
+    LOG(DEBUG) << "    EditDelEnd " << std::hex << cmd << std::dec;
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+
+    bool rc{true};
+
+    if (y < m_editor->GetStrCount())
+    {
+        m_editor->SetUndoRemark("Del end");
+        rc = m_editor->DelEnd(true, y, x);
+        ChangeSelected(select_change::delete_ch, y, x, MAX_STRLEN - x);
+    }
+
+    return rc;
 }
 
 bool EditorWnd::EditBlockCopy(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    if (m_selectState != select_state::complete)
+        return true;
+
+    LOG(DEBUG) << "    EditBlockCopy " << std::hex << cmd << std::dec << " ss=" << static_cast<int>(m_selectState) << " t=" << static_cast<int>(m_selectType)
+        << " bx=" << m_beginX << " by=" << m_beginY << " ex=" << m_endX << " ey=" << m_endY;
+
+    select_t mode;
+    std::vector<std::u16string> strArray;
+    bool rc = CopySelected(strArray, mode);
+    rc = PasteSelected(strArray, mode);
+
+    return rc;
 }
 
 bool EditorWnd::EditBlockMove(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    if (m_selectState != select_state::complete)
+        return true;
+
+    LOG(DEBUG) << "    EditBlockMove " << std::hex << cmd << std::dec << " ss=" << static_cast<int>(m_selectState) << " t=" << static_cast<int>(m_selectType)
+        << " bx=" << m_beginX << " by=" << m_beginY << " ex=" << m_endX << " ey=" << m_endY;
+
+    select_t mode;
+    std::vector<std::u16string> strArray;
+
+    bool rc = CopySelected(strArray, mode);
+    rc = DelSelected();
+    rc = PasteSelected(strArray, mode);
+
+    return rc;
 }
 
 bool EditorWnd::EditBlockDel(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    if (m_selectState != select_state::complete)
+        return true;
+
+    LOG(DEBUG) << "    EditBlockDel " << std::hex << cmd << std::dec << " ss=" << static_cast<int>(m_selectState) << " t=" << static_cast<int>(m_selectType)
+        << " bx=" << m_beginX << " by=" << m_beginY << " ex=" << m_endX << " ey=" << m_endY;
+
+    bool rc = DelSelected();
+
+    return rc;
 }
 
 bool EditorWnd::EditBlockIndent(input_t cmd)

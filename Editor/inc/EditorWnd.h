@@ -135,6 +135,9 @@ class EditorWnd : public FrameWnd
     bool    ChangeSelected(select_change type, size_t line = 0, size_t pos = 0, size_t size = 1);
     bool    CorrectSelection();
     bool    InsertStr(const std::u16string& str, size_t y = STR_NOTDEFINED, bool save = true);
+    bool    CopySelected(std::vector<std::u16string>& strArray, select_t& selType);
+    bool    PasteSelected(const std::vector<std::u16string>& strArray, select_t selType);
+    bool    DelSelected();
 
 public:
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
@@ -211,7 +214,6 @@ public:
   int       ReplaceSubstr(int nline, int pos, int len, wchar* pSubstr, int size);
   int       CopySelected(WStrBuff* pBuff, int* pSelType);
   int       PasteSelected(WStrBuff* pBuff, int SelType);
-  int       DelSelected();
 
   int       EditWndCopy(WndEdit* pWFrom);
   int       EditWndMove(WndEdit* pWFrom);
@@ -259,7 +261,6 @@ public:
     bool EditDelBegin(input_t cmd);
     bool EditDelEnd(input_t cmd);
 
-    bool EditBlockClear(input_t cmd);
     bool EditBlockCopy(input_t cmd);
     bool EditBlockMove(input_t cmd);
     bool EditBlockDel(input_t cmd);

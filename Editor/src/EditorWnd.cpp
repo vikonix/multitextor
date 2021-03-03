@@ -1221,3 +1221,357 @@ bool EditorWnd::InsertStr(const std::u16string& str, size_t y, bool save)
 
     return rc;
 }
+
+bool EditorWnd::CopySelected(std::vector<std::u16string>& strArray, select_t& selType)
+{
+    LOG(DEBUG) << "    CopySelected";
+
+    CorrectSelection();
+    strArray.clear();
+
+    size_t n = m_endY - m_beginY;
+    for (size_t i = 0; i <= n; ++i)
+    {
+        size_t bx, ex;
+        if (m_selectType == select_t::stream)
+        {
+            if (n == 0)
+            {
+                bx = m_beginX;
+                ex = m_endX;
+            }
+            else if (i == 0)
+            {
+                bx = m_beginX;
+                ex = MAX_STRLEN;
+            }
+            else if (i == n)
+            {
+                bx = 0;
+                ex = m_endX;
+            }
+            else
+            {
+                bx = 0;
+                ex = MAX_STRLEN;
+            }
+        }
+        else if (m_selectType == select_t::line)
+        {
+            bx = 0;
+            ex = MAX_STRLEN;
+        }
+        else
+        {
+            bx = m_beginX;
+            ex = m_endX;
+        }
+
+        size_t srcY = m_beginY + i;
+        size_t size = ex - bx + 1;
+        
+        auto str = m_editor->GetStr(srcY, bx, size);
+        strArray.push_back(str);
+    }
+
+    selType = m_selectType;
+
+    return true;
+}
+
+bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, select_t selType)
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    PasteSelected";
+
+    size_t posX = m_xOffset + m_cursorx;
+    size_t posY = m_firstLine + m_cursory;
+
+    EditCmd edit { cmd_t::CMD_BEGIN, posY, posX };
+    EditCmd undo { cmd_t::CMD_BEGIN, posY, posX };
+    m_editor->SetUndoRemark("Paste block");
+    m_editor->AddUndoCommand(edit, undo);
+
+    size_t n = strArray.size();
+    bool save{true};
+
+    bool rc{true};
+    size_t bx1, ex1{};
+    for(size_t i = 0; i < n; ++i)
+    {
+        const auto& str = strArray[i];
+
+        int copyLine{};
+
+        if (selType == select_t::stream)
+        {
+            if (n == 1)
+            {
+                //only 1 string
+                bx1 = posX;
+                ex1 = posX + str.size() - 1;
+            }
+            else if (i == 0)
+            {
+                //first line
+                bx1 = posX;
+                ex1 = MAX_STRLEN - 1;
+                copyLine = 1;
+            }
+            else if (i == n - 1)
+            {
+                //last line
+                bx1 = 0;
+                ex1 = str.size() - 1;
+            }
+            else
+            {
+                bx1 = 0;
+                ex1 = MAX_STRLEN - 1;
+                copyLine = 2;
+            }
+        }
+        else if (selType == select_t::line)
+        {
+            bx1 = 0;
+            ex1 = MAX_STRLEN - 1;
+            copyLine = 2;
+        }
+        else
+        {
+            bx1 = posX;
+            ex1 = posX + str.size() - 1;
+        }
+
+        if (ex1 < 0)
+            ex1 = 0;
+
+        size_t dstY = posY + i;
+
+        if (copyLine == 1)
+        {
+            LOG(DEBUG) << "     Copy first line dy=" << dstY;
+            //split and change first line
+            if (!bx1)
+            {
+                rc = InsertStr(str, dstY);
+            }
+            else
+            {
+                //split line
+                rc = m_editor->SplitLine(save, dstY, bx1);
+                rc = m_editor->AddSubstr(save, dstY, bx1, str);
+            }
+        }
+        else if (copyLine == 2)
+        {
+            LOG(DEBUG) << "     Copy line dy=" << dstY;
+            //insert full line
+            rc = InsertStr(str, dstY, save);
+        }
+        else
+        {
+            LOG(DEBUG) << "     Copy substr dx=" << bx1 << " dy=" << dstY;
+            //change line
+            m_editor->AddSubstr(save, dstY, bx1, str);
+        }
+    }
+
+    edit.command = cmd_t::CMD_END;
+    undo.command = cmd_t::CMD_END;
+    m_editor->AddUndoCommand(edit, undo);
+
+    //new selection
+    m_beginX = posX;
+    m_beginY = posY;
+    m_endX = ex1;
+    m_endY = posY + n - 1;
+    m_selectType = selType;
+    m_selectState = select_state::complete;
+
+    InvalidateRect();
+
+    return true;
+}
+
+bool EditorWnd::DelSelected()
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    DelSelected";
+
+    CorrectSelection();
+
+    EditCmd edit { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
+    EditCmd undo { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
+    m_editor->SetUndoRemark("Delete block");
+    m_editor->AddUndoCommand(edit, undo);
+
+    size_t n = m_endY - m_beginY;
+    bool save{true};
+    bool rc{true};
+
+    size_t bx, ex;
+    size_t dy = 0;
+
+    for (size_t i = 0; i <= n; ++i)
+    {
+        int deleteLine{};
+
+        if (m_selectType == select_t::stream)
+        {
+            if (n == 0)
+            {
+                //only 1 str
+                bx = m_beginX;
+                ex = m_endX;
+            }
+            else if (i == 0)
+            {
+                //first line
+                bx = m_beginX;
+                ex = MAX_STRLEN;
+                deleteLine = 1;
+            }
+            else if (i == n)
+            {
+                //last line
+                bx = 0;
+                ex = m_endX;
+                deleteLine = 3;
+            }
+            else
+            {
+                bx = 0;
+                ex = MAX_STRLEN;
+                deleteLine = 2;
+            }
+        }
+        else if (m_selectType == select_t::line)
+        {
+            bx = 0;
+            ex = MAX_STRLEN;
+            deleteLine = 2;
+        }
+        else
+        {
+            bx = m_beginX;
+            ex = m_endX;
+        }
+
+        size_t srcY = m_beginY + i;
+        size_t size = ex - bx + 1;
+
+        if (deleteLine == 1)
+        {
+            LOG(DEBUG) << "     Del first line dy=" << m_beginY;
+            dy = 1;
+            rc = m_editor->DelEnd(save, m_beginY, bx);
+            auto str = m_editor->GetStr(m_beginY + n, m_endX + 1);
+            rc = m_editor->ChangeSubstr(save, m_beginY, bx, str);
+        }
+        else if (deleteLine)
+        {
+            LOG(DEBUG) << "     Del line dy=" << m_beginY + dy;
+            //del full line
+            rc = m_editor->DelLine(save, m_beginY + dy);
+        }
+        else
+        {
+            LOG(DEBUG) << "     Del substr dx=" << bx << " dy=" << srcY;
+            //change line
+            rc = m_editor->DelSubstr(save, srcY, bx, size);
+        }
+    }
+
+    edit.command = cmd_t::CMD_END;
+    undo.command = cmd_t::CMD_END;
+    m_editor->AddUndoCommand(edit, undo);
+
+    //correct cursor position
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+
+    if (y >= m_beginY)
+    {
+        if (m_selectType == select_t::stream)
+        {
+            //stream
+            if (y == m_beginY && m_beginY == m_endY)
+            {
+                //only substr
+                if (x >= m_beginX)
+                {
+                    if (x <= m_endX)
+                        x = m_beginX;
+                    else
+                        x -= m_endX - m_beginX + 1;
+                }
+            }
+            else  if (y == m_beginY)
+            {
+                //first line
+                if (x >= m_beginX)
+                    x = m_beginX;
+            }
+            else if (y == m_endY)
+            {
+                //last line
+                if (x <= m_endX)
+                    x = m_beginX;
+                else
+                    x = m_beginX + x - m_endX - 1;
+            }
+
+            if (y <= m_endY)
+                y = m_beginY;
+            else
+                y -= m_endY - m_beginY;
+        }
+        else if (m_selectType == select_t::line)
+        {
+            //line
+            if (y <= m_endY)
+                y = m_beginY;
+            else
+                y -= m_endY - m_beginY + 1;
+        }
+        else
+        {
+            //column
+            if (y <= m_endY && y >= m_beginY)
+                if (x >= m_beginX)
+                {
+                    if (x <= m_endX)
+                        x = m_beginX;
+                    else
+                        x -= m_endX - m_beginX + 1;
+                }
+        }
+    }
+
+    int cx = x - m_xOffset;
+    if (cx < 0 || cx >= m_sizeX)
+        cx = -1;
+
+    int cy = y - m_firstLine;
+    if (cy < 0 || cy >= m_sizeY)
+        cy = -1;
+
+    if (cx < 0 || cy < 0)
+        rc = _GotoXY(x, y);
+    else
+    {
+        m_cursorx = cx;
+        m_cursory = cy;
+    }
+
+    //del mark
+    ChangeSelected(select_change::clear);
+    InvalidateRect();
+
+    return true;
+}
