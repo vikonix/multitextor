@@ -72,7 +72,7 @@ bool EditorWnd::EditDelC(input_t cmd)
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
     
-    bool rc{};
+    bool rc{true};
 
     if (y < m_editor->GetStrCount())
     {
@@ -119,7 +119,7 @@ bool EditorWnd::EditBS(input_t cmd)
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
 
-    bool rc{};
+    bool rc{true};
 
     if (y > m_editor->GetStrCount())
     {
@@ -163,7 +163,7 @@ bool EditorWnd::EditBS(input_t cmd)
         ChangeSelected(select_change::delete_str, y);
     }
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::EditEnter(input_t cmd)
@@ -206,12 +206,49 @@ bool EditorWnd::EditEnter(input_t cmd)
 
 bool EditorWnd::EditTab(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditTab " << std::hex << cmd << std::dec;
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+
+    size_t t = m_editor->GetTab();
+    size_t x1 = (x + t) - (x + t) % t;
+    size_t len = x1 - x;
+    
+    MoveRight(len);
+
+    bool rc{true};
+
+    if (Application::getInstance().IsInsertMode() && y < m_editor->GetStrCount())
+    {
+        char16_t ch = m_editor->GetSaveTab() ? 0x9 : ' ';
+        std::u16string str;
+        str.resize(len, ch);
+        
+        m_editor->SetUndoRemark("Add tab");
+        rc = m_editor->AddSubstr(true, y, x, str);
+        ChangeSelected(select_change::insert_ch, y, x, len);
+    }
+
+    return rc;
 }
 
 bool EditorWnd::EditDelStr(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditDelStr " << std::hex << cmd << std::dec;
+
+    size_t y = m_firstLine + m_cursory;
+
+    m_editor->SetUndoRemark("Del line");
+    bool rc = m_editor->DelLine(true, y);
+    ChangeSelected(select_change::delete_str, y);
+    
+    return rc;
 }
 
 bool EditorWnd::EditDelBegin(input_t cmd)

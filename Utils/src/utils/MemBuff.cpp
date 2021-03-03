@@ -162,7 +162,7 @@ bool SBuff<Tbuff, Tview>::AppendStr(const Tview str)
     if (!m_buff)
         return false;
 
-    auto offset_end = m_strOffsetList.back();
+    auto offset_end = GetBuffSize();
     uint32_t dl = static_cast<uint32_t>(str.size());
 
     if (offset_end + dl > m_buff->capacity())
@@ -186,7 +186,7 @@ bool SBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
         return false;
 
     auto offset_n = GetStrOffset(n);
-    auto offset_end = m_strOffsetList.back();
+    auto offset_end = GetBuffSize();
     uint32_t dl = static_cast<uint32_t>(str.size());
 
     if (offset_end + dl > m_buff->capacity())
@@ -218,7 +218,7 @@ bool SBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
 
     auto offset_n = GetStrOffset(n);
     auto offset_n1 = GetStrOffset(n + 1);
-    auto offset_end = m_strOffsetList.back();
+    auto offset_end = GetBuffSize();
     int dl = (int)str.size() - (int)(offset_n1 - offset_n);
 
     if(dl > 0 && (size_t)offset_end + dl > m_buff->capacity())
@@ -406,7 +406,7 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
     {
         LOG(DEBUG) << "curBuff->m_lostData first=" << m_curBuffLine << " last=" << m_curBuffLine + (*m_curBuff)->GetStrCount() - 1;
 
-        bool rc = LoadBuff((*m_curBuff)->m_fileOffset, (*m_curBuff)->m_strOffsetList.back(), (*m_curBuff)->GetBuff());
+        bool rc = LoadBuff((*m_curBuff)->m_fileOffset, (*m_curBuff)->GetBuffSize(), (*m_curBuff)->GetBuff());
         if (!rc)
             return std::nullopt;
 
@@ -445,7 +445,7 @@ size_t MemStrBuff<Tbuff, Tview>::GetSize()
 
     for (const auto& buff: m_buffList)
     {
-        size += buff->m_strOffsetList.back();
+        size += buff->GetBuffSize();
     }
 
     return size;
@@ -513,7 +513,7 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
     oldBuff->m_mod = true;
 
     uint32_t begin = oldBuff->GetStrOffset(split);
-    uint32_t end = oldBuff->m_strOffsetList.back();
+    uint32_t end = oldBuff->GetBuffSize();
 
     newBuffData->resize(end - begin);
     memcpy(newBuffData->data(), oldBuffData->c_str() + begin, end - begin);

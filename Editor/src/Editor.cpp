@@ -305,7 +305,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     }
 
     str->resize(i);
-    rest = size - strBuff->m_strOffsetList.back();
+    rest = size - strBuff->GetBuffSize();
     strBuff->ReleaseBuff();
 
     return true;

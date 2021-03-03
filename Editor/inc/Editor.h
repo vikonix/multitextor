@@ -102,6 +102,8 @@ public:
         , m_cp{cp}
     {
         m_lexParser.SetParseStyle(cp, parseStyle);
+        m_tab = m_lexParser.GetTabSize();
+        m_saveTab = m_lexParser.GetSaveTab();
     }
 
     static size_t UStrLen(const std::u16string& str) 
@@ -145,7 +147,7 @@ public:
     bool                    GetSaveTab() const      {return m_saveTab;}
     void                    SetSaveTab(bool save)   {m_saveTab = save;}
     bool                    GetShowTab() const      {return m_showTab;}
-    void                    SetShowTab(bool show)   {m_showTab = show;}
+    void                    SetShowTab(bool show)   {m_lexParser.SetShowTab(m_showTab = show);}
 
     size_t                  GetStrCount() const {return m_buffer.GetStrCount(); }
     bool                    IsChanged() const {return m_curChanged || m_buffer.IsChanged(); }

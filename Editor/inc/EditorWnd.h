@@ -31,7 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorCmd.h"
 
 #include <functional>
-
+#include <unordered_map>
 
 class EditorWnd : public FrameWnd
 {

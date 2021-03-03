@@ -58,7 +58,7 @@ bool ScreenTTY::Init()
             char buff[100];
             char* pbuff = buff;
 
-            char* str = tgetstr(g_screenCap[i].id, &pbuff);
+            char* str = tgetstr(const_cast<char*>(g_screenCap[i].id), &pbuff);
             if(nullptr != str)
             {
                 //load this cap

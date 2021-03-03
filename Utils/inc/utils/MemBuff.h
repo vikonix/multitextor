@@ -107,6 +107,8 @@ public:
 
     bool    Clear();
     size_t  GetStrCount() { return m_strOffsetList.size(); }
+    uint32_t GetBuffSize() { return m_strOffsetList.empty() ? 0 : m_strOffsetList.back(); }
+
     Tview   GetStr(size_t n);
     bool    AddStr(size_t n, const Tview str);
     bool    AppendStr(const Tview str);

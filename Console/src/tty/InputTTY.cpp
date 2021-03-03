@@ -85,7 +85,7 @@ bool InputTTY::LoadKeyCode()
     {
         char buff[16];
         char* pbuff = buff;
-        char* str = tgetstr(g_keyCap[i].id, &pbuff);
+        char* str = tgetstr(const_cast<char*>(g_keyCap[i].id), &pbuff);
         if(str)
             m_KeyMap.AddKey(str, g_keyCap[i].code);
     }

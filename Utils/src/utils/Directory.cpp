@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #include <unistd.h>
 #endif
 
+#ifdef __APPLE__
+    #include <libproc.h>
+#endif
 
 std::string  Directory::m_projectName;
 path_t Directory::m_runPath = [] {
@@ -54,10 +57,16 @@ path_t Directory::m_runPath = [] {
     {
         path = std::filesystem::read_symlink(self);
     }
+#ifdef __APPLE__
     else
     {
-        LOG(ERROR) << "self link not exists";
+        char pathbuf[PROC_PIDPATHINFO_MAXSIZE];
+        pid_t pid = getpid();
+        int ret = proc_pidpath(pid, pathbuf, sizeof(pathbuf));
+        if (ret > 0)
+            path = pathbuff;
     }
+#endif
 #endif
 
     path.remove_filename();
