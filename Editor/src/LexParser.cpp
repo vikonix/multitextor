@@ -277,7 +277,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
     {
         //LOG(DEBUG) << "  lexem[" << end - begin + 1 << "]='" << std::string(str.substr(begin, end - begin + 1)) << "'";
 
-        if (color)
+        if (color && begin > 0)
         {
             if (m_commentLine || m_commentOpen)
                 buff.resize(begin, 'R');
@@ -352,7 +352,10 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
 
                     if (color)
                     {
-                        buff.resize(end, 'R');
+                        if (comment != lex_t::COMMENT_CLOSE)
+                            buff.resize(end, 'R');
+                        else
+                            buff.resize(end + 1, 'R');
                     }
                     else
                     {
@@ -771,6 +774,9 @@ bool LexParser::CheckForOpenComments(size_t line)
         //C style
         while(--it != m_lexPosition.end())
         {
+            if (it->first >= line)
+                continue;
+
             auto[l, str] = *it;
             for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
             {

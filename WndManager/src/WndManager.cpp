@@ -494,6 +494,8 @@ bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 {
     LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " refresh=" << refresh << " view=" << view;
 
+    //save current state before change wnd list
+    bool inv = m_invalidate;
     if (0 == view)
     {
         m_activeView = 0;
@@ -502,7 +504,6 @@ bool WndManager::Show(Wnd* wnd, bool refresh, int view)
     else
         SetTopWnd(wnd, view);
 
-    bool inv = m_invalidate;
     if (!inv && !refresh)
         m_invalidate = false;
 
