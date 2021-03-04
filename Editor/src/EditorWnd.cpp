@@ -1345,7 +1345,7 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
             ex1 = posX + str.size() - 1;
         }
 
-        if (ex1 < 0)
+        if (ex1 < 0)//???
             ex1 = 0;
 
         size_t dstY = posY + i;

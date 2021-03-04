@@ -564,7 +564,7 @@ bool Editor::AddSubstr(bool save, size_t line, size_t pos, const std::u16string&
         if (save)
         {
             m_undoList.AddEditCmd(cmd_t::CMD_ADD_SUBSTR, line, pos, 0, substr.size(), substr);
-            m_undoList.AddUndoCmd(cmd_t::CMD_DEL_SUBSTR, line, pos, 0, substr.size(), std::nullopt);
+            m_undoList.AddUndoCmd(cmd_t::CMD_DEL_SUBSTR, line, pos, 0, substr.size(), {});
         }
 
         CorrectTab(save, line, m_curStrBuff);
@@ -647,7 +647,7 @@ bool Editor::CorrectTab(bool save, size_t line, std::u16string& str)
 
     if (save && !tabs.empty())
     {
-        m_undoList.AddEditCmd(cmd_t::CMD_CORRECT_TAB, line, 0, 0, 0, std::nullopt);
+        m_undoList.AddEditCmd(cmd_t::CMD_CORRECT_TAB, line, 0, 0, 0, {});
         m_undoList.AddUndoCmd(cmd_t::CMD_RESTORE_TAB, line, 0, 0, tabs.size(), tabs);
     }
 
@@ -684,7 +684,7 @@ bool Editor::AddLine(bool save, size_t line, const std::u16string& str)
     if (save)
     {
         m_undoList.AddEditCmd(cmd_t::CMD_ADD_LINE, line, 0, 0, str.size(), str);
-        m_undoList.AddUndoCmd(cmd_t::CMD_DEL_LINE, line, 0, count, 0, std::nullopt);
+        m_undoList.AddUndoCmd(cmd_t::CMD_DEL_LINE, line, 0, count, 0, {});
     }
 
     return rc;
@@ -707,7 +707,7 @@ bool Editor::DelSubstr(bool save, size_t line, size_t pos, size_t len)
 
     if (save)
     {
-        m_undoList.AddEditCmd(cmd_t::CMD_DEL_SUBSTR, line, pos, 0, len, std::nullopt);
+        m_undoList.AddEditCmd(cmd_t::CMD_DEL_SUBSTR, line, pos, 0, len, {});
         m_undoList.AddUndoCmd(cmd_t::CMD_ADD_SUBSTR, line, pos, 0, len, prevStr);
     }
 
@@ -726,7 +726,7 @@ bool Editor::DelLine(bool save, size_t line, size_t count)
         auto str = GetStr(line);
         size_t len = Editor::UStrLen(str);
 
-        m_undoList.AddEditCmd(cmd_t::CMD_DEL_LINE, line, 0, count, 0, std::nullopt);
+        m_undoList.AddEditCmd(cmd_t::CMD_DEL_LINE, line, 0, count, 0, {});
         m_undoList.AddUndoCmd(cmd_t::CMD_ADD_LINE, line, 0, 0, len, str);
     }
 
@@ -788,8 +788,8 @@ bool Editor::MergeLine(bool save, size_t line, size_t pos, size_t indent)
 
     if (save)
     {
-        m_undoList.AddEditCmd(cmd_t::CMD_MERGE_LINE, line, pos, indent, 0, std::nullopt);
-        m_undoList.AddUndoCmd(cmd_t::CMD_SPLIT_LINE, line, pos, indent, 0, std::nullopt);
+        m_undoList.AddEditCmd(cmd_t::CMD_MERGE_LINE, line, pos, indent, 0, {});
+        m_undoList.AddUndoCmd(cmd_t::CMD_SPLIT_LINE, line, pos, indent, 0, {});
     }
 
     CorrectTab(save, line, m_curStrBuff);
@@ -821,11 +821,11 @@ bool Editor::SplitLine(bool save, size_t line, size_t pos, size_t indent)
 
     if (save)
     {
-        m_undoList.AddEditCmd(cmd_t::CMD_SPLIT_LINE, line, pos, indent, 0, std::nullopt);
-        m_undoList.AddUndoCmd(cmd_t::CMD_MERGE_LINE, line, pos, indent, 0, std::nullopt);
+        m_undoList.AddEditCmd(cmd_t::CMD_SPLIT_LINE, line, pos, indent, 0, {});
+        m_undoList.AddUndoCmd(cmd_t::CMD_MERGE_LINE, line, pos, indent, 0, {});
     }
 
-    bool rc = AddLine(0, line + 1, str);
+    bool rc = AddLine(false, line + 1, str);
     InvalidateWnd(line, invalidate_t::insert);
 
     return rc;
@@ -849,7 +849,7 @@ bool Editor::SaveTab(bool save, size_t line)
 
     if (save && !tabs.empty())
     {
-        m_undoList.AddEditCmd(cmd_t::CMD_SAVE_TAB, line, 0, 0, 0, std::nullopt);
+        m_undoList.AddEditCmd(cmd_t::CMD_SAVE_TAB, line, 0, 0, 0, {});
         m_undoList.AddUndoCmd(cmd_t::CMD_RESTORE_TAB, line, 0, 0, tabs.size(), tabs);
     }
 
@@ -873,7 +873,7 @@ bool Editor::ClearSubstr(bool save, size_t line, size_t pos, size_t len)
 
     if (save)
     {
-        m_undoList.AddEditCmd(cmd_t::CMD_CLEAR_SUBSTR, line, pos, 0, len, std::nullopt);
+        m_undoList.AddEditCmd(cmd_t::CMD_CLEAR_SUBSTR, line, pos, 0, len, {});
         m_undoList.AddUndoCmd(cmd_t::CMD_CHANGE_SUBSTR, line, pos, 0, len, prevstr);
     }
 
@@ -888,4 +888,68 @@ bool Editor::AddUndoCommand(const EditCmd& editCmd, const EditCmd& undoCmd)
     m_undoList.AddUndoCmd(undoCmd.command, undoCmd.line, undoCmd.pos, undoCmd.count, undoCmd.len, undoCmd.str);
 
     return true;
+}
+
+bool Editor::ClearModifyFlag()
+{
+    //???m_pDObject->CheckAccess(1);
+    m_buffer.m_changed = false;
+    m_curChanged = false;
+    return true;
+}
+
+bool Editor::Command(const EditCmd& cmd)
+{
+    bool rc{};
+
+    switch (cmd.command)
+    {
+    case cmd_t::CMD_ADD_LINE:
+        rc = AddLine(false, cmd.line, cmd.str);
+        break;
+    case cmd_t::CMD_DEL_LINE:
+        rc = DelLine(false, cmd.line, cmd.count);
+        break;
+    case cmd_t::CMD_MERGE_LINE:
+        rc = MergeLine(false, cmd.line, cmd.pos, cmd.count);
+        break;
+    case cmd_t::CMD_SPLIT_LINE:
+        rc = SplitLine(false, cmd.line, cmd.pos, cmd.count);
+        break;
+    case cmd_t::CMD_ADD_SUBSTR:
+        rc = AddSubstr(false, cmd.line, cmd.pos, cmd.str);
+        break;
+    case cmd_t::CMD_CHANGE_SUBSTR:
+        rc = ChangeSubstr(false, cmd.line, cmd.pos, cmd.str);
+        break;
+    case cmd_t::CMD_CLEAR_SUBSTR:
+        rc = ClearSubstr(false, cmd.line, cmd.pos, cmd.len);
+        break;
+    case cmd_t::CMD_DEL_SUBSTR:
+        rc = DelSubstr(false, cmd.line, cmd.pos, cmd.len);
+        break;
+    case cmd_t::CMD_REPLACE_SUBSTR:
+        //???rc = ReplaceSubstr(false, cmd.line, cmd.pos, cmd.count, cmd.str);
+        break;
+    case cmd_t::CMD_INDENT:
+        //???rc = Indent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
+        break;
+    case cmd_t::CMD_UNDENT:
+        //???rc = Undent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
+        break;
+    case cmd_t::CMD_CORRECT_TAB:
+        break;
+    case cmd_t::CMD_SAVE_TAB:
+        rc = SaveTab(false, cmd.line);
+        break;
+    case cmd_t::CMD_RESTORE_TAB:
+        //???rc = RestoreTab(false, cmd.line, cmd.str);
+        break;
+
+    default:
+        LOG(ERROR) << "Unknown command " << static_cast<int>(cmd.command);
+        break;
+    }
+
+    return rc;
 }

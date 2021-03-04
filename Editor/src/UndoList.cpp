@@ -37,7 +37,7 @@ bool UndoList::Clear()
     return true;
 }
 
-bool UndoList::AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, std::optional<const std::u16string> str)
+bool UndoList::AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str)
 {
     if (m_editIt != m_editList.end())
     {
@@ -48,7 +48,7 @@ bool UndoList::AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, 
     return true;
 }
 
-bool UndoList::AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, std::optional<const std::u16string> str)
+bool UndoList::AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str)
 {
     if (m_undoIt != m_undoList.end())
     {

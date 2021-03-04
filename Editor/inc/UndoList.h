@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum class cmd_t
 {
+    CMD_ABSENT,
     CMD_END,             //end of command sequence
     CMD_BEGIN,           //begin of command sequence
     CMD_SET_POS,
@@ -59,14 +60,14 @@ enum class cmd_t
 
 struct EditCmd
 {
-  cmd_t             command;
-  size_t            line;
-  size_t            pos;
-  size_t            len;
-  size_t            count;
+    cmd_t             command{};
+    size_t            line{};
+    size_t            pos{};
+    size_t            len{};
+    size_t            count{};
 
-  std::optional<std::u16string> str;
-  std::string       remark;
+    std::u16string    str{};
+    std::string       remark{};
 };
 
 
@@ -86,8 +87,8 @@ public:
   void SetRemark(const std::string& rem) { m_rem = rem; }
 
   bool Clear();
-  bool AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, std::optional<const std::u16string> str);
-  bool AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, std::optional<const std::u16string> str);
+  bool AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str);
+  bool AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str);
 
   EditCmd GetEditCmd();
   EditCmd PeekEditCmd();

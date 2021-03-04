@@ -162,7 +162,7 @@ public:
 
     bool                    CorrectTab(bool save, size_t line, std::u16string& str);
     bool                    SaveTab(bool save, size_t line);
-    bool                    RestoreTab(bool save, size_t line, const std::u16string& str, size_t len);
+    bool                    RestoreTab(bool save, size_t line, const std::u16string& str);
 
     bool                    AddLine(bool save, size_t line, const std::u16string& str);
     bool                    DelLine(bool save, size_t line, size_t count = 1);
@@ -186,11 +186,11 @@ public:
     //undo control
     void                    SetUndoRemark(const std::string& rem) {m_undoList.SetRemark(rem);}
     bool                    AddUndoCommand(const EditCmd& editCmd, const EditCmd& undoCmd);
-    bool                    Command(EditCmd cmd);
-    EditCmd                 GetUndo();
-    EditCmd                 GetRedo();
-    EditCmd                 PeekUndo();
-    EditCmd                 PeekRedo();
+    bool                    Command(const EditCmd& cmd);
+    EditCmd                 GetUndo() { return m_undoList.GetUndoCmd(); }
+    EditCmd                 GetRedo() { return m_undoList.GetEditCmd(); }
+    EditCmd                 PeekUndo() { return m_undoList.PeekUndoCmd(); }
+    EditCmd                 PeekRedo() { return m_undoList.PeekEditCmd(); }
 
     //lexical API
     bool                    SetParseStyle(const std::string& style);
