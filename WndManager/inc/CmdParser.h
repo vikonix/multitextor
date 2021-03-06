@@ -44,7 +44,7 @@ class CmdParser final
     std::list<std::vector<input_t>> m_cmdMap;
 
     std::vector<input_t>            m_savedKeys;
-    time_t                          m_time;
+    time_t                          m_time{};
 
 public:
     CmdParser() = default;

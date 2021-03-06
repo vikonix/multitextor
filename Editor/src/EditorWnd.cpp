@@ -1553,11 +1553,11 @@ bool EditorWnd::DelSelected()
         }
     }
 
-    int cx = x - m_xOffset;
+    int cx = static_cast<int>(x - m_xOffset);
     if (cx < 0 || cx >= m_sizeX)
         cx = -1;
 
-    int cy = y - m_firstLine;
+    int cy = static_cast<int>(y - m_firstLine);
     if (cy < 0 || cy >= m_sizeY)
         cy = -1;
 
@@ -1565,8 +1565,8 @@ bool EditorWnd::DelSelected()
         rc = _GotoXY(x, y);
     else
     {
-        m_cursorx = cx;
-        m_cursory = cy;
+        m_cursorx = static_cast<pos_t>(cx);
+        m_cursory = static_cast<pos_t>(cy);
     }
 
     //del mark
