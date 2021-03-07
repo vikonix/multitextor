@@ -227,9 +227,9 @@ bool  Application::PrintClock(bool print)
 
     time_t curTime = time(nullptr);
 
-    if (curTime <= m_prevTime + 1 && !print)
+    if (curTime <= m_prevClock + 1 && !print)
         return true;
-    m_prevTime = curTime;
+    m_prevClock = curTime;
 
     tm _tm;
 #ifdef WIN32    

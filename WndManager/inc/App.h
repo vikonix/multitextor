@@ -73,7 +73,7 @@ protected:
     bool                        m_insert{ true };
     bool                        m_mouseCapture{ false };
     bool                        m_recordMacro{ false };
-    time_t                      m_prevTime{};
+    time_t                      m_prevClock{};
 
     CmdParser                   m_cmdParser;
     CaptureInput*               m_capturedInput{};
