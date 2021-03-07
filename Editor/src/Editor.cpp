@@ -371,9 +371,9 @@ char Editor::GetAccessInfo()
         return 'M';
     
     auto mode = Directory::GetAccessMode(m_file);
-    if (mode == notexists)
+    if (mode == fileaccess_t::notexists)
         return 'N';//new
-    else if (m_ro || mode == readonly)
+    else if (m_ro || mode == fileaccess_t::readonly)
         return 'R';
     else
         return ' ';

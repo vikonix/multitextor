@@ -187,10 +187,10 @@ public:
     void                    SetUndoRemark(const std::string& rem) {m_undoList.SetRemark(rem);}
     bool                    AddUndoCommand(const EditCmd& editCmd, const EditCmd& undoCmd);
     bool                    Command(const EditCmd& cmd);
-    EditCmd                 GetUndo() { return m_undoList.GetUndoCmd(); }
-    EditCmd                 GetRedo() { return m_undoList.GetEditCmd(); }
-    EditCmd                 PeekUndo() { return m_undoList.PeekUndoCmd(); }
-    EditCmd                 PeekRedo() { return m_undoList.PeekEditCmd(); }
+    std::optional<EditCmd>  GetUndo() { return m_undoList.GetUndoCmd(); }
+    std::optional<EditCmd>  GetRedo() { return m_undoList.GetEditCmd(); }
+    std::optional<EditCmd>  PeekUndo() { return m_undoList.PeekUndoCmd(); }
+    std::optional<EditCmd>  PeekRedo() { return m_undoList.PeekEditCmd(); }
 
     //lexical API
     bool                    SetParseStyle(const std::string& style);

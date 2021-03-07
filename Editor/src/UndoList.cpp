@@ -59,36 +59,36 @@ bool UndoList::AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, 
     return true;
 }
 
-EditCmd UndoList::GetEditCmd()
+std::optional<EditCmd> UndoList::GetEditCmd()
 {
     if (m_editIt == m_editList.end())
-        return {};
+        return std::nullopt;
     auto it = m_editIt;
     ++m_editIt;
     ++m_undoIt;
     return *it;
 }
 
-EditCmd UndoList::PeekEditCmd()
+std::optional<EditCmd> UndoList::PeekEditCmd()
 {
     if (m_editIt == m_editList.end())
-        return {};
+        return std::nullopt;
     return *m_editIt;
 }
 
-EditCmd UndoList::GetUndoCmd()
+std::optional<EditCmd> UndoList::GetUndoCmd()
 {
     if (m_undoIt == m_undoList.begin())
-        return {};
+        return std::nullopt;
     --m_editIt;
     --m_undoIt;
     return *m_undoIt;
 }
 
-EditCmd UndoList::PeekUndoCmd()
+std::optional<EditCmd> UndoList::PeekUndoCmd()
 {
     if (m_undoIt == m_undoList.begin())
-        return {};
+        return std::nullopt;
     auto it = m_undoIt;
     --it;
     return *it;

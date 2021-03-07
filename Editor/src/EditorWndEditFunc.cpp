@@ -351,6 +351,160 @@ bool EditorWnd::EditBlockDel(input_t cmd)
     return rc;
 }
 
+bool EditorWnd::EditUndo(input_t cmd)
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditUndo " << std::hex << cmd << std::dec;
+
+    auto editCmd = m_editor->PeekUndo();
+    if (!editCmd)
+        return true;
+
+    if (editCmd->line != m_firstLine + m_cursory)
+    {
+        if (editCmd->pos >= 0)//???
+            _GotoXY(editCmd->pos, editCmd->line);
+        else
+            _GotoXY(m_xOffset + m_cursorx, editCmd->line);
+        
+        return true;
+    }
+
+    bool rc{true};
+    editCmd = m_editor->GetUndo();
+    if (editCmd)
+    {
+        if (m_selectState == select_state::complete)
+        {
+            //del mark
+            ChangeSelected(select_change::clear);
+            InvalidateRect();
+        }
+
+        if (editCmd->pos >= 0)//???
+            _GotoXY(editCmd->pos, editCmd->line);
+        else
+            _GotoXY(m_xOffset + m_cursorx, editCmd->line);
+
+        if (editCmd->command == cmd_t::CMD_SET_POS)
+            ;//nothing to do
+        else if (editCmd->command == cmd_t::CMD_END)
+        {
+            //sprintf(StatBuff, GetSStr(STR_S(SS_WaitWhileUndo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
+            //???SetHelpLine(StatBuff);
+
+            int n = 1;
+            while (editCmd = m_editor->GetUndo())
+            {
+                if (editCmd->command == cmd_t::CMD_END)
+                    ++n;
+                if (editCmd->command == cmd_t::CMD_BEGIN)
+                    --n;
+                if (!n)
+                    break;
+
+                rc = m_editor->Command(*editCmd);
+            }
+
+            //sprintf(StatBuff, GetSStr(STR_S(SS_Undo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
+            //???SetHelpLine(StatBuff, 1);
+        }
+        else
+        {
+            //sprintf(StatBuff, GetSStr(STR_S(SS_Undo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
+            //???SetHelpLine(StatBuff, 1);
+
+            rc = m_editor->Command(*editCmd);
+        }
+    }
+    else
+    {
+        //???SetErrorLine(STR_S(SS_UndoCommandAbsent));
+        m_editor->SetCurStr(STR_NOTDEFINED);
+        if (!m_saved)
+            m_editor->ClearModifyFlag();
+    }
+
+    return true;
+}
+
+bool EditorWnd::EditRedo(input_t cmd)
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditRedo " << std::hex << cmd << std::dec;
+
+    auto redoCmd = m_editor->PeekRedo();
+    if (!redoCmd)
+        return true;
+
+    if (redoCmd->line != m_firstLine + m_cursory)
+    {
+        if (redoCmd->pos >= 0)//???
+            _GotoXY(redoCmd->pos, redoCmd->line);
+        else
+            _GotoXY(m_xOffset + m_cursorx, redoCmd->line);
+        return true;
+    }
+
+    bool rc{true};
+    redoCmd = m_editor->GetRedo();
+    if (redoCmd)
+    {
+        if (m_selectState == select_state::complete)
+        {
+            //del mark
+            ChangeSelected(select_change::clear);
+            InvalidateRect();
+        }
+
+        if (redoCmd->pos >= 0)//???
+            _GotoXY(redoCmd->pos, redoCmd->line);
+        else
+            _GotoXY(m_xOffset + m_cursorx, redoCmd->line);
+
+        if (redoCmd->command == cmd_t::CMD_SET_POS)
+            ;//nothing to do
+        else if (redoCmd->command == cmd_t::CMD_BEGIN)
+        {
+            //sprintf(StatBuff, GetSStr(STR_S(SS_WaitWhileRedo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
+            //???SetHelpLine(StatBuff);
+
+            int n = 1;
+            while (redoCmd = m_editor->GetRedo())
+            {
+                if (redoCmd->command == cmd_t::CMD_BEGIN)
+                    ++n;
+                if (redoCmd->command == cmd_t::CMD_END)
+                    --n;
+                if (!n)
+                    break;
+
+                rc = m_editor->Command(*redoCmd);
+            }
+
+            //sprintf(StatBuff, GetSStr(STR_S(SS_Redo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
+            //???SetHelpLine(StatBuff, 1);
+        }
+        else
+        {
+            //sprintf(StatBuff, GetSStr(STR_S(SS_Redo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
+            //???SetHelpLine(StatBuff, 1);
+
+            rc = m_editor->Command(*redoCmd);
+        }
+    }
+    else
+    {
+        //???SetErrorLine(STR_S(SS_RedoCommandAbsent));
+    }
+
+    return true;
+}
+
 bool EditorWnd::EditBlockIndent(input_t cmd)
 {
     return true;
@@ -373,160 +527,6 @@ bool EditorWnd::EditCutToClipboard(input_t cmd)
 
 bool EditorWnd::EditPasteFromClipboard(input_t cmd)
 {
-    return true;
-}
-
-bool EditorWnd::EditUndo(input_t cmd)
-{
-    if (m_readOnly)
-        return true;
-
-    LOG(DEBUG) << "    EditUndo " << std::hex << cmd << std::dec;
-
-    auto editCmd = m_editor->PeekUndo();
-    if (editCmd.command == cmd_t::CMD_ABSENT)
-        return true;
-
-    if (editCmd.line != m_firstLine + m_cursory)
-    {
-        if (editCmd.pos >= 0)//???
-            _GotoXY(editCmd.pos, editCmd.line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, editCmd.line);
-        
-        return true;
-    }
-
-    bool rc{true};
-    editCmd = m_editor->GetUndo();
-    if (editCmd.command != cmd_t::CMD_ABSENT)
-    {
-        if (m_selectState == select_state::complete)
-        {
-            //del mark
-            ChangeSelected(select_change::clear);
-            InvalidateRect();
-        }
-
-        if (editCmd.pos >= 0)//???
-            _GotoXY(editCmd.pos, editCmd.line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, editCmd.line);
-
-        if (editCmd.command == cmd_t::CMD_SET_POS)
-            ;//nothing to do
-        else if (editCmd.command == cmd_t::CMD_END)
-        {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_WaitWhileUndo_s_command)), redoCmd.remark ? GetSStr(redoCmd.remark) : "?");
-            //???SetHelpLine(StatBuff);
-
-            int n = 1;
-            while (editCmd = m_editor->GetUndo(), editCmd.command != cmd_t::CMD_ABSENT)
-            {
-                if (editCmd.command == cmd_t::CMD_END)
-                    ++n;
-                if (editCmd.command == cmd_t::CMD_BEGIN)
-                    --n;
-                if (!n)
-                    break;
-
-                rc = m_editor->Command(editCmd);
-            }
-
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Undo_s_command)), redoCmd.remark ? GetSStr(redoCmd.remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
-        }
-        else
-        {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Undo_s_command)), redoCmd.remark ? GetSStr(redoCmd.remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
-
-            rc = m_editor->Command(editCmd);
-        }
-    }
-    else
-    {
-        //???SetErrorLine(STR_S(SS_UndoCommandAbsent));
-        m_editor->SetCurStr(STR_NOTDEFINED);
-        if (!m_saved)
-            m_editor->ClearModifyFlag();
-    }
-
-    return true;
-}
-
-bool EditorWnd::EditRedo(input_t cmd)
-{
-    if (m_readOnly)
-        return true;
-
-    LOG(DEBUG) << "    EditRedo " << std::hex << cmd << std::dec;
-
-    auto redoCmd = m_editor->PeekRedo();
-    if (redoCmd.command == cmd_t::CMD_ABSENT)
-        return true;
-
-    if (redoCmd.line != m_firstLine + m_cursory)
-    {
-        if (redoCmd.pos >= 0)//???
-            _GotoXY(redoCmd.pos, redoCmd.line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, redoCmd.line);
-        return true;
-    }
-
-    bool rc{true};
-    redoCmd = m_editor->GetRedo();
-    if (redoCmd.command != cmd_t::CMD_ABSENT)
-    {
-        if (m_selectState == select_state::complete)
-        {
-            //del mark
-            ChangeSelected(select_change::clear);
-            InvalidateRect();
-        }
-
-        if (redoCmd.pos >= 0)//???
-            _GotoXY(redoCmd.pos, redoCmd.line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, redoCmd.line);
-
-        if (redoCmd.command == cmd_t::CMD_SET_POS)
-            ;//nothing to do
-        else if (redoCmd.command == cmd_t::CMD_BEGIN)
-        {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_WaitWhileRedo_s_command)), redoCmd.remark ? GetSStr(redoCmd.remark) : "?");
-            //???SetHelpLine(StatBuff);
-
-            int n = 1;
-            while (redoCmd = m_editor->GetRedo(), redoCmd.command != cmd_t::CMD_ABSENT)
-            {
-                if (redoCmd.command == cmd_t::CMD_BEGIN)
-                    ++n;
-                if (redoCmd.command == cmd_t::CMD_END)
-                    --n;
-                if (!n)
-                    break;
-
-                rc = m_editor->Command(redoCmd);
-            }
-
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Redo_s_command)), redoCmd.remark ? GetSStr(redoCmd.remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
-        }
-        else
-        {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Redo_s_command)), redoCmd.remark ? GetSStr(redoCmd.remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
-
-            rc = m_editor->Command(redoCmd);
-        }
-    }
-    else
-    {
-        //???SetErrorLine(STR_S(SS_RedoCommandAbsent));
-    }
-
     return true;
 }
 

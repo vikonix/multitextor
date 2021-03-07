@@ -669,7 +669,7 @@ bool EditorWnd::SelectBegin(input_t cmd)
     if ((m_selectState & select_state::end) != 0)
         SelectUnselect(cmd);
 
-    CaptureInput();
+    InputCapture();
     //???StatusMark((m_nSelectKeyShift || m_nSelectMouse) ? 1 : 2);
 
     if (!m_selectState)

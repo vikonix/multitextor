@@ -128,7 +128,7 @@ bool LexParser::SetParseStyle(int cp, const std::string& style)
 
             m_showTab = false;
 
-            if ((!m_openComment.empty() && !m_closeComment.empty()))//??? || !cfg.delimiters.empty())
+            if (!m_openComment.empty() && !m_closeComment.empty())
                 m_scan = true;
 
             return true;
@@ -568,6 +568,7 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
     {
     case lex_t::BACKSLASH:
         m_cutLine = true;
+        [[fallthrough]];
     case lex_t::END:
     case lex_t::DELIMITER:
         //along symbol

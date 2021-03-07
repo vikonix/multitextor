@@ -33,7 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 enum class cmd_t
 {
-    CMD_ABSENT,
+    CMD_NULL,
     CMD_END,             //end of command sequence
     CMD_BEGIN,           //begin of command sequence
     CMD_SET_POS,
@@ -90,8 +90,8 @@ public:
   bool AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str);
   bool AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, size_t len, const std::u16string& str);
 
-  EditCmd GetEditCmd();
-  EditCmd PeekEditCmd();
-  EditCmd GetUndoCmd();
-  EditCmd PeekUndoCmd();
+  std::optional<EditCmd> GetEditCmd();
+  std::optional<EditCmd> PeekEditCmd();
+  std::optional<EditCmd> GetUndoCmd();
+  std::optional<EditCmd> PeekUndoCmd();
 };

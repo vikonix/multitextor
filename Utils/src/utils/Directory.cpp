@@ -151,24 +151,24 @@ std::string Directory::CutPath(const path_t& path, size_t len)
     return shortPath.u8string();
 }
 
-access_t Directory::GetAccessMode(const path_t& path)
+fileaccess_t Directory::GetAccessMode(const path_t& path)
 {
     std::error_code ec;
     if (!std::filesystem::exists(path, ec))
-        return notexists;
+        return fileaccess_t::notexists;
         
-    access_t mode{ exists };
+    fileaccess_t mode{ fileaccess_t::exists };
     auto file = path.u8string();
 #ifdef WIN32
     if (_access(file.c_str(), 4) == 0)
-        mode = readonly;
+        mode = fileaccess_t::readonly;
     if (_access(file.c_str(), 6) == 0)
-        mode = readwrite;
+        mode = fileaccess_t::readwrite;
 #else
     if (access(file.c_str(), R_OK) == 0)
-        mode = readonly;
+        mode = fileaccess_t::readonly;
     if (access(file.c_str(), R_OK | W_OK) == 0)
-        mode = readwrite;
+        mode = fileaccess_t::readwrite;
 #endif
     return mode;
 }
