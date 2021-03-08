@@ -30,8 +30,19 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
 
+std::unordered_map<char16_t, std::pair<char16_t, bool>> LexParser::s_lexPairs
+{
+    {'[', {']', false}},
+    {']', {'[', true}},
+    {'{', {'}', false}},
+    {'}', {'{', true}},
+    {'(', {')', false}},
+    {')', {'(', true}},
+    {'<', {'>', false}},
+    {'>', {'<', true}},
+};
 
-std::list<LexConfig> LexParser::s_lexConfig =
+std::list<LexConfig> LexParser::s_lexConfig
 {
     {
         //plain text
@@ -972,331 +983,249 @@ bool LexParser::DeleteLexem(size_t line)
     return true;
 }
 
-
-#if 0
-
-int LexBuff::DumpLPos()
+bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& pos)
 {
-  TPRINT(("\nDumpLPos %d\n", m_nPos));
-//  for(int i = 0; i < m_nPos; ++i)
-//    TPRINT(("LP%5d line=%04d t=%c\n", i, m_pLPos[i].nline, m_pLPos[i].type));
-  return 0;
-}
+    LOG(DEBUG) << "CheckLexPair";
 
+    if(!m_scan || m_lexPosition.empty())
+        return false;
 
-int LexBuff::CheckLexPair(const wchar* pStr, size_t* pLine, int* pX)
-{
-  TPRINT(("CheckLexPair\n"));
+    char16_t ch = wstr[pos];
 
-  if(!m_pLPos || !m_pParse)
-    return 0;
+    auto pair = s_lexPairs.find(ch);
+    if(pair == s_lexPairs.end())
+        return false;
 
-  int   x = *pX;
-  wchar c = pStr[x];
-
-  if(c != '[' && c != ']'
-  && c != '{' && c != '}'
-  && c != '(' && c != ')'
-  && c != '<' && c != '>')
-    return 0;
-
-  int i;
-  char str[MAX_PARSE_STR];
-  for(i = 0; pStr[i] && i < MAX_PARSE_STR; ++i)
-    str[i] = wchar2char(m_nCP, pStr[i]);
-  str[i] = 0;
-
-  size_t nline = *pLine;
-  int pos = (int)GetLexPos(nline);//pos used as signed in loop
-
-  if(pos && m_pLPos[pos - 1].nline == nline - 1 && m_pLPos[pos - 1].type == '\\')
-  {
-    m_fCutLine = 1;
-    m_fString  = m_pLPos[pos - 2].type;
-  }
-  else
-  {
-    m_fCutLine = 0;
-    m_fString  = 0;
-  }
-
-  CheckForOpenRem(nline, pos);
-
-  char lex[MAX_PARSE_STR];
-  LexicalParse(nline, str, lex, NULL);
-
-  TPRINT(("%s. x=%d\n", lex, x));
-  if(lex[x] != '4')
-    return 0;
-
-  int fUp  = 0;
-  int pair = 0;
-  switch(c)
-  {
-  case '[':
-    pair = ']';
-    break;
-  case '{':
-    pair = '}';
-    break;
-  case '(':
-    pair = ')';
-    break;
-  case ']':
-    pair = '[';
-    fUp = 1;
-    break;
-  case '}':
-    pair = '{';
-    fUp = 1;
-    break;
-  case ')':
-    pair = '(';
-    fUp = 1;
-    break;
-  case '<':
-    pair = '>';
-    break;
-  case '>':
-    pair = '<';
-    fUp = 1;
-    break;
-  }
-
-  int count = 1;
-  if(!fUp)
-  {
-    ++x;
-    //ищем в текущей строке
-    while(pStr[x])
+    std::string str;
+    for (auto c : wstr)
     {
-      if(lex[x] == '4')
-      {
-        if(pStr[x] == pair)
-          --count;
-        else if(pStr[x] == c)
-          ++count;
-      }
-      if(!count)
-      {
-        *pX = x;
-        return 1;
-      }
-      ++x;
+        str += (char)c;//???wchar2char(m_nCP, pStr[i]);
     }
 
-    while(pos < m_nPos && m_pLPos[pos].nline == nline)
-      ++pos;
+    CheckForConcatenatedLine(line);
+    CheckForOpenComments(line);
 
-    //ищем в следующих строках
-    while(pos < m_nPos)
+    std::string curLex;
+    LexicalParse(str, curLex, true);
+    const char delimiter{ '8' };
+
+    LOG(DEBUG) << "    lex=" << curLex << ". pos=" << pos;
+    if(curLex[pos] != delimiter)
+        return false;
+
+    auto& [chPair, up] = pair->second;
+    auto posIt = m_lexPosition.lower_bound(line);
+
+    int count = 1;
+    if(!up)
     {
-      if(m_pLPos[pos].type == 'O')
-      {
-        //skip rem
-        while(pos < m_nPos && m_pLPos[pos].type != 'C')
-          ++pos;
-      }
-      else if(m_pLPos[pos].type == pair)
-        --count;
-      else if(m_pLPos[pos].type == c)
-        ++count;
-
-      if(!count)
-        goto GetStartCount;
-
-      ++pos;
-    }
-  }
-  else
-  {
-    --x;
-    //ищем в текущей строке
-    while(x >= 0)
-    {
-      if(lex[x] == '4')
-      {
-        if(pStr[x] == pair)
-          --count;
-        else if(pStr[x] == c)
-          ++count;
-      }
-      if(!count)
-      {
-        *pX = x;
-        return 1;
-      }
-      --x;
-    }
-
-    while(pos >= 0 && m_pLPos[pos].nline == nline)
-      --pos;
-
-    //ищем в предыдущих строках
-    while(pos >= 0)
-    {
-      if(m_pLPos[pos].type == 'C')
-      {
-        //skip rem
-        TPRINT(("Scan skip rem pos=%d\n", pos));
-        int open = pos;
-        --pos;
-        while(pos > 0 && m_pLPos[pos].type != 'C')
+        ++pos;
+        //looking in current line
+        for(; pos < str.size(); ++pos)
         {
-          if(m_pLPos[pos].type == 'O')
-            open = pos;
-          --pos;
+            if(curLex[pos] == delimiter)
+            {
+                if(str[pos] == chPair)
+                    --count;
+                else if(str[pos] == ch)
+                    ++count;
+            }
+            if(!count)
+            {
+                return true;
+            }
         }
-        pos = open;
-        TPRINT(("Skip rem pos=%d\n", pos));
-      }
-      else if(m_pLPos[pos].type == pair)
-        --count;
-      else if(m_pLPos[pos].type == c)
-        ++count;
 
-      if(!count)
-        goto GetStartCount;
+        //looking in next lines
+        bool skipComment{};
+        for (; posIt != m_lexPosition.end(); ++posIt)
+        {
+            if (posIt->first == line)
+                continue;
+            for (auto c : posIt->second)
+            {
+                if (c == 'O')
+                {
+                    //skip comment
+                    skipComment = true;
+                }
+                else if (skipComment)
+                {
+                    if (c == 'C')
+                        skipComment = false;
+                }
+                else if (c == chPair)
+                    --count;
+                else if (c == ch)
+                    ++count;
 
-      --pos;
+                if (!count)
+                    goto GetStartCount;
+            }
+        }
     }
-  }
+    else
+    {
+        --pos;
+        //looking in current line
+        for (; pos < str.size(); --pos)
+        {
+            if (curLex[pos] == delimiter)
+            {
+                if (str[pos] == chPair)
+                    --count;
+                else if (str[pos] == ch)
+                    ++count;
+            }
+            if (!count)
+            {
+                return true;
+            }
+        }
 
-  return 0;
+        //looking in prev lines
+        for (; posIt != m_lexPosition.end(); --posIt)
+        {
+            if (posIt->first == line)
+                continue;
+
+            auto lex = posIt->second;
+            for (size_t i = lex.size() - 1; i < lex.size(); --i)
+            {
+                char c = lex[i];
+                if (c == 'C')
+                {
+                    auto saveIt{ m_lexPosition.end() };
+                    size_t saveI{};
+                    bool end{};
+
+                    LOG(DEBUG) << "Scan skip rem line=" << posIt->first << " pos=" << i;
+                    for (; posIt != m_lexPosition.end() && !end; --posIt)
+                    {
+                        const auto& lex1 = posIt->second;
+                        for (--i; i < lex1.size(); --i)
+                        {
+                            char c1 = lex1[i];
+                            if (c1 == 'O')
+                            {
+                                saveIt = posIt;
+                                saveI = i;
+                            }
+                            else if (c1 == 'C')
+                            {
+                                end = true;
+                                break;
+                            }
+                        }
+                    }
+
+                    if (saveIt == m_lexPosition.end())
+                        return false;
+
+                    posIt = saveIt;
+                    i = saveI;
+                    lex = saveIt->second;
+                    LOG(DEBUG) << "Skip rem line=" << posIt->first << " pos=" << i;
+                }
+                else if (c == chPair)
+                    --count;
+                else if (c == ch)
+                    ++count;
+
+                if (!count)
+                    goto GetStartCount;
+            }
+        }
+    }
+    return false;
 
 GetStartCount:
-  *pLine = m_pLPos[pos].nline;
+    line = posIt->first;
+    const auto& lex = posIt->second;
 
-  //идем в начало строки и считаем скобки
-  while(m_pLPos[pos].nline == *pLine)
-  {
-    if(m_pLPos[pos].type == pair)
-      --count;
-    else if(m_pLPos[pos].type == c)
-      ++count;
-
-    if(pos)
-      --pos;
-    else
-      break;
-  }
-  *pX = count;//count на начало строки
-
-  TPRINT(("l=%d x=%d\n", *pLine, *pX));
-
-  return 1;
-}
-
-
-int LexBuff::GetLexPair(const wchar* pStr, size_t nline, wchar c, int* pX)
-{
-  TPRINT(("GetLexPair line=%d c=%c n=%d\n", nline, c, *pX));
-
-  if(!m_pLPos || !m_pParse)
-    return 0;
-
-  int count = -*pX;
-
-  int i;
-  char str[MAX_PARSE_STR];
-  for(i = 0; pStr[i] && i < MAX_PARSE_STR; ++i)
-    str[i] = wchar2char(m_nCP, pStr[i]);
-  str[i] = 0;
-
-  size_t pos = GetLexPos(nline);
-  if(pos && m_pLPos[pos - 1].nline == nline - 1 && m_pLPos[pos - 1].type == '\\')
-  {
-    m_fCutLine = 1;
-    m_fString  = m_pLPos[pos - 2].type;
-  }
-  else
-  {
-    m_fCutLine = 0;
-    m_fString  = 0;
-  }
-
-  CheckForOpenRem(nline, pos);
-
-  char lex[MAX_PARSE_STR];
-  LexicalParse(nline, str, lex, NULL);
-
-  TPRINT(("%s.\n", lex));
-
-  int fUp  = 0;
-  int pair = 0;
-  switch(c)
-  {
-  case '[':
-    pair = ']';
-    break;
-  case '{':
-    pair = '}';
-    break;
-  case '(':
-    pair = ')';
-    break;
-  case ']':
-    pair = '[';
-    fUp  = 1;
-    break;
-  case '}':
-    pair = '{';
-    fUp  = 1;
-    break;
-  case ')':
-    pair = '(';
-    fUp  = 1;
-    break;
-  case '<':
-    pair = '>';
-    break;
-  case '>':
-    pair = '<';
-    fUp  = 1;
-    break;
-  }
-
-  int x = 0;
-  while(pStr[x])
-  {
-    if(lex[x] == '4')
+    //goto begin of line and count brackets
+    for (size_t i = lex.size() - 1; i < lex.size(); --i)
     {
-      if(pStr[x] == pair)
-      {
-        int posx = x;
-        if(!fUp)
-          --count;
-        else
-        {
-          ++x;
-          while(pStr[x] && lex[x] != '4')
-            ++x;
-
-          if(pStr[x] != c)
-          {
+        char c = lex[i];
+        if (c == chPair)
             --count;
-            --x;
-          }
-        }
-
-        if(!count)
-        {
-          x = posx;
-          break;
-        }
-      }
-      else if(pStr[x] == c)
-        ++count;
+        else if (c == ch)
+            ++count;
     }
-    ++x;
-  }
 
-  *pX = x;
+    pos = static_cast<size_t>(count);
 
-  return 1;
+    LOG(DEBUG) << "line=" << line << " pos=" << pos;
+    return true;
 }
 
+bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch, size_t& pos)
+{
+    int count = -static_cast<int>(pos);
 
+    LOG(DEBUG) << "GetLexPair line=" << line << " ch=" << ch << " count=" << count;
+
+    if (!m_scan || m_lexPosition.empty())
+        return false;
+
+    auto pair = s_lexPairs.find(ch);
+    if (pair == s_lexPairs.end())
+        return false;
+
+    std::string str;
+    for (auto c : wstr)
+    {
+        str += (char)c;//???wchar2char(m_nCP, pStr[i]);
+    }
+
+    CheckForConcatenatedLine(line);
+    CheckForOpenComments(line);
+
+    std::string lex;
+    LexicalParse(str, lex, true);
+    const char delimiter{ '8' };
+    
+    LOG(DEBUG) << "    lex=" << lex;
+    auto& [chPair, up] = pair->second;
+
+    size_t x{};
+    for(; x < str.size(); ++x)
+    {
+        if(lex[x] == delimiter)
+        {
+            if(str[x] == chPair)
+            {
+                size_t posx = x;
+                if(!up)
+                    --count;
+                else
+                {
+                    ++x;
+                    while(x < str.size() && lex[x] != delimiter)
+                        ++x;
+
+                    if(str[x] != ch)
+                    {
+                        --count;
+                        --x;
+                    }
+                }
+
+                if(!count)
+                {
+                    pos = posx;
+                    break;
+                }
+            }
+            else if(str[x] == ch)
+                ++count;
+        }
+    }
+
+    return true;
+}
+
+/*
 int LexBuff::CheckFunc(size_t nline, const wchar* pStr)
 {
   if(!m_pLPos || !m_pParse)
@@ -1385,4 +1314,4 @@ int LexBuff::CheckFunc(size_t nline, const wchar* pStr)
   return fFunc;
 }
 
-#endif
+*/

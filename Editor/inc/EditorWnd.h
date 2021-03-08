@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 #include <unordered_map>
 
+class Diff;
+
 class EditorWnd : public FrameWnd
 {
     enum select_state : int
@@ -120,8 +122,8 @@ class EditorWnd : public FrameWnd
     int             m_lexY{-1};
 
     //diff mode
-    //Diff*      m_pDiff;
-    //int        m_nDiffBuff;
+    std::shared_ptr<Diff>   m_diff;
+    int        m_diffBuff;
 
     bool    _GotoXY(size_t x, size_t y, bool top = false);
     bool    InvalidateRect(pos_t x = 0, pos_t y = 0, pos_t sizex = 0, pos_t sizey = 0);
@@ -130,7 +132,7 @@ class EditorWnd : public FrameWnd
     bool    UpdateAccessInfo();
     bool    UpdateNameInfo();
     bool    UpdatePosInfo();
-    bool    UpdateProgress(size_t d);
+//    bool    UpdateProgress(size_t d);
     bool    UpdateLexPair();
     bool    ChangeSelected(select_change type, size_t line = 0, size_t pos = 0, size_t size = 1);
     bool    CorrectSelection();
@@ -153,6 +155,12 @@ public:
     bool        HideFound();
     bool        SelectClear();
     bool        FindWord(const std::u16string& str, size_t& begin, size_t& end);
+    bool        SetDiffMode(std::shared_ptr<Diff> diff = nullptr, int buff = -1)
+    {
+        m_diff = diff;
+        m_diffBuff = buff;
+        return true;
+    }
 
     //bool        IsSelected() { return m_selectState != select_state::no; }
 
@@ -194,8 +202,6 @@ public:
   int       SetFileName(char* pName = NULL, int fUntitled = 0, const char* pParse = "");
   int       SaveCfg(SSave* pSave);
   int       LoadCfg();
-  int       SetDiffMode(Diff* pDiff = NULL, int diff = -1)
-    {m_pDiff = pDiff; m_nDiffBuff = diff; return 0;}
 
   int       SelectWord(wchar* pStr, size_t* pB, size_t* pE);
   int       GetWord(char* pStr = NULL);

@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "UndoList.h"
-
+#include "Editor.h"
 
 bool UndoList::Clear()
 {
@@ -44,7 +44,10 @@ bool UndoList::AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, 
         m_editList.erase(m_editIt, m_editList.end());
         m_editIt = m_editList.end();
     }
-    m_editList.push_back(EditCmd{ command, line, pos, len, count, str, m_rem });
+    size_t strlen = Editor::UStrLen(str);
+    if (strlen > len)
+        strlen = len;
+    m_editList.push_back(EditCmd{ command, line, pos, len, count, std::move(str.substr(0, strlen)), m_rem });
     return true;
 }
 
@@ -55,7 +58,10 @@ bool UndoList::AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, 
         m_undoList.erase(m_undoIt, m_undoList.end());
         m_undoIt = m_undoList.end();
     }
-    m_undoList.emplace_back(EditCmd{ command, line, pos, len, count, str, m_rem });
+    size_t strlen = Editor::UStrLen(str);
+    if (strlen > len)
+        strlen = len;
+    m_undoList.emplace_back(EditCmd{ command, line, pos, len, count, std::move(str.substr(0, strlen)), m_rem });
     return true;
 }
 

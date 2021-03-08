@@ -34,6 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <optional>
 #include <unordered_set>
+#include <unordered_map>
 
                             //symbol_t types
 enum class lex_t
@@ -83,6 +84,7 @@ using string_set = std::unordered_set<std::string>;
 class LexParser
 {
     static std::list<LexConfig> s_lexConfig;
+    static std::unordered_map<char16_t, std::pair<char16_t, bool>> s_lexPairs;
 
     bool        m_scan{};
     std::string m_parseStyle;
@@ -152,7 +154,7 @@ public:
     bool    ScanStr(size_t line, std::string_view str);
     bool    GetColor(size_t line, const std::u16string& str, std::vector<color_t>& color, size_t len);
 
-    bool    CheckLexPair(const std::u16string& str, size_t& line, size_t pos);
+    bool    CheckLexPair(const std::u16string& str, size_t& line, size_t& pos);
     bool    GetLexPair(const std::u16string& str, size_t line, char16_t c, size_t& pos);
 
     bool    ChangeStr(size_t line, const std::u16string& str, invalidate_t& inv);

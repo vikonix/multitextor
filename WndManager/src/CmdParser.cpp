@@ -60,9 +60,9 @@ scancmd_t CmdParser::ScanKey(input_t key)
     {
         if (!m_savedKeys.empty() && time(NULL) - m_time > 1)
         {
-            //big time between key pressing
+            //long time between key pressing
             //return all collected codes
-            //StatusWaitKey(false);
+            Application::getInstance().StatusWaitKey();
             return scancmd_t::collected;
         }
         else
@@ -88,7 +88,7 @@ scancmd_t CmdParser::ScanKey(input_t key)
             {
                 --cmdit;
                 m_savedKeys = *cmdit;
-                //StatusWaitKey(false);
+                Application::getInstance().StatusWaitKey();
                 return scancmd_t::collected;
             }
         }
@@ -97,7 +97,8 @@ scancmd_t CmdParser::ScanKey(input_t key)
             if (!std::memcmp(savedptr, keyptr, m_savedKeys.size() * sizeof(input_t)))
             {
                 m_time = time(NULL);
-                //if(m_savedKeys.size() == 1) StatusWaitKey(true);
+                if(m_savedKeys.size() == 1) 
+                    Application::getInstance().StatusWaitKey(true);
                 return scancmd_t::wait_next;
             }
         }

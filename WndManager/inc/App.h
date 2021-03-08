@@ -92,9 +92,10 @@ public:
     virtual bool    LoadCfg()                                   { return true; } //configuration loading
     virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  { return true; } //configuration saving
 
-    bool    Init();
-    void    Deinit();
-    
+    virtual bool    Init();
+    virtual void    Deinit();
+    virtual bool    StatusWaitKey([[maybe_unused]]bool wait = false) { return true; }
+
     input_t MainProc(input_t exit_code = K_EXIT);//input treatment loop
     input_t CheckMouse(input_t code);
     input_t ParseCommand(input_t code);

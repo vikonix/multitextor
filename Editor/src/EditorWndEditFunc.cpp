@@ -27,9 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "utils/SymbolType.h"
 #include "EditorWnd.h"
-//#include "EditorCmd.h"
 #include "WndManager.h"
-#include "App.h"
+#include "EditorApp.h"
 
 bool EditorWnd::EditC(input_t cmd)
 {
@@ -98,7 +97,7 @@ bool EditorWnd::EditDelC(input_t cmd)
             if (!rc)
             {
                 Beep();
-                //???SetErrorLine(STR_S(SS_StringTooLongForMerge));
+                EditorApp::SetErrorLine("String too long for merge");
             }
             else
                 ChangeSelected(select_change::merge_str, y, x);
@@ -150,7 +149,7 @@ bool EditorWnd::EditBS(input_t cmd)
         if (!rc)
         {
             Beep();
-            //???SetErrorLine(STR_S(SS_StringTooLongForMerge));
+            EditorApp::SetErrorLine("String too long for merge");
         }
         else
             ChangeSelected(select_change::merge_str, y - 1, m_xOffset + m_cursorx);
@@ -392,8 +391,7 @@ bool EditorWnd::EditUndo(input_t cmd)
             ;//nothing to do
         else if (editCmd->command == cmd_t::CMD_END)
         {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_WaitWhileUndo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
-            //???SetHelpLine(StatBuff);
+            EditorApp::SetHelpLine("Wait while undo '" + editCmd->remark + "' command");
 
             int n = 1;
             while (editCmd = m_editor->GetUndo())
@@ -408,20 +406,18 @@ bool EditorWnd::EditUndo(input_t cmd)
                 rc = m_editor->Command(*editCmd);
             }
 
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Undo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
+            EditorApp::SetHelpLine("Undo: '" + editCmd->remark + "'", stat_color::grayed);
         }
         else
         {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Undo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
+            EditorApp::SetHelpLine("Undo: '" + editCmd->remark + "'", stat_color::grayed);
 
             rc = m_editor->Command(*editCmd);
         }
     }
     else
     {
-        //???SetErrorLine(STR_S(SS_UndoCommandAbsent));
+        EditorApp::SetErrorLine("Undo command absents");
         m_editor->SetCurStr(STR_NOTDEFINED);
         if (!m_saved)
             m_editor->ClearModifyFlag();
@@ -470,8 +466,7 @@ bool EditorWnd::EditRedo(input_t cmd)
             ;//nothing to do
         else if (redoCmd->command == cmd_t::CMD_BEGIN)
         {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_WaitWhileRedo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
-            //???SetHelpLine(StatBuff);
+            EditorApp::SetHelpLine("Wait while redo '" + redoCmd->remark + "' command");
 
             int n = 1;
             while (redoCmd = m_editor->GetRedo())
@@ -486,20 +481,18 @@ bool EditorWnd::EditRedo(input_t cmd)
                 rc = m_editor->Command(*redoCmd);
             }
 
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Redo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
+            EditorApp::SetHelpLine("Redo: '" + redoCmd->remark + "'", stat_color::grayed);
         }
         else
         {
-            //sprintf(StatBuff, GetSStr(STR_S(SS_Redo_s_command)), redoCmd->remark ? GetSStr(redoCmd->remark) : "?");
-            //???SetHelpLine(StatBuff, 1);
+            EditorApp::SetHelpLine("Redo: '" + redoCmd->remark + "'", stat_color::grayed);
 
             rc = m_editor->Command(*redoCmd);
         }
     }
     else
     {
-        //???SetErrorLine(STR_S(SS_RedoCommandAbsent));
+        EditorApp::SetErrorLine("Redo command absents");
     }
 
     return true;

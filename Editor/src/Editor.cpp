@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "utils/SymbolType.h"
 #include "utfcpp/utf8.h"
-#include "App.h"
+#include "EditorApp.h"
 
 
 bool Editor::Clear()
@@ -97,7 +97,7 @@ bool Editor::Load()
 
     m_buffer.SetLoadBuffFunc(std::bind(&Editor::LoadBuff, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
 
-    Application::getInstance().SetHelpLine("Wait for file loading");
+    EditorApp::SetHelpLine("Wait for file loading");
 
     time_t t1 = time(nullptr);
     size_t percent = 0;
@@ -124,7 +124,7 @@ bool Editor::Load()
             if (pr != percent)
             {
                 percent = pr;
-                Application::getInstance().ShowProgressBar(pr);
+                EditorApp::ShowProgressBar(pr);
             }
         }
         return static_cast<size_t>(read);
@@ -185,8 +185,8 @@ bool Editor::Load()
     LOG(DEBUG) << "loadtime=" << time(NULL) - start;
     LOG(DEBUG) << "num str=" << m_buffer.m_totalStrCount;
 
-    Application::getInstance().ShowProgressBar();
-    Application::getInstance().SetHelpLine("Ready", stat_color::grayed);
+    EditorApp::ShowProgressBar();
+    EditorApp::SetHelpLine("Ready", stat_color::grayed);
 
     return true;
 }
@@ -809,7 +809,6 @@ bool Editor::SplitLine(bool save, size_t line, size_t pos, size_t indent)
     str.resize(indent, ' ');
     //copy rest of current str to new buff
     str.append(m_curStrBuff.substr(pos));
-    //str.resize(MAX_STRLEN, ' '); //???
 
     //clear end of current str
     m_curStrBuff.replace(pos, m_curStrBuff.size() - pos, m_curStrBuff.size() - pos, ' ');
@@ -952,4 +951,21 @@ bool Editor::Command(const EditCmd& cmd)
     }
 
     return rc;
+}
+
+bool Editor::CheckLexPair(size_t& line, size_t& pos)
+{
+    auto str = GetStr(line);
+    size_t y = line;
+    char16_t c = str[pos];
+
+    bool rc = m_lexParser.CheckLexPair(str, line, pos);
+    if (!rc)
+        return false;
+    if (y == line)
+        return true;
+
+    //matching at another line
+    str = GetStr(line);
+    return m_lexParser.GetLexPair(str, line, c, pos);
 }

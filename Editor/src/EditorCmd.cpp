@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "EditorCmd.h"
+#include "EditorWnd.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -148,5 +149,80 @@ CmdMap g_defaultEditKeyMap
 
     //for testing
     { 'T' | K_ALT },            {K_ED(E_CTRL_REFRESH)}
+};
+
+std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap =
+{
+    {E_MOVE_LEFT,           {&EditorWnd::MoveLeft,               EditorWnd::select_state::begin}},
+    {E_MOVE_RIGHT,          {&EditorWnd::MoveRight,              EditorWnd::select_state::begin}},
+    {E_MOVE_UP,             {&EditorWnd::MoveUp,                 EditorWnd::select_state::begin}},
+    {E_MOVE_DOWN,           {&EditorWnd::MoveDown,               EditorWnd::select_state::begin}},
+    {E_MOVE_SCROLL_LEFT,    {&EditorWnd::MoveScrollLeft,         EditorWnd::select_state::begin}},
+    {E_MOVE_SCROLL_RIGHT,   {&EditorWnd::MoveScrollRight,        EditorWnd::select_state::begin}},
+    {E_MOVE_PAGE_UP,        {&EditorWnd::MovePageUp,             EditorWnd::select_state::begin}},
+    {E_MOVE_PAGE_DOWN,      {&EditorWnd::MovePageDown,           EditorWnd::select_state::begin}},
+    {E_MOVE_FILE_BEGIN,     {&EditorWnd::MoveFileBegin,          EditorWnd::select_state::begin}},
+    {E_MOVE_FILE_END,       {&EditorWnd::MoveFileEnd,            EditorWnd::select_state::begin}},
+    {E_MOVE_STR_BEGIN,      {&EditorWnd::MoveStrBegin,           EditorWnd::select_state::begin}},
+    {E_MOVE_STR_END,        {&EditorWnd::MoveStrEnd,             EditorWnd::select_state::begin}},
+    {E_MOVE_TAB_LEFT,       {&EditorWnd::MoveTabLeft,            EditorWnd::select_state::begin}},
+    {E_MOVE_TAB_RIGHT,      {&EditorWnd::MoveTabRight,           EditorWnd::select_state::begin}},
+    {E_MOVE_WORD_LEFT,      {&EditorWnd::MoveWordLeft,           EditorWnd::select_state::begin}},
+    {E_MOVE_WORD_RIGHT,     {&EditorWnd::MoveWordRight,          EditorWnd::select_state::begin}},
+    {E_MOVE_POS,            {&EditorWnd::MovePos,                EditorWnd::select_state::begin}},
+    {E_MOVE_CENTER,         {&EditorWnd::MoveCenter,             EditorWnd::select_state::no}},
+
+    {E_SELECT_WORD,         {&EditorWnd::SelectWord,             EditorWnd::select_state::no}},
+    {E_SELECT_LINE,         {&EditorWnd::SelectLine,             EditorWnd::select_state::no}},
+    {E_SELECT_ALL,          {&EditorWnd::SelectAll,              EditorWnd::select_state::no}},
+    {E_SELECT_BEGIN,        {&EditorWnd::SelectBegin,            EditorWnd::select_state::no}},
+    {E_SELECT_END,          {&EditorWnd::SelectEnd,              EditorWnd::select_state::no}},
+    {E_SELECT_UNSELECT,     {&EditorWnd::SelectUnselect,         EditorWnd::select_state::no}},
+    {E_SELECT_MODE,         {&EditorWnd::SelectMode,             EditorWnd::select_state::no}},
+
+    {E_EDIT_C,              {&EditorWnd::EditC,                  EditorWnd::select_state::end}},
+    {E_EDIT_DEL_C,          {&EditorWnd::EditDelC,               EditorWnd::select_state::end}},
+    {E_EDIT_BS,             {&EditorWnd::EditBS,                 EditorWnd::select_state::end}},
+    {E_EDIT_TAB,            {&EditorWnd::EditTab,                EditorWnd::select_state::end}},
+    {E_EDIT_ENTER,          {&EditorWnd::EditEnter,              EditorWnd::select_state::end}},
+    {E_EDIT_DEL_STR,        {&EditorWnd::EditDelStr,             EditorWnd::select_state::end}},
+    {E_EDIT_DEL_BEGIN,      {&EditorWnd::EditDelBegin,           EditorWnd::select_state::end}},
+    {E_EDIT_DEL_END,        {&EditorWnd::EditDelEnd,             EditorWnd::select_state::end}},
+
+    {E_EDIT_BLOCK_COPY,     {&EditorWnd::EditBlockCopy,          EditorWnd::select_state::end}},
+    {E_EDIT_BLOCK_MOVE,     {&EditorWnd::EditBlockMove,          EditorWnd::select_state::end}},
+    {E_EDIT_BLOCK_DEL,      {&EditorWnd::EditBlockDel,           EditorWnd::select_state::end}},
+    {E_EDIT_BLOCK_INDENT,   {&EditorWnd::EditBlockIndent,        EditorWnd::select_state::end}},
+    {E_EDIT_BLOCK_UNDENT,   {&EditorWnd::EditBlockUndent,        EditorWnd::select_state::end}},
+    {E_EDIT_CB_COPY,        {&EditorWnd::EditCopyToClipboard,    EditorWnd::select_state::end}},
+    {E_EDIT_CB_CUT,         {&EditorWnd::EditCutToClipboard,     EditorWnd::select_state::end}},
+    {E_EDIT_CB_PASTE,       {&EditorWnd::EditPasteFromClipboard, EditorWnd::select_state::end}},
+    {E_EDIT_UNDO,           {&EditorWnd::EditUndo,               EditorWnd::select_state::end}},
+    {E_EDIT_REDO,           {&EditorWnd::EditRedo,               EditorWnd::select_state::end}},
+
+    {E_CTRL_FIND,           {&EditorWnd::CtrlFind,               EditorWnd::select_state::begin}},
+    {E_CTRL_FINDUP,         {&EditorWnd::CtrlFindUp,             EditorWnd::select_state::begin}},
+    {E_CTRL_FINDDN,         {&EditorWnd::CtrlFindDown,           EditorWnd::select_state::begin}},
+    {E_CTRL_FINDUPW,        {&EditorWnd::FindUpWord,             EditorWnd::select_state::begin}},
+    {E_CTRL_FINDDNW,        {&EditorWnd::FindDownWord,           EditorWnd::select_state::begin}},
+    {E_CTRL_REPLACE,        {&EditorWnd::Replace,                EditorWnd::select_state::end}},
+    {E_CTRL_REPEAT,         {&EditorWnd::Repeat,                 EditorWnd::select_state::end}},
+
+    {E_DLG_GOTO,            {&EditorWnd::DlgGoto,                EditorWnd::select_state::end}},
+    {E_DLG_FIND,            {&EditorWnd::DlgFind,                EditorWnd::select_state::end}},
+    {E_DLG_REPLACE,         {&EditorWnd::DlgReplace,             EditorWnd::select_state::end}},
+
+    {E_CTRL_GETSUBSTR,      {&EditorWnd::CtrlGetSubstr,          EditorWnd::select_state::end}},
+    {E_CTRL_REFRESH,        {&EditorWnd::CtrlRefresh,            EditorWnd::select_state::end}},
+    {E_CTRL_RELOAD,         {&EditorWnd::Reload,                 EditorWnd::select_state::end}},
+    {E_CTRL_SAVE,           {&EditorWnd::Save,                   EditorWnd::select_state::end}},
+    {E_CTRL_SAVEAS,         {&EditorWnd::SaveAs,                 EditorWnd::select_state::end}},
+    {E_CTRL_CLOSE,          {&EditorWnd::Close,                  EditorWnd::select_state::end}},
+
+    {E_MOVE_LEX_MATCH,      {&EditorWnd::MoveLexMatch,           EditorWnd::select_state::begin}},
+    {E_CTRL_FLIST,          {&EditorWnd::CtrlFuncList,           EditorWnd::select_state::end}},
+    {E_CTRL_PROPERTIES,     {&EditorWnd::CtrlProperties,         EditorWnd::select_state::end}},
+    {E_CTRL_CHANGE_CP,      {&EditorWnd::CtrlChangeCP,           EditorWnd::select_state::no}},
+    {E_POPUP_MENU,          {&EditorWnd::TrackPopupMenu,         EditorWnd::select_state::end}}
 };
 

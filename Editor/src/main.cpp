@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "DlgControls.h"
 #include "Dialogs/StdDialogs.h"
 
-#include "EditorWnd.h"
+#include "EditorApp.h"
 
 #include <iostream>
 
@@ -43,7 +43,8 @@ Logo g_Logo {
   ColorScreen,
   ColorScreen,
   '-',
-  -1, -1, 
+  -1, 
+  -1, 
   {
       "----------  ----",
       "--------- # ----",
@@ -78,16 +79,6 @@ menu_list menu1 {
     {MENU_ITEM,       "menu7",     K_F7}
 };
 
-sline_list sLine {
-    {"",     "",     stat_color::normal},//0
-    {"Key",  "",     stat_color::grayed},//1
-    {"Mark", "",     stat_color::grayed},//2
-    {"Rec",  "Play", stat_color::grayed},//3
-    {"Ins",  "Ovr",  stat_color::normal} //4
-};
-
-
-/////////////////////////////////////////////////////////////////////////////
 menu_list mAccess {
   {MENU_ITEM, "&F&1Exit"},
   {MENU_ITEM, "&F&2Menu"},
@@ -101,85 +92,24 @@ menu_list mAccess {
   {MENU_ITEM, "&F&1&0"}
 };
 
-std::unordered_map<std::string, std::shared_ptr<EditorWnd>> g_editors;
-
-class MyApp : public Application
-{
-public:
-    virtual input_t AppProc(input_t code) override final 
-    { 
-        //input treatment in user function
-        if (code != K_TIME)
-            LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
-
-        if (code == K_F1)
-        {
-            g_editors.clear();
-        }
-        else if (code == K_F2)
-        {
-            WndManager::getInstance().PutInput(K_MENU);
-            code = 0;
-        }
-        else if (code == K_F3)
-        {
-            //code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK_CANCEL_IGNORE);
-            FileDialog dlg{ FileDlgMode::Open };
-            auto rc = dlg.Activate();
-            code = 0;
-            if (rc == ID_OK)
-            {
-                std::filesystem::path path{dlg.s_vars.path};
-                path /= dlg.s_vars.file;
-                //Editor ed{ path };
-                //ed.Load();
-                auto editor = std::make_shared<EditorWnd>();
-                editor->Show(true, -1);
-                std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
-                editor->SetFileName(path, false, type);
-                
-                g_editors[path.u8string()] = editor;
-            }
-        }
-
-        return code; 
-    } 
-
-    virtual bool    LoadCfg()  override final
-    {
-        //configuration loading
-        LOG(DEBUG) << __FUNC__;
-        return true;
-    }
-
-    virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  override final
-    { 
-        //configuration saving
-        LOG(DEBUG) << __FUNC__;
-        return true;
-    } 
-};
-
-MyApp app;
+/////////////////////////////////////////////////////////////////////////////
+EditorApp app;
 Application& Application::s_app{app};
 
 int main()
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log");
     LOG(INFO);
-    LOG(INFO) << "Winman test";
+    LOG(INFO) << "Multitextor";
 
-    //Application& app = Application::getInstance();
-    //MyApp app;
     app.Init();
     WndManager::getInstance().SetScreenSize();
 
     app.SetLogo(g_Logo);
-    app.WriteAppName(L"TestApp");
+    app.WriteAppName(L"Multitextor");
 
     app.SetMenu({menu0, menu1});
     app.SetAccessMenu(mAccess);
-    app.SetStatusLine(sLine);
     app.SetClock(clock_pos::bottom);
     
     app.Refresh();
@@ -187,6 +117,6 @@ int main()
 
     app.Deinit();
 
-    LOG(INFO) << "End";
+    LOG(INFO) << "Exit";
     return 0;
 }

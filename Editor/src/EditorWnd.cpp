@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/SymbolType.h"
 #include "EditorWnd.h"
 #include "WndManager.h"
+#include "EditorApp.h"
 
 #include <algorithm>
 
@@ -163,18 +164,6 @@ bool EditorWnd::UpdatePosInfo()
     m_infoStrSize = str.size() - 14;
 
     WriteWnd(m_sizeX - (pos_t)len, 0, str.substr(str.size() - len), *m_pColorWindowTitle);
-    return true;
-}
-
-bool EditorWnd::UpdateProgress(size_t d)
-{
-    //???
-    return true;
-}
-
-bool EditorWnd::UpdateLexPair()
-{
-    //???
     return true;
 }
 
@@ -398,8 +387,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
             Mark(m_foundX, m_foundY, m_foundX + m_foundSize - 1, m_foundY, ColorWindowFound);
     };
 
-    //if(!m_pDiff || !m_pDiff->IsDiff(m_nDiffBuff, m_nFirstLine + y))
-//    if (!m_diff) //???
+    if (!m_diff)
     {
         std::vector<color_t> colorBuff;
         colorBuff.reserve(MAX_STRLEN);
@@ -410,16 +398,16 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
         else
             rc = WriteWStr(x, y, str.substr(offset, len));
     }
-/*
     else
     {
-        if (m_pDiff->IsDiff(m_nDiffBuff, m_nFirstLine + y))
+/*        
+        if (m_diff->IsDiff(m_nDiffBuff, m_nFirstLine + y))//???
             SetTextAttr(ColorWindowDiff);
         else
-            SetTextAttr(ColorWindowNotDiff);//???
+            SetTextAttr(ColorWindowNotDiff);
         rc = WriteWStr(x, y, pStr + offset);
-    }
 */
+    }
 
     if (!IsSelectVisible())
     {
@@ -981,7 +969,7 @@ bool EditorWnd::SelectClear()
 {
     if (m_selectState != select_state::no)
     {
-        //???StatusMark(0);
+        EditorApp::StatusMark();
 
         m_selectState = select_state::no;
         m_beginX = m_endX = 0;
@@ -1572,6 +1560,40 @@ bool EditorWnd::DelSelected()
     //del mark
     ChangeSelected(select_change::clear);
     InvalidateRect();
+
+    return true;
+}
+
+bool EditorWnd::UpdateLexPair()
+{
+    if (m_diff)
+        return true;
+
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+    if (m_editor->CheckLexPair(y, x))
+    {
+        //TPRINT(("Match pair x=%d y=%d\n", x, y));
+
+        if (x >= m_xOffset   && x < m_xOffset + m_sizeX
+         && y >= m_firstLine && y < m_firstLine + m_sizeY)
+        {
+            //if visible
+            m_lexX = static_cast<int>(x);
+            m_lexY = static_cast<int>(y);
+            Mark(x, y, x, y, ColorWindowLMatch);
+        }
+        else
+        {
+            m_lexX = -1;
+            m_lexY = -1;
+        }
+    }
+    else
+    {
+        m_lexX = -1;
+        m_lexY = -1;
+    }
 
     return true;
 }
