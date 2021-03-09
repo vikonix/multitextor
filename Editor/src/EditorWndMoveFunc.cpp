@@ -842,7 +842,17 @@ bool EditorWnd::SelectAll(input_t cmd)
     return true;
 }
 
-bool EditorWnd::MoveLexMatch(input_t cmd)
+bool EditorWnd::MoveLexMatch([[maybe_unused]]input_t cmd)
 {
+    LOG(DEBUG) << "    MoveLexMatch";
+
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+
+    if (m_editor->CheckLexPair(y, x))
+        _GotoXY(x, y);
+    else
+        EditorApp::SetHelpLine("No lexical pair found", stat_color::grayed);
+
     return true;
 }

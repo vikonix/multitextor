@@ -44,7 +44,7 @@ bool UndoList::AddEditCmd(cmd_t command, size_t line, size_t pos, size_t count, 
         m_editList.erase(m_editIt, m_editList.end());
         m_editIt = m_editList.end();
     }
-    size_t strlen = Editor::UStrLen(str);
+    size_t strlen = str.size();
     if (strlen > len)
         strlen = len;
     m_editList.push_back(EditCmd{ command, line, pos, len, count, std::move(str.substr(0, strlen)), m_rem });
@@ -58,7 +58,7 @@ bool UndoList::AddUndoCmd(cmd_t command, size_t line, size_t pos, size_t count, 
         m_undoList.erase(m_undoIt, m_undoList.end());
         m_undoIt = m_undoList.end();
     }
-    size_t strlen = Editor::UStrLen(str);
+    size_t strlen = str.size();
     if (strlen > len)
         strlen = len;
     m_undoList.emplace_back(EditCmd{ command, line, pos, len, count, std::move(str.substr(0, strlen)), m_rem });

@@ -855,6 +855,21 @@ bool Editor::SaveTab(bool save, size_t line)
     return true;
 }
 
+bool Editor::RestoreTab([[maybe_unused]]bool save, size_t line, const std::u16string& str)
+{
+    if (!m_saveTab)
+        return true;
+
+    LOG(DEBUG) << "RestoreTab line=" << line;
+
+    SetCurStr(line);
+    for(auto pos : str)
+        m_curStrBuff[pos] = 0x9;//set tab
+
+    InvalidateWnd(line, invalidate_t::change);
+    return 0;
+}
+
 bool Editor::ClearSubstr(bool save, size_t line, size_t pos, size_t len)
 {
     if (line >= GetStrCount())
@@ -877,6 +892,107 @@ bool Editor::ClearSubstr(bool save, size_t line, size_t pos, size_t len)
     }
 
     CorrectTab(save, line, m_curStrBuff);
+
+    return true;
+}
+
+bool Editor::ReplaceSubstr(bool save, size_t line, size_t pos, size_t len, const std::u16string& substr)
+{
+    if (line >= GetStrCount())
+        return true;
+
+    SetCurStr(line);
+
+    std::u16string prevStr = m_curStrBuff.substr(pos, len);
+    m_curStrBuff.replace(pos, len, substr);
+
+    m_curChanged = true;
+    invalidate_t inv;
+    m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+    InvalidateWnd(line, inv);
+
+    if (save)
+    {
+        m_undoList.AddEditCmd(cmd_t::CMD_REPLACE_SUBSTR, line, pos, len, substr.size(), substr);
+        m_undoList.AddUndoCmd(cmd_t::CMD_REPLACE_SUBSTR, line, pos, substr.size(), len, prevStr);
+    }
+
+    CorrectTab(save, line, m_curStrBuff);
+
+    return true;
+}
+
+bool Editor::Indent(bool save, size_t line, size_t pos, size_t len, size_t n)
+{
+    if (line >= GetStrCount())
+        return true;
+
+    SetCurStr(line);
+    
+    //count number of spaces before [pos+len]
+    size_t count = 0;
+    for (size_t i = 0; i < n; ++i)
+        if (m_curStrBuff[pos + len - 1 - i] == ' ')
+            ++count;
+        else
+            break;
+
+    if (count)
+    {
+        m_curStrBuff.erase(pos + len - count, count);
+        m_curStrBuff.insert(pos, count, ' ');
+
+        m_curChanged = true;
+        invalidate_t inv;
+        m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+        InvalidateWnd(line, inv);
+
+        if (save)
+        {
+            m_undoList.AddEditCmd(cmd_t::CMD_INDENT, line, pos, count, len, {});
+            m_undoList.AddUndoCmd(cmd_t::CMD_UNDENT, line, pos, count, len, {});
+        }
+
+        CorrectTab(save, line, m_curStrBuff);
+    }
+
+    return true;
+}
+
+bool Editor::Undent(bool save, size_t line, size_t pos, size_t len, size_t n)
+{
+    if (line >= GetStrCount())
+        return true;
+
+    SetCurStr(line);
+
+    //count number of spaces after [pos]
+
+    size_t count = 0;
+    for (size_t i = 0; i < n; ++i)
+        if (m_curStrBuff[pos + i] == ' ')
+            ++count;
+        else
+            break;
+
+    if (count)
+    {
+        m_curStrBuff.insert(pos + len, count, ' ');
+        m_curStrBuff.erase(pos, count);
+
+        m_curChanged = true;
+        invalidate_t inv;
+        m_lexParser.ChangeStr(line, m_curStrBuff, inv);
+        InvalidateWnd(line, inv);
+
+        if (save)
+        {
+            m_undoList.AddEditCmd(cmd_t::CMD_UNDENT, line, pos, count, len, {});
+            m_undoList.AddUndoCmd(cmd_t::CMD_INDENT, line, pos, count, len, {});
+        }
+
+        CorrectTab(save, line, m_curStrBuff);
+    }
 
     return true;
 }
@@ -928,13 +1044,13 @@ bool Editor::Command(const EditCmd& cmd)
         rc = DelSubstr(false, cmd.line, cmd.pos, cmd.len);
         break;
     case cmd_t::CMD_REPLACE_SUBSTR:
-        //???rc = ReplaceSubstr(false, cmd.line, cmd.pos, cmd.count, cmd.str);
+        rc = ReplaceSubstr(false, cmd.line, cmd.pos, cmd.count, cmd.str);
         break;
     case cmd_t::CMD_INDENT:
-        //???rc = Indent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
+        rc = Indent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
         break;
     case cmd_t::CMD_UNDENT:
-        //???rc = Undent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
+        rc = Undent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
         break;
     case cmd_t::CMD_CORRECT_TAB:
         break;
@@ -942,7 +1058,7 @@ bool Editor::Command(const EditCmd& cmd)
         rc = SaveTab(false, cmd.line);
         break;
     case cmd_t::CMD_RESTORE_TAB:
-        //???rc = RestoreTab(false, cmd.line, cmd.str);
+        rc = RestoreTab(false, cmd.line, cmd.str);
         break;
 
     default:

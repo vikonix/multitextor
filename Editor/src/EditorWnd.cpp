@@ -665,7 +665,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
 
 input_t EditorWnd::EventProc(input_t code)
 {
-    LOG(DEBUG) << "    EditorWnd::WndProc " << std::hex << code << std::dec;
+    //LOG(DEBUG) << "    EditorWnd::WndProc " << std::hex << code << std::dec;
     if (code == K_TIME)
     {
         //check for file changing by external program
@@ -765,7 +765,9 @@ input_t EditorWnd::EventProc(input_t code)
             ParseCommand(cmd);
     }
 
-    if (code != K_TIME)
+    if (code != K_TIME
+     && code != K_FOCUSLOST
+     && code != K_FOCUSSET)
     {
         Repaint();
 

@@ -81,12 +81,12 @@ private:
     std::u16string  m_curStrBuff;
 
     bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);
-    bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff);
+//    bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff);
 
     std::u16string  _GetStr(size_t line, size_t offset, size_t size);
     bool    _AddStr(size_t n, const std::u16string& str);
     bool    AddStr(size_t n, const std::u16string& str);
-    bool    AppendStr(const std::u16string& str);
+//    bool    AppendStr(const std::u16string& str);
     bool    ChangeStr(size_t n, const std::u16string& str);
     bool    ConvertStr(const std::u16string& str, std::string& buff) const;
 
@@ -158,7 +158,6 @@ public:
     //editor API with undo
     std::u16string          GetStr(size_t line, size_t offset = 0, size_t size = MAX_STRLEN);
     bool                    SetCurStr(size_t line);
-    size_t                  CalcStrLen(const std::u16string& str);
 
     bool                    CorrectTab(bool save, size_t line, std::u16string& str);
     bool                    SaveTab(bool save, size_t line);
@@ -197,7 +196,7 @@ public:
     std::string             GetParseStyle() const { return m_lexParser.GetParseStyle(); }
     bool                    GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len);
     bool                    CheckLexPair(size_t& line, size_t& pos);
-    //bool                    GetFuncList(List* pList, int* pLine);
+//    bool                    GetFuncList(List* pList, int* pLine);
 };
 
 using EditorPtr = std::shared_ptr<Editor>;

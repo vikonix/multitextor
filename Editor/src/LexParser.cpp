@@ -824,12 +824,12 @@ bool LexParser::CheckForOpenComments(size_t line)
 
 bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t& inv)
 {
+    inv = invalidate_t::change;
     if (!m_scan)
         return true;
 
-    LOG(DEBUG) << "LexParser::ChangeStr l=" << line;
+    //LOG(DEBUG) << "LexParser::ChangeStr l=" << line;
 
-    inv = invalidate_t::change;
     CheckForConcatenatedLine(line);
     CheckForOpenComments(line);
 
@@ -884,12 +884,12 @@ bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t&
 
 bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& inv)
 {
+    inv = invalidate_t::insert;
     if (!m_scan)
         return true;
 
-    LOG(DEBUG) << "LexParser::AddStr l=" << line;
+    //LOG(DEBUG) << "LexParser::AddStr l=" << line;
     
-    inv = invalidate_t::insert;
     CheckForOpenComments(line);
 
     std::string str = utf8::utf16to8(wstr);
@@ -914,12 +914,12 @@ bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& in
 
 bool LexParser::DelStr(size_t line, invalidate_t& inv)
 {
+    inv = invalidate_t::del;
     if (!m_scan)
         return true;
 
-    LOG(DEBUG) << "LexParser::DelStr l=" << line;
+    //LOG(DEBUG) << "LexParser::DelStr l=" << line;
 
-    inv = invalidate_t::del;
     auto it = m_lexPosition.find(line);
     if (it != m_lexPosition.end())
     {
