@@ -123,7 +123,7 @@ class EditorWnd : public FrameWnd
 
     //diff mode
     std::shared_ptr<Diff>   m_diff;
-    int        m_diffBuff;
+    int                     m_diffBuff{-1};
 
     bool    _GotoXY(size_t x, size_t y, bool top = false);
     bool    InvalidateRect(pos_t x = 0, pos_t y = 0, pos_t sizex = 0, pos_t sizey = 0);

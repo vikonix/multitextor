@@ -83,8 +83,8 @@ bool EditorApp::StatusMark(mark_status mark)
 input_t EditorApp::AppProc(input_t code)
 { 
     //input treatment in user function
-    if (code != K_TIME)
-        LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
+//    if (code != K_TIME)
+//        LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
 
     if (code == K_F1)
     {

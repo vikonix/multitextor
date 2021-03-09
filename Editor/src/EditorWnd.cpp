@@ -285,7 +285,7 @@ bool EditorWnd::Invalidate(size_t line, invalidate_t type, size_t pos, size_t si
     if (x < 0 && endx > 0)
         x = 0;
 
-    LOG(DEBUG) << "    Invalidate line=" << line << " type=" << static_cast<int>(type) << " pos=" << pos << " size=" << size << "; x=" << x << " y=" << y << " endx=" << endx;
+    //LOG(DEBUG) << "    Invalidate line=" << line << " type=" << static_cast<int>(type) << " pos=" << pos << " size=" << size << "; y=" << y << " x=" << x << " endx=" << endx;
 
     if (y < 0 && type != invalidate_t::find && type != invalidate_t::change)
     {

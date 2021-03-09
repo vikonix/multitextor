@@ -398,7 +398,7 @@ bool Editor::RefreshAllWnd(FrameWnd* wnd) const
 
 bool Editor::ChangeStr(size_t n, const std::u16string& wstr)
 {
-    LOG(DEBUG) << "ChangeStr " << n << " total=" << GetStrCount();
+    //LOG(DEBUG) << "ChangeStr " << n << " total=" << GetStrCount();
 
     if (n >= GetStrCount())
     {
@@ -430,7 +430,7 @@ bool Editor::AddStr(size_t n, const std::u16string& wstr)
 
 bool Editor::_AddStr(size_t n, const std::u16string& wstr)
 {
-    LOG(DEBUG) << "AddStr n=" << n;
+    //LOG(DEBUG) << "AddStr n=" << n;
 
     std::string str;
     bool rc = ConvertStr(wstr, str);
@@ -510,7 +510,7 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
             buff += ' ';
     }
 
-    LOG(DEBUG) << "ConvertStr '" << buff << "'";
+    //LOG(DEBUG) << "ConvertStr '" << buff << "'";
     if (m_eol == eol_t::unix_eol)
     {
         buff += 0xa;

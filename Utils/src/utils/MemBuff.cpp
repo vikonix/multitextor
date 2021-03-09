@@ -631,7 +631,7 @@ bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
 {
-    LOG(DEBUG) << "ChangeStr " << n;
+    //LOG(DEBUG) << "ChangeStr " << n;
     if (n >= m_totalStrCount)
         return false;
 
@@ -671,7 +671,7 @@ bool MemStrBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::DelStr(size_t n)
 {
-    LOG(DEBUG) << "DelStr " << n;
+    //LOG(DEBUG) << "DelStr " << n;
 
     auto buff = GetBuff(n);
     if (!buff)

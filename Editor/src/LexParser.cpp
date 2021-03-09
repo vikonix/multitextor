@@ -985,7 +985,7 @@ bool LexParser::DeleteLexem(size_t line)
 
 bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& pos)
 {
-    LOG(DEBUG) << "CheckLexPair";
+    //LOG(DEBUG) << "CheckLexPair";
 
     if(!m_scan || m_lexPosition.empty())
         return false;
@@ -1009,7 +1009,7 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
     LexicalParse(str, curLex, true);
     const char delimiter{ '8' };
 
-    LOG(DEBUG) << "    lex=" << curLex << ". pos=" << pos;
+    //LOG(DEBUG) << "    lex=" << curLex << ". pos=" << pos;
     if(curLex[pos] != delimiter)
         return false;
 
@@ -1163,7 +1163,7 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
 {
     int count = -static_cast<int>(pos);
 
-    LOG(DEBUG) << "GetLexPair line=" << line << " ch=" << ch << " count=" << count;
+    //LOG(DEBUG) << "GetLexPair line=" << line << " ch=" << ch << " count=" << count;
 
     if (!m_scan || m_lexPosition.empty())
         return false;
@@ -1185,7 +1185,7 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
     LexicalParse(str, lex, true);
     const char delimiter{ '8' };
     
-    LOG(DEBUG) << "    lex=" << lex;
+    //LOG(DEBUG) << "    lex=" << lex;
     auto& [chPair, up] = pair->second;
 
     size_t x{};
