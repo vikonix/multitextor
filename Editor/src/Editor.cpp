@@ -83,7 +83,7 @@ bool Editor::Load()
 
     Clear();
 
-    auto fileSize = std::filesystem::file_size(m_file);
+    auto fileSize{ std::filesystem::file_size(m_file) };
     decltype(fileSize) fileOffset{};
     if (0 == fileSize)
         return true;
@@ -99,12 +99,12 @@ bool Editor::Load()
 
     EditorApp::SetHelpLine("Wait for file loading");
 
-    time_t t1 = time(nullptr);
-    size_t percent = 0;
-    auto step = fileSize / 100;//1%
+    time_t t1{ time(nullptr) };
+    size_t percent{};
+    auto step{ fileSize / 100 };//1%
 
-    const size_t buffsize = 0x200000;//2MB
-    auto buff = std::make_unique<std::array<char, buffsize>>();
+    const size_t buffsize{ 0x200000 };//2MB
+    auto buff{ std::make_unique<std::array<char, buffsize>>() };
     size_t buffOffset{0};
 
     auto readFile = [&]() -> size_t {
@@ -116,11 +116,11 @@ bool Editor::Load()
         if (0 == read)
             return 0;
 
-        time_t t2 = time(NULL);
+        time_t t2{ time(NULL) };
         if (t1 != t2 && step)
         {
             t1 = t2;
-            size_t pr = (size_t)((fileOffset + read) / step);
+            size_t pr{ (size_t)((fileOffset + read) / step) };
             if (pr != percent)
             {
                 percent = pr;
@@ -142,14 +142,14 @@ bool Editor::Load()
                 strBuff = m_buffer.GetNewBuff();
                 strOffset = 0;
             }
-            auto strBuffData = strBuff->GetBuff();
+            auto strBuffData{ strBuff->GetBuff() };
             if (!strBuffData)
             {
                 //no memory
                 _assert(0);
                 return false;
             }
-            size_t tocopy = std::min((size_t)BUFF_SIZE - strOffset, read);
+            size_t tocopy{ std::min((size_t)BUFF_SIZE - strOffset, read) };
             strBuffData->resize(strOffset + tocopy);
             std::memcpy(strBuffData->data() + strOffset, buff->data() + buffOffset, tocopy);
             strBuff->ReleaseBuff();
@@ -193,23 +193,23 @@ bool Editor::Load()
 
 bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest)
 {
-    auto str = strBuff->GetBuff();
+    auto str{ strBuff->GetBuff() };
     if (!str)
         return false;
 
     //1 byte is reserved for 0xA so 0D and 0A EOL will go to same buffers
     //and we not get left empty string
-    const size_t maxsize = !last ? size - 1 : size;
-    const size_t maxtab = 10;
-    size_t cr = 0;
-    size_t crlf = 0;
-    size_t lf = 0;
-    size_t cut = 0;
-    size_t len = 0;
+    const size_t maxsize{ !last ? size - 1 : size };
+    const size_t maxtab{ 10 };
+    size_t cr{};
+    size_t crlf{};
+    size_t lf{};
+    size_t cut{};
+    size_t len{};
 
-    size_t begin = 0;
+    size_t begin{};
     size_t i;
-    const char* buff = str->c_str();
+    const char* buff {str->c_str()};
 
     for (i = 0; i < maxsize; ++i)
     {
@@ -326,7 +326,7 @@ std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
 
     std::u16string outstr(size, ' ');
     
-    auto str = m_buffer.GetStr(line);
+    auto str{ m_buffer.GetStr(line) };
     std::u16string wstr = utf8::utf8to16(std::string(str));//???Convert char with cp
 
     //go from begin of string for right tabulation calculating 
@@ -616,10 +616,10 @@ bool Editor::CorrectTab(bool save, size_t line, std::u16string& str)
 
     LOG(DEBUG) << "CorrectTab save=" << save << " line=" << line;
 
-    size_t len = UStrLen(str);
+    size_t len{ UStrLen(str) };
     std::u16string tabs;
 
-    for(size_t i= 0; i < len; ++i)
+    for(size_t i = 0; i < len; ++i)
     {
         if (str[i] == 0x9)
         {
@@ -660,7 +660,7 @@ bool Editor::AddLine(bool save, size_t line, const std::u16string& str)
         ++m_curStr;
 
     int rc;
-    size_t count = 0;
+    size_t count{};
     if (line >= GetStrCount())
     {
         LOG(DEBUG) << "Fill end of file";
@@ -677,7 +677,7 @@ bool Editor::AddLine(bool save, size_t line, const std::u16string& str)
     }
 
     rc = _AddStr(line, str);
-    invalidate_t inv = invalidate_t::insert;
+    invalidate_t inv;
     m_lexParser.AddStr(line, str, inv);
     InvalidateWnd(line, inv);
 
@@ -723,8 +723,8 @@ bool Editor::DelLine(bool save, size_t line, size_t count)
 
     if (save)
     {
-        auto str = GetStr(line);
-        size_t len = Editor::UStrLen(str);
+        auto str{ GetStr(line) };
+        size_t len{ UStrLen(str) };
 
         m_undoList.AddEditCmd(cmd_t::CMD_DEL_LINE, line, 0, count, 0, {});
         m_undoList.AddUndoCmd(cmd_t::CMD_ADD_LINE, line, 0, 0, len, str);
@@ -761,14 +761,14 @@ bool Editor::MergeLine(bool save, size_t line, size_t pos, size_t indent)
     //merge current string with prev
     SetCurStr(line);
     if (pos > MAX_STRLEN)
-        pos = Editor::UStrLen(m_curStrBuff);
+        pos = UStrLen(m_curStrBuff);
 
-    auto str = GetStr(line + 1);
-    size_t len1 = Editor::UStrLen(str);
+    auto str{ GetStr(line + 1) };
+    size_t len{ UStrLen(str) };
 
-    if (len1 > indent)
+    if (len > indent)
     {
-        if (pos + len1 > MAX_STRLEN)
+        if (pos + len > MAX_STRLEN)
         {
             //too long string
             _assert(0);
@@ -805,8 +805,7 @@ bool Editor::SplitLine(bool save, size_t line, size_t pos, size_t indent)
     SaveTab(save, line);
     SetCurStr(line);
     
-    std::u16string str;
-    str.resize(indent, ' ');
+    std::u16string str(indent, ' ');
     //copy rest of current str to new buff
     str.append(m_curStrBuff.substr(pos));
 
@@ -877,7 +876,7 @@ bool Editor::ClearSubstr(bool save, size_t line, size_t pos, size_t len)
 
     SetCurStr(line);
 
-    std::u16string prevstr = m_curStrBuff.substr(pos, len);
+    std::u16string prevstr{ m_curStrBuff.substr(pos, len) };
     m_curStrBuff.replace(pos, len, len, ' ');
 
     m_curChanged = true;
@@ -903,7 +902,7 @@ bool Editor::ReplaceSubstr(bool save, size_t line, size_t pos, size_t len, const
 
     SetCurStr(line);
 
-    std::u16string prevStr = m_curStrBuff.substr(pos, len);
+    std::u16string prevStr{ m_curStrBuff.substr(pos, len) };
     m_curStrBuff.replace(pos, len, substr);
 
     m_curChanged = true;
@@ -930,7 +929,7 @@ bool Editor::Indent(bool save, size_t line, size_t pos, size_t len, size_t n)
     SetCurStr(line);
     
     //count number of spaces before [pos+len]
-    size_t count = 0;
+    size_t count{};
     for (size_t i = 0; i < n; ++i)
         if (m_curStrBuff[pos + len - 1 - i] == ' ')
             ++count;
@@ -968,7 +967,7 @@ bool Editor::Undent(bool save, size_t line, size_t pos, size_t len, size_t n)
 
     //count number of spaces after [pos]
 
-    size_t count = 0;
+    size_t count{};
     for (size_t i = 0; i < n; ++i)
         if (m_curStrBuff[pos + i] == ' ')
             ++count;
@@ -1071,9 +1070,9 @@ bool Editor::Command(const EditCmd& cmd)
 
 bool Editor::CheckLexPair(size_t& line, size_t& pos)
 {
-    auto str = GetStr(line);
-    size_t y = line;
-    char16_t c = str[pos];
+    auto str{ GetStr(line) };
+    size_t y{ line };
+    char16_t c{ str[pos] };
 
     bool rc = m_lexParser.CheckLexPair(str, line, pos);
     if (!rc)
