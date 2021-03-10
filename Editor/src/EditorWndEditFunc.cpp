@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorWnd.h"
 #include "WndManager.h"
 #include "EditorApp.h"
+#include "KeyCodes.h"
 
 bool EditorWnd::EditC(input_t cmd)
 {
@@ -500,12 +501,156 @@ bool EditorWnd::EditRedo(input_t cmd)
 
 bool EditorWnd::EditBlockIndent(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditBlockIndent " << std::hex << cmd << std::dec;
+    if (m_selectState != select_state::complete)
+        return true;
+
+    input_t count{ K_GET_CODE(cmd) };
+    if (!count)
+        count = 1;
+
+    CorrectSelection();
+
+    EditCmd edit { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
+    EditCmd undo { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
+    m_editor->SetUndoRemark("Indent");
+    m_editor->AddUndoCommand(edit, undo);
+
+    size_t n { m_endY - m_beginY };
+    bool save {true};
+    bool rc {};
+
+    size_t bx, ex;
+    size_t i;
+    for (i = 0; i <= n; ++i)
+    {
+        if (m_selectType == select_t::stream)
+        {
+            if (n == 0)
+            {
+                bx = m_beginX;
+                ex = m_endX;
+            }
+            else if (i == 0)
+            {
+                bx = m_beginX;
+                ex = MAX_STRLEN;
+            }
+            else if (i == n)
+            {
+                bx = 0;
+                ex = m_endX;
+            }
+            else
+            {
+                bx = 0;
+                ex = MAX_STRLEN;
+            }
+        }
+        else if (m_selectType == select_t::line)
+        {
+            bx = 0;
+            ex = MAX_STRLEN;
+        }
+        else
+        {
+            bx = m_beginX;
+            ex = m_endX;
+        }
+
+        size_t y = m_beginY + i;
+        size_t size = ex - bx + 1;
+        if (size > MAX_STRLEN)
+            size = MAX_STRLEN;
+
+        rc = m_editor->Indent(save, y, bx, size, count);
+    }
+
+    edit.command = cmd_t::CMD_END;
+    undo.command = cmd_t::CMD_END;
+    m_editor->AddUndoCommand(edit, undo);
+    
+    return rc;
 }
 
 bool EditorWnd::EditBlockUndent(input_t cmd)
 {
-    return true;
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditBlockUndent " << std::hex << cmd << std::dec;
+    if (m_selectState != select_state::complete)
+        return true;
+
+    input_t count{ K_GET_CODE(cmd) };
+    if (!count)
+        count = 1;
+
+    CorrectSelection();
+
+    EditCmd edit { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
+    EditCmd undo { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
+    m_editor->SetUndoRemark("Undent");
+    m_editor->AddUndoCommand(edit, undo);
+
+    size_t n { m_endY - m_beginY };
+    bool save { true };
+    bool rc { true };
+
+    size_t bx, ex;
+    size_t i;
+    for (i = 0; i <= n; ++i)
+    {
+        if (m_selectType == select_t::stream)
+        {
+            if (n == 0)
+            {
+                bx = m_beginX;
+                ex = m_endX;
+            }
+            else if (i == 0)
+            {
+                bx = m_beginX;
+                ex = MAX_STRLEN;
+            }
+            else if (i == n)
+            {
+                bx = 0;
+                ex = m_endX;
+            }
+            else
+            {
+                bx = 0;
+                ex = MAX_STRLEN;
+            }
+        }
+        else if (m_selectType == select_t::line)
+        {
+            bx = 0;
+            ex = MAX_STRLEN;
+        }
+        else
+        {
+            bx = m_beginX;
+            ex = m_endX;
+        }
+
+        size_t y = m_beginY + i;
+        size_t size = ex - bx + 1;
+        if (size > MAX_STRLEN)
+            size = MAX_STRLEN;
+
+        rc = m_editor->Undent(save, y, bx, size, count);
+    }
+
+    edit.command = cmd_t::CMD_END;
+    undo.command = cmd_t::CMD_END;
+    m_editor->AddUndoCommand(edit, undo);
+    
+    return rc;
 }
 
 bool EditorWnd::EditCopyToClipboard(input_t cmd)

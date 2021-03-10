@@ -938,7 +938,7 @@ bool Editor::Indent(bool save, size_t line, size_t pos, size_t len, size_t n)
 
     if (count)
     {
-        m_curStrBuff.erase(pos + len - count, count);
+        m_curStrBuff.erase(pos + len - 1 - count, count);
         m_curStrBuff.insert(pos, count, ' ');
 
         m_curChanged = true;
@@ -966,7 +966,6 @@ bool Editor::Undent(bool save, size_t line, size_t pos, size_t len, size_t n)
     SetCurStr(line);
 
     //count number of spaces after [pos]
-
     size_t count{};
     for (size_t i = 0; i < n; ++i)
         if (m_curStrBuff[pos + i] == ' ')
@@ -976,7 +975,7 @@ bool Editor::Undent(bool save, size_t line, size_t pos, size_t len, size_t n)
 
     if (count)
     {
-        m_curStrBuff.insert(pos + len, count, ' ');
+        m_curStrBuff.insert(pos + len - 1 - count, count, ' ');
         m_curStrBuff.erase(pos, count);
 
         m_curChanged = true;
