@@ -32,7 +32,7 @@ bool CaptureInput::InputCapture()
 {
     if (!m_captured)
     {
-        LOG(DEBUG) << __FUNC__ << " " << this;
+        //LOG(DEBUG) << __FUNC__ << " " << this;
         m_prevCaptured = Application::getInstance().Capture(this);
         m_captured = true;
     }
@@ -43,7 +43,7 @@ bool CaptureInput::InputRelease()
 {
     if (m_captured)
     {
-        LOG(DEBUG) << __FUNC__ << " " << this;
+        //LOG(DEBUG) << __FUNC__ << " " << this;
         Application::getInstance().Capture(m_prevCaptured);
         m_prevCaptured = nullptr;
         m_captured = false;

@@ -1383,7 +1383,7 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
 
     InvalidateRect();
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::DelSelected()
@@ -1563,7 +1563,7 @@ bool EditorWnd::DelSelected()
     ChangeSelected(select_change::clear);
     InvalidateRect();
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::UpdateLexPair()

@@ -424,7 +424,7 @@ bool EditorWnd::EditUndo(input_t cmd)
             m_editor->ClearModifyFlag();
     }
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::EditRedo(input_t cmd)
@@ -496,7 +496,7 @@ bool EditorWnd::EditRedo(input_t cmd)
         EditorApp::SetErrorLine("Redo command absents");
     }
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::EditBlockIndent(input_t cmd)
