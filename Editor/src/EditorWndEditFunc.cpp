@@ -723,12 +723,6 @@ bool EditorWnd::CtrlGetSubstr(input_t cmd)
     return true;
 }
 
-bool EditorWnd::CtrlRefresh([[maybe_unused]]input_t cmd)
-{
-    m_editor->FlushCurStr();
-    return Refresh();
-}
-
 bool EditorWnd::Reload(input_t cmd)
 {
     return true;
@@ -767,5 +761,11 @@ bool EditorWnd::CtrlFuncList(input_t cmd)
 bool EditorWnd::TrackPopupMenu(input_t cmd)
 {
     return true;
+}
+
+bool EditorWnd::CtrlRefresh([[maybe_unused]] input_t cmd)
+{
+    m_editor->FlushCurStr();
+    return Refresh();
 }
 
