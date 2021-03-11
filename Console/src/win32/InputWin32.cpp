@@ -59,7 +59,7 @@ bool InputWin32::Init()
         return false;
     }
 
-    dwModeIn = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT | ENABLE_EXTENDED_FLAGS;
+    dwModeIn = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
     if (!SetConsoleMode(m_hStdin, dwModeIn))
     {
         LOG(ERROR) << "SetConsoleMode error" << GetLastError();
