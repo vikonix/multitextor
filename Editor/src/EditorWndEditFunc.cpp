@@ -395,7 +395,7 @@ bool EditorWnd::EditUndo(input_t cmd)
             EditorApp::SetHelpLine("Wait while undo '" + editCmd->remark + "' command");
 
             int n = 1;
-            while (editCmd = m_editor->GetUndo())
+            while ((editCmd = m_editor->GetUndo()) != std::nullopt)
             {
                 if (editCmd->command == cmd_t::CMD_END)
                     ++n;
@@ -470,7 +470,7 @@ bool EditorWnd::EditRedo(input_t cmd)
             EditorApp::SetHelpLine("Wait while redo '" + redoCmd->remark + "' command");
 
             int n = 1;
-            while (redoCmd = m_editor->GetRedo())
+            while ((redoCmd = m_editor->GetRedo()) != std::nullopt)
             {
                 if (redoCmd->command == cmd_t::CMD_BEGIN)
                     ++n;

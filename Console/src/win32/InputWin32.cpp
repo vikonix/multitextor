@@ -466,21 +466,6 @@ void InputWin32::ProcessMouseEvent(MOUSE_EVENT_RECORD* pMouseEvent)
     case FROM_LEFT_2ND_BUTTON_PRESSED:
         iMKey = K_MOUSEKM;
         break;
-
-    case 0x780000:
-        iMKey = K_MOUSEWUP | K_MOUSEW;
-        break;
-    case 0xff880000:
-        iMKey = K_MOUSEWDN | K_MOUSEW;
-        break;
-    default:
-        LOG(DEBUG) << "dwButtonState=" << std::hex << pMouseEvent->dwButtonState << std::dec;
-        break;
-    }
-
-    if(iMKey & K_MOUSEW)
-    {
-        m_fMouseTrack = false;
     }
 
     input_t iMType = 0;
@@ -488,7 +473,18 @@ void InputWin32::ProcessMouseEvent(MOUSE_EVENT_RECORD* pMouseEvent)
     {
 #ifdef MOUSE_WHEELED
     case MOUSE_WHEELED:
-        iMType = K_MOUSEW;
+        {
+            iMType = K_MOUSEW;
+            DWORD st = pMouseEvent->dwButtonState & 0xffff0000;
+            if (st != 0)
+            {
+                if ((st & 0x80000000) != 0)
+                    iMKey = K_MOUSEWDN | K_MOUSEW;
+                else
+                    iMKey = K_MOUSEWUP | K_MOUSEW;
+                m_fMouseTrack = false;
+            }
+        }
         break;
 #endif
     default:
