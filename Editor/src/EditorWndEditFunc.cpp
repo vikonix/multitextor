@@ -663,10 +663,10 @@ bool EditorWnd::EditCopyToClipboard(input_t cmd)
 
     select_t mode;
     std::vector<std::u16string> strArray;
-    bool rc = CopySelected(strArray, mode);
-    rc = CopyToClipboard(strArray, mode != select_t::stream ? true : false);
+    bool rc = CopySelected(strArray, mode)
+    && CopyToClipboard(strArray, mode != select_t::stream ? true : false);
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::EditCutToClipboard(input_t cmd)
@@ -678,11 +678,11 @@ bool EditorWnd::EditCutToClipboard(input_t cmd)
 
     select_t mode;
     std::vector<std::u16string> strArray;
-    bool rc = CopySelected(strArray, mode);
-    rc = DelSelected();
-    rc = CopyToClipboard(strArray, mode != select_t::stream ? true : false);
+    bool rc = CopySelected(strArray, mode)
+    && DelSelected()
+    && CopyToClipboard(strArray, mode != select_t::stream ? true : false);
 
-    return true;
+    return rc;
 }
 
 bool EditorWnd::EditPasteFromClipboard(input_t cmd)
@@ -695,12 +695,12 @@ bool EditorWnd::EditPasteFromClipboard(input_t cmd)
     LOG(DEBUG) << "    EditPasteFromClipboard " << std::hex << cmd << std::dec;
 
     std::vector<std::u16string> strArray;
-    bool rc = PasteFromClipboard(strArray);
-    rc = PasteSelected(strArray, select_t::stream);
+    bool rc = PasteFromClipboard(strArray)
+    && PasteSelected(strArray, select_t::stream);
     
     //del mark
     ChangeSelected(select_change::clear);
-    return true;
+    return rc;
 }
 
 bool EditorWnd::CtrlFind(input_t cmd)

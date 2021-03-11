@@ -30,11 +30,13 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef WIN32
     #include <windows.h>
+
+    const std::u16string c_eol = u"\r\n";
 #else
     #include <filesystem>
 
     namespace fs = std::filesystem;
-    static const std::string s_clipFile = "/temp/m.clp";
+    static const std::string s_clipFile = "/tmp/m.clp";
 #endif
 
 
@@ -52,10 +54,10 @@ bool CopyToClipboard(const std::vector<std::u16string>& strArray, bool eol)
     for (auto& s : strArray)
     {
         str += s;
-        str += u"\r\n";
+        str += c_eol;
     }
     if (eol)
-        str += u"\r\n";
+        str += c_eol;
 
     //copy text using the CF_UNICODETEXT format.
     // Allocate a global memory object for the text.
@@ -127,12 +129,12 @@ bool PasteFromClipboard(std::vector<std::u16string>& strArray)
     }
 
     strArray.clear();
-    std::u16string str{ static_cast<char16_t*>(paste) };//???
+    std::u16string_view str{ static_cast<char16_t*>(paste) };
     size_t offset = 0;
     while (offset < str.size())
     {
-        size_t strEnd = str.find(u"\r\n", offset);
-        strArray.push_back(str.substr(offset, strEnd - offset));
+        size_t strEnd = str.find(c_eol, offset);
+        strArray.push_back(std::u16string{ str.substr(offset, strEnd - offset) });
         if (strEnd == std::string::npos)
             break;
         offset = strEnd + 2;
