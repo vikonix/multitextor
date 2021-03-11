@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 
 #include "utils/SymbolType.h"
+#include "utils/Clipboard.h"
 #include "EditorWnd.h"
 #include "WndManager.h"
 #include "EditorApp.h"
@@ -503,10 +504,10 @@ bool EditorWnd::EditBlockIndent(input_t cmd)
 {
     if (m_readOnly)
         return true;
-
-    LOG(DEBUG) << "    EditBlockIndent " << std::hex << cmd << std::dec;
     if (m_selectState != select_state::complete)
         return true;
+
+    LOG(DEBUG) << "    EditBlockIndent " << std::hex << cmd << std::dec;
 
     input_t count{ K_GET_CODE(cmd) };
     if (!count)
@@ -580,10 +581,10 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
 {
     if (m_readOnly)
         return true;
-
-    LOG(DEBUG) << "    EditBlockUndent " << std::hex << cmd << std::dec;
     if (m_selectState != select_state::complete)
         return true;
+
+    LOG(DEBUG) << "    EditBlockUndent " << std::hex << cmd << std::dec;
 
     input_t count{ K_GET_CODE(cmd) };
     if (!count)
@@ -655,16 +656,50 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
 
 bool EditorWnd::EditCopyToClipboard(input_t cmd)
 {
+    if (m_selectState != select_state::complete)
+        return true;
+
+    LOG(DEBUG) << "    EditCopyToClipboard " << std::hex << cmd << std::dec;
+
+    select_t mode;
+    std::vector<std::u16string> strArray;
+    bool rc = CopySelected(strArray, mode);
+    rc = CopyToClipboard(strArray, mode != select_t::stream ? true : false);
+
     return true;
 }
 
 bool EditorWnd::EditCutToClipboard(input_t cmd)
 {
+    if (m_selectState != select_state::complete)
+        return true;
+
+    LOG(DEBUG) << "    EditCopyToClipboard " << std::hex << cmd << std::dec;
+
+    select_t mode;
+    std::vector<std::u16string> strArray;
+    bool rc = CopySelected(strArray, mode);
+    rc = DelSelected();
+    rc = CopyToClipboard(strArray, mode != select_t::stream ? true : false);
+
     return true;
 }
 
 bool EditorWnd::EditPasteFromClipboard(input_t cmd)
 {
+    if (m_readOnly)
+        return true;
+    if (!IsClipboardReady())
+        return true;
+
+    LOG(DEBUG) << "    EditPasteFromClipboard " << std::hex << cmd << std::dec;
+
+    std::vector<std::u16string> strArray;
+    bool rc = PasteFromClipboard(strArray);
+    rc = PasteSelected(strArray, select_t::stream);
+    
+    //del mark
+    ChangeSelected(select_change::clear);
     return true;
 }
 

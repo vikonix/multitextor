@@ -117,7 +117,7 @@ public:
         }
         else
             return pos + 1;
-    };
+    }
 
     bool                    SetFilePath(const std::filesystem::path& file);
     std::filesystem::path   GetFilePath() const {return m_file;}

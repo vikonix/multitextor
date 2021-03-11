@@ -123,8 +123,8 @@ bool ScreenWin32::Resize()
     if(m_scrSizeX >= sbInfo.dwMaximumWindowSize.X)
         m_scrSizeX = sbInfo.dwMaximumWindowSize.X - 1;
 
-    if(m_scrSizeY >= sbInfo.dwMaximumWindowSize.Y - 1)
-        m_scrSizeY = sbInfo.dwMaximumWindowSize.Y - 2;
+    if(m_scrSizeY >= sbInfo.dwMaximumWindowSize.Y)
+        m_scrSizeY = sbInfo.dwMaximumWindowSize.Y - 1;
 
     SMALL_RECT rect {0, 0, m_scrSizeX - 1, m_scrSizeY - 1};
     rc = SetConsoleWindowInfo(m_hStdout, TRUE, &rect);

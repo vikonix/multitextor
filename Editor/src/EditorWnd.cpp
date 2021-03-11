@@ -1261,7 +1261,7 @@ bool EditorWnd::CopySelected(std::vector<std::u16string>& strArray, select_t& se
         size_t size = ex - bx + 1;
         
         auto str = m_editor->GetStr(srcY, bx, size);
-        strArray.push_back(str);
+        strArray.push_back(str.substr(0, Editor::UStrLen(str)));
     }
 
     selType = m_selectType;

@@ -154,7 +154,7 @@ bool Editor::Load()
             std::memcpy(strBuffData->data() + strOffset, buff->data() + buffOffset, tocopy);
             strBuff->ReleaseBuff();
 
-            if (strOffset + tocopy < BUFF_SIZE && !file.eof())
+            if (strOffset + tocopy < BUFF_SIZE / 2 && !file.eof())
                 strOffset += tocopy;
             else
             {
@@ -167,9 +167,13 @@ bool Editor::Load()
                 //LOG(DEBUG) << std::hex << "rest=" << rest << std::dec;
 
                 _assert(rc);
-                _assert(tocopy > rest);//???
+                if(tocopy > rest)
+                    tocopy -= rest;
+                else
+                {
+                    _assert(0);
+                }
 
-                tocopy -= rest;
                 fileOffset += tocopy + strOffset;
                 m_buffer.m_totalStrCount += strBuff->GetStrCount();
                 strBuff = nullptr;
