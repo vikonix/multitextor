@@ -105,7 +105,6 @@ class LexParser
     size_t      m_tabSize{8};
 
     bool        m_showTab{};
-    int         m_cp{};
 
     std::map<size_t, std::string> m_lexPosition;
     char16_t    m_stringSymbol{};
@@ -124,7 +123,6 @@ protected:
     
     bool    AddLexem(size_t line, const std::string& lexstr);
     bool    DeleteLexem(size_t line);
-    bool    DumpLexem();
 
     lex_t   SymbolType(int c);
     lex_t   ScanCommentFromBegin(std::string_view lexem, size_t& end);
@@ -142,7 +140,7 @@ public:
 
     static bool SetLexConfig(const std::list<LexConfig>& config) { s_lexConfig = config; return true; }
 
-    bool    SetParseStyle(int cp = 0, const std::string& style = "");
+    bool    SetParseStyle(const std::string& style = "");
     std::string GetParseStyle() const   {return m_parseStyle;}
 
     bool    GetShowTab() const          {return m_showTab;};
@@ -161,5 +159,5 @@ public:
     bool    AddStr(size_t line, const std::u16string& str, invalidate_t& inv);
     bool    DelStr(size_t line, invalidate_t& inv);
 
-    std::optional<size_t> CheckFunc(size_t line, const std::u16string& str);
+    //std::optional<size_t> CheckFunc(size_t line, const std::u16string& str);
 };

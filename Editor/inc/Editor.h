@@ -101,7 +101,7 @@ public:
         : m_file{file}
         , m_cp{cp}
     {
-        m_lexParser.SetParseStyle(cp, parseStyle);
+        m_lexParser.SetParseStyle(parseStyle);
         m_tab = m_lexParser.GetTabSize();
         m_saveTab = m_lexParser.GetSaveTab();
     }

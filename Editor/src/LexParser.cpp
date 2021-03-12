@@ -94,10 +94,8 @@ std::list<LexConfig> LexParser::s_lexConfig
 };
 
 //////////////////////////////////////////////////////////////////////////////
-bool LexParser::SetParseStyle(int cp, const std::string& style)
+bool LexParser::SetParseStyle(const std::string& style)
 {
-    m_cp = cp;
-
     m_scan = false;
     m_parseStyle.clear();
     m_lexPosition.clear();
@@ -182,9 +180,8 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
     CheckForConcatenatedLine(line);
     CheckForOpenComments(line);
 
-    std::string str = utf8::utf16to8(wstr.substr(0, strLen));
     std::string lexstr;
-    LexicalParse(str, lexstr, true);
+    LexicalParse(utf8::utf16to8(wstr.substr(0, strLen)), lexstr, true);
 
     //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
     //LOG(DEBUG) << "  color='" << lex << "'";
@@ -198,15 +195,15 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
             color.push_back(ColorWindowLKeyW);
             break;
         case 'R'://rem
-            if (str[i] == '{' && i < len - 1 && str[i + 1] == '$')//???
+            if (wstr[i] == '{' && i < len - 1 && wstr[i + 1] == '$')//???
             {
                 //pascal preprocessor
                 color.push_back(ColorWindowLDelim);
                 color.push_back(ColorWindowLDelim);
                 ++i;
-                for (++i; i < len && str[i] != '}'; ++i)
+                for (++i; i < len && wstr[i] != '}'; ++i)
                     color.push_back(ColorWindowLRem);
-                if (str[i] == '}')
+                if (wstr[i] == '}')
                     color.push_back(ColorWindowLDelim);
                 else
                     color.push_back(ColorWindowLRem);
@@ -226,7 +223,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
             //case '1'://space
             //case '3'://back slash
             //case '6'://symbol
-            if (str[i] != 0x9 || !m_showTab)
+            if (wstr[i] != 0x9 || !m_showTab)
                 color.push_back(ColorWindow);
             else
                 color.push_back(ColorWindowTab);//tab
@@ -833,9 +830,8 @@ bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t&
     CheckForConcatenatedLine(line);
     CheckForOpenComments(line);
 
-    std::string str = utf8::utf16to8(wstr);
     std::string lexstr;
-    LexicalParse(str, lexstr);
+    LexicalParse(utf8::utf16to8(wstr), lexstr);
 
     std::string prevLex;
     auto it = m_lexPosition.find(line);
@@ -892,9 +888,8 @@ bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& in
     
     CheckForOpenComments(line);
 
-    std::string str = utf8::utf16to8(wstr);
     std::string lexstr;
-    LexicalParse(str, lexstr);
+    LexicalParse(utf8::utf16to8(wstr), lexstr);
 
     if (!lexstr.empty())
     {
@@ -996,17 +991,11 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
     if(pair == s_lexPairs.end())
         return false;
 
-    std::string str;
-    for (auto c : wstr)
-    {
-        str += (char)c;//???wchar2char(m_nCP, pStr[i]);
-    }
-
     CheckForConcatenatedLine(line);
     CheckForOpenComments(line);
 
     std::string curLex;
-    LexicalParse(str, curLex, true);
+    LexicalParse(utf8::utf16to8(wstr), curLex, true);
     const char delimiter{ '8' };
 
     //LOG(DEBUG) << "    lex=" << curLex << ". pos=" << pos;
@@ -1021,13 +1010,13 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
     {
         ++pos;
         //looking in current line
-        for(; pos < str.size(); ++pos)
+        for(; pos < wstr.size(); ++pos)
         {
             if(curLex[pos] == delimiter)
             {
-                if(str[pos] == chPair)
+                if(wstr[pos] == chPair)
                     --count;
-                else if(str[pos] == ch)
+                else if(wstr[pos] == ch)
                     ++count;
             }
             if(!count)
@@ -1068,13 +1057,13 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
     {
         --pos;
         //looking in current line
-        for (; pos < str.size(); --pos)
+        for (; pos < wstr.size(); --pos)
         {
             if (curLex[pos] == delimiter)
             {
-                if (str[pos] == chPair)
+                if (wstr[pos] == chPair)
                     --count;
-                else if (str[pos] == ch)
+                else if (wstr[pos] == ch)
                     ++count;
             }
             if (!count)
@@ -1172,28 +1161,22 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
     if (pair == s_lexPairs.end())
         return false;
 
-    std::string str;
-    for (auto c : wstr)
-    {
-        str += (char)c;//???wchar2char(m_nCP, pStr[i]);
-    }
-
     CheckForConcatenatedLine(line);
     CheckForOpenComments(line);
 
     std::string lex;
-    LexicalParse(str, lex, true);
+    LexicalParse(utf8::utf16to8(wstr), lex, true);
     const char delimiter{ '8' };
     
     //LOG(DEBUG) << "    lex=" << lex;
     auto& [chPair, up] = pair->second;
 
     size_t x{};
-    for(; x < str.size(); ++x)
+    for(; x < wstr.size(); ++x)
     {
         if(lex[x] == delimiter)
         {
-            if(str[x] == chPair)
+            if(wstr[x] == chPair)
             {
                 size_t posx = x;
                 if(!up)
@@ -1201,10 +1184,10 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
                 else
                 {
                     ++x;
-                    while(x < str.size() && lex[x] != delimiter)
+                    while(x < wstr.size() && lex[x] != delimiter)
                         ++x;
 
-                    if(str[x] != ch)
+                    if(wstr[x] != ch)
                     {
                         --count;
                         --x;
@@ -1217,101 +1200,10 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
                     break;
                 }
             }
-            else if(str[x] == ch)
+            else if(wstr[x] == ch)
                 ++count;
         }
     }
 
     return true;
 }
-
-/*
-int LexBuff::CheckFunc(size_t nline, const wchar* pStr)
-{
-  if(!m_pLPos || !m_pParse)
-    return -1;
-
-  int i;
-  char str[MAX_PARSE_STR];
-  for(i = 0; pStr[i] && i < MAX_PARSE_STR; ++i)
-    str[i] = wchar2char(m_nCP, pStr[i]);
-  str[i] = 0;
-  TPRINT(("%s\n", str));
-
-  char lex[MAX_PARSE_STR];
-  LexicalParse(nline, str, lex, NULL);
-  TPRINT(("%s\n", lex));
-
-  if(!nline)
-  {
-    //начался новый поиск
-    m_fcheck = 0;
-    m_count  = 0;
-    m_line   = -1;
-  }
-
-  int fFunc = -1;
-  int fPrepr = 0;
-  //мы ищем () {
-  //или   { () {
-  for(i = 0; str[i]; ++i)
-  {
-    if(lex[i] == '5')
-    {
-      if(!fPrepr && str[i] == '#')
-      {
-        //TPRINT(("Prepr %d\n", line));
-        fPrepr = 1;
-      }
-    }
-    else if(lex[i] == '4')
-    {
-      char c = str[i];
-      if(c == '(')
-      {
-        if(m_fOldC && !fPrepr && !m_count)
-          m_line = (int) nline;
-        else if(m_line == -1 && !fPrepr && m_count == m_fcheck)
-        {
-          //TPRINT(("((( %d\n", line));
-          m_line = (int) nline;
-        }
-      }
-      else if(c == '{')
-      {
-        if(!m_count && m_line == -1 && !fPrepr && !m_fOldC)
-          //пытаемся учесть внешние скобки
-          m_fcheck = 1;
-
-        ++m_count;
-        if(m_count == m_fcheck + 1 && !fPrepr)
-        {
-          //TPRINT(("{{{ !!! %d\n", line));
-          fFunc = m_line;
-          m_line = -1;
-        }
-      }
-      else if(c == '}')
-      {
-        //TPRINT(("}}} %d\n", line));
-        if(m_count)
-          --m_count;
-
-        m_line = -1;
-
-        if(!m_count)
-          m_fcheck = 0;
-      }
-      else if(c == ';')
-      {
-        //TPRINT((";;; %d\n", line));
-        if(!m_fOldC)
-          m_line = -1;
-      }
-    }
-  }
-
-  return fFunc;
-}
-
-*/
