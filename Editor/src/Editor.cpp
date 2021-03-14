@@ -317,7 +317,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
 std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)
 {
-    _assert(offset == 0);
+    //_assert(offset == 0);
     if (line == m_curStr && !m_curStrBuff.empty())
     {
         if(offset + size <= m_maxStrlen)
