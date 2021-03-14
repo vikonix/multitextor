@@ -1089,7 +1089,7 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
                     size_t saveI{};
                     bool end{};
 
-                    LOG(DEBUG) << "Scan skip rem line=" << posIt->first << " pos=" << i;
+                    //LOG(DEBUG) << "Scan skip rem line=" << posIt->first << " pos=" << i;
                     for (; posIt != m_lexPosition.end() && !end; --posIt)
                     {
                         const auto& lex1 = posIt->second;
@@ -1115,7 +1115,7 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
                     posIt = saveIt;
                     i = saveI;
                     lex = saveIt->second;
-                    LOG(DEBUG) << "Skip rem line=" << posIt->first << " pos=" << i;
+                    //LOG(DEBUG) << "Skip rem line=" << posIt->first << " pos=" << i;
                 }
                 else if (c == chPair)
                     --count;
@@ -1145,7 +1145,7 @@ GetStartCount:
 
     pos = static_cast<size_t>(count);
 
-    LOG(DEBUG) << "line=" << line << " pos=" << pos;
+    //LOG(DEBUG) << "line=" << line << " pos=" << count;
     return true;
 }
 

@@ -598,7 +598,7 @@ bool EditorWnd::SelectBegin(input_t cmd)
     InputCapture();
     EditorApp::StatusMark((m_selectKeyShift || m_selectMouse) ? EditorApp::mark_status::mark : EditorApp::mark_status::mark_by_key);
 
-    if (!m_selectState)
+    if (m_selectState == select_state::no)
     {
         //start selection
         m_selectState = select_state::begin;
@@ -656,7 +656,7 @@ bool EditorWnd::SelectBegin(input_t cmd)
             }
             else
             {
-                if (IsNormalSelection(0, m_endY, 0, y))
+                if (y != m_endY && IsNormalSelection(0, m_endY, 0, y))
                 {
                     //TPRINT(("-+\n"));
                     Mark(0, m_endY, 0, y - 1, 0, m_selectType);
