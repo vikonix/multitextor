@@ -113,7 +113,7 @@ bool WndManager::CalcView()
 
 bool WndManager::Refresh()
 {
-    LOG(DEBUG) << "  M::Refresh";
+    //LOG(DEBUG) << "  M::Refresh";
 
     if (!m_sizex || !m_sizey)
         return false;

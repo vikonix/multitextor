@@ -95,7 +95,7 @@ Shade::~Shade()
 
 bool Shade::Hide()
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
 
     WndManager::getInstance().PutBlock(m_x, m_y - 1, m_x + m_sizex - 1, m_y - 1, m_pSaveT);
     WndManager::getInstance().PutBlock(m_x, m_y, m_x, m_y + m_sizey - 1, m_pSaveL);
@@ -107,7 +107,7 @@ bool Shade::Hide()
 
 bool Shade::Paint()
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
 
     color_t color = ColorShade;
 

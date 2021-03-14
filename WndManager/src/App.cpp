@@ -179,7 +179,7 @@ bool Application::ShowProgressBar(size_t n)
 //////////////////////////////////////////////////////////////////////////////
 bool Application::Repaint()
 {
-    LOG(DEBUG) << " A::Repaint a=" << m_accessMenu.size() << " s=" << m_sLine.size();
+    //LOG(DEBUG) << " A::Repaint access menu=" << m_accessMenu.size() << " status line=" << m_sLine.size();
 
     if (!m_accessMenu.empty())
     {

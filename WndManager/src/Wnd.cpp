@@ -106,7 +106,7 @@ bool Wnd::CheckClientPos(pos_t x, pos_t y) const
 //////////////////////////////////////////////////////////////////////////////
 bool FrameWnd::Refresh()
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
     if (!m_visible)
         return true;
 

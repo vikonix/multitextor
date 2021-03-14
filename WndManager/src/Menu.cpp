@@ -121,7 +121,7 @@ int Menu::GetPrevItem(int n)
 /////////////////////////////////////////////////////////////////////////////
 input_t LineMenu::Activate(bool capture)
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
     if (m_menu.empty())
         return 0;
   
@@ -153,7 +153,7 @@ input_t LineMenu::Close(input_t code)
 
 bool LineMenu::Refresh()
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
 
     pos_t x = m_left;
 
@@ -313,7 +313,7 @@ input_t LineMenu::EventProc(input_t code)
             if(x >= m_left && x < m_left + m_sizex
                 && y >= m_top  && y < m_top + m_sizey)
             {
-                LOG(DEBUG) << "LineMenu::Check mouse c=" << std::hex << code << std::dec << " x=" << x << " y=" << y;
+                //LOG(DEBUG) << "LineMenu::Check mouse c=" << std::hex << code << std::dec << " x=" << x << " y=" << y;
                 if((code & K_TYPEMASK) != K_MOUSEKL
                 && (code & K_TYPEMASK) != K_MOUSEKR
                 && (code & K_TYPEMASK) != K_MOUSEKUP)
@@ -408,7 +408,7 @@ input_t LineMenu::EventProc(input_t code)
 /////////////////////////////////////////////////////////////////////////////
 input_t FrameMenu::Activate(bool capture)
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
     if (m_menu.empty())
         return 0;
 
@@ -456,7 +456,7 @@ input_t FrameMenu::Activate(bool capture)
     if(m_top + m_sizey >= WndManager::getInstance().m_sizey - 1)
         m_top = WndManager::getInstance().m_sizey - m_sizey - 1;
 
-    LOG(DEBUG) << "FrameMenu::Activate x=" << m_left << " y=" << m_top << " sx=" << m_sizex << " sy=" << m_sizey;
+    //LOG(DEBUG) << "FrameMenu::Activate x=" << m_left << " y=" << m_top << " sx=" << m_sizex << " sy=" << m_sizey;
 
     WndManager::getInstance().GetBlock(m_left, m_top, m_left + m_sizex - 1, m_top + m_sizey - 1, m_saveBlock);
 
@@ -472,7 +472,7 @@ input_t FrameMenu::Activate(bool capture)
 
 bool FrameMenu::Refresh()
 {
-    LOG(DEBUG) << __FUNC__;
+    //LOG(DEBUG) << __FUNC__;
 
     if(m_selected != -1)
         Application::getInstance().SetHelpLine(m_menu[m_selected].helpLine);
@@ -705,7 +705,7 @@ input_t FrameMenu::EventProc(input_t code)
             if(x >= m_left && x < m_left + m_sizex
             && y >= m_top  && y < m_top + m_sizey)
             {
-                LOG(DEBUG) << "FrameMenu::Check mouse c=" << std::hex << code << std::dec << " x=" << x << " y=" << y;
+                //LOG(DEBUG) << "FrameMenu::Check mouse c=" << std::hex << code << std::dec << " x=" << x << " y=" << y;
                 if((code & K_TYPEMASK) != K_MOUSEKL
                 && (code & K_TYPEMASK) != K_MOUSEKUP)
                     return 0;

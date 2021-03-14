@@ -39,7 +39,7 @@ Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
         controls.front().sizex, controls.front().sizey, BORDER_FULL)
     , m_Shade(x, y, controls.front().sizex, controls.front().sizey)
 {
-    LOG(DEBUG) << "    Dialog";
+    //LOG(DEBUG) << "    Dialog";
 
     m_pColorWindow       = &ColorDialog;
     m_pColorWindowTitle  = &ColorDialogTitle;
@@ -454,7 +454,7 @@ bool Dialog::Refresh()
 
 bool Dialog::_Refresh()
 {
-    LOG(DEBUG) << "    Dialog::_Refresh";
+    //LOG(DEBUG) << "    Dialog::_Refresh";
 
     Application::getInstance().SetHelpLine(m_controls[m_selected]->m_helpLine);
     StopPaint();
