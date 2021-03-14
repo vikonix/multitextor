@@ -290,7 +290,7 @@ bool EditorWnd::EditDelEnd(input_t cmd)
     {
         m_editor->SetUndoRemark("Del end");
         rc = m_editor->DelEnd(true, y, x);
-        ChangeSelected(select_change::delete_ch, y, x, MAX_STRLEN - x);
+        ChangeSelected(select_change::delete_ch, y, x, m_editor->GetMaxStrLen() - x);
     }
 
     return rc;
@@ -538,7 +538,7 @@ bool EditorWnd::EditBlockIndent(input_t cmd)
             else if (i == 0)
             {
                 bx = m_beginX;
-                ex = MAX_STRLEN;
+                ex = m_editor->GetMaxStrLen();
             }
             else if (i == n)
             {
@@ -548,13 +548,13 @@ bool EditorWnd::EditBlockIndent(input_t cmd)
             else
             {
                 bx = 0;
-                ex = MAX_STRLEN;
+                ex = m_editor->GetMaxStrLen();
             }
         }
         else if (m_selectType == select_t::line)
         {
             bx = 0;
-            ex = MAX_STRLEN;
+            ex = m_editor->GetMaxStrLen();
         }
         else
         {
@@ -564,8 +564,8 @@ bool EditorWnd::EditBlockIndent(input_t cmd)
 
         size_t y = m_beginY + i;
         size_t size = ex - bx + 1;
-        if (size > MAX_STRLEN)
-            size = MAX_STRLEN;
+        if (size > m_editor->GetMaxStrLen())
+            size = m_editor->GetMaxStrLen();
 
         rc = m_editor->Indent(save, y, bx, size, count);
     }
@@ -615,7 +615,7 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
             else if (i == 0)
             {
                 bx = m_beginX;
-                ex = MAX_STRLEN;
+                ex = m_editor->GetMaxStrLen();
             }
             else if (i == n)
             {
@@ -625,13 +625,13 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
             else
             {
                 bx = 0;
-                ex = MAX_STRLEN;
+                ex = m_editor->GetMaxStrLen();
             }
         }
         else if (m_selectType == select_t::line)
         {
             bx = 0;
-            ex = MAX_STRLEN;
+            ex = m_editor->GetMaxStrLen();
         }
         else
         {
@@ -641,8 +641,8 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
 
         size_t y = m_beginY + i;
         size_t size = ex - bx + 1;
-        if (size > MAX_STRLEN)
-            size = MAX_STRLEN;
+        if (size > m_editor->GetMaxStrLen())
+            size = m_editor->GetMaxStrLen();
 
         rc = m_editor->Undent(save, y, bx, size, count);
     }

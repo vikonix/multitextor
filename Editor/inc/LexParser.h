@@ -54,8 +54,6 @@ enum class lex_t
     COMMENT_LINE
 };
 
-#define MAX_PARSE_STR (MAX_STRLEN + 1)
-
 struct LexConfig 
 {
     std::string langName;

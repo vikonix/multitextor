@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_set>
 #include <filesystem>
 #include <limits>
+#include <algorithm>
 
 
 enum class eol_t
@@ -68,7 +69,7 @@ private:
 
     //config variables
     int             m_cp{};
-    size_t          m_maxStrlen{MAX_STRLEN};
+    size_t          m_maxStrlen{0x1000};
     eol_t           m_eol{DEF_EOL};
     size_t          m_tab{8};   //tab position
     bool            m_saveTab{};//save tab or not
@@ -137,7 +138,7 @@ public:
     char                    GetAccessInfo();
 
     size_t                  GetMaxStrLen() const    {return m_maxStrlen;}
-    void                    SetMaxStrLen(size_t len){m_maxStrlen = len;}
+    void                    SetMaxStrLen(size_t len){m_maxStrlen = std::min(static_cast<size_t>(MAX_STRLEN), len);}
     int                     GetCP() const           {return m_cp;}
     void                    SetCP(int cp)           {m_cp = cp;}
     eol_t                   GetEol() const          {return m_eol;}
@@ -156,7 +157,7 @@ public:
     time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
     //editor API with undo
-    std::u16string          GetStr(size_t line, size_t offset = 0, size_t size = MAX_STRLEN);
+    std::u16string          GetStr(size_t line, size_t offset = 0, size_t size = MAX_STRLEN + 1);
     bool                    SetCurStr(size_t line);
 
     bool                    CorrectTab(bool save, size_t line, std::u16string& str);
@@ -180,7 +181,7 @@ public:
     bool                    ChangeCh(bool save, size_t line, size_t pos, char16_t ch);
     bool                    DelCh(bool save, size_t line, size_t pos)    {return DelSubstr(save, line, pos, 1);}
     bool                    DelBegin(bool save, size_t line, size_t pos) {return DelSubstr(save, line, 0, pos);}
-    bool                    DelEnd(bool save, size_t line, size_t pos)   {return ClearSubstr(save, line, pos, MAX_STRLEN);}
+    bool                    DelEnd(bool save, size_t line, size_t pos)   {return ClearSubstr(save, line, pos, m_maxStrlen - pos);}
 
     //undo control
     void                    SetUndoRemark(const std::string& rem) {m_undoList.SetRemark(rem);}

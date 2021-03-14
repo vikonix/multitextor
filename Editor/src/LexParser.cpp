@@ -195,7 +195,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
             color.push_back(ColorWindowLKeyW);
             break;
         case 'R'://rem
-            if (wstr[i] == '{' && i < len - 1 && wstr[i + 1] == '$')//???
+            if (wstr[i] == '{' && i < len - 2 && wstr[i + 1] == '$')//???
             {
                 //pascal preprocessor
                 color.push_back(ColorWindowLDelim);
@@ -559,12 +559,13 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
 {
     size_t strSize{ str.size() };
     lex_t type{};
-    if (begin < strSize)
-        type = SymbolType(str[begin]);
 
     //skip leading space
     while (begin < strSize - 1 && (type = SymbolType(str[begin])) == lex_t::SPACE)
         ++begin;
+
+    if (begin < strSize)
+        type = SymbolType(str[begin]);
 
     end = begin;
 

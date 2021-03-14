@@ -189,9 +189,9 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
     {
         m_cursorx = m_sizeX - 5;//we will see 4 symbols
         pos = x - m_cursorx;
-        if (pos >= static_cast<size_t>(MAX_STRLEN - m_sizeX))
+        if (pos >= static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
         {
-            pos = MAX_STRLEN - m_sizeX;
+            pos = m_editor->GetMaxStrLen() - m_sizeX;
             m_cursorx = static_cast<pos_t>(x - pos);
         }
     }
@@ -273,7 +273,7 @@ bool EditorWnd::InvalidateRect(pos_t x, pos_t y, pos_t sizex, pos_t sizey)
 bool EditorWnd::Invalidate(size_t line, invalidate_t type, size_t pos, size_t size)
 {
     if (size == 0)
-        size = MAX_STRLEN;
+        size = m_editor->GetMaxStrLen();
 
     int y = static_cast<int>(line) - static_cast<int>(m_firstLine);
     int x = static_cast<int>(pos) - static_cast<int>(m_xOffset);
@@ -338,7 +338,7 @@ bool EditorWnd::Repaint()
 
         for (pos_t i = m_invBeginY; i < m_invEndY; ++i)
         {
-            auto str = m_editor->GetStr(m_firstLine + i);
+            auto str = m_editor->GetStr(m_firstLine + i, 0, m_editor->GetMaxStrLen());//??? , 0, m_xOffset + m_invEndX);
             rc = PrintStr(m_invBeginX, i, str, m_xOffset + m_invBeginX, m_invEndX - m_invBeginX);
         }
 
@@ -362,7 +362,7 @@ bool EditorWnd::Repaint()
     return rc;
 }
 
-bool EditorWnd::IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey)
+bool EditorWnd::IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey) const
 {
     //true - normal selection
     //false - inverse selection
@@ -387,11 +387,12 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
             Mark(m_foundX, m_foundY, m_foundX + m_foundSize - 1, m_foundY, ColorWindowFound);
     };
 
+    bool rc{};
     if (!m_diff)
     {
         std::vector<color_t> colorBuff;
-        colorBuff.reserve(MAX_STRLEN);
-        bool rc = m_editor->GetColor(m_firstLine + y, str, colorBuff, offset + len);
+        colorBuff.reserve(offset + len);
+        rc = m_editor->GetColor(m_firstLine + y, str, colorBuff, offset + len);
 
         if (rc)
             rc = WriteColorStr(x, y, str.substr(offset, len), std::vector<color_t>(colorBuff.cbegin() + offset, colorBuff.cend()));
@@ -400,7 +401,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
     }
     else
     {
-/*        
+/*???
         if (m_diff->IsDiff(m_nDiffBuff, m_nFirstLine + y))//???
             SetTextAttr(ColorWindowDiff);
         else
@@ -416,89 +417,20 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
         return true;
     }
 
-    //check begin and end of selection
-    size_t x1, x2;
-    size_t y1, y2;
-
-    if (IsNormalSelection(m_beginX, m_beginY, m_endX, m_endY))
-    {
-        x1 = m_beginX;
-        x2 = m_endX;
-        y1 = m_beginY;
-        y2 = m_endY;
-    }
-    else
-    {
-        x1 = m_endX;
-        x2 = m_beginX;
-        y1 = m_endY;
-        y2 = m_beginY;
-    }
-
     size_t posy = y + m_firstLine;
-
-    if (posy < y1 || posy > y2)
+    size_t bx, ex;
+    [[maybe_unused]]select_line type;
+    if (!GetSelectedPos(posy, bx, ex, type))
     {
-        //not selected
+        //line not selected
         MarkFound();
         return true;
     }
 
-    size_t bx, ex;
-    if (m_selectType == select_t::stream)
-    {
-        //stream
-        if (posy == y1)
-        {
-            //first line
-            if (y1 == y2)
-            {
-                //fill x1-x2
-                bx = x1;
-                ex = x2;
-            }
-            else
-            {
-                //fill x1-.
-                bx = x1;
-                ex = MAX_STRLEN;
-            }
-        }
-        else if (posy == y2)
-        {
-            //last line
-            //fill 0-x2
-            bx = 0;
-            ex = x2;
-        }
-        else
-        {
-            //fill 0-.
-            bx = 0;
-            ex = MAX_STRLEN;
-        }
-    }
-    else if (m_selectType == select_t::line)
-    {
-        //line
-        //fill 0-.
-        bx = 0;
-        ex = MAX_STRLEN;
-    }
-    else
-    {
-        //columns
-        //fill x1-x2
-        bx = x1;
-        ex = x2;
-    }
-
-    bool rc;
-
-//    if (!m_diff)
+    if (!m_diff)
         rc = Mark(bx, posy, ex, posy, ColorWindowSelect, m_selectType);
-//    else
-//        rc = Mark(bx, posy, ex, posy, ColorWindowCurDiff, m_selectType);
+    else
+        ;//???        rc = Mark(bx, posy, ex, posy, ColorWindowCurDiff, m_selectType);
 
     MarkFound();
 
@@ -542,7 +474,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
         if (y2 >= m_firstLine + m_sizeY)
         {
             y2 = m_firstLine + m_sizeY - 1;
-            x2 = MAX_STRLEN;
+            x2 = m_editor->GetMaxStrLen();
         }
     }
     else
@@ -601,7 +533,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
                 {
                     //fill x1-.
                     bx = x1;
-                    ex = MAX_STRLEN;
+                    ex = m_editor->GetMaxStrLen();
                 }
             }
             else if (y == y2)
@@ -616,7 +548,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
                 //full line
                 //fill 0-.
                 bx = 0;
-                ex = MAX_STRLEN;
+                ex = m_editor->GetMaxStrLen();
             }
         }
         else if (selectType == select_t::line)
@@ -624,7 +556,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             //line
             //fill 0-.
             bx = 0;
-            ex = MAX_STRLEN;
+            ex = m_editor->GetMaxStrLen();
         }
         else
         {
@@ -646,9 +578,9 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             ColorRect(static_cast<pos_t>(bx - m_xOffset), static_cast<pos_t>(y - m_firstLine), static_cast<pos_t>(ex - bx + 1), 1, color);
         else
         {
-            auto str = m_editor->GetStr(y);
+            auto str = m_editor->GetStr(y, 0, ex + 1);
             std::vector<color_t> colorBuff;
-            colorBuff.reserve(MAX_STRLEN);
+            colorBuff.reserve(ex + 1);
             bool rc = m_editor->GetColor(y, str, colorBuff, ex + 1);
             if (rc)
             {
@@ -930,7 +862,7 @@ bool EditorWnd::HideFound()
           && static_cast<size_t>(m_lexX) >= m_xOffset   && static_cast<size_t>(m_lexX) < m_xOffset + m_sizeX)
         {
             //if visible
-            auto str = m_editor->GetStr(m_lexY);
+            auto str = m_editor->GetStr(m_lexY);//??? , 0, m_lexX + 1);
             rc = PrintStr(static_cast<pos_t>(m_lexX - m_xOffset), static_cast<pos_t>(m_lexY - m_firstLine), str, m_lexX, 1);
         }
 
@@ -946,7 +878,7 @@ bool EditorWnd::HideFound()
 
         if (m_foundY >= m_firstLine && m_foundY < m_firstLine + m_sizeY)
         {
-            auto str = m_editor->GetStr(m_foundY);
+            auto str = m_editor->GetStr(m_foundY);//??? , 0, m_xOffset + m_foundX);
 
             int x = static_cast<int>(m_foundX) - static_cast<int>(m_xOffset);
             if (x < 0)
@@ -997,7 +929,7 @@ bool EditorWnd::FindWord(const std::u16string& str, size_t& begin, size_t& end)
     ++b;
 
     size_t e;
-    for (e = x; e < MAX_STRLEN; ++e)
+    for (e = x; e < m_editor->GetMaxStrLen(); ++e)
         if (GetSymbolType(str[e]) != type)
             break;
     --e;
@@ -1177,7 +1109,7 @@ bool EditorWnd::CorrectSelection()
     else if (m_selectType == select_t::line)
     {
         m_beginX = 0;
-        m_endX = MAX_STRLEN;
+        m_endX = m_editor->GetMaxStrLen();
     }
     else
     {
@@ -1188,6 +1120,84 @@ bool EditorWnd::CorrectSelection()
             m_beginX = m_endX;
             m_endX = x;
         }
+    }
+
+    return true;
+}
+
+bool EditorWnd::GetSelectedPos(size_t line, size_t& begin, size_t& end, select_line& type) const
+{
+    //check begin and end of selection
+    size_t x1, x2;
+    size_t y1, y2;
+
+    if (IsNormalSelection(m_beginX, m_beginY, m_endX, m_endY))
+    {
+        x1 = m_beginX;
+        x2 = m_endX;
+        y1 = m_beginY;
+        y2 = m_endY;
+    }
+    else
+    {
+        x1 = m_endX;
+        x2 = m_beginX;
+        y1 = m_endY;
+        y2 = m_beginY;
+    }
+
+    if (line < y1 || line > y2)
+        return false;
+
+    if (m_selectType == select_t::stream)
+    {
+        //stream
+        if (line == y1)
+        {
+            //first line
+            if (y1 == y2)
+            {
+                //[x1,x2]
+                begin = x1;
+                end = x2;
+                type = select_line::substr;
+            }
+            else
+            {
+                //[x1,).
+                begin = x1;
+                end = m_editor->GetMaxStrLen();
+                type = select_line::end;
+            }
+        }
+        else if (line == y2)
+        {
+            //last line (,x2]
+            begin = 0;
+            end = x2;
+            type = select_line::begin;
+        }
+        else
+        {
+            //[0,)
+            begin = 0;
+            end = m_editor->GetMaxStrLen();
+            type = select_line::full;
+        }
+    }
+    else if (m_selectType == select_t::line)
+    {
+        //line [0,)
+        begin = 0;
+        end = m_editor->GetMaxStrLen();
+        type = select_line::full;
+    }
+    else
+    {
+        //columns [x1,x2]
+        begin = x1;
+        end = x2;
+        type = select_line::substr;
     }
 
     return true;
@@ -1223,39 +1233,8 @@ bool EditorWnd::CopySelected(std::vector<std::u16string>& strArray, select_t& se
     for (size_t i = 0; i <= n; ++i)
     {
         size_t bx, ex;
-        if (m_selectType == select_t::stream)
-        {
-            if (n == 0)
-            {
-                bx = m_beginX;
-                ex = m_endX;
-            }
-            else if (i == 0)
-            {
-                bx = m_beginX;
-                ex = MAX_STRLEN;
-            }
-            else if (i == n)
-            {
-                bx = 0;
-                ex = m_endX;
-            }
-            else
-            {
-                bx = 0;
-                ex = MAX_STRLEN;
-            }
-        }
-        else if (m_selectType == select_t::line)
-        {
-            bx = 0;
-            ex = MAX_STRLEN;
-        }
-        else
-        {
-            bx = m_beginX;
-            ex = m_endX;
-        }
+        [[maybe_unused]] select_line type;
+        GetSelectedPos(m_beginY + i, bx, ex, type);
 
         size_t srcY = m_beginY + i;
         size_t size = ex - bx + 1;
@@ -1307,7 +1286,7 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
             {
                 //first line
                 bx1 = posX;
-                ex1 = MAX_STRLEN - 1;
+                ex1 = m_editor->GetMaxStrLen() - 1;
                 copyLine = 1;
             }
             else if (i == n - 1)
@@ -1319,14 +1298,14 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
             else
             {
                 bx1 = 0;
-                ex1 = MAX_STRLEN - 1;
+                ex1 = m_editor->GetMaxStrLen() - 1;
                 copyLine = 2;
             }
         }
         else if (selType == select_t::line)
         {
             bx1 = 0;
-            ex1 = MAX_STRLEN - 1;
+            ex1 = m_editor->GetMaxStrLen() - 1;
             copyLine = 2;
         }
         else
@@ -1409,53 +1388,13 @@ bool EditorWnd::DelSelected()
 
     for (size_t i = 0; i <= n; ++i)
     {
-        int deleteLine{};
-
-        if (m_selectType == select_t::stream)
-        {
-            if (n == 0)
-            {
-                //only 1 str
-                bx = m_beginX;
-                ex = m_endX;
-            }
-            else if (i == 0)
-            {
-                //first line
-                bx = m_beginX;
-                ex = MAX_STRLEN;
-                deleteLine = 1;
-            }
-            else if (i == n)
-            {
-                //last line
-                bx = 0;
-                ex = m_endX;
-                deleteLine = 3;
-            }
-            else
-            {
-                bx = 0;
-                ex = MAX_STRLEN;
-                deleteLine = 2;
-            }
-        }
-        else if (m_selectType == select_t::line)
-        {
-            bx = 0;
-            ex = MAX_STRLEN;
-            deleteLine = 2;
-        }
-        else
-        {
-            bx = m_beginX;
-            ex = m_endX;
-        }
+        select_line type;
+        GetSelectedPos(m_beginY + i, bx, ex, type);
 
         size_t srcY = m_beginY + i;
         size_t size = ex - bx + 1;
 
-        if (deleteLine == 1)
+        if (type == select_line::end)
         {
             LOG(DEBUG) << "     Del first line dy=" << m_beginY;
             dy = 1;
@@ -1463,7 +1402,7 @@ bool EditorWnd::DelSelected()
             auto str = m_editor->GetStr(m_beginY + n, m_endX + 1);
             rc = m_editor->ChangeSubstr(save, m_beginY, bx, str);
         }
-        else if (deleteLine)
+        else if (type != select_line::substr)
         {
             LOG(DEBUG) << "     Del line dy=" << m_beginY + dy;
             //del full line

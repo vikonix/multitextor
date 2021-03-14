@@ -68,6 +68,14 @@ class EditorWnd : public FrameWnd
         split_str,
         merge_str
     };
+
+    enum class select_line
+    {
+        begin,
+        full,
+        end,
+        substr
+    };
     
     using EditorFunc = std::function<bool(EditorWnd*, input_t)>;
 
@@ -140,6 +148,12 @@ class EditorWnd : public FrameWnd
     bool    CopySelected(std::vector<std::u16string>& strArray, select_t& selType);
     bool    PasteSelected(const std::vector<std::u16string>& strArray, select_t selType);
     bool    DelSelected();
+    bool    Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, select_t selectType = select_t::stream);
+    bool    IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey) const;
+    bool    HideFound();
+    bool    SelectClear();
+    bool    FindWord(const std::u16string& str, size_t& begin, size_t& end);
+    bool    GetSelectedPos(size_t line, size_t& begin, size_t& end, select_line& type) const;
 
 public:
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
@@ -150,11 +164,6 @@ public:
     bool        SetEditor(EditorPtr editor);
     EditorPtr   GetEditor() { return m_editor; }
 
-    bool        Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, select_t selectType = select_t::stream);
-    bool        IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey);
-    bool        HideFound();
-    bool        SelectClear();
-    bool        FindWord(const std::u16string& str, size_t& begin, size_t& end);
     bool        SetDiffMode(std::shared_ptr<Diff> diff = nullptr, int buff = -1)
     {
         m_diff = diff;

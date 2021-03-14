@@ -317,8 +317,14 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
 std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)
 {
+    _assert(offset == 0);
     if (line == m_curStr && !m_curStrBuff.empty())
-        return m_curStrBuff.substr(offset, size);
+    {
+        if(offset + size <= m_maxStrlen)
+            return m_curStrBuff.substr(offset, size);
+        else
+            return m_curStrBuff.substr(offset);
+    }
     else
         return _GetStr(line, offset, size);
 }
@@ -326,12 +332,20 @@ std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)
 std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
 {
     if (line >= m_buffer.GetStrCount())
-        return std::u16string(size, ' ');
+    {
+        if(offset + size <= m_maxStrlen)
+            return std::u16string(size - offset, ' ');
+        else
+            return {};
+    }
 
-    std::u16string outstr(size, ' ');
-    
     auto str{ m_buffer.GetStr(line) };
     std::u16string wstr = utf8::utf8to16(std::string(str));//???Convert char with cp
+    std::u16string outstr;
+    if (offset + size <= m_maxStrlen)
+        outstr.resize(size, ' ');
+    else
+        outstr.resize(wstr.size(), ' ');
 
     //go from begin of string for right tabulation calculating 
     size_t pos{ 0 };
@@ -347,6 +361,8 @@ std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
         if (c == 0x9)//tab
         {
             size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
+            outstr.resize(std::min(outstr.size() + tabpos, size), ' ');
+
             if (m_saveTab || m_showTab)
                 while (pos < tabpos)
                 {
@@ -473,7 +489,7 @@ bool Editor::SetCurStr(size_t line)
         }
 
         m_curStr = line;
-        m_curStrBuff = _GetStr(line, 0, MAX_STRLEN);
+        m_curStrBuff = _GetStr(line, 0, m_maxStrlen);
     }
 
     return true;
@@ -554,7 +570,7 @@ bool Editor::AddSubstr(bool save, size_t line, size_t pos, const std::u16string&
 {
     SetCurStr(line);
     m_curStrBuff.insert(pos, substr);
-    m_curStrBuff.resize(MAX_STRLEN, ' ');
+    m_curStrBuff.resize(m_maxStrlen, ' ');
 
     if (line >= GetStrCount())
     {
@@ -586,7 +602,7 @@ bool Editor::ChangeSubstr(bool save, size_t line, size_t pos, const std::u16stri
     SetCurStr(line);
     std::u16string prevStr{ m_curStrBuff.substr(pos, substr.size()) };
     m_curStrBuff.replace(pos, substr.size(), substr);
-    m_curStrBuff.resize(MAX_STRLEN, ' ');
+    m_curStrBuff.resize(m_maxStrlen, ' ');
 
     if (line >= GetStrCount())
     {
@@ -702,7 +718,7 @@ bool Editor::DelSubstr(bool save, size_t line, size_t pos, size_t len)
     SetCurStr(line);
     std::u16string prevStr{ m_curStrBuff.substr(pos, len) };
     m_curStrBuff.erase(pos, len);
-    m_curStrBuff.resize(MAX_STRLEN, ' ');
+    m_curStrBuff.resize(m_maxStrlen, ' ');
 
     m_curChanged = true;
     invalidate_t inv;
@@ -764,7 +780,7 @@ bool Editor::MergeLine(bool save, size_t line, size_t pos, size_t indent)
 
     //merge current string with prev
     SetCurStr(line);
-    if (pos > MAX_STRLEN)
+    if (pos > m_maxStrlen)
         pos = UStrLen(m_curStrBuff);
 
     auto str{ GetStr(line + 1) };
@@ -772,7 +788,7 @@ bool Editor::MergeLine(bool save, size_t line, size_t pos, size_t indent)
 
     if (len > indent)
     {
-        if (pos + len > MAX_STRLEN)
+        if (pos + len > m_maxStrlen)
         {
             //too long string
             _assert(0);
@@ -1073,7 +1089,7 @@ bool Editor::Command(const EditCmd& cmd)
 
 bool Editor::CheckLexPair(size_t& line, size_t& pos)
 {
-    auto str{ GetStr(line) };
+    auto str{ GetStr(line, 0, m_maxStrlen) };
     size_t y{ line };
     char16_t c{ str[pos] };
 
@@ -1084,6 +1100,6 @@ bool Editor::CheckLexPair(size_t& line, size_t& pos)
         return true;
 
     //matching at another line
-    str = GetStr(line);
+    str = GetStr(line, 0, m_maxStrlen);
     return m_lexParser.GetLexPair(str, line, c, pos);
 }

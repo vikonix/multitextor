@@ -111,7 +111,7 @@ bool EditorWnd::MoveRight(input_t cmd)
     {
         if (m_cursorx < m_sizeX - 1)
             ++m_cursorx;
-        else if (offset < static_cast<size_t>(MAX_STRLEN - m_sizeX))
+        else if (offset < static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
             ++offset;
     }
     else
@@ -123,10 +123,10 @@ bool EditorWnd::MoveRight(input_t cmd)
             step -= m_sizeX - 1 - m_cursorx;
             m_cursorx = m_sizeX - 1;
 
-            if (offset < static_cast<size_t>(MAX_STRLEN - m_sizeX - step))
+            if (offset < static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX - step))
                 offset += step;
             else
-                offset = MAX_STRLEN - m_sizeX;
+                offset = m_editor->GetMaxStrLen() - m_sizeX;
         }
     }
 
@@ -287,12 +287,12 @@ bool EditorWnd::MoveScrollRight(input_t cmd)
 {
     size_t step = K_GET_CODE(cmd);
 
-    if (m_xOffset >= static_cast<size_t>(MAX_STRLEN - m_sizeX))
+    if (m_xOffset >= static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
         return MoveRight(cmd);
 
     size_t offset = m_xOffset + (step ? step : 1);
-    if (offset > static_cast<size_t>(MAX_STRLEN - m_sizeX))
-        offset = MAX_STRLEN - m_sizeX;
+    if (offset > static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
+        offset = m_editor->GetMaxStrLen() - m_sizeX;
 
     if (offset != m_xOffset)
     {
@@ -436,7 +436,7 @@ bool EditorWnd::MoveStrEnd([[maybe_unused]]input_t cmd)
     if (len >= static_cast<size_t>(m_sizeX))
     {
         m_cursorx = m_sizeX - 1;
-        if (len == MAX_STRLEN)
+        if (len == m_editor->GetMaxStrLen())
             x = len - m_cursorx - 1;
         else
             x = len - m_cursorx;
@@ -814,7 +814,7 @@ bool EditorWnd::SelectLine(input_t cmd)
     m_beginY = m_endY = m_firstLine + m_cursory;
 
     m_beginX = 0;
-    m_endX = MAX_STRLEN;
+    m_endX = m_editor->GetMaxStrLen();
 
     //show selection
     m_selectType = select_t::stream;
@@ -832,7 +832,7 @@ bool EditorWnd::SelectAll(input_t cmd)
     m_beginY = 0;
     m_endY = m_editor->GetStrCount() - 1;
     m_beginX = 0;
-    m_endX = MAX_STRLEN;
+    m_endX = m_editor->GetMaxStrLen();
 
     //show selection
     m_selectType = select_t::stream;
