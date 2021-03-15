@@ -50,7 +50,7 @@ color_t g_ColorMap[C_COUNT]
     /*C_WINDOW_TITLE     */           FON_GREEN | FON_BLUE,
     /*C_WINDOW_INFO      */           FON_GREEN | FON_BLUE | TEXT_RED | TEXT_GREEN | TEXT_BLUE | TEXT_BRIGHT,
     /*C_WINDOW_SEL       */ FON_RED | FON_GREEN | FON_BLUE,
-    /*C_WINDOW_SEL_LMATCH*/ FON_RED | FON_GREEN | FON_BLUE | TEXT_RED,
+    /*C_WINDOW_SEL_LMATCH*/ FON_RED | FON_GREEN | FON_BLUE | TEXT_RED |                          TEXT_BRIGHT,
     /*C_WINDOW_FOUND     */           FON_GREEN,
     /*C_WINDOW_DIFF      */                       FON_BLUE | TEXT_RED |                          TEXT_BRIGHT,
     /*C_WINDOW_NOTDIFF   */                       FON_BLUE | TEXT_RED | TEXT_GREEN | TEXT_BLUE,

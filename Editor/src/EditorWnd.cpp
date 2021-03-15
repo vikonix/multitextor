@@ -1529,7 +1529,7 @@ bool EditorWnd::UpdateLexPair()
             size_t bx, ex;
             select_line type;
             bool sel = GetSelectedPos(y, bx, ex, type);
-            if(sel && bx <= x && x < ex)
+            if(sel && bx <= x && x <= ex)
                 Mark(x, y, x, y, ColorWindowSelectLMatch);
             else
                 Mark(x, y, x, y, ColorWindowLMatch);
