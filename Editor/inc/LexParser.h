@@ -78,7 +78,7 @@ struct LexConfig
 
 
 //////////////////////////////////////////////////////////////////////////////
-using string_set = std::unordered_set<std::string>;
+using string_set = std::unordered_set<std::u16string>;
 class LexParser
 {
     static std::list<LexConfig> s_lexConfig;
@@ -122,15 +122,15 @@ protected:
     bool    AddLexem(size_t line, const std::string& lexstr);
     bool    DeleteLexem(size_t line);
 
-    lex_t   SymbolType(int c);
-    lex_t   ScanCommentFromBegin(std::string_view lexem, size_t& end);
-    lex_t   ScanComment(std::string_view lexem, size_t& begin, size_t& end);
-    bool    ScanSpecial(std::string_view lexem, size_t& end);
-    bool    IsNumeric(std::string_view lexem);
-    bool    IsKeyWord(std::string_view lexem);
+    lex_t   SymbolType(char16_t c);
+    lex_t   ScanCommentFromBegin(std::u16string_view lexem, size_t& end);
+    lex_t   ScanComment(std::u16string_view lexem, size_t& begin, size_t& end);
+    bool    ScanSpecial(std::u16string_view lexem, size_t& end);
+    bool    IsNumeric(std::u16string_view lexem);
+    bool    IsKeyWord(std::u16string_view lexem);
 
-    lex_t   LexicalScan(std::string_view str, size_t& begin, size_t& end);
-    bool    LexicalParse(std::string_view str, std::string& buff, bool color = false);//if color is true scan for color scheme
+    lex_t   LexicalScan(std::u16string_view str, size_t& begin, size_t& end);
+    bool    LexicalParse(std::u16string_view str, std::string& buff, bool color = false);//if color is true scan for color scheme
 
 public:
     LexParser() = default;

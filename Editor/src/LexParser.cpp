@@ -119,15 +119,16 @@ bool LexParser::SetParseStyle(const std::string& style)
                 m_lexTab[s] = lex_t::SYMBOL;
 
             for (auto special : cfg.special)
-                m_special.insert(special);
+                m_special.insert(utf8::utf8to16(special));
             for (auto lineComment : cfg.lineComment)
-                m_lineComment.insert(lineComment);
+                m_lineComment.insert(utf8::utf8to16(lineComment));
             for (auto openComment : cfg.openComment)
-                m_openComment.insert(openComment);
+                m_openComment.insert(utf8::utf8to16(openComment));
             for (auto closeComment : cfg.closeComment)
-                m_closeComment.insert(closeComment);
+                m_closeComment.insert(utf8::utf8to16(closeComment));
 
-            m_keyWords = cfg.keyWords;
+            for (auto kword : cfg.keyWords)
+                m_keyWords.insert(utf8::utf8to16(kword));
 
             m_recursiveComment = cfg.recursiveComment;
             m_toggledComment = cfg.toggledComment;
@@ -155,8 +156,9 @@ bool LexParser::ScanStr(size_t line, std::string_view str, [[maybe_unused]]int c
 
     //LOG(DEBUG) << "ScanStr(" << line << ") '" << std::string(str) << "'";
 
+    std::u16string wstr = utf8::utf8to16(std::string{ str });//??? +cp
     std::string lexstr;
-    bool rc = LexicalParse(str, lexstr);
+    bool rc = LexicalParse(wstr, lexstr);
 
     if (rc && !lexstr.empty())
     {
@@ -181,7 +183,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
     CheckForOpenComments(line);
 
     std::string lexstr;
-    LexicalParse(utf8::utf16to8(wstr.substr(0, strLen)), lexstr, true);
+    LexicalParse(std::u16string_view(wstr).substr(0, strLen), lexstr, true);
 
     //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
     //LOG(DEBUG) << "  color='" << lex << "'";
@@ -262,7 +264,7 @@ bool LexParser::CheckForConcatenatedLine(size_t line)
     return true;
 }
 
-bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color)
+bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool color)
 {
     if (!m_cutLine)
         m_stringSymbol = 0;
@@ -382,7 +384,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
             {
                 if (!m_commentLine)
                 {
-                    char c = str[begin];
+                    auto c = str[begin];
                     if (!color)
                     {
                         if (type == lex_t::DELIMITER)
@@ -391,7 +393,7 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
                              || c == '{'
                              || c == '['
                              || c == '<')
-                                buff += c;
+                                buff += static_cast<char>(c);
                             else if (c == ')')
                             {
                                 if (buff.empty() || buff.back() != '(')
@@ -548,15 +550,15 @@ bool LexParser::LexicalParse(std::string_view str, std::string& buff, bool color
     return true;
 }
 
-lex_t LexParser::SymbolType(int c)
+lex_t LexParser::SymbolType(char16_t c)
 {
-    if (c & 0x80)
-        return lex_t::OTHER;//??? GetSymbolType (char2wchar(m_nCP, c));
-    else
+    if (c < 0x80)
         return m_lexTab[c];
+    else
+        return lex_t::OTHER;
 }
 
-lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
+lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end)
 {
     size_t strSize{ str.size() };
     lex_t type{};
@@ -637,7 +639,7 @@ lex_t LexParser::LexicalScan(std::string_view str, size_t& begin, size_t& end)
     return type;
 }
 
-bool LexParser::ScanSpecial(std::string_view lexem, size_t& end)
+bool LexParser::ScanSpecial(std::u16string_view lexem, size_t& end)
 {
     for (auto& special : m_special)
     {
@@ -651,7 +653,7 @@ bool LexParser::ScanSpecial(std::string_view lexem, size_t& end)
     return false;
 }
 
-bool LexParser::IsNumeric(std::string_view lexem)
+bool LexParser::IsNumeric(std::u16string_view lexem)
 {
     if ((lexem[0] >= '0' && lexem[0] <= '9') || lexem[0] == '#')
         return true;
@@ -659,9 +661,9 @@ bool LexParser::IsNumeric(std::string_view lexem)
         return false;
 }
 
-bool LexParser::IsKeyWord(std::string_view lexem)
+bool LexParser::IsKeyWord(std::u16string_view lexem)
 {
-    if (m_keyWords.find(std::string(lexem)) != m_keyWords.end())
+    if (m_keyWords.find(std::u16string(lexem)) != m_keyWords.end())
         return true;
     else
         return false;
@@ -670,7 +672,7 @@ bool LexParser::IsKeyWord(std::string_view lexem)
 //line comment shields opened and hides closed
 //first opened comment shields other opened comments
 //closed comment always only one
-lex_t LexParser::ScanCommentFromBegin(std::string_view lexem, size_t& end)
+lex_t LexParser::ScanCommentFromBegin(std::u16string_view lexem, size_t& end)
 {
     if (!m_commentLine || m_toggledComment)
         //check for line comment
@@ -707,7 +709,7 @@ lex_t LexParser::ScanCommentFromBegin(std::string_view lexem, size_t& end)
     return lex_t::END;
 }
 
-lex_t LexParser::ScanComment(std::string_view lexem, size_t& begin, size_t& end)
+lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& end)
 {
     size_t line{};
     size_t open{};
@@ -833,7 +835,7 @@ bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t&
     CheckForOpenComments(line);
 
     std::string lexstr;
-    LexicalParse(utf8::utf16to8(wstr), lexstr);
+    LexicalParse(wstr, lexstr);
 
     std::string prevLex;
     auto it = m_lexPosition.find(line);
@@ -891,7 +893,7 @@ bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& in
     CheckForOpenComments(line);
 
     std::string lexstr;
-    LexicalParse(utf8::utf16to8(wstr), lexstr);
+    LexicalParse(wstr, lexstr);
 
     if (!lexstr.empty())
     {
@@ -997,7 +999,7 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
     CheckForOpenComments(line);
 
     std::string curLex;
-    LexicalParse(utf8::utf16to8(wstr), curLex, true);
+    LexicalParse(wstr, curLex, true);
     const char delimiter{ '8' };
 
     //LOG(DEBUG) << "    lex=" << curLex << ". pos=" << pos;
@@ -1081,7 +1083,7 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
                 continue;
 
             auto lex = posIt->second;
-            for (size_t i = lex.size() - 1; i < lex.size(); --i)
+            for (size_t i = lex.size() - 1; i < lex.size(); --i)//go through 0
             {
                 char c = lex[i];
                 if (c == 'C')
@@ -1135,7 +1137,7 @@ GetStartCount:
     const auto& lex = posIt->second;
 
     //goto begin of line and count brackets
-    for (size_t i = lex.size() - 1; i < lex.size(); --i)
+    for (size_t i = lex.size() - 1; i < lex.size(); --i)//go through 0
     {
         char c = lex[i];
         if (c == chPair)
@@ -1167,7 +1169,7 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
     CheckForOpenComments(line);
 
     std::string lex;
-    LexicalParse(utf8::utf16to8(wstr), lex, true);
+    LexicalParse(wstr, lex, true);
     const char delimiter{ '8' };
     
     //LOG(DEBUG) << "    lex=" << lex;
