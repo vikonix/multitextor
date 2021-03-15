@@ -168,7 +168,7 @@ public:
 
     bool  Beep();
     bool  PutMacro(input_t cmd);
-    bool  CheckInput(const std::chrono::milliseconds& waitTime = 100ms);
+    input_t CheckInput(const std::chrono::milliseconds& waitTime = 100ms);
 
     pos_t GetWSizeX() const;
     pos_t GetWSizeY() const;

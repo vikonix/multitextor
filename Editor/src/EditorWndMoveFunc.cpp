@@ -858,3 +858,58 @@ bool EditorWnd::MoveLexMatch([[maybe_unused]]input_t cmd)
 
     return true;
 }
+
+bool EditorWnd::Find(bool silence)
+{
+    if (g_up)
+        return FindUp(silence);
+    else
+        return FindDown(silence);
+}
+
+bool EditorWnd::CtrlFind([[maybe_unused]]input_t cmd)
+{
+    return Find();
+}
+
+bool EditorWnd::CtrlFindUp([[maybe_unused]] input_t cmd)
+{
+    return FindUp();
+}
+
+bool EditorWnd::CtrlFindDown([[maybe_unused]] input_t cmd)
+{
+    return FindDown();
+}
+
+bool EditorWnd::FindUpWord([[maybe_unused]] input_t cmd)
+{
+    if (!GetWord(g_findStr))
+    {
+        EditorApp::SetErrorLine("Nothing to find");
+        return false;
+    }
+
+    //???App SaveFindStr(g_findStr);
+    return FindUp();
+}
+
+bool EditorWnd::FindDownWord([[maybe_unused]] input_t cmd)
+{
+    if (!GetWord(g_findStr))
+    {
+        EditorApp::SetErrorLine("Nothing to find");
+        return false;
+    }
+
+    //???App SaveFindStr(g_findStr);
+    return FindDown();
+}
+
+bool EditorWnd::Repeat(input_t cmd)
+{
+    if (!g_replace)
+        return Find();
+    else
+        return Replace(cmd);
+}

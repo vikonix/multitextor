@@ -1005,17 +1005,19 @@ bool WndManager::TrackView(const std::string& msg)
     return rc;
 }
 
-bool WndManager::CheckInput(const std::chrono::milliseconds& waitTime)
+input_t WndManager::CheckInput(const std::chrono::milliseconds& waitTime)
 {
-    while (1)
+    bool key = m_console.InputPending(waitTime);
+
+    Application::getInstance().PrintClock();
+    if (key)
     {
-        m_console.InputPending(waitTime);
-        input_t key = m_console.GetInput();
-        LOG_IF(key, INFO) << "  " << ConsoleInput::CastKeyCode(key);
-        if (key == K_SPACE)
-            break;
+        input_t code = m_console.GetInput();
+        LOG_IF(code, DEBUG) << "  " << ConsoleInput::CastKeyCode(key);
+        return code;
     }
-    return true;
+
+    return 0;
 }
 
 bool WndManager::Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t n, scroll_t mode)

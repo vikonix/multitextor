@@ -31,6 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorApp.h"
 
 #include <algorithm>
+#include <iterator>
+#include <cwctype>
+
+std::u16string  EditorWnd::g_findStr;
+bool            EditorWnd::g_noCase{};
+bool            EditorWnd::g_up{};
+bool            EditorWnd::g_replace{};
+bool            EditorWnd::g_inSelected{};
+bool            EditorWnd::g_word{};
 
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode)
@@ -383,8 +392,9 @@ bool EditorWnd::IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey) co
 
 bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t offset, size_t len)
 {
-    auto MarkFound = [this, y]() {
-        if (m_foundSize && static_cast<size_t>(y) == m_foundY)
+    size_t line = y + m_firstLine;
+    auto MarkFound = [this, line]() {
+        if (m_foundSize && line == m_foundY)
             //mark found
             Mark(m_foundX, m_foundY, m_foundX + m_foundSize - 1, m_foundY, ColorWindowFound);
     };
@@ -418,10 +428,9 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
         return true;
     }
 
-    size_t posy = y + m_firstLine;
     size_t bx, ex;
     [[maybe_unused]]select_line type;
-    if (!GetSelectedPos(posy, bx, ex, type))
+    if (!GetSelectedPos(line, bx, ex, type))
     {
         //line not selected
         MarkFound();
@@ -429,7 +438,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
     }
 
     if (!m_diff)
-        rc = Mark(bx, posy, ex, posy, ColorWindowSelect, m_selectType);
+        rc = Mark(bx, line, ex, line, ColorWindowSelect, m_selectType);
     else
         ;//???        rc = Mark(bx, posy, ex, posy, ColorWindowCurDiff, m_selectType);
 
@@ -1548,3 +1557,483 @@ bool EditorWnd::UpdateLexPair()
 
     return true;
 }
+
+bool EditorWnd::GetWord(std::u16string& str)
+{
+    size_t y = m_firstLine + m_cursory;
+    auto curStr = m_editor->GetStr(y);
+    if (curStr.empty())
+        return false;
+
+    str.clear();
+    if (m_selectState == select_state::complete && m_selectType != select_t::line)
+    {
+        if (y == m_beginY && y == m_endY && m_beginX != m_endX)
+        {
+            CorrectSelection();
+
+            for (size_t i = m_beginX; i <= m_endX; ++i)
+            {
+                auto c = curStr[i];
+                str += c != 0x9 ? c : ' ';
+            }
+
+            return true;
+        }
+    }
+
+    size_t b, e;
+    if (!FindWord(curStr, b, e))
+        return false;
+
+    for (size_t i = b; i <= e; ++i)
+    {
+        auto c = curStr[m_beginX + i];
+        str += c != 0x9 ? c : ' ';
+    }
+
+    return true;
+}
+
+bool EditorWnd::UpdateProgress(size_t step)
+{
+    if (m_progress != step)
+    {
+        std::stringstream sstr;
+        sstr << "[" << step << "]";
+        
+        pos_t x{};
+        if (m_border & BORDER_TOP)
+            x += 2;
+
+        WriteWnd(x, 0, sstr.str(), ColorWindowInfo);
+        EditorApp::ShowProgressBar(step);
+
+        WndManager::getInstance().Flush();
+
+        m_progress = step;
+        return CheckInput();
+    }
+
+    return false;
+}
+
+bool EditorWnd::FindUp(bool silence)
+{
+    if (g_findStr.empty())
+    {
+        EditorApp::SetErrorLine("Nothing to find");
+        return false;
+    }
+
+    if (!silence)
+        EditorApp::SetHelpLine("Search. Press any key for cancel");
+
+    time_t t{ time(NULL) };
+    std::u16string find{ g_findStr };
+    if (g_noCase)
+    {
+        std::transform(find.begin(), find.end(), find.begin(),
+            [](char16_t c) { return std::towupper(c); }
+        );
+    }
+    size_t size = find.size();
+
+    //search diaps
+    size_t line{ m_firstLine + m_cursory };
+    size_t end{};
+    if (g_inSelected && m_selectState == select_state::complete)
+    {
+        if (m_beginY <= m_endY)
+        {
+            if (line > m_endY)
+                line = m_endY;
+            end = m_beginY;
+        }
+        else
+        {
+            if (line > m_beginY)
+                line = m_beginY;
+            end = m_endY;
+        }
+    }
+
+    size_t offset{ m_xOffset + m_cursorx };
+    if (offset == 0)
+    {
+        if (line)
+            --line;
+        else
+        {
+            EditorApp::SetErrorLine("Nothing to find");
+            return false;
+        }
+    }
+
+    size_t begin{ line };
+    size_t progress{};
+    bool userBreak{};
+    while (line >= end)
+    {
+        auto str = m_editor->GetStr(line);
+        for (auto it = str.begin(); it < str.end(); ++it)
+        {
+            if (*it == 0x9)
+                *it = ' ';
+            else if (g_noCase)
+                *it = std::towupper(*it);
+        }
+
+        auto itBegin = offset ? std::next(str.rbegin(), str.size() - offset) : str.rbegin();
+        offset = 0;
+        if (auto itFound = std::search(itBegin, str.rend(), std::boyer_moore_horspool_searcher(find.rbegin(), find.rend())); 
+            itFound != str.rend())
+        {
+            offset = std::distance(itFound, str.rend()) - size;
+            //???if (!g_word || IsWord(pStr, offset, n))
+            {
+                LOG(DEBUG) << "    Found time=" << time(NULL) - t;
+                _GotoXY(offset, line);
+
+                m_foundX = offset;
+                m_foundY = line;
+                if (offset - m_xOffset + size < m_sizeX)
+                    m_foundSize = size;
+                else
+                    m_foundSize = m_sizeX - (offset - m_xOffset);
+
+                Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
+
+                if (!silence)
+                    EditorApp::SetHelpLine();
+                return true;
+            }
+        }
+
+        if (line)
+            --line;
+        else
+            break;
+
+        if (++progress == 1000)
+        {
+            progress = 0;
+            if (userBreak = UpdateProgress((begin - line) * 99 / begin); userBreak)
+                break;
+        }
+    }
+
+    if (!silence)
+    {
+        HideFound();
+        if (!userBreak)
+            EditorApp::SetErrorLine("String not found");
+        else
+            EditorApp::SetHelpLine("User abort", stat_color::grayed);
+    }
+
+    return false;
+}
+
+bool EditorWnd::FindDown(bool silence)
+{
+    if (g_findStr.empty())
+    {
+        EditorApp::SetErrorLine("Nothing to find");
+        return false;
+    }
+
+    if (!silence)
+        EditorApp::SetHelpLine("Search. Press any key for cancel");
+
+    time_t t{ time(NULL) };
+    std::u16string find{ g_findStr };
+    if (g_noCase)
+    {
+        std::transform(find.begin(), find.end(), find.begin(),
+            [](char16_t c) { return std::towupper(c); }
+        );
+    }
+    size_t size = find.size();
+
+    //search diaps
+    size_t line{ m_firstLine + m_cursory };
+    size_t end{m_editor->GetStrCount()};
+    if (g_inSelected && m_selectState == select_state::complete)
+    {
+        if (m_beginY <= m_endY)
+        {
+            if (line < m_beginY)
+                line = m_beginY;
+            end = m_endY;
+        }
+        else
+        {
+            if (line < m_endY)
+                line = m_endY;
+            end = m_beginY;
+        }
+    }
+
+    size_t offset{ m_xOffset + m_cursorx + 1};
+
+    size_t begin{ line };
+    size_t progress{};
+    bool userBreak{};
+    while (line < end)
+    {
+        auto str = m_editor->GetStr(line);
+        for (auto it = str.begin(); it < str.end(); ++it)
+        {
+            if (*it == 0x9)
+                *it = ' ';
+            else if (g_noCase)
+                *it = std::towupper(*it);
+        }
+
+        auto itBegin = offset ? std::next(str.begin(), offset) : str.begin();
+        offset = 0;
+        if (auto itFound = std::search(itBegin, str.end(), std::boyer_moore_horspool_searcher(find.begin(), find.end()));
+            itFound != str.end())
+        {
+            offset = std::distance(str.begin(), itFound);
+            //???if (!g_word || IsWord(pStr, offset, n))
+            {
+                LOG(DEBUG) << "    Found time=" << time(NULL) - t;
+                _GotoXY(offset, line);
+
+                m_foundX = offset;
+                m_foundY = line;
+                if (offset - m_xOffset + size < m_sizeX)
+                    m_foundSize = size;
+                else
+                    m_foundSize = m_sizeX - (offset - m_xOffset);
+
+                Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
+
+                if (!silence)
+                    EditorApp::SetHelpLine();
+                return true;
+            }
+        }
+
+        ++line;
+
+        if (++progress == 1000)
+        {
+            progress = 0;
+            if (userBreak = UpdateProgress((line - begin) * 99 / (end - begin)); userBreak)
+                break;
+        }
+    }
+
+    if (!silence)
+    {
+        HideFound();
+        if (!userBreak)
+            EditorApp::SetErrorLine("String not found");
+        else
+            EditorApp::SetHelpLine("User abort", stat_color::grayed);
+    }
+
+    return false;
+}
+
+#if 0
+int WndEdit::FindDown(int fSilence)
+{
+    TPRINT(("    FindDown for %s\n", g_sFind));
+    if (!g_sFind[0])
+    {
+        TPRINT(("    Nothing to find\n"));
+        SetErrorLine(STR_S(SS_NothingToFind));
+        return 0;
+    }
+
+    if (!fSilence)
+        SetHelpLine(STR_S(SS_SearchPressAnyKeyForCancel));
+
+    int t = time(NULL);
+    int fBreak = 0;
+
+    static wchar sFind[MAX_STRLEN + 1];
+    int n = 0; //длина строки поиска
+    int cs = 0; //контрольная сумма строки поиска
+
+    //переводим в юникод с учетом регистра
+    char* pSrc = g_sFind;
+    wchar* pDest = sFind;
+    while (*pSrc)
+    {
+        wchar wc = char2wchar(g_textCP, *pSrc++);
+        if (g_fCaseSensitive)
+            cs += wc;
+        else
+            cs += wc = wc2upper(wc);
+
+        *pDest++ = wc;
+        ++n;
+    }
+    *pDest = 0;
+    int n2 = n * 2;
+
+    /*
+      Сдвиг плохого символа, используемый в алгоритме Боуера - Мура,
+      не очень эффективен для маленького алфавита, но, когда размер алфавита большой
+      по сравнению с длиной образца, как это часто имеет место с таблицей ASCII и
+      при обычном поиске в текстовом редакторе, он становится чрезвычайно полезен.
+      Использование в алгоритме только его одного может быть весьма эффективным.
+
+      После попытки совмещения x и y [ i , i + m - 1 ], длина сдвига - не менее 1.
+      Таким образом, символ y [ i + m ] обязательно будет вовлечен в следующую
+      попытку, а значит, может быть использован в текущей попытке для сдвига плохого
+      символа. Модифицируем функцию плохого символа, чтобы принять в расчет
+      последний символ х:
+
+      bc[ a ] = min { j | 0 <= j <= m и x[ m - 1 - j ] = a },
+        если a встречается в x,
+      bc[ a ] = m
+        в противоположном случае.
+
+      void QS( char* y, char* x, int n, int m)
+      {
+        int i, qs_bc[ ASIZE ];
+        // Preprocessing
+        for ( i = 0; i < ASIZE; i++ )
+          qs_bc[ i ] = m + 1;
+        for ( i = 0; i < m; i ++ )
+          qs_bc[ x[i] ] = m - i;
+
+        // Searching
+        i = 0;
+        while ( i <= n - m )
+        {
+          if ( memcmp( &y[i], x, m ) == 0 )
+            OUTPUT( i );
+
+          // shift
+          i += qs_bc[ y[ i + m ] ];
+        }
+      }
+    */
+
+    //#define USE_BCS
+
+#ifdef USE_BCS
+    unsigned char* pBadCharShift = new unsigned char[0x10000];
+    if (!pBadCharShift)
+    {
+        TPRINT(("    ERROR no memory for BC\n"));
+        return 0;
+    }
+    memset(pBadCharShift, n, 0x10000);
+    for (int i = 0; i < n; ++i)
+        pBadCharShift[sFind[i]] = n - i;
+#endif
+
+    //set search diaps
+    int l = m_nFirstLine + m_cursory;//cur line
+    int end = m_pTBuff->GetStrCount();
+    if (g_fInMarked && m_nSelectState == 0x103)
+    {
+        if (m_nBeginY <= m_nEndY)
+        {
+            if (l < m_nBeginY)
+                l = m_nBeginY;
+            end = m_nEndY;
+        }
+        else
+        {
+            if (l < m_nEndY)
+                l = m_nEndY;
+            end = m_nBeginY;
+        }
+    }
+
+    int Begin = l;
+    int offset = m_nXOffset + m_cursorx + 1;
+
+    int progress = 0;
+    while (l <= end)
+    {
+        wchar* pStr = m_pTBuff->GetStr(l, 0, MAX_STRLEN);
+        int slen = m_pTBuff->GetStrLen(pStr);
+        static wchar sStr[MAX_STRLEN + 1];
+
+        int i = 0;
+        if (!g_fCaseSensitive)
+            for (; i < slen; ++i)
+                sStr[i] = pStr[i] != 0x9 ? wc2upper(pStr[i]) : ' ';
+        else
+            for (; i < slen; ++i)
+                sStr[i] = pStr[i] != 0x9 ? pStr[i] : ' ';
+        sStr[i] = 0;
+        pStr = sStr;
+
+        wchar* pEndStr = pStr + offset;
+        int cs1 = 0;
+        if (offset + n <= slen)
+            for (i = 0; i < n; ++i)
+                cs1 += *pEndStr++;
+
+        while (slen - offset >= n)
+        {
+#ifndef USE_BCS
+            if (cs == cs1 && !memcmp(pStr + offset, sFind, n2))
+#else
+            if (!memcmp(pStr + offset, sFind, n2))
+#endif
+            {
+                if (!g_fWholeWord || IsWord(pStr, offset, n))
+                {
+                    TPRINT(("    Found t=%d\n", time(NULL) - t));
+                    _GotoXY(offset, l);
+
+                    m_nFoundX = offset;
+                    m_nFoundY = l;
+                    if (offset - m_nXOffset + n < m_nSizeX)
+                        m_nFoundSize = n;
+                    else
+                        m_nFoundSize = m_nSizeX - (offset - m_nXOffset);
+                    Invalidate(m_nFoundY, 0, m_nFoundX, m_nFoundSize);
+
+                    if (!fSilence)
+                        SetHelpLine();
+                    return 1;
+                }
+            }
+
+#ifndef USE_BCS
+            cs1 += *pEndStr++ - pStr[offset];
+            ++offset;
+#else
+            offset += pBadCharShift[pStr[offset + n]];
+#endif
+        }
+        offset = 0;
+        ++l;
+
+        //if(!fSilence)
+        if (++progress == 1000)
+        {
+            progress = 0;
+            if ((fBreak = UpdateProgress((l - Begin) * 99 / (end - Begin))) != 0)
+                break;
+        }
+    }
+
+    if (!fSilence)
+    {
+        HideFound();
+        if (!fBreak)
+            SetErrorLine(STR_S(SS_StringNotFound));
+        else
+            SetHelpLine(STR_S(SS_UserAbort), 1);
+    }
+
+    if (!fBreak)
+        return 0;
+    else
+        return -1;
+}
+#endif

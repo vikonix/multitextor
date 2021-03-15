@@ -112,6 +112,7 @@ class EditorWnd : public FrameWnd
     size_t          m_foundX{};
     size_t          m_foundY{};
     size_t          m_foundSize{};
+    size_t          m_progress{};
 
     //file position info
     size_t          m_infoStrSize{};
@@ -140,7 +141,7 @@ class EditorWnd : public FrameWnd
     bool    UpdateAccessInfo();
     bool    UpdateNameInfo();
     bool    UpdatePosInfo();
-//    bool    UpdateProgress(size_t d);
+    bool    UpdateProgress(size_t step);
     bool    UpdateLexPair();
     bool    ChangeSelected(select_change type, size_t line = 0, size_t pos = 0, size_t size = 1);
     bool    CorrectSelection();
@@ -153,9 +154,21 @@ class EditorWnd : public FrameWnd
     bool    HideFound();
     bool    SelectClear();
     bool    FindWord(const std::u16string& str, size_t& begin, size_t& end);
+    bool    GetWord(std::u16string& buff);
     bool    GetSelectedPos(size_t line, size_t& begin, size_t& end, select_line& type) const;
+    bool    Find(bool silence = false);
+    bool    FindUp(bool silence = false);
+    bool    FindDown(bool silence = false);
 
 public:
+    //find and replace params
+    static std::u16string   g_findStr;
+    static bool             g_noCase;
+    static bool             g_up;
+    static bool             g_replace;
+    static bool             g_inSelected;
+    static bool             g_word;
+
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
         : FrameWnd(left, top, sizex, sizey, border) {m_cmdParser.SetCmdMap(g_defaultEditKeyMap);}
     virtual ~EditorWnd() = default;
@@ -212,10 +225,6 @@ public:
   int       SaveCfg(SSave* pSave);
   int       LoadCfg();
 
-  int       SelectWord(wchar* pStr, size_t* pB, size_t* pE);
-  int       GetWord(char* pStr = NULL);
-  int       GetSubstr(char* pStr = NULL);
-
   int       SelectAndGoto(int nline, int size);
   int       Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, int SelectType = 0);
   int       IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey);
@@ -233,9 +242,6 @@ public:
   int       EditWndCopy(WndEdit* pWFrom);
   int       EditWndMove(WndEdit* pWFrom);
 
-  int       Find(int fSilence = 0);
-  int       FindUp(int fSilence = 0);
-  int       FindDown(int fSilence = 0);
   int       IsWord(wchar* pStr, size_t offset, size_t len);
 */
     ///////////////////////////////////////////////////////////////////////////
@@ -299,7 +305,6 @@ public:
     bool DlgFind(input_t cmd);
     bool DlgReplace(input_t cmd);
 
-    bool CtrlGetSubstr(input_t cmd);
     bool CtrlRefresh(input_t cmd);
     bool Reload(input_t cmd);
     bool Save(input_t cmd);

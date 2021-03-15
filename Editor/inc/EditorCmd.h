@@ -90,7 +90,6 @@ enum EditorCmd : input_t
     E_DLG_FIND,
     E_DLG_REPLACE,
 
-    E_CTRL_GETSUBSTR,
     E_CTRL_REFRESH,
     E_CTRL_RELOAD,
     E_CTRL_SAVE,

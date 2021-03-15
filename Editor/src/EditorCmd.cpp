@@ -151,7 +151,7 @@ CmdMap g_defaultEditKeyMap
     { 'T' | K_ALT },            {K_ED(E_CTRL_REFRESH)}
 };
 
-std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap =
+std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap 
 {
     {E_MOVE_LEFT,           {&EditorWnd::MoveLeft,               EditorWnd::select_state::begin}},
     {E_MOVE_RIGHT,          {&EditorWnd::MoveRight,              EditorWnd::select_state::begin}},
@@ -212,7 +212,6 @@ std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select
     {E_DLG_FIND,            {&EditorWnd::DlgFind,                EditorWnd::select_state::end}},
     {E_DLG_REPLACE,         {&EditorWnd::DlgReplace,             EditorWnd::select_state::end}},
 
-    {E_CTRL_GETSUBSTR,      {&EditorWnd::CtrlGetSubstr,          EditorWnd::select_state::end}},
     {E_CTRL_REFRESH,        {&EditorWnd::CtrlRefresh,            EditorWnd::select_state::end}},
     {E_CTRL_RELOAD,         {&EditorWnd::Reload,                 EditorWnd::select_state::end}},
     {E_CTRL_SAVE,           {&EditorWnd::Save,                   EditorWnd::select_state::end}},

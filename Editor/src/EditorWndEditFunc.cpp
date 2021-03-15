@@ -703,37 +703,7 @@ bool EditorWnd::EditPasteFromClipboard(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::CtrlFind(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlFindUp(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlFindDown(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::FindUpWord(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::FindDownWord(input_t cmd)
-{
-    return true;
-}
-
 bool EditorWnd::Replace(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Repeat(input_t cmd)
 {
     return true;
 }
@@ -749,11 +719,6 @@ bool EditorWnd::DlgFind(input_t cmd)
 }
 
 bool EditorWnd::DlgReplace(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlGetSubstr(input_t cmd)
 {
     return true;
 }

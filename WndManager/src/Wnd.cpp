@@ -466,3 +466,8 @@ bool FrameWnd::Beep()
 {
     return WndManager::getInstance().Beep();
 }
+
+input_t FrameWnd::CheckInput(const std::chrono::milliseconds& waitTime)
+{
+    return WndManager::getInstance().CheckInput(waitTime);
+}
