@@ -1326,7 +1326,7 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
             ex1 = posX + str.size() - 1;
         }
 
-        if (ex1 < 0)//???
+        if (static_cast<int>(ex1) < 0)//???
             ex1 = 0;
 
         size_t dstY = posY + i;
@@ -1697,7 +1697,7 @@ bool EditorWnd::FindUp(bool silence)
 
                 m_foundX = offset;
                 m_foundY = line;
-                if (offset - m_xOffset + size < m_sizeX)
+                if (offset - m_xOffset + size < static_cast<size_t>(m_sizeX))
                     m_foundSize = size;
                 else
                     m_foundSize = m_sizeX - (offset - m_xOffset);
@@ -1804,7 +1804,7 @@ bool EditorWnd::FindDown(bool silence)
 
                 m_foundX = offset;
                 m_foundY = line;
-                if (offset - m_xOffset + size < m_sizeX)
+                if (offset - m_xOffset + size < static_cast<size_t>(m_sizeX))
                     m_foundSize = size;
                 else
                     m_foundSize = m_sizeX - (offset - m_xOffset);
