@@ -1525,7 +1525,14 @@ bool EditorWnd::UpdateLexPair()
             //if visible
             m_lexX = static_cast<int>(x);
             m_lexY = static_cast<int>(y);
-            Mark(x, y, x, y, ColorWindowLMatch);
+            
+            size_t bx, ex;
+            select_line type;
+            bool sel = GetSelectedPos(y, bx, ex, type);
+            if(sel && bx <= x && x < ex)
+                Mark(x, y, x, y, ColorWindowSelectLMatch);
+            else
+                Mark(x, y, x, y, ColorWindowLMatch);
         }
         else
         {
