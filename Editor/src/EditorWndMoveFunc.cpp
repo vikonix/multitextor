@@ -405,6 +405,8 @@ bool EditorWnd::MoveStrBegin([[maybe_unused]]input_t cmd)
     for (x = 0; x < str.size(); ++x)
         if (str[x] > ' ')
             break;
+    if (x == str.size())
+        x = 0;
 
     size_t offset = 0;
 

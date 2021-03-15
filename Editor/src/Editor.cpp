@@ -234,7 +234,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             else
                 ++cr;
 
-            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), {buff + begin, i - begin});
+            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), {buff + begin, i - begin}, m_cp);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             begin = i + 1;
             len = 0;
@@ -243,7 +243,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
         else if (buff[i] == 0xa)
         {
             ++lf;
-            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin });
+            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             begin = i + 1;
             len = 0;
@@ -281,7 +281,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
                 i = cut;
             }
 
-            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin });
+            m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             begin = i + 1;
             len = 0;
@@ -292,7 +292,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     if (len && last)
     {
         //parse last string in file
-        m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin });
+        m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
         strBuff->m_strOffsetList.push_back((uint32_t)i);
     }
 

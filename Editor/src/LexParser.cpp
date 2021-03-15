@@ -148,7 +148,7 @@ bool LexParser::SetParseStyle(const std::string& style)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-bool LexParser::ScanStr(size_t line, std::string_view str)
+bool LexParser::ScanStr(size_t line, std::string_view str, [[maybe_unused]]int cp)
 {
     if (!m_scan)
         return true;
@@ -186,6 +186,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
     //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
     //LOG(DEBUG) << "  color='" << lex << "'";
 
+    color.reserve(len);
     for (size_t i = 0; i < lexstr.size(); ++i)
         switch (lexstr[i])
         {

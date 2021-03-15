@@ -338,7 +338,9 @@ bool EditorWnd::Repaint()
 
         for (pos_t i = m_invBeginY; i < m_invEndY; ++i)
         {
-            auto str = m_editor->GetStr(m_firstLine + i, 0, m_editor->GetMaxStrLen());//??? , 0, m_xOffset + m_invEndX);
+            auto str = m_editor->GetStr(m_firstLine + i);// , 0, m_editor->GetMaxStrLen());//??? , 0, m_xOffset + m_invEndX);
+            if (str.size() < m_xOffset + m_invEndX)
+                str.resize(m_xOffset + m_invEndX, ' ');
             rc = PrintStr(m_invBeginX, i, str, m_xOffset + m_invBeginX, m_invEndX - m_invBeginX);
         }
 
@@ -391,7 +393,6 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
     if (!m_diff)
     {
         std::vector<color_t> colorBuff;
-        colorBuff.reserve(offset + len);
         rc = m_editor->GetColor(m_firstLine + y, str, colorBuff, offset + len);
 
         if (rc)
@@ -578,9 +579,8 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             ColorRect(static_cast<pos_t>(bx - m_xOffset), static_cast<pos_t>(y - m_firstLine), static_cast<pos_t>(ex - bx + 1), 1, color);
         else
         {
-            auto str = m_editor->GetStr(y, 0, ex + 1);
+            auto str = m_editor->GetStr(y);//??? , 0, ex + 1);
             std::vector<color_t> colorBuff;
-            colorBuff.reserve(ex + 1);
             bool rc = m_editor->GetColor(y, str, colorBuff, ex + 1);
             if (rc)
             {
@@ -1195,6 +1195,9 @@ bool EditorWnd::GetSelectedPos(size_t line, size_t& begin, size_t& end, select_l
     else
     {
         //columns [x1,x2]
+        if (x1 > x2)
+            std::swap(x1, x2);
+
         begin = x1;
         end = x2;
         type = select_line::substr;

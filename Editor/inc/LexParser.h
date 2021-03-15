@@ -147,7 +147,7 @@ public:
     size_t  GetTabSize() const          {return m_tabSize;}
 
     bool    Clear() { m_lexPosition.clear(); return true; }
-    bool    ScanStr(size_t line, std::string_view str);
+    bool    ScanStr(size_t line, std::string_view str, int cp);
     bool    GetColor(size_t line, const std::u16string& str, std::vector<color_t>& color, size_t len);
 
     bool    CheckLexPair(const std::u16string& str, size_t& line, size_t& pos);
