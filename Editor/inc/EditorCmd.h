@@ -30,6 +30,66 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "KeyCodes.h"
 
 
+enum AppCmd : input_t
+{
+    K_APP_ABOUT = K_APP,
+    K_APP_HELP,
+    K_APP_HELP_KEYMAP,
+
+    K_APP_NEW,
+    K_APP_OPEN,
+    K_APP_EXEC,
+    K_APP_SAVE_ALL,
+    K_APP_DLG_OPEN,
+    K_APP_DLG_LOAD,
+    K_APP_DLG_EXEC,
+
+    K_APP_FINDFILE,
+    K_APP_REPLACEFILE,
+    K_APP_FOUNDFILE,
+    K_APP_WND_COPY,
+    K_APP_WND_MOVE,
+
+    K_APP_WND_CLOSE,
+    K_APP_WND_CLOSEALL,
+    K_APP_WND_NEXT,
+    K_APP_WND_PREV,
+    K_APP_WND_LIST,
+
+    K_APP_VIEW,
+    K_APP_VIEW_MODE,
+    K_APP_VIEW_SET,
+    K_APP_VIEW_SIZE,
+
+    K_APP_DIFF,
+    K_APP_BOOKMARK,
+    K_APP_KEYGEN,
+    K_APP_NEW_SESSION,
+    K_APP_OPEN_SESSION,
+
+    K_APP_RECORD_MACRO,
+    K_APP_PLAY_MACRO,
+
+    K_APP_COLOR,
+    K_APP_SETTINGS,
+
+    K_APP_FIRST_RUN,
+
+    K_APP_BOOKMARK_0,
+    K_APP_BOOKMARK_1,
+    K_APP_BOOKMARK_2,
+    K_APP_BOOKMARK_3,
+    K_APP_BOOKMARK_4,
+    K_APP_BOOKMARK_5,
+    K_APP_BOOKMARK_6,
+    K_APP_BOOKMARK_7,
+    K_APP_BOOKMARK_8,
+    K_APP_BOOKMARK_9,
+
+    K_APP_FILE_RECENT = K_APP_BOOKMARK_9 + 100,
+    K_APP_SESSION_RECENT = K_APP_FILE_RECENT + 100
+};
+
 enum EditorCmd : input_t
 {
     E_MOVE_LEFT,
@@ -107,3 +167,4 @@ enum EditorCmd : input_t
 #define K_ED(n) (EDITOR_CMD + ((n) << 16))
 
 extern CmdMap g_defaultEditKeyMap;
+extern CmdMap g_defaultAppKeyMap;

@@ -80,17 +80,18 @@ menu_list menu1 {
 };
 
 menu_list mAccess {
-  {MENU_ITEM, "&F&1Exit"},
-  {MENU_ITEM, "&F&2Menu"},
-  {MENU_ITEM, "&F&3DlgBox"},
-  {MENU_ITEM, "&F&4"},
-  {MENU_ITEM, "&F&5"},
-  {MENU_ITEM, "&F&6"},
-  {MENU_ITEM, "&F&7"},
-  {MENU_ITEM, "&F&8"},
-  {MENU_ITEM, "&F&9"},
-  {MENU_ITEM, "&F&1&0"}
+  {MENU_ITEM, "&F&1Help"},
+  {MENU_ITEM, "&F&2Save"},
+  {MENU_ITEM, "&F&3Open"},
+  {MENU_ITEM, "&F&4Mark"},
+  {MENU_ITEM, "&F&5Copy"},
+  {MENU_ITEM, "&F&6Move"},
+  {MENU_ITEM, "&F&7Search"},
+  {MENU_ITEM, "&F&8Unmark"},
+  {MENU_ITEM, "&F&9Menu"},
+  {MENU_ITEM, "&F&1&0Exit"}
 };
+
 
 /////////////////////////////////////////////////////////////////////////////
 EditorApp app;
@@ -110,10 +111,11 @@ int main()
 
     app.SetMenu({menu0, menu1});
     app.SetAccessMenu(mAccess);
+    app.SetCmdParser(g_defaultAppKeyMap);
     app.SetClock(clock_pos::bottom);
     
     app.Refresh();
-    app.MainProc(K_F1);
+    app.MainProc(K_EXIT);
 
     app.Deinit();
 

@@ -744,20 +744,25 @@ bool WndManager::IsVisible(const Wnd* wnd)
         || (m_wndList.size() > 1 && m_wndList[0]->GetWndType() == wnd_t::dialog && m_wndList[1] == wnd);
 }
 
-bool WndManager::ProcInput(input_t code)
+input_t WndManager::ProcInput(input_t code)
 {
-//    if(code != K_TIME)
-//        LOG(DEBUG) << "  M:ProcInput " <<  std::hex << code << std::dec;
+//    LOG_IF(code != K_TIME, DEBUG) << "  M:ProcInput " <<  std::hex << code << std::dec;
 
-    bool rc = 0;
+    input_t out{code};
+    bool rc{};
+
     if (code == K_REFRESH)
     {
         //refresh
         LOG(DEBUG) << "WndManager Refresh";
         Refresh();
+        out = 0;
     }
     else if ((code & K_TYPEMASK) == K_RESIZE)
+    {
         rc = Resize(K_GET_X(code), K_GET_Y(code));
+        out = 0;
+    }
     else
     {
         if (!m_wndList.empty())
@@ -769,9 +774,9 @@ bool WndManager::ProcInput(input_t code)
                     || (code & K_MOUSEW) == K_MOUSEW)
                 {
                     if (!m_activeView)
-                        rc = m_wndList[0]->EventProc(code);
+                        out = m_wndList[0]->EventProc(code);
                     else
-                        rc = m_view[2].wnd->EventProc(code);
+                        out = m_view[2].wnd->EventProc(code);
                 }
                 else
                 {
@@ -784,7 +789,7 @@ bool WndManager::ProcInput(input_t code)
                         SetActiveView(0);
                         m_wndList[0]->ScreenToClient(x, y);
                         if (m_wndList[0]->CheckClientPos(x, y))
-                            rc = m_wndList[0]->EventProc(code);
+                            out = m_wndList[0]->EventProc(code);
                     }
                     else if (m_view[2].wnd)
                     {
@@ -793,7 +798,7 @@ bool WndManager::ProcInput(input_t code)
                             SetActiveView(1);
                             m_view[2].wnd->ScreenToClient(x, y);
                             if (m_view[2].wnd->CheckClientPos(x, y))
-                                rc = m_view[2].wnd->EventProc(code);
+                                out = m_view[2].wnd->EventProc(code);
                         }
                         else
                         {
@@ -810,9 +815,9 @@ bool WndManager::ProcInput(input_t code)
                 if ((code & K_TYPEMASK) != K_TIME)
                 {
                     if (!m_activeView)
-                        rc = m_wndList[0]->EventProc(code);
+                        out = m_wndList[0]->EventProc(code);
                     else
-                        rc = m_view[2].wnd->EventProc(code);
+                        out = m_view[2].wnd->EventProc(code);
                 }
                 else if (m_wndList[0]->IsUsedTimer())
                 {
@@ -826,7 +831,7 @@ bool WndManager::ProcInput(input_t code)
         }
     }
 
-    return rc;
+    return out;
 }
 
 bool WndManager::SetActiveView(int n)

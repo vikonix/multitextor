@@ -83,21 +83,19 @@ bool EditorApp::StatusMark(mark_status mark)
 input_t EditorApp::AppProc(input_t code)
 { 
     //input treatment in user function
-//    if (code != K_TIME)
-//        LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
+    LOG_IF(code != K_TIME, DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
 
-    if (code == K_F1)
+    if (code == K_EXIT)
     {
         m_editors.clear();
     }
-    else if (code == K_F2)
+//    else if (code == K_MENU)
+//    {
+//        WndManager::getInstance().PutInput(K_MENU);
+//        code = 0;
+//    }
+    else if (code == K_APP_DLG_OPEN)
     {
-        WndManager::getInstance().PutInput(K_MENU);
-        code = 0;
-    }
-    else if (code == K_F3)
-    {
-        //code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK_CANCEL_IGNORE);
         FileDialog dlg{ FileDlgMode::Open };
         auto rc = dlg.Activate();
         code = 0;
@@ -105,8 +103,7 @@ input_t EditorApp::AppProc(input_t code)
         {
             std::filesystem::path path{dlg.s_vars.path};
             path /= dlg.s_vars.file;
-            //Editor ed{ path };
-            //ed.Load();
+
             auto editor = std::make_shared<EditorWnd>();
             editor->Show(true, -1);
             std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";

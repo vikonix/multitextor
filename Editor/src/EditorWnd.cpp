@@ -720,7 +720,10 @@ input_t EditorWnd::EventProc(input_t code)
     }
 
     if (m_close)
-        Wnd::Destroy();
+    {
+        m_close = false;//???
+        return Wnd::Destroy();
+    }
 
     return 0;
 }

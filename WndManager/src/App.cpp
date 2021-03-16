@@ -503,13 +503,12 @@ input_t Application::ParseCommand(input_t code)
     //5 check user
     if(code)
     {
-        if(code != K_TIME)
-            LOG(INFO) << "  " << ConsoleInput::CastKeyCode(code);
+        LOG_IF(code != K_TIME, INFO) << "  " << ConsoleInput::CastKeyCode(code);
 
         if(code == K_EXIT)
             SaveCfg();
 
-        [[maybe_unused]]bool rc = m_wndManager.ProcInput(code);
+        code = m_wndManager.ProcInput(code);
     }
 
     return code;
@@ -523,6 +522,12 @@ bool Application::PutMacro(input_t code)
     else
         return true;
 }
+
+bool Application::SetCmdParser(const CmdMap& cmdMap)
+{
+    return m_cmdParser.SetCmdMap(cmdMap);
+}
+
 
 std::string Application::GetKeyName(input_t code)
 {

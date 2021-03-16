@@ -32,6 +32,83 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 /////////////////////////////////////////////////////////////////////////////
 //first array is key array
 //second array is cmd array
+CmdMap g_defaultAppKeyMap
+{
+    {K_F1},                     {K_APP_HELP},
+
+    {'S' | K_ALT},              {K_APP_SAVE_ALL},
+    {K_F2},                     {K_APP_SAVE_ALL},
+
+    {K_F3},                     {K_APP_DLG_OPEN},
+    {K_F3 | K_SHIFT},           {K_APP_DLG_LOAD},
+
+    {K_F5 | K_SHIFT},           {K_APP_WND_COPY},
+    {K_F6 | K_SHIFT},           {K_APP_WND_MOVE},
+
+    {'F' | K_ALT},              {K_APP_FINDFILE},
+    {K_ESC, K_F7},              {K_APP_FINDFILE},
+    {K_ESC, 'f'},               {K_APP_FINDFILE},
+    {K_ESC, 'F'},               {K_APP_FINDFILE},
+    {'R' | K_ALT},              {K_APP_REPLACEFILE},
+    {'H' | K_ALT},              {K_APP_REPLACEFILE},
+    {K_ESC, 'r'},               {K_APP_REPLACEFILE},
+    {K_ESC, 'R'},               {K_APP_REPLACEFILE},
+
+    {'L' | K_CTRL},             {K_APP_FOUNDFILE},
+    {'L' | K_ALT},              {K_APP_FOUNDFILE},
+
+    {'W' | K_CTRL},             {K_APP_WND_LIST},
+
+    {K_F9},                     {K_MENU},
+    {K_ESC, K_F1},              {K_MENU},
+
+    {K_F10},                    {K_EXIT},
+    {'X' | K_ALT},              {K_EXIT},
+    {K_ESC, 'x'},               {K_EXIT},
+    {K_ESC, 'X'},               {K_EXIT},
+
+    {K_ESC, '0'},               {K_INSERT},
+
+    {'/' | K_ALT},              {K_APP_VIEW},
+    {'+' | K_ALT},              {K_APP_VIEW_MODE},
+    {'=' | K_ALT},              {K_APP_VIEW_MODE},
+    {'-' | K_ALT},              {K_APP_VIEW_SIZE},
+    {K_ESC, '/'},               {K_APP_VIEW},
+    {K_ESC, '='},               {K_APP_VIEW_MODE},
+    {K_ESC, '+'},               {K_APP_VIEW_MODE},
+    {K_ESC, '-'},               {K_APP_VIEW_SIZE},
+    {K_PAGEUP | K_ALT},         {K_APP_VIEW_SET},
+    {K_PAGEDN | K_ALT},         {K_APP_VIEW_SET},
+    {K_ESC, K_PAGEUP},          {K_APP_VIEW_SET},
+    {K_ESC, K_PAGEDN},          {K_APP_VIEW_SET},
+    {K_ESC, '9'},               {K_APP_VIEW_SET},
+    {K_ESC, '3'},               {K_APP_VIEW_SET},
+
+    {'D' | K_CTRL},             {K_APP_DIFF},
+    {'\\' | K_CTRL},            {K_APP_BOOKMARK},
+    {'\\' | K_ALT},             {K_APP_BOOKMARK},
+
+    {'0' | K_ALT},              {K_APP_BOOKMARK_0},
+    {'1' | K_ALT},              {K_APP_BOOKMARK_1},
+    {'2' | K_ALT},              {K_APP_BOOKMARK_2},
+    {'3' | K_ALT},              {K_APP_BOOKMARK_3},
+    {'4' | K_ALT},              {K_APP_BOOKMARK_4},
+    {'5' | K_ALT},              {K_APP_BOOKMARK_5},
+    {'6' | K_ALT},              {K_APP_BOOKMARK_6},
+    {'7' | K_ALT},              {K_APP_BOOKMARK_7},
+    {'8' | K_ALT},              {K_APP_BOOKMARK_8},
+    {'9' | K_ALT},              {K_APP_BOOKMARK_9},
+
+    {'K' | K_CTRL},             {K_APP_RECORD_MACRO},
+    {'K' | K_ALT},              {K_APP_PLAY_MACRO},
+    {'Q' | K_CTRL},             {K_APP_KEYGEN},
+
+    //for test
+    {K_F12},                    {K_REFRESH}
+};
+
+
+
 CmdMap g_defaultEditKeyMap
 {
     {K_LEFT},                   {K_ED(E_MOVE_LEFT)},
@@ -225,3 +302,183 @@ std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select
     {E_POPUP_MENU,          {&EditorWnd::TrackPopupMenu,         EditorWnd::select_state::end}}
 };
 
+std::unordered_map<input_t, std::string> g_CmdNames
+{
+    //Keys
+    {K_SHIFT,                       "Shift"},
+    {K_CTRL,                        "Ctrl"},
+    {K_ALT,                         "Alt"},
+
+    {K_F1,                          "F1"},
+    {K_F2,                          "F2"},
+    {K_F3,                          "F3"},
+    {K_F4,                          "F4"},
+    {K_F5,                          "F5"},
+    {K_F6,                          "F6"},
+    {K_F7,                          "F7"},
+    {K_F8,                          "F8"},
+    {K_F9,                          "F9"},
+    {K_F10,                         "F10"},
+    {K_F11,                         "F11"},
+    {K_F12,                         "F12"},
+
+    {K_ESC,                         "Esc"},
+    {K_ENTER,                       "Enter"},
+    {K_SPACE,                       "Space"},
+    {K_BS,                          "BackSpace"},
+    {K_TAB,                         "Tab"},
+
+    {K_INSERT,                      "Insert"},
+    {K_DELETE,                      "Delete"},
+    {K_HOME,                        "Home"},
+    {K_END,                         "End"},
+    {K_PAGEUP,                      "PageUp"},
+    {K_PAGEDN,                      "PageDn"},
+
+    {K_UP,                          "Up"},
+    {K_DOWN,                        "Down"},
+    {K_LEFT,                        "Left"},
+    {K_RIGHT,                       "Right"},
+
+    {K_MOUSEWUP | K_MOUSEW,         "MouseScrollUp"},
+    {K_MOUSEWDN | K_MOUSEW,         "MouseScrollDown"},
+    {K_MOUSEKL | K_MOUSE2,          "MouseLeft2"},
+    {K_MOUSEKL | K_MOUSE3,          "MouseLeft3"},
+
+    {K_RELEASE | K_SHIFT,           "ShiftRelease"},
+
+    //App cmd
+    {K_EXIT,                        "APP_EXIT"},
+    {K_MENU,                        "APP_MENU"},
+    {K_REFRESH,                     "APP_REFRESH"},
+    {K_INSERT,                      "APP_INSERT_MODE"},
+
+    {K_APP_ABOUT,                   "APP_ABOUT"},
+    {K_APP_HELP,                    "APP_HELP"},
+
+    {K_APP_NEW,                     "APP_NEW"},
+    {K_APP_SAVE_ALL,                "APP_SAVE_ALL"},
+    {K_APP_DLG_OPEN,                "APP_DLG_OPEN"},
+    {K_APP_DLG_LOAD,                "APP_DLG_LOAD"},
+    {K_APP_DLG_EXEC,                "APP_DLG_EXEC"},
+
+    {K_APP_FINDFILE,                "APP_DLG_FINDFILE"},
+    {K_APP_REPLACEFILE,             "APP_DLG_REPLACEFILE"},
+    {K_APP_FOUNDFILE,               "APP_DLG_FOUNDFILE"},
+    {K_APP_WND_COPY,                "APP_DLG_WND_COPY"},
+    {K_APP_WND_MOVE,                "APP_DLG_WND_MOVE"},
+
+    {K_APP_WND_CLOSE,               "APP_WND_CLOSE"},
+    {K_APP_WND_CLOSEALL,            "APP_WND_CLOSEALL"},
+    {K_APP_WND_NEXT,                "APP_WND_NEXT"},
+    {K_APP_WND_PREV,                "APP_WND_PREV"},
+    {K_APP_WND_LIST,                "APP_DLG_WND_LIST"},
+
+    {K_APP_VIEW,                    "APP_VIEW_SPLIT_MERGE"},
+    {K_APP_VIEW_MODE,               "APP_VIEW_SPLIT_VH"},
+    {K_APP_VIEW_SET,                "APP_VIEW_SELECT"},
+    {K_APP_VIEW_SIZE,               "APP_VIEW_SIZE"},
+
+    {K_APP_DIFF,                    "APP_DLG_DIFF"},
+    {K_APP_BOOKMARK,                "APP_DLG_BOOKMARK"},
+    {K_APP_KEYGEN,                  "APP_DLG_KEYGEN"},
+    {K_APP_NEW_SESSION,             "APP_DLG_NEW_SESSION"},
+    {K_APP_OPEN_SESSION,            "APP_DLG_OPEN_SESSION"},
+
+    {K_APP_BOOKMARK_0,              "APP_BOOKMARK_0"},
+    {K_APP_BOOKMARK_1,              "APP_BOOKMARK_1"},
+    {K_APP_BOOKMARK_2,              "APP_BOOKMARK_2"},
+    {K_APP_BOOKMARK_3,              "APP_BOOKMARK_3"},
+    {K_APP_BOOKMARK_4,              "APP_BOOKMARK_4"},
+    {K_APP_BOOKMARK_5,              "APP_BOOKMARK_5"},
+    {K_APP_BOOKMARK_6,              "APP_BOOKMARK_6"},
+    {K_APP_BOOKMARK_7,              "APP_BOOKMARK_7"},
+    {K_APP_BOOKMARK_8,              "APP_BOOKMARK_8"},
+    {K_APP_BOOKMARK_9,              "APP_BOOKMARK_9"},
+
+    {K_APP_RECORD_MACRO,            "APP_RECORD_MACRO"},
+    {K_APP_PLAY_MACRO,              "APP_PLAY_MACRO"},
+
+    {K_APP_COLOR,                   "APP_COLOR"},
+    {K_APP_SETTINGS,                "APP_SETTINGS"},
+
+    //Editor wnd
+    { K_ED(E_MOVE_LEFT),            "EDIT_MOVE_LEFT"},
+    { K_ED(E_MOVE_RIGHT),           "EDIT_MOVE_RIGHT"},
+    { K_ED(E_MOVE_SCROLL_LEFT),     "EDIT_MOVE_SCROLL_LEFT"},
+    { K_ED(E_MOVE_SCROLL_RIGHT),    "EDIT_MOVE_SCROLL_RIGHT"},
+    { K_ED(E_MOVE_UP),              "EDIT_MOVE_UP"},
+    { K_ED(E_MOVE_DOWN),            "EDIT_MOVE_DOWN"},
+    { K_ED(E_MOVE_PAGE_UP),         "EDIT_MOVE_PAGE_UP"},
+    { K_ED(E_MOVE_PAGE_DOWN),       "EDIT_MOVE_PAGE_DOWN"},
+    { K_ED(E_MOVE_FILE_BEGIN),      "EDIT_MOVE_FILE_BEGIN"},
+    { K_ED(E_MOVE_FILE_END),        "EDIT_MOVE_FILE_END"},
+    { K_ED(E_MOVE_STR_BEGIN),       "EDIT_MOVE_STR_BEGIN"},
+    { K_ED(E_MOVE_STR_END),         "EDIT_MOVE_STR_END"},
+    { K_ED(E_MOVE_TAB_LEFT),        "EDIT_MOVE_TAB_LEFT"},
+    { K_ED(E_MOVE_TAB_RIGHT),       "EDIT_MOVE_TAB_RIGHT"},
+    { K_ED(E_MOVE_WORD_LEFT),       "EDIT_MOVE_WORD_LEFT"},
+    { K_ED(E_MOVE_WORD_RIGHT),      "EDIT_MOVE_WORD_RIGHT"},
+    { K_ED(E_MOVE_POS),             "EDIT_MOVE_POS"},
+    { K_ED(E_MOVE_CENTER),          "EDIT_MOVE_CENTER"},
+
+    { K_ED(E_SELECT_WORD),          "EDIT_SELECT_WORD"},
+    { K_ED(E_SELECT_LINE),          "EDIT_SELECT_LINE"},
+    { K_ED(E_SELECT_ALL),           "EDIT_SELECT_ALL"},
+    { K_ED(E_SELECT_BEGIN),         "EDIT_SELECT_STREAM_BEGIN"},
+    { K_ED(E_SELECT_END),           "EDIT_SELECT_END"},
+    { K_ED(E_SELECT_UNSELECT),      "EDIT_SELECT_UNSELECT"},
+    { K_ED(E_SELECT_MODE),          "EDIT_SELECT_LINES_BEGIN"},
+
+    { K_ED(E_EDIT_DEL_C),           "EDIT_DEL_CHAR"},
+    { K_ED(E_EDIT_BS),              "EDIT_BS"},
+    { K_ED(E_EDIT_TAB),             "EDIT_TAB"},
+    { K_ED(E_EDIT_ENTER),           "EDIT_ENTER"},
+    { K_ED(E_EDIT_DEL_STR),         "EDIT_DEL_STR"},
+    { K_ED(E_EDIT_DEL_BEGIN),       "EDIT_DEL_BEGIN"},
+    { K_ED(E_EDIT_DEL_END),         "EDIT_DEL_END"},
+    { K_ED(E_EDIT_BLOCK_CLEAR),     "EDIT_BLOCK_CLEAR"},
+    { K_ED(E_EDIT_BLOCK_COPY),      "EDIT_BLOCK_COPY"},
+    { K_ED(E_EDIT_BLOCK_MOVE),      "EDIT_BLOCK_MOVE"},
+    { K_ED(E_EDIT_BLOCK_DEL),       "EDIT_BLOCK_DEL"},
+    { K_ED(E_EDIT_BLOCK_INDENT),    "EDIT_BLOCK_INDENT"},
+    { K_ED(E_EDIT_BLOCK_UNDENT),    "EDIT_BLOCK_UNDENT"},
+    { K_ED(E_EDIT_CB_COPY),         "EDIT_CB_COPY"},
+    { K_ED(E_EDIT_CB_CUT),          "EDIT_CB_CUT"},
+    { K_ED(E_EDIT_CB_PASTE),        "EDIT_CB_PASTE"},
+    { K_ED(E_EDIT_UNDO),            "EDIT_UNDO"},
+    { K_ED(E_EDIT_REDO),            "EDIT_REDO"},
+
+    { K_ED(E_CTRL_FIND),            "EDIT_CTRL_FIND"},
+    { K_ED(E_CTRL_FINDUP),          "EDIT_CTRL_FINDUP"},
+    { K_ED(E_CTRL_FINDDN),          "EDIT_CTRL_FINDDN"},
+    { K_ED(E_CTRL_FINDUPW),         "EDIT_CTRL_FINDUPWORD"},
+    { K_ED(E_CTRL_FINDDNW),         "EDIT_CTRL_FINDDNWORD"},
+    { K_ED(E_CTRL_REPLACE),         "EDIT_CTRL_REPLACE"},
+    { K_ED(E_CTRL_REPEAT),          "EDIT_CTRL_REPEAT"},
+    { K_ED(E_DLG_GOTO),             "EDIT_DLG_GOTO"},
+    { K_ED(E_DLG_FIND),             "EDIT_DLG_FIND"},
+    { K_ED(E_DLG_REPLACE),          "EDIT_DLG_REPLACE"},
+
+    { K_ED(E_CTRL_REFRESH),         "EDIT_CTRL_REFRESH"},
+    { K_ED(E_CTRL_RELOAD),          "EDIT_CTRL_RELOAD"},
+    { K_ED(E_CTRL_SAVE),            "EDIT_CTRL_SAVE"},
+    { K_ED(E_CTRL_SAVEAS),          "EDIT_CTRL_SAVEAS"},
+    { K_ED(E_CTRL_CLOSE),           "EDIT_CTRL_CLOSE"},
+
+    { K_ED(E_MOVE_LEX_MATCH),       "EDIT_MOVE_BRACKET_MATCH"},
+    { K_ED(E_CTRL_FLIST),           "EDIT_DLG_FUNCLIST"},
+    { K_ED(E_CTRL_PROPERTIES),      "EDIT_DLG_PROPERTIES"},
+    { K_ED(E_CTRL_CHANGE_CP),       "EDIT_CTRL_CHANGE_CP"},
+    { K_ED(E_POPUP_MENU),           "EDIT_POPUP_MENU"},
+
+    //Editor additional
+    { K_ED(E_MOVE_UP) + 1,          "EDIT_MOVE_SCROLL_UP"},
+    { K_ED(E_MOVE_DOWN) + 1,        "EDIT_MOVE_SCROLL_DOWN"},
+    { K_ED(E_SELECT_BEGIN) + 1,     "EDIT_SELECT_SHIFT_BEGIN"},
+    { K_ED(E_SELECT_END) + 1,       "EDIT_SELECT_SHIFT_END"},
+    { K_ED(E_SELECT_MODE) + 1,      "EDIT_SELECT_COLUMN_BEGIN"},
+    { K_ED(E_CTRL_SAVE) + 1,        "EDIT_CTRL_OVERWRITE"},
+    { K_ED(E_MOVE_UP) + 3,          "EDIT_MOVE_SCROLL3_UP"},
+    { K_ED(E_MOVE_DOWN) + 3,        "EDIT_MOVE_SCROLL3_DOWN"}
+};

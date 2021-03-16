@@ -117,7 +117,7 @@ public:
 
     input_t CheckInput(const std::chrono::milliseconds& waitTime);
     bool    PutInput(input_t code) { return m_console.PutInput(code); }
-    bool    ProcInput(input_t code); //events that not treated will pass to active window
+    input_t ProcInput(input_t code); //events that not treated will pass to active window
     bool    ShowInputCursor(cursor_t nCursor, pos_t x = -1, pos_t y = -1);
     bool    HideCursor();
     bool    Beep() {return m_console.Beep();}
