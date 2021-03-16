@@ -703,63 +703,23 @@ bool EditorWnd::EditPasteFromClipboard(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::Replace(input_t cmd)
+bool EditorWnd::Reload([[maybe_unused]]input_t cmd)
 {
-    return true;
+    LOG(DEBUG) << "    Reload";
+
+    m_selectState = select_state::no;
+    m_beginX = m_endX = 0;
+    m_beginY = m_endY = 0;
+    m_selectType = select_t::stream;
+
+    bool rc = m_editor->Load();
+    rc = Refresh();
+    return rc;
 }
 
-bool EditorWnd::DlgGoto(input_t cmd)
+bool EditorWnd::Close([[maybe_unused]]input_t cmd)
 {
-    return true;
-}
-
-bool EditorWnd::DlgFind(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::DlgReplace(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Reload(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Save(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::SaveAs(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::Close(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlProperties(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlChangeCP(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::CtrlFuncList(input_t cmd)
-{
-    return true;
-}
-
-bool EditorWnd::TrackPopupMenu(input_t cmd)
-{
+    m_close = true;
     return true;
 }
 
@@ -767,5 +727,15 @@ bool EditorWnd::CtrlRefresh([[maybe_unused]] input_t cmd)
 {
     m_editor->FlushCurStr();
     return Refresh();
+}
+
+bool EditorWnd::Replace(input_t cmd)
+{
+    return true;
+}
+
+bool EditorWnd::Save(input_t cmd)
+{
+    return true;
 }
 
