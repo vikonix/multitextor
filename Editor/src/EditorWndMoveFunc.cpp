@@ -861,7 +861,7 @@ bool EditorWnd::MoveLexMatch([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::Find(bool silence)
 {
-    if (g_up)
+    if (g_findUp)
         return FindUp(silence);
     else
         return FindDown(silence);
@@ -908,7 +908,7 @@ bool EditorWnd::FindDownWord([[maybe_unused]] input_t cmd)
 
 bool EditorWnd::Repeat(input_t cmd)
 {
-    if (!g_replace)
+    if (!g_findReplace)
         return Find();
     else
         return Replace(cmd);

@@ -35,11 +35,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cwctype>
 
 std::u16string  EditorWnd::g_findStr;
-bool            EditorWnd::g_noCase{};
-bool            EditorWnd::g_up{};
-bool            EditorWnd::g_replace{};
-bool            EditorWnd::g_inSelected{};
-bool            EditorWnd::g_word{};
+bool            EditorWnd::g_findNoCase{};
+bool            EditorWnd::g_findUp{};
+bool            EditorWnd::g_findReplace{};
+bool            EditorWnd::g_findInSelected{};
+bool            EditorWnd::g_findWord{};
 
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode)
@@ -1631,7 +1631,7 @@ bool EditorWnd::FindUp(bool silence)
 
     time_t t{ time(NULL) };
     std::u16string find{ g_findStr };
-    if (g_noCase)
+    if (g_findNoCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1642,7 +1642,7 @@ bool EditorWnd::FindUp(bool silence)
     //search diaps
     size_t line{ m_firstLine + m_cursory };
     size_t end{};
-    if (g_inSelected && m_selectState == select_state::complete)
+    if (g_findInSelected && m_selectState == select_state::complete)
     {
         if (m_beginY <= m_endY)
         {
@@ -1680,7 +1680,7 @@ bool EditorWnd::FindUp(bool silence)
         {
             if (*it == 0x9)
                 *it = ' ';
-            else if (g_noCase)
+            else if (g_findNoCase)
                 *it = std::towupper(*it);
         }
 
@@ -1748,7 +1748,7 @@ bool EditorWnd::FindDown(bool silence)
 
     time_t t{ time(NULL) };
     std::u16string find{ g_findStr };
-    if (g_noCase)
+    if (g_findNoCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1759,7 +1759,7 @@ bool EditorWnd::FindDown(bool silence)
     //search diaps
     size_t line{ m_firstLine + m_cursory };
     size_t end{m_editor->GetStrCount()};
-    if (g_inSelected && m_selectState == select_state::complete)
+    if (g_findInSelected && m_selectState == select_state::complete)
     {
         if (m_beginY <= m_endY)
         {
@@ -1791,7 +1791,7 @@ bool EditorWnd::FindDown(bool silence)
         {
             if (*it == 0x9)
                 *it = ' ';
-            else if (g_noCase)
+            else if (g_findNoCase)
                 *it = std::towupper(*it);
         }
 

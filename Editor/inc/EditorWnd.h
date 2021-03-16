@@ -163,11 +163,11 @@ class EditorWnd : public FrameWnd
 public:
     //find and replace params
     static std::u16string   g_findStr;
-    static bool             g_noCase;
-    static bool             g_up;
-    static bool             g_replace;
-    static bool             g_inSelected;
-    static bool             g_word;
+    static bool             g_findNoCase;
+    static bool             g_findUp;
+    static bool             g_findReplace;
+    static bool             g_findInSelected;
+    static bool             g_findWord;
 
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
         : FrameWnd(left, top, sizex, sizey, border) {m_cmdParser.SetCmdMap(g_defaultEditKeyMap);}
