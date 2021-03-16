@@ -404,7 +404,7 @@ std::optional<typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterat
 
     if ((*m_curBuff)->m_lostData)
     {
-        LOG(DEBUG) << "curBuff->m_lostData first=" << m_curBuffLine << " last=" << m_curBuffLine + (*m_curBuff)->GetStrCount() - 1;
+        //LOG(DEBUG) << "curBuff->m_lostData first=" << m_curBuffLine << " last=" << m_curBuffLine + (*m_curBuff)->GetStrCount() - 1;
 
         bool rc = LoadBuff((*m_curBuff)->m_fileOffset, (*m_curBuff)->GetBuffSize(), (*m_curBuff)->GetBuff());
         if (!rc)

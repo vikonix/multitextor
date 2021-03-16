@@ -1600,7 +1600,7 @@ bool EditorWnd::UpdateProgress(size_t step)
     if (m_progress != step)
     {
         std::stringstream sstr;
-        sstr << "[" << step << "]";
+        sstr << "[" << std::setw(2) << step << "]";
         
         pos_t x{};
         if (m_border & BORDER_TOP)
@@ -1692,7 +1692,7 @@ bool EditorWnd::FindUp(bool silence)
             offset = std::distance(itFound, str.rend()) - size;
             //???if (!g_word || IsWord(pStr, offset, n))
             {
-                LOG(DEBUG) << "    Found time=" << time(NULL) - t;
+                LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);
 
                 m_foundX = offset;
@@ -1775,7 +1775,11 @@ bool EditorWnd::FindDown(bool silence)
         }
     }
 
-    size_t offset{ m_xOffset + m_cursorx + 1};
+    size_t offset{ m_xOffset + m_cursorx };
+    if (m_foundY == line && m_foundX == offset)
+        offset += size;
+    else
+        ++offset;
 
     size_t begin{ line };
     size_t progress{};
@@ -1799,7 +1803,7 @@ bool EditorWnd::FindDown(bool silence)
             offset = std::distance(str.begin(), itFound);
             //???if (!g_word || IsWord(pStr, offset, n))
             {
-                LOG(DEBUG) << "    Found time=" << time(NULL) - t;
+                LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);
 
                 m_foundX = offset;

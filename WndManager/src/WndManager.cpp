@@ -1013,7 +1013,10 @@ input_t WndManager::CheckInput(const std::chrono::milliseconds& waitTime)
     if (key)
     {
         input_t code = m_console.GetInput();
-        LOG_IF(code, DEBUG) << "  " << ConsoleInput::CastKeyCode(key);
+        if (code == K_FOCUSLOST || code == K_FOCUSSET)
+            code = 0;
+
+        LOG_IF(code, DEBUG) << "  " << ConsoleInput::CastKeyCode(code);
         return code;
     }
 
