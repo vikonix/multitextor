@@ -778,7 +778,7 @@ input_t FrameMenu::EventProc(input_t code)
                 Refresh();
             }
 
-            if(open)
+            if(open && m_selected != -1)
             {
                 code = m_menu[m_selected].code;
 

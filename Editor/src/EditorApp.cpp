@@ -28,7 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Dialogs/StdDialogs.h"
 
 
-sline_list sLine{
+sline_list g_statusLine
+{
     {"",     "",     stat_color::normal},//0
     {"Key",  "",     stat_color::grayed},//1
     {"Mark", "",     stat_color::grayed},//2
@@ -39,7 +40,7 @@ sline_list sLine{
 bool EditorApp::Init()
 {
     Application::Init();
-    SetStatusLine(sLine);
+    SetStatusLine(g_statusLine);
     return true;
 }
 

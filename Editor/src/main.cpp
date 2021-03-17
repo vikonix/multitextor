@@ -29,73 +29,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "utils/logger.h"
-#include "utils/Directory.h"
-#include "App.h"
-#include "DlgControls.h"
-#include "Dialogs/StdDialogs.h"
-
 #include "EditorApp.h"
-
-#include <iostream>
-
-/////////////////////////////////////////////////////////////////////////////
-Logo g_Logo {
-  ColorScreen,
-  ColorScreen,
-  '-',
-  -1, 
-  -1, 
-  {
-      "----------  ----",
-      "--------- # ----",
-      "-------- ## ----",
-      "------- ###   --",
-      "------ #### # --",
-      "----- #### ## --",
-      "---- #### ###   ",
-      "--- #### #### # ",
-      "-- #### #### ## ",
-      "- #### #### ### ",
-      " #### #### #### "
-  }
-};
-
-menu_list menu0 {
-    {MENU_ITEM,       "&File",     K_MENU + 1, "File menu"},
-    {MENU_ITEM,       "&Edit",     K_MENU + 2, "Edit menu"},
-    {MENU_ITEM,       "Bloc&k",    K_MENU + 3},
-    {MENU_ITEM,       "&Search",   K_MENU + 4},
-    {MENU_ITEM,       "&Tools",    K_MENU + 5},
-    {MENU_ITEM,       "Windo&ws",  K_MENU + 6},
-    {MENU_ITEM,       "&Help",     K_MENU + 7}
-};
-menu_list menu1 {
-    {MENU_ITEM,       "menu1",     K_MENU + 1, "Next menu"},
-    {MENU_ITEM,       "menu2",     K_F2},
-    {MENU_SEPARATOR,  "menu3",     K_F3},
-    {MENU_ITEM,       "menu4",     K_F4},
-    {MENU_ITEM,       "menu5",     K_F5},
-    {MENU_ITEM,       "menu6",     K_MENU + 1, "Next menu"},
-    {MENU_ITEM,       "menu7",     K_F7}
-};
-
-menu_list mAccess {
-  {MENU_ITEM, "&F&1Help"},
-  {MENU_ITEM, "&F&2Save"},
-  {MENU_ITEM, "&F&3Open"},
-  {MENU_ITEM, "&F&4Mark"},
-  {MENU_ITEM, "&F&5Copy"},
-  {MENU_ITEM, "&F&6Move"},
-  {MENU_ITEM, "&F&7Search"},
-  {MENU_ITEM, "&F&8Unmark"},
-  {MENU_ITEM, "&F&9Menu"},
-  {MENU_ITEM, "&F&1&0Exit"}
-};
-
 
 /////////////////////////////////////////////////////////////////////////////
 EditorApp app;
 Application& Application::s_app{app};
+
 
 int main()
 {
@@ -106,11 +45,11 @@ int main()
     app.Init();
     WndManager::getInstance().SetScreenSize();
 
-    app.SetLogo(g_Logo);
+    app.SetLogo(g_logo);
     app.WriteAppName(L"Multitextor");
 
-    app.SetMenu({menu0, menu1});
-    app.SetAccessMenu(mAccess);
+    app.SetMenu(g_mainMenu);
+    app.SetAccessMenu(g_accessMenu);
     app.SetCmdParser(g_defaultAppKeyMap);
     app.SetClock(clock_pos::bottom);
     

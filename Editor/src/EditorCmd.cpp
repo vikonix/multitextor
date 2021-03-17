@@ -209,7 +209,7 @@ CmdMap g_defaultEditKeyMap
     {'P' | K_ALT},              {K_ED(E_CTRL_FINDUPW)},
     {'N' | K_ALT},              {K_ED(E_CTRL_FINDDNW)},
 
-    {'J' | K_CTRL},             {K_ED(E_CTRL_FLIST)},
+    {'J' | K_CTRL},             {K_ED(E_CTRL_FUNC_LIST)},
     {'A' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
     {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
 
@@ -296,7 +296,7 @@ std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select
     {E_CTRL_CLOSE,          {&EditorWnd::Close,                  EditorWnd::select_state::end}},
 
     {E_MOVE_LEX_MATCH,      {&EditorWnd::MoveLexMatch,           EditorWnd::select_state::begin}},
-    {E_CTRL_FLIST,          {&EditorWnd::CtrlFuncList,           EditorWnd::select_state::end}},
+    {E_CTRL_FUNC_LIST,      {&EditorWnd::CtrlFuncList,           EditorWnd::select_state::end}},
     {E_CTRL_PROPERTIES,     {&EditorWnd::CtrlProperties,         EditorWnd::select_state::end}},
     {E_CTRL_CHANGE_CP,      {&EditorWnd::CtrlChangeCP,           EditorWnd::select_state::no}},
     {E_POPUP_MENU,          {&EditorWnd::TrackPopupMenu,         EditorWnd::select_state::end}}
@@ -467,7 +467,7 @@ std::unordered_map<input_t, std::string> g_CmdNames
     { K_ED(E_CTRL_CLOSE),           "EDIT_CTRL_CLOSE"},
 
     { K_ED(E_MOVE_LEX_MATCH),       "EDIT_MOVE_BRACKET_MATCH"},
-    { K_ED(E_CTRL_FLIST),           "EDIT_DLG_FUNCLIST"},
+    { K_ED(E_CTRL_FUNC_LIST),       "EDIT_DLG_FUNC_LIST"},
     { K_ED(E_CTRL_PROPERTIES),      "EDIT_DLG_PROPERTIES"},
     { K_ED(E_CTRL_CHANGE_CP),       "EDIT_CTRL_CHANGE_CP"},
     { K_ED(E_POPUP_MENU),           "EDIT_POPUP_MENU"},

@@ -27,6 +27,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "App.h"
 #include "EditorWnd.h"
 
+extern Logo g_logo;
+extern sline_list g_statusLine;
+extern menu_list g_accessMenu;
+extern menu_list g_menuRecentFiles;
+extern menu_list g_menuRecentSessions;
+extern std::vector<menu_list> g_mainMenu;
+
+
 class EditorApp : public Application
 {
     std::unordered_map<std::string, std::shared_ptr<EditorWnd>> m_editors;

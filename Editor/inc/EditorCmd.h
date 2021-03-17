@@ -157,7 +157,7 @@ enum EditorCmd : input_t
     E_CTRL_CLOSE,
 
     E_MOVE_LEX_MATCH,
-    E_CTRL_FLIST,
+    E_CTRL_FUNC_LIST,
     E_CTRL_PROPERTIES,
     E_CTRL_CHANGE_CP,
     E_POPUP_MENU
