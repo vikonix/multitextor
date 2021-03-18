@@ -462,7 +462,10 @@ input_t FrameMenu::Activate(bool capture)
 
     Refresh();
 
-    m_shade = std::make_unique<Shade>(m_left, m_top, m_sizex, m_sizey, (SHADE_ALL | SHADE_PAINT | SHADE_SAVE) & ~SHADE_TOP);
+    int shadeMode = SHADE_ALL | SHADE_PAINT | SHADE_SAVE;
+    if (m_top <= 1)
+        shadeMode &= ~SHADE_TOP;
+    m_shade = std::make_unique<Shade>(m_left, m_top, m_sizex, m_sizey, shadeMode);
 
     if(capture)
         InputCapture();
@@ -793,7 +796,8 @@ input_t FrameMenu::EventProc(input_t code)
                     auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);
                     if (menu)
                     {
-                        m_nextMenu = std::make_unique<FrameMenu>(*menu, m_menu[m_selected].x, (pos_t)1);
+                        m_nextMenu = std::make_unique<FrameMenu>(*menu, 
+                            static_cast<pos_t>(m_left + m_sizex - 1), static_cast<pos_t>(m_menu[m_selected].y + 1));
                         if (m_nextMenu)
                             m_nextMenu->Activate();
                     }
