@@ -123,7 +123,7 @@ input_t LineMenu::Activate(bool capture)
 {
     //LOG(DEBUG) << __FUNC__;
     if (m_menu.empty())
-        return 0;
+        return K_CLOSE;
   
     m_selected = 0;
     m_sizex = WndManager::getInstance().m_sizex - m_left;
@@ -410,9 +410,10 @@ input_t FrameMenu::Activate(bool capture)
 {
     //LOG(DEBUG) << __FUNC__;
     if (m_menu.empty())
-        return 0;
+        return K_CLOSE;
 
-    short maxKey = 0; //max key string
+    size_t n{};
+    pos_t maxKey{}; //max key string
     for(const auto& m : m_menu)
     {
         pos_t strLen{};
@@ -430,19 +431,22 @@ input_t FrameMenu::Activate(bool capture)
                 strLen = (pos_t)pos;
                 keyLen = (pos_t)(m.name.size() - pos);
             }
+
+            if (m_sizex < strLen)
+                m_sizex = strLen;
+            if (maxKey < keyLen)
+                maxKey = keyLen;
+            ++n;
+
+            LOG(DEBUG) << "menu key=" << Application::getInstance().GetKeyName(m.code) << ";";
         }
-
-        if(m_sizex < strLen)
-            m_sizex = strLen;
-        if(maxKey < keyLen)
-            maxKey = keyLen;
-        ++m_sizey;
-
-        LOG(DEBUG) << "menu key=" << Application::getInstance().GetKeyName(m.code) << ";";
     }
 
+    if (0 == n)
+        return K_CLOSE;
+
     m_sizex += 5 + maxKey;//really one more by simbol &
-    m_sizey += 2;
+    m_sizey = m_menu.size() + 2;
 
     m_selected = GetNextItem(-1);
 
@@ -470,7 +474,7 @@ input_t FrameMenu::Activate(bool capture)
     if(capture)
         InputCapture();
 
-    return true;
+    return 0;
 }
 
 bool FrameMenu::Refresh()
@@ -599,6 +603,7 @@ bool FrameMenu::Refresh()
       && WndManager::getInstance().GotoXY(m_left + m_sizex - 1, y)
       && WndManager::getInstance().WriteChar(ACS_LRCORNER);
 
+    _assert(m_sizey == y - m_top + 1);
     m_sizey = y - m_top + 1;//real size ???
 
     WndManager::getInstance().BeginPaint();
@@ -799,7 +804,11 @@ input_t FrameMenu::EventProc(input_t code)
                         m_nextMenu = std::make_unique<FrameMenu>(*menu, 
                             static_cast<pos_t>(m_left + m_sizex - 1), static_cast<pos_t>(m_menu[m_selected].y + 1));
                         if (m_nextMenu)
-                            m_nextMenu->Activate();
+                        {
+                            auto rc = m_nextMenu->Activate();
+                            if (rc == K_CLOSE)
+                                m_nextMenu.reset();
+                        }
                     }
                 }
                 else if(open == 4 || open == 3)
