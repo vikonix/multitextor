@@ -529,7 +529,7 @@ bool Application::SetCmdParser(const CmdMap& cmdMap)
 }
 
 
-std::string Application::GetKeyName(input_t code)
+std::string Application::GetKeyName(input_t code) const
 {
-    return "F?";//???
+    return {};
 }

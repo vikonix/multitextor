@@ -81,6 +81,90 @@ bool EditorApp::StatusMark(mark_status mark)
     return 0;
 }
 
+std::string EditorApp::GetKeyName(input_t code) const
+{
+    std::vector<input_t> codeKeys;
+    for (auto it = g_defaultAppKeyMap.cbegin(); it != g_defaultAppKeyMap.cend(); ++it)
+    {
+        const auto& keys = *it;
+        ++it;
+        const auto& cmd = *it;
+
+
+        if (cmd.size() == 1 && code == cmd[0])
+        {
+            codeKeys = keys;
+            break;
+        }
+    }
+    if(codeKeys.empty())
+        for (auto it = g_defaultEditKeyMap.cbegin(); it != g_defaultEditKeyMap.cend(); ++it)
+        {
+            const auto& key = *it;
+            ++it;
+            const auto& cmd = *it;
+
+
+            if (cmd.size() == 1 && code == cmd[0])
+            {
+                codeKeys = key;
+                break;
+            }
+        }
+    if (codeKeys.empty())
+        return {};
+
+    std::string keyNames;
+    for (auto key : codeKeys)
+    {
+        if (!keyNames.empty())
+            keyNames += " ";
+        auto keyType = key & K_TYPEMASK;
+        auto keyCmd = key & 0xffff0000;
+        auto keyCode = K_GET_CODE(key);
+
+        if (key & K_SHIFT)
+            keyNames += "Shift+";
+        if (key & K_CTRL)
+            keyNames += "Ctrl+";
+        if (key & K_ALT)
+            keyNames += "Alt+";
+
+        bool found{};
+        if (0 != keyType)
+        {
+            auto it = g_CmdNames.find(keyType);
+            if (it != g_CmdNames.end())
+            {
+                keyNames += it->second;
+                found = true;
+            }
+        }
+        if(!found && 0 != keyType && 0 != keyCmd)
+        {
+            auto it = g_CmdNames.find(keyCmd);
+            if (it != g_CmdNames.end())
+            {
+                keyNames += it->second;
+                found = true;
+            }
+        }
+        if (!found && 0 != keyCode)
+        {
+            auto it = g_CmdNames.find(keyCode);
+            if (it != g_CmdNames.end())
+            {
+                keyNames += it->second;
+                found = true;
+            }
+        }
+        if(!found && keyCode > ' ')
+            keyNames += static_cast<char>(keyCode);
+    }
+
+    return keyNames;
+}
+
 input_t EditorApp::AppProc(input_t code)
 { 
     //input treatment in user function

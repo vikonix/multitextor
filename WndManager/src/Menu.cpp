@@ -438,7 +438,8 @@ input_t FrameMenu::Activate(bool capture)
                 maxKey = keyLen;
             ++n;
 
-            LOG(DEBUG) << "menu key=" << Application::getInstance().GetKeyName(m.code) << ";";
+            LOG(DEBUG) << "menu code=" << std::hex << m.code << std::dec 
+                << " key=" << Application::getInstance().GetKeyName(m.code) << ";";
         }
     }
 
@@ -446,7 +447,7 @@ input_t FrameMenu::Activate(bool capture)
         return K_CLOSE;
 
     m_sizex += 5 + maxKey;//really one more by simbol &
-    m_sizey = m_menu.size() + 2;
+    m_sizey = static_cast<pos_t>(m_menu.size()) + 2;
 
     m_selected = GetNextItem(-1);
 
