@@ -169,7 +169,7 @@ bool EditorApp::CloseWindow(Wnd* wnd)
 {
     if(auto it = m_editors.find(wnd); it != m_editors.end())
     {
-        LOG(DEBUG) << "CloseWindows" << wnd;
+        //LOG(DEBUG) << "CloseWindows " << wnd;
         m_editors.erase(it);
         return true;
     }

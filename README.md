@@ -27,6 +27,7 @@ Minimal requirenment: gcc 8.0 or MSVS 2017
  - Third party library (easyloggingpp, utfcpp, termdb).
  - Console input/output library.
  - Console windows library.
+ - Main editor components.
  
 ## In progress:
- - Editor components.
+ - Editor alpha version.
