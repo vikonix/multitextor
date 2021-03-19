@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
-#include "Dialogs/StdDialogs.h"
+
 
 sline_list g_statusLine
 {
@@ -200,22 +200,21 @@ input_t EditorApp::AppProc(input_t code)
     {
         m_editors.clear();
     }
-    else if (code == K_APP_DLG_OPEN)
+    else if(code >= K_APP && code <= K_APP_END)
     {
-        FileDialog dlg{ FileDlgMode::Open };
-        auto rc = dlg.Activate();
-        code = 0;
-        if (rc == ID_OK)
-        {
-            std::filesystem::path path{dlg.s_vars.path};
-            path /= dlg.s_vars.file;
+        AppCmd cmd = static_cast<AppCmd>(code);
+        if (code >= K_APP_BOOKMARK && code < K_APP_FILE_RECENT)
+            cmd = K_APP_BOOKMARK;
+        else if (code >= K_APP_FILE_RECENT && code < K_APP_SESSION_RECENT)
+            cmd = K_APP_FILE_RECENT;
+        else if (code > K_APP_SESSION_RECENT)
+            cmd = K_APP_SESSION_RECENT;
 
-            auto editor = std::make_shared<EditorWnd>();
-            editor->Show(true, -1);
-            std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
-            editor->SetFileName(path, false, type);
-                
-            m_editors[editor.get()] = editor;
+        if (auto it = s_funcMap.find(cmd); it != s_funcMap.end())
+        {
+            auto& [k, func] = *it;
+            [[maybe_unused]]bool rc = func(this, code);
+            return 0;
         }
     }
 

@@ -97,6 +97,21 @@ bool    EditorApp::FileSaveAllProc(input_t cmd)
 
 bool    EditorApp::FileOpenProc(input_t cmd)
 {
+    FileDialog dlg{ FileDlgMode::Open };
+    auto rc = dlg.Activate();
+    if (rc == ID_OK)
+    {
+        std::filesystem::path path{ dlg.s_vars.path };
+        path /= dlg.s_vars.file;
+
+        auto editor = std::make_shared<EditorWnd>();
+        editor->Show(true, -1);
+        std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
+        editor->SetFileName(path, false, type);
+
+        m_editors[editor.get()] = editor;
+    }
+
     return true;
 }
 
