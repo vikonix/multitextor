@@ -53,7 +53,7 @@ bool CaptureInput::InputRelease()
 
 bool Wnd::Show(bool refresh, int view)
 {
-    bool rc = 0;
+    bool rc{true};
     if (!m_visible)
     {
         m_visible = true;
@@ -64,7 +64,7 @@ bool Wnd::Show(bool refresh, int view)
 
 bool Wnd::Hide(bool refresh)
 {
-    bool rc = 0;
+    bool rc{ true };
     if (m_visible)
     {
         m_visible = false;

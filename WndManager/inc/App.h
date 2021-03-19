@@ -96,6 +96,7 @@ public:
     virtual void    Deinit();
     virtual bool    StatusWaitKey([[maybe_unused]]bool wait = false) { return true; }
     virtual std::string GetKeyName(input_t code) const;
+    virtual bool    CloseWindow(Wnd* wnd);
 
     input_t MainProc(input_t exit_code = K_EXIT);//input treatment loop
     input_t CheckMouse(input_t code);

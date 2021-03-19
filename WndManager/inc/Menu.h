@@ -46,7 +46,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 struct menu
 {
     int         type{};
-    std::string name;
+    std::string name{};
     input_t     code{};
     std::string helpLine{};
 

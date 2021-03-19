@@ -165,20 +165,42 @@ std::string EditorApp::GetKeyName(input_t code) const
     return keyNames;
 }
 
+bool EditorApp::CloseWindow(Wnd* wnd)
+{
+    if(auto it = m_editors.find(wnd); it != m_editors.end())
+    {
+        LOG(DEBUG) << "CloseWindows" << wnd;
+        m_editors.erase(it);
+        return true;
+    }
+
+    return false;
+}
+
 input_t EditorApp::AppProc(input_t code)
 { 
     //input treatment in user function
-    LOG_IF(code != K_TIME, DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
+    //LOG_IF(code != K_TIME, DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
 
-    if (code == K_EXIT)
+    if (code == K_INSERT)
+    {
+        if (m_insert)
+        {
+            m_insert = false;
+            SwapStatusLine(4);
+        }
+        else
+        {
+            m_insert = true;
+            SwapStatusLine(4);
+        }
+
+        return 0;
+    }
+    else if (code == K_EXIT)
     {
         m_editors.clear();
     }
-//    else if (code == K_MENU)
-//    {
-//        WndManager::getInstance().PutInput(K_MENU);
-//        code = 0;
-//    }
     else if (code == K_APP_DLG_OPEN)
     {
         FileDialog dlg{ FileDlgMode::Open };
@@ -194,7 +216,7 @@ input_t EditorApp::AppProc(input_t code)
             std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
             editor->SetFileName(path, false, type);
                 
-            m_editors[path.u8string()] = editor;
+            m_editors[editor.get()] = editor;
         }
     }
 

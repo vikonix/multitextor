@@ -119,7 +119,7 @@ static menu_list menuBlock
     {MENU_ITEM,         "Select C&olumn",               K_ED(E_SELECT_MODE) | 1,    "Begin of column selection"},
     {MENU_ITEM,         "Select &Stream;Esc Arrows",    K_ED(E_SELECT_BEGIN),       "Begin of stream selection"},
     {MENU_ITEM,         "Select &All",                  K_ED(E_SELECT_ALL),         "Select whole file"},
-    {MENU_ITEM,         "&End Select Mode;F4",          K_ED(E_SELECT_END),         "End of selection mode"},
+    {MENU_ITEM,         "&End Select Mode",             K_ED(E_SELECT_END),         "End of selection mode"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "U&nselect",                    K_ED(E_SELECT_UNSELECT),    "Hide selection"}
 };

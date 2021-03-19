@@ -37,7 +37,7 @@ extern std::vector<menu_list> g_mainMenu;
 
 class EditorApp : public Application
 {
-    std::unordered_map<std::string, std::shared_ptr<EditorWnd>> m_editors;
+    std::unordered_map<Wnd*, std::shared_ptr<EditorWnd>> m_editors;
     bool s_wait{};
 
 public:
@@ -49,6 +49,7 @@ public:
     virtual void    Deinit() override final;
     virtual bool    StatusWaitKey(bool wait) override final;
     virtual std::string GetKeyName(input_t code) const override final;
+    virtual bool    CloseWindow(Wnd* wnd) override final;
 
     static bool SetHelpLine(std::optional<const std::string> help = std::nullopt, stat_color color = stat_color::normal)
     {

@@ -244,7 +244,7 @@ bool WndManager::ShowInputCursor(cursor_t cursor, pos_t x, pos_t y)
 
 bool WndManager::HideCursor()
 {
-    int rc = 0;
+    int rc{ true };
     if (m_cursor != cursor_t::CURSOR_HIDE)
     {
         rc = m_console.SetCursor(cursor_t::CURSOR_HIDE);
@@ -749,7 +749,7 @@ input_t WndManager::ProcInput(input_t code)
 //    LOG_IF(code != K_TIME, DEBUG) << "  M:ProcInput " <<  std::hex << code << std::dec;
 
     input_t out{code};
-    bool rc{};
+    [[maybe_unused]]bool rc{};
 
     if (code == K_REFRESH)
     {

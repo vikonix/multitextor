@@ -721,8 +721,9 @@ input_t EditorWnd::EventProc(input_t code)
 
     if (m_close)
     {
-        m_close = false;//???
-        return Wnd::Destroy();
+        m_close = false;
+        Application::getInstance().CloseWindow(this);
+        return K_CLOSE;
     }
 
     return 0;
