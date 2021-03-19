@@ -69,11 +69,11 @@ CmdMap g_defaultAppKeyMap
 
     {K_ESC, '0'},               {K_INSERT},
 
-    {'/' | K_ALT},              {K_APP_VIEW},
+    {'/' | K_ALT},              {K_APP_VIEW_SPLIT},
     {'+' | K_ALT},              {K_APP_VIEW_MODE},
     {'=' | K_ALT},              {K_APP_VIEW_MODE},
     {'-' | K_ALT},              {K_APP_VIEW_SIZE},
-    {K_ESC, '/'},               {K_APP_VIEW},
+    {K_ESC, '/'},               {K_APP_VIEW_SPLIT},
     {K_ESC, '='},               {K_APP_VIEW_MODE},
     {K_ESC, '+'},               {K_APP_VIEW_MODE},
     {K_ESC, '-'},               {K_APP_VIEW_SIZE},
@@ -85,8 +85,8 @@ CmdMap g_defaultAppKeyMap
     {K_ESC, '3'},               {K_APP_VIEW_SET},
 
     {'D' | K_CTRL},             {K_APP_DIFF},
-    {'\\' | K_CTRL},            {K_APP_BOOKMARK},
-    {'\\' | K_ALT},             {K_APP_BOOKMARK},
+    {'\\' | K_CTRL},            {K_APP_BOOKMARK_LIST},
+    {'\\' | K_ALT},             {K_APP_BOOKMARK_LIST},
 
     {'0' | K_ALT},              {K_APP_BOOKMARK_0},
     {'1' | K_ALT},              {K_APP_BOOKMARK_1},
@@ -361,7 +361,6 @@ std::unordered_map<input_t, std::string> g_CmdNames
     {K_APP_SAVE_ALL,                "APP_SAVE_ALL"},
     {K_APP_DLG_OPEN,                "APP_DLG_OPEN"},
     {K_APP_DLG_LOAD,                "APP_DLG_LOAD"},
-    {K_APP_DLG_EXEC,                "APP_DLG_EXEC"},
 
     {K_APP_FINDFILE,                "APP_DLG_FINDFILE"},
     {K_APP_REPLACEFILE,             "APP_DLG_REPLACEFILE"},
@@ -369,19 +368,16 @@ std::unordered_map<input_t, std::string> g_CmdNames
     {K_APP_WND_COPY,                "APP_DLG_WND_COPY"},
     {K_APP_WND_MOVE,                "APP_DLG_WND_MOVE"},
 
-    {K_APP_WND_CLOSE,               "APP_WND_CLOSE"},
     {K_APP_WND_CLOSEALL,            "APP_WND_CLOSEALL"},
-    {K_APP_WND_NEXT,                "APP_WND_NEXT"},
-    {K_APP_WND_PREV,                "APP_WND_PREV"},
     {K_APP_WND_LIST,                "APP_DLG_WND_LIST"},
 
-    {K_APP_VIEW,                    "APP_VIEW_SPLIT_MERGE"},
+    {K_APP_VIEW_SPLIT,              "APP_VIEW_SPLIT_MERGE"},
     {K_APP_VIEW_MODE,               "APP_VIEW_SPLIT_VH"},
     {K_APP_VIEW_SET,                "APP_VIEW_SELECT"},
     {K_APP_VIEW_SIZE,               "APP_VIEW_SIZE"},
 
     {K_APP_DIFF,                    "APP_DLG_DIFF"},
-    {K_APP_BOOKMARK,                "APP_DLG_BOOKMARK"},
+    {K_APP_BOOKMARK_LIST,           "APP_DLG_BOOKMARK"},
     {K_APP_KEYGEN,                  "APP_DLG_KEYGEN"},
     {K_APP_NEW_SESSION,             "APP_DLG_NEW_SESSION"},
     {K_APP_OPEN_SESSION,            "APP_DLG_OPEN_SESSION"},

@@ -74,4 +74,38 @@ public:
     };
 
     static bool StatusMark(mark_status mark = mark_status::no);
+
+    //editor app commands
+    bool    AboutProc(input_t cmd);
+    bool    HelpProc(input_t cmd);
+    bool    HelpKeymapProc(input_t cmd);
+    bool    FileNewProc(input_t cmd);
+    bool    FileSaveProc(input_t cmd);
+    bool    FileSaveAllProc(input_t cmd);
+    bool    FileOpenProc(input_t cmd);
+    bool    FileLoadProc(input_t cmd);
+    bool    FindInFilesProc(input_t cmd);
+    bool    ReplaceInFilesProc(input_t cmd);
+    bool    FoundFilesProc(input_t cmd);
+    bool    WndCopyProc(input_t cmd);
+    bool    WndMoveProc(input_t cmd);
+    bool    WndCloseAllProc(input_t cmd);
+    bool    WndListProc(input_t cmd);
+    bool    ViewSplitProc(input_t cmd);
+    bool    ViewModeProc(input_t cmd);
+    bool    ViewSelectProc(input_t cmd);
+    bool    ViewMoveProc(input_t cmd);
+    bool    DiffProc(input_t cmd);
+    bool    BookmarkListProc(input_t cmd);
+    bool    KeygenProc(input_t cmd);
+    bool    NewSessionProc(input_t cmd);
+    bool    OpenSessionProc(input_t cmd);
+    bool    RecordMacroProc(input_t cmd);
+    bool    PlayMacroProc(input_t cmd);
+    bool    ColorDlgProc(input_t cmd);
+    bool    SettingsDlgProc(input_t cmd);
+
+    bool    SelectBookmarkProc(input_t cmd);
+    bool    SelectRecentFileProc(input_t cmd);
+    bool    SelectRecentSessionProc(input_t cmd);
 };

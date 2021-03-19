@@ -39,12 +39,9 @@ enum AppCmd : input_t
     K_APP_HELP_KEYMAP,
 
     K_APP_NEW,
-    K_APP_OPEN,
-    K_APP_EXEC,
     K_APP_SAVE_ALL,
     K_APP_DLG_OPEN,
     K_APP_DLG_LOAD,
-    K_APP_DLG_EXEC,
 
     K_APP_FINDFILE,
     K_APP_REPLACEFILE,
@@ -52,19 +49,16 @@ enum AppCmd : input_t
     K_APP_WND_COPY,
     K_APP_WND_MOVE,
 
-    K_APP_WND_CLOSE,
     K_APP_WND_CLOSEALL,
-    K_APP_WND_NEXT,
-    K_APP_WND_PREV,
     K_APP_WND_LIST,
 
-    K_APP_VIEW,
+    K_APP_VIEW_SPLIT,
     K_APP_VIEW_MODE,
     K_APP_VIEW_SET,
     K_APP_VIEW_SIZE,
 
     K_APP_DIFF,
-    K_APP_BOOKMARK,
+    K_APP_BOOKMARK_LIST,
     K_APP_KEYGEN,
     K_APP_NEW_SESSION,
     K_APP_OPEN_SESSION,
@@ -75,9 +69,8 @@ enum AppCmd : input_t
     K_APP_COLOR,
     K_APP_SETTINGS,
 
-    K_APP_FIRST_RUN,
-
-    K_APP_BOOKMARK_0,
+    K_APP_BOOKMARK,
+    K_APP_BOOKMARK_0 = K_APP_BOOKMARK,
     K_APP_BOOKMARK_1,
     K_APP_BOOKMARK_2,
     K_APP_BOOKMARK_3,

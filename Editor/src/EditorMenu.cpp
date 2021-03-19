@@ -146,7 +146,7 @@ static menu_list menuTools
 {
     {MENU_ITEM,         "Goto &Matched Bracket",        K_ED(E_MOVE_LEX_MATCH),     "Go to opposite bracket"},
     {MENU_ITEM,         "Fu&nctions List...",           K_ED(E_CTRL_FUNC_LIST),     "Get functions list in file"},
-    {MENU_ITEM,         "Bookmark&s...",                K_APP_BOOKMARK,             "Set or go to bookmark"},
+    {MENU_ITEM,         "Bookmark&s...",                K_APP_BOOKMARK_LIST,        "Set or go to bookmark"},
     {MENU_ITEM,         "&Compare Files...",            K_APP_DIFF,                 "Compare two files for difference"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "Start/Stop &Record Macro",     K_APP_RECORD_MACRO,         "Start/Stop recording of editing command"},
@@ -166,7 +166,7 @@ static menu_list menuWindows
     {MENU_ITEM,         "&Close Window",                K_ED(E_CTRL_CLOSE),         "Close current window"},
     {MENU_ITEM,         "Close &All Windows",           K_APP_WND_CLOSEALL,         "Close all windows"},
     {MENU_SEPARATOR},
-    {MENU_ITEM,         "Split/Merge &View",            K_APP_VIEW,                 "Split/Merge window view"},
+    {MENU_ITEM,         "Split/Merge &View",            K_APP_VIEW_SPLIT,           "Split/Merge window view"},
     {MENU_ITEM,         "Split &Horizontal/Vertical",   K_APP_VIEW_MODE,            "Change split type horizontal <-> vertical"},
     {MENU_ITEM,         "&Move Split Line",             K_APP_VIEW_SIZE,            "Change split line position"},
     {MENU_ITEM,         "&Change Active View;Alt+Page", K_APP_VIEW_SET,             "Set another view as active"},
