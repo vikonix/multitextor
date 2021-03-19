@@ -37,6 +37,9 @@ extern std::vector<menu_list> g_mainMenu;
 
 class EditorApp : public Application
 {
+    using AppFunc = std::function<bool(EditorApp*, input_t)>;
+    static std::unordered_map<AppCmd, AppFunc> s_funcMap;
+
     std::unordered_map<Wnd*, std::shared_ptr<EditorWnd>> m_editors;
     bool s_wait{};
 
@@ -80,17 +83,16 @@ public:
     bool    HelpProc(input_t cmd);
     bool    HelpKeymapProc(input_t cmd);
     bool    FileNewProc(input_t cmd);
-    bool    FileSaveProc(input_t cmd);
     bool    FileSaveAllProc(input_t cmd);
     bool    FileOpenProc(input_t cmd);
     bool    FileLoadProc(input_t cmd);
+    bool    WndCloseAllProc(input_t cmd);
+    bool    WndListProc(input_t cmd);
     bool    FindInFilesProc(input_t cmd);
     bool    ReplaceInFilesProc(input_t cmd);
     bool    FoundFilesProc(input_t cmd);
     bool    WndCopyProc(input_t cmd);
     bool    WndMoveProc(input_t cmd);
-    bool    WndCloseAllProc(input_t cmd);
-    bool    WndListProc(input_t cmd);
     bool    ViewSplitProc(input_t cmd);
     bool    ViewModeProc(input_t cmd);
     bool    ViewSelectProc(input_t cmd);

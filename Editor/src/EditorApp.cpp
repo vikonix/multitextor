@@ -27,7 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorApp.h"
 #include "Dialogs/StdDialogs.h"
 
-
 sline_list g_statusLine
 {
     {"",     "",     stat_color::normal},//0

@@ -78,7 +78,6 @@ class EditorWnd : public FrameWnd
     };
     
     using EditorFunc = std::function<bool(EditorWnd*, input_t)>;
-
     static std::unordered_map<EditorCmd, std::pair<EditorFunc, select_state>> s_funcMap;
 
     EditorPtr       m_editor;
