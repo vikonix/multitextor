@@ -660,6 +660,9 @@ input_t FrameMenu::EventProc(input_t code)
         }
         else if(code == K_RIGHT)
         {
+            if (m_selected < 0)
+                return Close(code);
+
             input_t mcode = m_menu[m_selected].code;
             if ((mcode & K_TYPEMASK) == K_MENU && (mcode & K_CODEMASK) != 0)
             {

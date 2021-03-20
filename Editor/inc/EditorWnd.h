@@ -189,25 +189,20 @@ public:
     input_t     ParseCommand(input_t cmd);
     virtual input_t EventProc(input_t code) override;
 
-    virtual bool    Refresh() override;
-    virtual bool    Repaint() override;
-    virtual bool    Invalidate(size_t line, invalidate_t type, size_t pos = 0, size_t size = 0) override;
-    virtual char    GetAccessInfo() const override { return m_editor->GetAccessInfo(); }
+    virtual bool            Refresh() override;
+    virtual bool            Repaint() override;
+    virtual bool            Invalidate(size_t line, invalidate_t type, size_t pos = 0, size_t size = 0) override;
+    virtual char            GetAccessInfo() const override { return m_editor->GetAccessInfo(); }
+    virtual std::wstring    GetObjName() const override { return m_editor->GetFilePath().filename().wstring(); }
 
-    /*
-
+/*
   virtual Wnd*          CloneWnd() override;
   virtual int           IsClone() override      {return m_fClone;}
-
   virtual const char*   GetWndType() override   {return "EDT";}
   virtual const char*   GetObjPath() override   {return m_pTBuff->GetObjPath();}
-  virtual const char*   GetObjName() override   {return m_pTBuff->GetObjName();}
-  virtual int           Refresh() override;
-
   virtual int           IsUsedTimer() override  {return 1;}
   virtual int           IsUsedView() override   {return 1;}
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
-
 
   int       IsRO()                   {return m_fReadOnly;}
   int       SetRO(int ro)            {return m_fReadOnly = ro;}
@@ -219,30 +214,17 @@ public:
   int       IsChanged()              {return m_pTBuff->IsChanged();}
   long long GetSize()                {return m_pTBuff->GetSize();}
 
-  int       SetTextBuff(TextBuff* pTBuff);
-  TextBuff* GetTextBuff() {return m_pTBuff;}
-  int       SetFileName(char* pName = NULL, int fUntitled = 0, const char* pParse = "");
   int       SaveCfg(SSave* pSave);
   int       LoadCfg();
 
   int       SelectAndGoto(int nline, int size);
-  int       Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, int SelectType = 0);
-  int       IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey);
   int       GetSelectedLines(int* pBegin, int* pEnd);
-
-  int       HideFound();
   int       ScrollWnd(int iCode, int size = 1);
   size_t    GetCurPos()  {return m_nXOffset + m_cursorx;}
   size_t    GetCurLine() {return m_nFirstLine + m_cursory;}
-
   int       ReplaceSubstr(int nline, int pos, int len, wchar* pSubstr, int size);
-  int       CopySelected(WStrBuff* pBuff, int* pSelType);
-  int       PasteSelected(WStrBuff* pBuff, int SelType);
-
   int       EditWndCopy(WndEdit* pWFrom);
   int       EditWndMove(WndEdit* pWFrom);
-
-  int       IsWord(wchar* pStr, size_t offset, size_t len);
 */
     ///////////////////////////////////////////////////////////////////////////
     //editor functions
