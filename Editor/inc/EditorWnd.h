@@ -158,6 +158,7 @@ class EditorWnd : public FrameWnd
     bool    Find(bool silence = false);
     bool    FindUp(bool silence = false);
     bool    FindDown(bool silence = false);
+    bool    IsWord(const std::u16string& str, size_t offset, size_t len);
 
 public:
     //find and replace params

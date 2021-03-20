@@ -122,7 +122,7 @@ protected:
     bool    AddLexem(size_t line, const std::string& lexstr);
     bool    DeleteLexem(size_t line);
 
-    lex_t   SymbolType(char16_t c);
+    lex_t   SymbolType(char16_t c) const ;
     lex_t   ScanCommentFromBegin(std::u16string_view lexem, size_t& end);
     lex_t   ScanComment(std::u16string_view lexem, size_t& begin, size_t& end);
     bool    ScanSpecial(std::u16string_view lexem, size_t& end);

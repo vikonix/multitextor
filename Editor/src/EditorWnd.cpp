@@ -1622,6 +1622,15 @@ bool EditorWnd::UpdateProgress(size_t step)
     return false;
 }
 
+bool EditorWnd::IsWord(const std::u16string& str, size_t offset, size_t len)
+{
+    if ((offset == 0 || GetSymbolType(str[offset - 1]) != symbol_t::alnum)
+     && (offset + len <= str.size() || GetSymbolType(str[offset + len]) != symbol_t::alnum))
+        return true;
+    else
+        return false;
+}
+
 bool EditorWnd::FindUp(bool silence)
 {
     if (g_findStr.empty())
@@ -1694,7 +1703,7 @@ bool EditorWnd::FindUp(bool silence)
             itFound != str.rend())
         {
             offset = std::distance(itFound, str.rend()) - size;
-            //???if (!g_word || IsWord(pStr, offset, n))
+            if (!g_findWord || IsWord(str, offset, size))
             {
                 LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);
@@ -1805,7 +1814,7 @@ bool EditorWnd::FindDown(bool silence)
             itFound != str.end())
         {
             offset = std::distance(str.begin(), itFound);
-            //???if (!g_word || IsWord(pStr, offset, n))
+            if (!g_findWord || IsWord(str, offset, size))
             {
                 LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);

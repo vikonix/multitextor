@@ -51,8 +51,8 @@ public:
     virtual bool    Init() override final;
     virtual void    Deinit() override final;
     virtual bool    StatusWaitKey(bool wait) override final;
-    virtual std::string GetKeyName(input_t code) const override final;
     virtual bool    CloseWindow(Wnd* wnd) override final;
+    virtual std::string GetKeyName(input_t code) const override final;
 
     static bool SetHelpLine(std::optional<const std::string> help = std::nullopt, stat_color color = stat_color::normal)
     {

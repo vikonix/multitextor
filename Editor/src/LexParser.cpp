@@ -550,7 +550,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
     return true;
 }
 
-lex_t LexParser::SymbolType(char16_t c)
+lex_t LexParser::SymbolType(char16_t c) const
 {
     if (c < 0x80)
         return m_lexTab[c];
