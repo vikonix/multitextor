@@ -35,7 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cwctype>
 
 std::u16string  EditorWnd::g_findStr;
-bool            EditorWnd::g_findNoCase{};
+bool            EditorWnd::g_findCase{};
 bool            EditorWnd::g_findUp{};
 bool            EditorWnd::g_findReplace{};
 bool            EditorWnd::g_findInSelected{};
@@ -1644,7 +1644,7 @@ bool EditorWnd::FindUp(bool silence)
 
     time_t t{ time(NULL) };
     std::u16string find{ g_findStr };
-    if (g_findNoCase)
+    if (!g_findCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1689,11 +1689,16 @@ bool EditorWnd::FindUp(bool silence)
     while (line >= end)
     {
         auto str = m_editor->GetStr(line);
+        if (offset > str.size())
+        {
+            offset = str.size();
+        }
+
         for (auto it = str.begin(); it < str.end(); ++it)
         {
             if (*it == 0x9)
                 *it = ' ';
-            else if (g_findNoCase)
+            else if (!g_findCase)
                 *it = std::towupper(*it);
         }
 
@@ -1761,7 +1766,7 @@ bool EditorWnd::FindDown(bool silence)
 
     time_t t{ time(NULL) };
     std::u16string find{ g_findStr };
-    if (g_findNoCase)
+    if (!g_findCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1800,11 +1805,18 @@ bool EditorWnd::FindDown(bool silence)
     while (line < end)
     {
         auto str = m_editor->GetStr(line);
+        if (offset > str.size())
+        {
+            offset = 0;
+            ++line;
+            continue;
+        }
+
         for (auto it = str.begin(); it < str.end(); ++it)
         {
             if (*it == 0x9)
                 *it = ' ';
-            else if (g_findNoCase)
+            else if (!g_findCase)
                 *it = std::towupper(*it);
         }
 

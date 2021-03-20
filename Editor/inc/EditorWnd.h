@@ -163,7 +163,7 @@ class EditorWnd : public FrameWnd
 public:
     //find and replace params
     static std::u16string   g_findStr;
-    static bool             g_findNoCase;
+    static bool             g_findCase;
     static bool             g_findUp;
     static bool             g_findReplace;
     static bool             g_findInSelected;
