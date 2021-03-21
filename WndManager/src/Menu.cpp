@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager.h"
 #include "App.h"
 #include "utils/logger.h"
+#include "utfcpp/utf8.h"
 
 #include <cwctype>
 
@@ -184,11 +185,12 @@ bool LineMenu::Refresh()
             m_cursorx = x;
         }
 
-        for(size_t i = 0; i < m.name.size(); ++i, ++x)
+        std::u16string name = utf8::utf8to16(m.name);
+        for(size_t i = 0; i < name.size(); ++i, ++x)
         {
-            char c = m.name[i];
+            auto c = name[i];
             if(c != '&')
-                WndManager::getInstance().WriteChar(c);
+                WndManager::getInstance().WriteWChar(c);
             else
             {
                 //& marked char
@@ -197,8 +199,8 @@ bool LineMenu::Refresh()
                 else
                     WndManager::getInstance().SetTextAttr(ColorMenuBSel);
 
-                WndManager::getInstance().WriteChar(m.name[++i]);
-                m.iKey = std::toupper(m.name[i]);
+                WndManager::getInstance().WriteWChar(name[++i]);
+                m.iKey = std::towupper(name[i]);
 
                 if(n != m_selected)
                     WndManager::getInstance().SetTextAttr(ColorMenu);
@@ -420,16 +422,17 @@ input_t FrameMenu::Activate(bool capture)
         pos_t keyLen{};
         if(!m.name.empty())
         {
-            auto pos = m.name.find(';');
+            std::u16string name = utf8::utf8to16(m.name);
+            auto pos = name.find(';');
             if(pos == std::string::npos)
             {
-                strLen = (pos_t)m.name.size();
+                strLen = (pos_t)name.size();
                 keyLen = (pos_t)Application::getInstance().GetKeyName(m.code).size();
             }
             else
             {
                 strLen = (pos_t)pos;
-                keyLen = (pos_t)(m.name.size() - pos);
+                keyLen = (pos_t)(name.size() - pos);
             }
 
             if (m_sizex < strLen)
@@ -528,20 +531,20 @@ bool FrameMenu::Refresh()
             WndManager::getInstance().WriteChar();
             pos_t x = 1;
 
-            const std::string& name = mi->name;
-            std::string key;
+            std::u16string name = utf8::utf8to16(mi->name);
+            std::u16string key;
             if(!name.empty())
             {
                 size_t i;
                 for(i = 0; i < name.size() && name[i] != ';'; ++i, ++x)
                 {
-                    char c = name[i];
+                    auto c = name[i];
                     if(c != '&')
-                        WndManager::getInstance().WriteChar(c);
+                        WndManager::getInstance().WriteWChar(c);
                     else
                     {
                         if(mi->type & MENU_DISABLED)
-                            WndManager::getInstance().WriteChar(name[++i]);
+                            WndManager::getInstance().WriteWChar(name[++i]);
                         else
                         {
                             if(n != m_selected)
@@ -549,7 +552,7 @@ bool FrameMenu::Refresh()
                             else
                                 WndManager::getInstance().SetTextAttr(ColorMenuBSel);
 
-                            WndManager::getInstance().WriteChar(name[++i]);
+                            WndManager::getInstance().WriteWChar(name[++i]);
                             mi->iKey = std::toupper(name[i]);
 
                             if(n != m_selected)
@@ -563,7 +566,7 @@ bool FrameMenu::Refresh()
                 if (i < name.size())
                     key = name.substr(i);
                 else
-                    key = Application::getInstance().GetKeyName(mi->code);
+                    key = utf8::utf8to16(Application::getInstance().GetKeyName(mi->code));
             }
 
             auto klen = key.size();
@@ -575,20 +578,20 @@ bool FrameMenu::Refresh()
             auto ki = key.cbegin();
             for(; x < mi->size; ++x)
             {
-                char c;
+                char16_t c;
                 if(ki != key.cend())
                     c = *ki++;
                 else
                     c = ' ';
 
                 if(x != mi->size - 1)
-                    WndManager::getInstance().WriteChar(c);
+                    WndManager::getInstance().WriteWChar(c);
                 else
                 {
                     if((mi->code & K_TYPEMASK) == K_MENU)
                         WndManager::getInstance().WriteChar('>');
                     else
-                        WndManager::getInstance().WriteChar(c);
+                        WndManager::getInstance().WriteWChar(c);
                 }
             }
             WndManager::getInstance().SetTextAttr(ColorMenuBorder);

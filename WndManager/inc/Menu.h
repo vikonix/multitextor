@@ -74,7 +74,8 @@ protected:
 
 public:
     Menu() = delete;
-    explicit Menu(const menu_list& menu, pos_t x, pos_t y) : m_menu{ menu } {
+    explicit Menu(const menu_list& menu, pos_t x, pos_t y) : m_menu{ menu } 
+    {
         m_left = x; m_top = y;
     }
     virtual ~Menu() { Close(0); }
@@ -108,14 +109,11 @@ public:
 
 class FrameMenu : public Menu
 {
-    pos_t     m_realSizey{};  //real y size ???
-
 public:
     FrameMenu() = delete;
     explicit FrameMenu(const menu_list& menu, pos_t x, pos_t y) : Menu(menu, x, y) {}
     virtual ~FrameMenu() = default; //{ LOG(DEBUG) << __FUNC__; }
 
-    virtual input_t Close(input_t code) override {return Menu::Close(code);}
     virtual input_t Activate(bool fCapture = false) override;
     virtual bool    Refresh() override;
     virtual input_t EventProc(input_t code) override;
@@ -128,8 +126,5 @@ public:
     explicit PopupMenu(const menu_list& menu, pos_t x, pos_t y) : FrameMenu(menu, x, y) {}
     virtual ~PopupMenu() { LOG(DEBUG) << __FUNC__; }
 
-    virtual input_t Close(input_t code) override final      {return FrameMenu::Close(code);}
     virtual input_t Activate(bool fCapture = true) override final;
-    virtual bool    Refresh() override final                {return FrameMenu::Refresh();}
-    virtual input_t EventProc(input_t code) override final  {return FrameMenu::EventProc(code);}
 };
