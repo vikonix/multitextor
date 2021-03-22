@@ -31,10 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "EditorApp.h"
 
+#include <iconv.h>
+
+
 /////////////////////////////////////////////////////////////////////////////
 EditorApp app;
 Application& Application::s_app{app};
-
 
 int main()
 {
