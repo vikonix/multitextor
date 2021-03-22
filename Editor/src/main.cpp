@@ -44,6 +44,9 @@ int main()
     LOG(INFO);
     LOG(INFO) << "Multitextor";
 
+    iconv_t cd = iconv_open("UTF-8", "CP1251");
+    iconv_close(cd);
+
     app.Init();
     WndManager::getInstance().SetScreenSize();
 

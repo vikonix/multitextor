@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.9)
 
 if(MSVC)
-    add_subdirectory(libiconv)
+    #add_subdirectory(libiconv)
 endif()
 
 set(PROJECT_NAME ThirdPartyLib)
@@ -21,6 +21,7 @@ add_library(${PROJECT_NAME} STATIC
 target_include_directories(${PROJECT_NAME}
     PUBLIC
         "${CMAKE_CURRENT_SOURCE_DIR}/inc"
+        "${CMAKE_CURRENT_SOURCE_DIR}/inc/win-iconv"
 )
 
 target_compile_definitions(${PROJECT_NAME}
@@ -41,7 +42,7 @@ if(MSVC)
     # warning level 4
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
     target_link_libraries(${PROJECT_NAME} PUBLIC
-        libiconv
+        #libiconv
     )
 else()
     # lots of warnings

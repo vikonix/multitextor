@@ -45,7 +45,7 @@ set_target_properties(${PROJECT_NAME}
 
 if(MSVC)
     # warning level 4
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+    #target_compile_options(${PROJECT_NAME} PRIVATE /W4)
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)

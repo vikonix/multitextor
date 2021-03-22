@@ -8,7 +8,6 @@ project(${PROJECT_NAME} VERSION 2.0.0)
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/_build/bin/")
 if(MSVC)
     add_link_options("/INCREMENTAL:NO")
-    add_definitions(-DLIBICONV_DLL)
 endif()
 
 add_subdirectory(ThirdParty)
