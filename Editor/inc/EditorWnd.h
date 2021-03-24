@@ -173,7 +173,8 @@ public:
         : FrameWnd(left, top, sizex, sizey, border) {m_cmdParser.SetCmdMap(g_defaultEditKeyMap);}
     virtual ~EditorWnd() = default;
 
-    bool        SetFileName(const std::filesystem::path& file, bool untitled = false, const std::string& parseMode = "");
+    bool        SetFileName(const std::filesystem::path& file, bool untitled = false, 
+        const std::string& parseMode = "", const std::string& cp = "");
     bool        SetEditor(EditorPtr editor);
     EditorPtr   GetEditor() { return m_editor; }
 

@@ -31,8 +31,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "EditorApp.h"
 
-#include <iconv.h>
-
 
 /////////////////////////////////////////////////////////////////////////////
 EditorApp app;
@@ -43,9 +41,6 @@ int main()
     ConfigureLogger("m-%datetime{%Y%M%d}.log");
     LOG(INFO);
     LOG(INFO) << "Multitextor";
-
-    iconv_t cd = iconv_open("UTF-8", "CP1251");
-    iconv_close(cd);
 
     app.Init();
     WndManager::getInstance().SetScreenSize();

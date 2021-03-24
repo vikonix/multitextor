@@ -56,9 +56,16 @@ class FrameWnd;
 /////////////////////////////////////////////////////////////////////////////
 #define STR_NOTDEFINED std::numeric_limits<size_t>::max()
 
+namespace iconvpp
+{
+class CpConverter;
+}
+
 class Editor
 {
 private:
+    std::shared_ptr<iconvpp::CpConverter>       m_converter;
+
     std::filesystem::path                       m_file;
     std::filesystem::file_time_type             m_lastWriteTime;
     MemStrBuff<std::string, std::string_view>   m_buffer;
@@ -68,8 +75,8 @@ private:
     LexParser       m_lexParser;
 
     //config variables
-    int             m_cp{};
-    size_t          m_maxStrlen{0x1000};
+    std::string     m_cp{""};
+    size_t          m_maxStrlen{0x800};
     eol_t           m_eol{DEF_EOL};
     size_t          m_tab{8};   //tab position
     bool            m_saveTab{};//save tab or not
@@ -98,13 +105,13 @@ public:
     void operator= (const Editor&) = delete;
     
     Editor() = default;
-    Editor(const std::filesystem::path& file, const std::string& parseStyle = "", int cp = 0)
+    Editor(const std::filesystem::path& file, const std::string& parseStyle = "", const std::string& cp = "")
         : m_file{file}
-        , m_cp{cp}
     {
         m_lexParser.SetParseStyle(parseStyle);
         m_tab = m_lexParser.GetTabSize();
         m_saveTab = m_lexParser.GetSaveTab();
+        SetCP(cp);
     }
 
     static size_t UStrLen(const std::u16string& str) 
@@ -139,8 +146,8 @@ public:
 
     size_t                  GetMaxStrLen() const    {return m_maxStrlen;}
     void                    SetMaxStrLen(size_t len){m_maxStrlen = std::min(static_cast<size_t>(MAX_STRLEN), len);}
-    int                     GetCP() const           {return m_cp;}
-    void                    SetCP(int cp)           {m_cp = cp;}
+    std::string             GetCP() const           {return m_cp;}
+    bool                    SetCP(const std::string& cp);
     eol_t                   GetEol() const          {return m_eol;}
     void                    SetEol(eol_t eol)       {m_eol = eol;}
     size_t                  GetTab() const          {return m_tab;}

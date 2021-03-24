@@ -149,7 +149,7 @@ bool LexParser::SetParseStyle(const std::string& style)
 }
 
 //////////////////////////////////////////////////////////////////////////////
-bool LexParser::ScanStr(size_t line, std::string_view str, [[maybe_unused]]int cp)
+bool LexParser::ScanStr(size_t line, std::string_view str, [[maybe_unused]]const std::string& cp)
 {
     if (!m_scan)
         return true;

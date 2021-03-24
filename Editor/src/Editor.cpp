@@ -28,9 +28,27 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/Directory.h"
 #include "utils/logger.h"
 #include "utils/SymbolType.h"
+#include "utils/CpConverter.h"
 #include "utfcpp/utf8.h"
 #include "EditorApp.h"
 
+
+bool Editor::SetCP(const std::string& cp) 
+{
+    m_cp = cp.empty() ? "UTF-8" : cp; 
+    try
+    {
+        m_converter = std::make_shared<iconvpp::CpConverter>(m_cp);
+    }
+    catch (...)
+    {
+        LOG(ERROR) << __FUNC__;
+        _assert(0);
+        return false;
+    }
+
+    return true;
+}
 
 bool Editor::Clear()
 {
@@ -315,6 +333,34 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     return true;
 }
 
+bool Editor::FlushCurStr()
+{
+    if (m_curChanged)
+    {
+        ChangeStr(m_curStr, m_curStrBuff);
+        m_curChanged = false;
+    }
+
+    return true;
+}
+
+bool Editor::SetCurStr(size_t line)
+{
+    if (line != m_curStr)
+    {
+        if (m_curChanged)
+        {
+            ChangeStr(m_curStr, m_curStrBuff);
+            m_curChanged = false;
+        }
+
+        m_curStr = line;
+        m_curStrBuff = _GetStr(line, 0, m_maxStrlen);
+    }
+
+    return true;
+}
+
 std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)
 {
     //_assert(offset == 0);
@@ -329,7 +375,7 @@ std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)
         return _GetStr(line, offset, size);
 }
 
-std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
+std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
 {
     if (line >= m_buffer.GetStrCount())
     {
@@ -340,7 +386,8 @@ std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
     }
 
     auto str{ m_buffer.GetStr(line) };
-    std::u16string wstr = utf8::utf8to16(std::string(str));//???Convert char with cp
+    std::u16string wstr;
+    [[maybe_unused]]bool rc = m_converter->Convert(str, wstr);
     std::u16string outstr;
     if (offset + size <= m_maxStrlen)
         outstr.resize(size, ' ');
@@ -385,116 +432,6 @@ std::u16string  Editor::_GetStr(size_t line, size_t offset, size_t size)
     return outstr;
 }
 
-char Editor::GetAccessInfo()
-{
-    if (IsChanged())//modified
-        return 'M';
-    
-    auto mode = Directory::GetAccessMode(m_file);
-    if (mode == fileaccess_t::notexists)
-        return 'N';//new
-    else if (m_ro || mode == fileaccess_t::readonly)
-        return 'R';
-    else
-        return ' ';
-}
-
-bool Editor::GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len)
-{
-    return m_lexParser.GetColor(line, str, buff, len);
-}
-
-bool Editor::RefreshAllWnd(FrameWnd* wnd) const
-{
-    for (auto w : m_wndList)
-    {
-        if (w == wnd)
-            continue;
-        w->Repaint();
-    }
-
-    return true;
-}
-
-bool Editor::ChangeStr(size_t n, const std::u16string& wstr)
-{
-    //LOG(DEBUG) << "ChangeStr " << n << " total=" << GetStrCount();
-
-    if (n >= GetStrCount())
-    {
-        bool rc = AddStr(n, wstr);
-        return rc;
-    }
-
-    std::string str;
-    bool rc = ConvertStr(wstr, str);
-    rc = m_buffer.ChangeStr(n, str);
-
-    return rc;
-}
-
-bool Editor::AddStr(size_t n, const std::u16string& wstr)
-{
-    bool rc;
-    if (n > GetStrCount())
-    {
-        LOG(DEBUG) << "Fill end of file";
-
-        for (size_t i = GetStrCount(); i < n; ++i)
-            rc = _AddStr(i, {});
-    }
-
-    rc = _AddStr(n, wstr);
-    return rc;
-}
-
-bool Editor::_AddStr(size_t n, const std::u16string& wstr)
-{
-    //LOG(DEBUG) << "AddStr n=" << n;
-
-    std::string str;
-    bool rc = ConvertStr(wstr, str);
-    rc = m_buffer.AddStr(n, str);
-
-    return rc;
-}
-
-bool Editor::InvalidateWnd(size_t line, invalidate_t type, pos_t pos, pos_t size) const
-{
-    for (auto wnd : m_wndList)
-        wnd->Invalidate(line, type, pos, size);
-
-    return true;
-}
-
-bool Editor::FlushCurStr()
-{
-    if (m_curChanged)
-    {
-        ChangeStr(m_curStr, m_curStrBuff);
-        m_curChanged = false;
-    }
-
-    return true;
-}
-
-bool Editor::SetCurStr(size_t line)
-{
-    if (line != m_curStr)
-    {
-        if (m_curChanged)
-        {
-            ChangeStr(m_curStr, m_curStrBuff);
-            m_curChanged = false;
-        }
-
-        m_curStr = line;
-        m_curStrBuff = _GetStr(line, 0, m_maxStrlen);
-    }
-
-    return true;
-}
-
 bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
 {
     size_t len = UStrLen(str);
@@ -503,7 +440,11 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
     for (size_t i = 0; i < len; ++i)
     {
         if (str[i] != 0x9)//tab
-            buff += (char)str[i];//??? wchar2char(m_nCP, pStr[i]);
+        {
+            std::string cpStr;
+            [[maybe_unused]]bool rc = m_converter->Convert(str[i], cpStr);
+            buff += cpStr;
+        }
         else if (m_saveTab)
         {
             size_t first = i;
@@ -545,6 +486,88 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
         //apple
         buff += 0xd;
     }
+
+    return true;
+}
+
+bool Editor::ChangeStr(size_t n, const std::u16string& wstr)
+{
+    //LOG(DEBUG) << "ChangeStr " << n << " total=" << GetStrCount();
+
+    if (n >= GetStrCount())
+    {
+        bool rc = AddStr(n, wstr);
+        return rc;
+    }
+
+    std::string str;
+    bool rc = ConvertStr(wstr, str);
+    rc = m_buffer.ChangeStr(n, str);
+
+    return rc;
+}
+
+char Editor::GetAccessInfo()
+{
+    if (IsChanged())//modified
+        return 'M';
+    
+    auto mode = Directory::GetAccessMode(m_file);
+    if (mode == fileaccess_t::notexists)
+        return 'N';//new
+    else if (m_ro || mode == fileaccess_t::readonly)
+        return 'R';
+    else
+        return ' ';
+}
+
+bool Editor::GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len)
+{
+    return m_lexParser.GetColor(line, str, buff, len);
+}
+
+bool Editor::RefreshAllWnd(FrameWnd* wnd) const
+{
+    for (auto w : m_wndList)
+    {
+        if (w == wnd)
+            continue;
+        w->Repaint();
+    }
+
+    return true;
+}
+
+bool Editor::AddStr(size_t n, const std::u16string& wstr)
+{
+    bool rc;
+    if (n > GetStrCount())
+    {
+        LOG(DEBUG) << "Fill end of file";
+
+        for (size_t i = GetStrCount(); i < n; ++i)
+            rc = _AddStr(i, {});
+    }
+
+    rc = _AddStr(n, wstr);
+    return rc;
+}
+
+bool Editor::_AddStr(size_t n, const std::u16string& wstr)
+{
+    //LOG(DEBUG) << "AddStr n=" << n;
+
+    std::string str;
+    bool rc = ConvertStr(wstr, str);
+    rc = m_buffer.AddStr(n, str);
+
+    return rc;
+}
+
+bool Editor::InvalidateWnd(size_t line, invalidate_t type, pos_t pos, pos_t size) const
+{
+    for (auto wnd : m_wndList)
+        wnd->Invalidate(line, type, pos, size);
 
     return true;
 }
