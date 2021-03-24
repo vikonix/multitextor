@@ -26,6 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
 #include "Dialogs/StdDialogs.h"
+#include "utfcpp/utf8.h"
+
 
 std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
 {
@@ -101,16 +103,24 @@ bool    EditorApp::FileOpenProc(input_t cmd)
     auto rc = dlg.Activate();
     if (rc == ID_OK)
     {
-        std::filesystem::path path{ dlg.s_vars.path };
-        path /= dlg.s_vars.file;
+        try
+        {
+            std::filesystem::path path{ utf8::utf8to16(dlg.s_vars.path) };
+            path /= utf8::utf8to16(dlg.s_vars.file);
 
-        auto editor = std::make_shared<EditorWnd>();
-        editor->Show(true, -1);
-        std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
-        std::string cp = dlg.s_vars.cp < dlg.s_vars.cpList.size() ? *std::next(dlg.s_vars.cpList.cbegin(), dlg.s_vars.cp) : "";
-        editor->SetFileName(path, false, type);
-
-        m_editors[editor.get()] = editor;
+            auto editor = std::make_shared<EditorWnd>();
+            editor->Show(true, -1);
+            std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
+            std::string cp = dlg.s_vars.cp < dlg.s_vars.cpList.size() ? *std::next(dlg.s_vars.cpList.cbegin(), dlg.s_vars.cp) : "";
+            if(editor->SetFileName(path, false, type, cp))
+                m_editors[editor.get()] = editor;
+        }
+        catch (...)
+        {
+            _assert(0);
+            LOG(ERROR) << "Error file loading";
+            EditorApp::SetErrorLine("Error file loading");
+        }
     }
 
     return true;

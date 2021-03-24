@@ -108,10 +108,12 @@ public:
                 }
                 else
                 {
-                    _assert(0);
                     //skip it
                     ++srcPtr;
                     --srcSize;
+                    *dstPtr++ = '?';
+                    *dstPtr++ = 0;
+                    dstSize -= 2;
                 }
             }
         }
@@ -129,7 +131,7 @@ public:
         const char* srcPtr = reinterpret_cast<const char*>(&ch);
         size_t srcSize = sizeof(ch);
 
-        out.resize(srcSize * 6); //6x reserve 
+        out.resize(srcSize * 3); //6x reserve 
         auto dstPtr = out.data();
         size_t dstSize = out.size();
         size_t reserv = dstSize;

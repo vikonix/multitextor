@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 EditorApp app;
 Application& Application::s_app{app};
 
-int main()
+int main() try
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log");
     LOG(INFO);
@@ -46,7 +46,7 @@ int main()
     WndManager::getInstance().SetScreenSize();
 
     app.SetLogo(g_logo);
-    app.WriteAppName(L"Multitextor");
+    app.WriteAppName("Multitextor");
 
     app.SetMenu(g_mainMenu);
     app.SetAccessMenu(g_accessMenu);
@@ -60,4 +60,8 @@ int main()
 
     LOG(INFO) << "Exit";
     return 0;
+}
+catch (...)
+{
+    LOG(ERROR) << "Unhandle exeption";
 }

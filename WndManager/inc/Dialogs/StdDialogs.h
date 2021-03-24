@@ -53,7 +53,7 @@ struct FileDialogVars
 class FileDialog : public Dialog
 {
     FileDlgMode     m_mode;
-    DirectoryList   m_list;
+    DirectoryList   m_dirList;
 
 public:
     static FileDialogVars s_vars;

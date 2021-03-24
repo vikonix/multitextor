@@ -84,7 +84,7 @@ public:
     input_t GetInput()
         {return m_input.GetInput();}
 
-    bool WriteConsoleTitle(const std::wstring& title)
+    bool WriteConsoleTitle(const std::string& title)
         {return m_screen.WriteConsoleTitle(title);}
     bool Beep()
         {return m_screen.Beep();}

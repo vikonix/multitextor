@@ -174,7 +174,7 @@ int main()
     app.Init();
 
     app.SetLogo(g_Logo);
-    app.WriteAppName(L"TestApp");
+    app.WriteAppName("TestApp");
 
     app.SetMenu({menu0, menu1});
     app.SetAccessMenu(mAccess);

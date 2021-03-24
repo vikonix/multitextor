@@ -44,13 +44,16 @@ bool            EditorWnd::g_findWord{};
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode, const std::string& cp)
 {
-    LOG(DEBUG) << "    SetFileName '" << file << "'";
+    LOG(DEBUG) << "    SetFileName '" << file.u8string() << "'";
 
     m_untitled = untitled;
     auto editor = std::make_shared<Editor>(file, parseMode, cp);
     bool rc = editor->Load();
     if (!rc)
+    {
+        _assert(0);
         return rc;
+    }
     return SetEditor(editor);
 }
 

@@ -79,7 +79,7 @@ public:
     virtual bool Resize() override {return true;}
     virtual bool SetSize(pos_t sizex, pos_t sizey) override;
 
-    virtual bool WriteConsoleTitle(const std::wstring& title) override;
+    virtual bool WriteConsoleTitle(const std::string& title) override;
     virtual bool Beep() override;
     virtual bool WriteChar(char16_t c) override;
     virtual bool WriteStr(const std::u16string& str) override;

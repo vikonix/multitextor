@@ -213,7 +213,7 @@ bool ScreenTTY::GetScreenSize(pos_t& sizex, pos_t& sizey) const
 }
 
 
-bool ScreenTTY::WriteConsoleTitle(const std::wstring& title)
+bool ScreenTTY::WriteConsoleTitle(const std::string& title)
 {
     if(m_stdout <= 0)
         return false;
@@ -221,11 +221,7 @@ bool ScreenTTY::WriteConsoleTitle(const std::wstring& title)
     //for XTERM
     if(m_fXTERMconsole)
     {
-        std::string _title;
-        for(const char32_t c : title)
-            utf8::append(c, _title);
-
-        std::string str {"\x1b]0;" + _title + "\7"};
+        std::string str {"\x1b]0;" + title + "\7"};
         write(m_stdout, str.c_str(), str.size());
     }
 

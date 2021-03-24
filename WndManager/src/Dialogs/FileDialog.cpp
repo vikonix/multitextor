@@ -137,7 +137,7 @@ bool FileDialog::OnActivate()
     for (const std::string& str : s_vars.maskList)
         ctrlType->AppendStr(str);
 
-    m_list.SetMask(s_vars.maskList.front());
+    m_dirList.SetMask(s_vars.maskList.front());
     ScanDir(s_vars.path);
 
     return true;
@@ -146,13 +146,13 @@ bool FileDialog::OnActivate()
 bool FileDialog::ScanDir(const std::string& mask)
 {
     std::u16string wmask = utf8::utf8to16(mask);
-    m_list.SetMask(wmask);
-    m_list.Scan();
+    m_dirList.SetMask(wmask);
+    m_dirList.Scan();
 
     GetItem(ID_OF_NAME)->SetName("");
     GetItem(ID_OF_INFO)->SetName("");
 
-    auto path = m_list.GetPath() / utf8::utf8to16(m_list.GetMask());
+    auto path = m_dirList.GetPath() / utf8::utf8to16(m_dirList.GetMask());
     auto pathCtrl = GetItem(ID_OF_PATH);
     pathCtrl->SetName(Directory::CutPath(path, pathCtrl->GetSizeX()));
     
@@ -160,16 +160,16 @@ bool FileDialog::ScanDir(const std::string& mask)
     auto fListPtr = std::dynamic_pointer_cast<CtrlList>(fList);
     fListPtr->Clear();
 
-    for (auto& file : m_list.GetFileList())
+    for (auto& file : m_dirList.GetFileList())
         fListPtr->AppendStr(file.path().filename().u8string());
 
     auto dList = GetItem(ID_OF_DIRLIST);
     auto dListPtr = std::dynamic_pointer_cast<CtrlList>(dList);
     dListPtr->Clear();
 
-    for (auto& dir : m_list.GetDirList())
+    for (auto& dir : m_dirList.GetDirList())
         dListPtr->AppendStr(dir);
-    for (auto& drv : m_list.GetDrvList())
+    for (auto& drv : m_dirList.GetDrvList())
         dListPtr->AppendStr(drv);
 
     int item = SelectItem(ID_OF_FILELIST);
@@ -178,7 +178,7 @@ bool FileDialog::ScanDir(const std::string& mask)
     SelectItem(item);
     Refresh();
 
-    return m_list.IsFound();
+    return m_dirList.IsFound();
 }
 
 input_t FileDialog::DialogProc(input_t code)
@@ -191,7 +191,7 @@ input_t FileDialog::DialogProc(input_t code)
         {
             //file list selected
             auto item = K_GET_CODE(code);
-            auto& list = m_list.GetFileList();
+            auto& list = m_dirList.GetFileList();
             if (item >= list.size())
                 return code;
             auto& info = list[item];
@@ -279,7 +279,7 @@ input_t FileDialog::DialogProc(input_t code)
                 if (!found)
                 {
                     //if not simple mask or found many files
-                    auto mask = m_list.GetMask();
+                    auto mask = m_dirList.GetMask();
                     LOG(DEBUG) << "Mask " << mask;
 
                     s_vars.maskList.remove(mask);
@@ -319,7 +319,7 @@ bool FileDialog::OnClose(int id)
 {
     if (id == ID_OK)
     {
-        auto path = m_list.GetPath();
+        auto path = m_dirList.GetPath();
         auto name = GetItem(ID_OF_NAME)->GetName();
         LOG(DEBUG) << "path=" << path.u8string() << " file=" << name;
         s_vars.path = path.u8string();

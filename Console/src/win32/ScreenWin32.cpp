@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "win32/ScreenWin32.h"
 #include "utils/logger.h"
+#include "utfcpp/utf8.h"
 
 
 //////////////////////////////////////////////////////////////////////////////
@@ -148,10 +149,11 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
 }
 
 
-bool ScreenWin32::WriteConsoleTitle(const std::wstring& title)
+bool ScreenWin32::WriteConsoleTitle(const std::string& title)
 {
     LOG(DEBUG) << "WriteConsoleTitle '" << title << "'";
-    bool rc = SetConsoleTitle(title.c_str());
+    auto str = utf8::utf8to32(title);
+    bool rc = SetConsoleTitle(reinterpret_cast<LPCTSTR>(str.c_str()));
     return rc;
 }
 

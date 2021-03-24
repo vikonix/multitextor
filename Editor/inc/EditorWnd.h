@@ -194,7 +194,10 @@ public:
     virtual bool            Repaint() override;
     virtual bool            Invalidate(size_t line, invalidate_t type, size_t pos = 0, size_t size = 0) override;
     virtual char            GetAccessInfo() const override { return m_editor->GetAccessInfo(); }
-    virtual std::wstring    GetObjName() const override { return m_editor->GetFilePath().filename().wstring(); }
+    virtual std::string     GetObjName() const override 
+    { 
+        return m_editor ? m_editor->GetFilePath().filename().u8string() : ""; 
+    }
 
 /*
   virtual Wnd*          CloneWnd() override;

@@ -77,8 +77,8 @@ public:
 
 
     virtual wnd_t           GetWndType() const      {return wnd_t::wnd;}
-    virtual std::wstring    GetObjPath() const      {return L"...";}
-    virtual std::wstring    GetObjName() const      {return {};}
+    virtual std::string     GetObjPath() const      {return "...";}
+    virtual std::string     GetObjName() const      {return {};}
     virtual char            GetAccessInfo() const   {return ' ';}
     virtual bool            IsClone() const         {return false;}
     virtual bool            IsUsedTimer() const     {return false;}

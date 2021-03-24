@@ -223,7 +223,7 @@ public:
     virtual bool Resize() = 0;
     virtual bool SetSize(pos_t sizex, pos_t sizey) = 0;
 
-    virtual bool WriteConsoleTitle(const std::wstring& title) = 0;
+    virtual bool WriteConsoleTitle(const std::string& title) = 0;
     virtual bool Beep() = 0;
     virtual bool WriteChar(char16_t c) = 0;
     virtual bool WriteStr(const std::u16string& str) = 0;

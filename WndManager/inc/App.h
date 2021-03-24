@@ -58,7 +58,7 @@ enum class clock_pos
 class Application
 {
 public:
-    std::wstring                m_appName;
+    std::string                 m_appName;
 
 protected:
     WndManager&                 m_wndManager;
@@ -106,7 +106,7 @@ public:
     bool    SetMenu(const std::vector<menu_list>& menu);
     std::optional<std::reference_wrapper<const menu_list>> GetMenu(size_t n);
     
-    void    WriteAppName(std::wstring name) { m_appName = name; }
+    void    WriteAppName(std::string name) { m_appName = name; }
     bool    IsInsertMode() {return m_insert;}
     void    SetLogo(const Logo& logo) { m_wndManager.SetLogo(logo); }
     bool    SetAccessMenu(const menu_list& menu);

@@ -57,7 +57,7 @@ void ConsoleTest()
         }
     };
 
-    console.WriteConsoleTitle(L"Console Screen \x428");
+    console.WriteConsoleTitle("Console Screen Ш");
     console.ClrScr();
     console.SetCursor(cursor_t::CURSOR_NORMAL);
     console.GotoXY(0, 0);

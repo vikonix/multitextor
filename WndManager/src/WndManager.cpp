@@ -395,7 +395,7 @@ bool WndManager::WriteConsoleTitle(bool set)
     if (!set && !m_invalidTitle)
         return true;
 
-    std::wstring name;
+    std::string name;
     if (!m_wndList.empty())
     {
         if (m_view[2].wnd && m_activeView == 1)
@@ -404,7 +404,7 @@ bool WndManager::WriteConsoleTitle(bool set)
             name = m_wndList[0]->GetObjName();
     }
 
-    bool rc = m_console.WriteConsoleTitle(name + L" - " + Application::getInstance().m_appName);
+    bool rc = m_console.WriteConsoleTitle(name + " - " + Application::getInstance().m_appName);
 
     return rc;
 }

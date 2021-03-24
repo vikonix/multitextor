@@ -211,11 +211,11 @@ bool DirectoryList::AddMask(const path_t& mask)
 
 bool DirectoryList::SetMask(const path_t& mask)
 {
-    LOG(DEBUG) << "SetMask " << mask;
+    LOG(DEBUG) << "SetMask " << mask.u8string();
 
     path_t path;
     if (mask.has_parent_path())
-        path = mask;
+        path = mask.u16string();
     else
         path = m_path / mask.u16string();
 
@@ -248,7 +248,7 @@ bool DirectoryList::SetMask(const path_t& mask)
         m_path = "/";
     }
 
-    LOG(DEBUG) << "path=" << m_path << " single mask=" << m_single;
+    LOG(DEBUG) << "path=" << m_path.u8string() << " single mask=" << m_single;
     return true;
 }
 
@@ -256,7 +256,7 @@ bool DirectoryList::Scan()
 {
     if (m_path.empty())
         m_path = Directory::CurPath();
-    LOG(DEBUG) << "ReadDir " << m_path;
+    LOG(DEBUG) << "ReadDir " << m_path.u8string();
 
     m_drvList.clear();
     m_dirList.clear();
