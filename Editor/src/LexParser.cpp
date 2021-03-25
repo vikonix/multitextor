@@ -158,7 +158,7 @@ bool LexParser::ScanStr(size_t line, std::string_view str, [[maybe_unused]]const
     
     auto simpleConverter = [](std::string_view str) {
         std::u16string wstr;
-        for (auto c : str)
+        for (unsigned char c : str)
         {
             if (c < 0x80)
                 wstr += c;
