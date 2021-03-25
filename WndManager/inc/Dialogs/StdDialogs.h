@@ -42,8 +42,12 @@ struct FileDialogVars
     std::list<std::string> typeList{ "Text", "C++" };
     std::list<std::string> cpList{ "UTF-8", "CP437", "CP866", "CP1251" };
     std::list<std::string> maskList;
+
     std::string path{"."};
     std::string file{ "*.*" };
+    std::string typeName;
+    std::string cpName;
+
     size_t type{};
     size_t cp{};
     bool ro{};

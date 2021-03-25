@@ -323,6 +323,8 @@ bool FileDialog::OnClose(int id)
         auto name = GetItem(ID_OF_NAME)->GetName();
         LOG(DEBUG) << "path=" << path.u8string() << " file=" << name;
         s_vars.path = path.u8string();
+        s_vars.cpName = GetItem(ID_OF_CP)->GetName();
+        s_vars.typeName = GetItem(ID_OF_TYPE)->GetName();
     }
     return true;
 }

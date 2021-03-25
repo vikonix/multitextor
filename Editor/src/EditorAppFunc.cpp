@@ -110,9 +110,7 @@ bool    EditorApp::FileOpenProc(input_t cmd)
 
             auto editor = std::make_shared<EditorWnd>();
             editor->Show(true, -1);
-            std::string type = dlg.s_vars.type < dlg.s_vars.typeList.size() ? *std::next(dlg.s_vars.typeList.cbegin(), dlg.s_vars.type) : "";
-            std::string cp = dlg.s_vars.cp < dlg.s_vars.cpList.size() ? *std::next(dlg.s_vars.cpList.cbegin(), dlg.s_vars.cp) : "";
-            if(editor->SetFileName(path, false, type, cp))
+            if(editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
                 m_editors[editor.get()] = editor;
         }
         catch (...)

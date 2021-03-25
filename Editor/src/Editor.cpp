@@ -106,7 +106,7 @@ bool Editor::Load()
     if (0 == fileSize)
         return true;
 
-    LOG(DEBUG) << __FUNC__ << " path=" << m_file << " size=" << std::hex << fileSize << std::dec;
+    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << std::hex << fileSize << std::dec;
     time_t start = time(NULL);
 
     std::ifstream file{m_file, std::ios::binary};
