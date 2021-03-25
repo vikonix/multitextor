@@ -72,8 +72,8 @@ bool EditorWnd::SetEditor(EditorPtr editor)
 
     m_xOffset = 0;
     m_firstLine = 0;
-    m_sizeX = 0;
-    m_sizeY = 0;
+    m_clientSizeX = 0;
+    m_clientSizeY = 0;
 
     m_selectState = select_state::no;
     m_beginX = 0;
@@ -97,11 +97,11 @@ bool EditorWnd::Refresh()
     if (!WndManager::getInstance().IsVisible(this))
         return true;
 
-    m_sizeX = GetCSizeX();
-    m_sizeY = GetCSizeY();
-    //LOG(DEBUG) << "sx=" << m_sizeX << " sy=" << m_sizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
+    m_clientSizeX = GetCSizeX();
+    m_clientSizeY = GetCSizeY();
+    //LOG(DEBUG) << "sx=" << m_clientSizeX << " sy=" << m_clientSizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
 
-    if (m_sizeX <= m_cursorx || m_sizeY <= m_cursory)
+    if (m_clientSizeX <= m_cursorx || m_clientSizeY <= m_cursory)
         _GotoXY(m_xOffset + m_cursorx, m_firstLine + m_cursory);
 
     bool rc = DrawBorder();
@@ -114,7 +114,7 @@ bool EditorWnd::Refresh()
 
     UpdateNameInfo();
 
-    InvalidateRect(0, 0, m_sizeX, m_sizeY);
+    InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     Repaint();
 
     UpdateLexPair();
@@ -137,14 +137,14 @@ bool EditorWnd::UpdateAccessInfo()
 
 bool EditorWnd::UpdateNameInfo()
 {
-    if (m_sizeX / 2 - 2 > 5)
+    if (m_clientSizeX / 2 - 2 > 5)
     {
         pos_t x = 5;
         if (m_border & BORDER_TOP)
             x += 2;
 
         auto path = m_editor->GetFilePath().filename().u8string();
-        path.resize(m_sizeX / 2 - 2, ' ');
+        path.resize(m_clientSizeX / 2 - 2, ' ');
         WriteWnd(x, 0, path, *m_pColorWindowTitle);
     }
     return true;
@@ -158,7 +158,7 @@ bool EditorWnd::UpdatePosInfo()
     std::stringstream stream;
 
     //15 spaces
-    if (m_sizeX > 40)
+    if (m_clientSizeX > 40)
         stream << "               [" << m_editor->GetStrCount() << "] L:" << y << " C:" << x;
     else
         stream << "               L:" << y << " C:" << x;
@@ -166,20 +166,20 @@ bool EditorWnd::UpdatePosInfo()
     auto str = stream.str();
 
     size_t len = std::max(str.size(), m_infoStrSize);
-    len = std::min({len, static_cast<size_t>(32), static_cast<size_t>(m_sizeX / 2 + 3)});
+    len = std::min({len, static_cast<size_t>(32), static_cast<size_t>(m_clientSizeX / 2 + 3)});
 
     m_infoStrSize = str.size() - 14;
 
-    WriteWnd(m_sizeX - (pos_t)len, 0, str.substr(str.size() - len), *m_pColorWindowTitle);
+    WriteWnd(m_clientSizeX - (pos_t)len, 0, str.substr(str.size() - len), *m_pColorWindowTitle);
     return true;
 }
 
 bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
 {
-    if (m_sizeX == 0 || m_sizeY == 0)
+    if (m_clientSizeX == 0 || m_clientSizeY == 0)
     {
-        m_sizeX = GetCSizeX();
-        m_sizeY = GetCSizeY();
+        m_clientSizeX = GetCSizeX();
+        m_clientSizeY = GetCSizeY();
     }
 
     size_t line = 0;
@@ -190,15 +190,15 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
 
     if (x == 0)
         m_cursorx = 0;
-    else if (x < static_cast<size_t>(m_sizeX - 1))
+    else if (x < static_cast<size_t>(m_clientSizeX - 1))
         m_cursorx = static_cast<pos_t>(x);
     else
     {
-        m_cursorx = m_sizeX - 5;//we will see 4 symbols
+        m_cursorx = m_clientSizeX - 5;//we will see 4 symbols
         pos = x - m_cursorx;
-        if (pos >= static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
+        if (pos >= static_cast<size_t>(m_editor->GetMaxStrLen() - m_clientSizeX))
         {
-            pos = m_editor->GetMaxStrLen() - m_sizeX;
+            pos = m_editor->GetMaxStrLen() - m_clientSizeX;
             m_cursorx = static_cast<pos_t>(x - pos);
         }
     }
@@ -207,16 +207,16 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
     {
         if (y <= 0)
             m_cursory = 0;
-        else if (y >= m_firstLine && y < m_firstLine + m_sizeY)
+        else if (y >= m_firstLine && y < m_firstLine + m_clientSizeY)
         {
             line = m_firstLine;
             m_cursory = static_cast<pos_t>(y - line);
         }
-        else if (y < static_cast<size_t>(m_sizeY / 2))
+        else if (y < static_cast<size_t>(m_clientSizeY / 2))
             m_cursory = static_cast<pos_t>(y);
         else
         {
-            m_cursory = m_sizeY / 2;
+            m_cursory = m_clientSizeY / 2;
             line = y - m_cursory;
         }
     }
@@ -231,7 +231,7 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
     {
         m_xOffset = pos;
         m_firstLine = line;
-        rc = InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        rc = InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return rc;
@@ -239,16 +239,16 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
 
 bool EditorWnd::InvalidateRect(pos_t x, pos_t y, pos_t sizex, pos_t sizey)
 {
-    if (0 == m_sizeX || 0 == m_sizeY)
+    if (0 == m_clientSizeX || 0 == m_clientSizeY)
     {
-        m_sizeX = GetCSizeX();
-        m_sizeY = GetCSizeY();
+        m_clientSizeX = GetCSizeX();
+        m_clientSizeY = GetCSizeY();
     }
 
     if (sizex == 0)
-        sizex = m_sizeX;
+        sizex = m_clientSizeX;
     if (sizey == 0)
-        sizey = m_sizeY;
+        sizey = m_clientSizeY;
 
     m_invalidate = true;
 
@@ -286,8 +286,8 @@ bool EditorWnd::Invalidate(size_t line, invalidate_t type, size_t pos, size_t si
     int x = static_cast<int>(pos) - static_cast<int>(m_xOffset);
 
     int endx = x + static_cast<int>(size);
-    if (endx >= m_sizeX)
-        endx = m_sizeX;
+    if (endx >= m_clientSizeX)
+        endx = m_clientSizeX;
 
     if (x < 0 && endx > 0)
         x = 0;
@@ -300,7 +300,7 @@ bool EditorWnd::Invalidate(size_t line, invalidate_t type, size_t pos, size_t si
         type = invalidate_t::full;
     }
 
-    if (y < 0 || y >= m_sizeY || x < 0 || x >= m_sizeX || endx < 0)
+    if (y < 0 || y >= m_clientSizeY || x < 0 || x >= m_clientSizeX || endx < 0)
         return true;
 
     switch (type)
@@ -310,13 +310,13 @@ bool EditorWnd::Invalidate(size_t line, invalidate_t type, size_t pos, size_t si
         InvalidateRect(static_cast<pos_t>(x), static_cast<pos_t>(y), static_cast<pos_t>(endx - x), 1);
         break;
     case invalidate_t::del:
-        InvalidateRect(0, static_cast<pos_t>(y), m_sizeX, static_cast<pos_t>(m_sizeY - y));
+        InvalidateRect(0, static_cast<pos_t>(y), m_clientSizeX, static_cast<pos_t>(m_clientSizeY - y));
         break;
     case invalidate_t::insert:
-        InvalidateRect(0, static_cast<pos_t>(y), m_sizeX, static_cast<pos_t>(m_sizeY - y));
+        InvalidateRect(0, static_cast<pos_t>(y), m_clientSizeX, static_cast<pos_t>(m_clientSizeY - y));
         break;
     case invalidate_t::full:
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
         break;
     }
 
@@ -331,15 +331,15 @@ bool EditorWnd::Repaint()
     bool rc;
     if (m_invalidate)
     {
-        if (m_invBeginX > m_sizeX)
+        if (m_invBeginX > m_clientSizeX)
             m_invBeginX = 0;
-        if (m_invEndX > m_sizeX)
-            m_invEndX = m_sizeX;
+        if (m_invEndX > m_clientSizeX)
+            m_invEndX = m_clientSizeX;
 
-        if (m_invBeginY > m_sizeY)
+        if (m_invBeginY > m_clientSizeY)
             m_invBeginY = 0;
-        if (m_invEndY > m_sizeY)
-            m_invEndY = m_sizeY;
+        if (m_invEndY > m_clientSizeY)
+            m_invEndY = m_clientSizeY;
 
         StopPaint();
 
@@ -366,7 +366,7 @@ bool EditorWnd::Repaint()
     UpdatePosInfo();
     BeginPaint();
     //-1 for updating window caption
-    rc = ShowBuff(0, static_cast<pos_t>(-1), m_sizeX, 1);
+    rc = ShowBuff(0, static_cast<pos_t>(-1), m_clientSizeX, 1);
 
     return rc;
 }
@@ -470,7 +470,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             y2 = by;
         }
 
-        if (y2 < m_firstLine || y1 >= m_firstLine + m_sizeY)
+        if (y2 < m_firstLine || y1 >= m_firstLine + m_clientSizeY)
             //not visible
             return true;
 
@@ -479,9 +479,9 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             y1 = m_firstLine;
             x1 = 0;
         }
-        if (y2 >= m_firstLine + m_sizeY)
+        if (y2 >= m_firstLine + m_clientSizeY)
         {
-            y2 = m_firstLine + m_sizeY - 1;
+            y2 = m_firstLine + m_clientSizeY - 1;
             x2 = m_editor->GetMaxStrLen();
         }
     }
@@ -510,15 +510,15 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             y2 = by;
         }
 
-        if (y2 < m_firstLine || y1 >= m_firstLine + m_sizeY)
+        if (y2 < m_firstLine || y1 >= m_firstLine + m_clientSizeY)
             //not visible
             return true;
 
         if (y1 < m_firstLine)
             y1 = m_firstLine;
 
-        if (y2 >= m_firstLine + m_sizeY)
-            y2 = m_firstLine + m_sizeY - 1;
+        if (y2 >= m_firstLine + m_clientSizeY)
+            y2 = m_firstLine + m_clientSizeY - 1;
     }
 
     //LOG(DEBUG) << "    Mark1 bx=" << x1 << " by=" << y1 << " ex=" << x2 << " ey=" << y2;
@@ -574,13 +574,13 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             ex = x2;
         }
 
-        if (ex < m_xOffset || bx >= m_xOffset + m_sizeX)
+        if (ex < m_xOffset || bx >= m_xOffset + m_clientSizeX)
             //not visible
             continue;
         if (bx < m_xOffset)
             bx = m_xOffset;
-        if (ex >= m_xOffset + m_sizeX)
-            ex = m_xOffset + m_sizeX - 1;
+        if (ex >= m_xOffset + m_clientSizeX)
+            ex = m_xOffset + m_clientSizeX - 1;
 
         if (color)
             ColorRect(static_cast<pos_t>(bx - m_xOffset), static_cast<pos_t>(y - m_firstLine), static_cast<pos_t>(ex - bx + 1), 1, color);
@@ -798,8 +798,8 @@ bool EditorWnd::HideFound()
     if (m_lexX >= 0 && m_lexY >= 0)
     {
         LOG(DEBUG) << "    HideLex x=" << m_lexX << " y=" << m_lexY;
-        if ( static_cast<size_t>(m_lexY) >= m_firstLine && static_cast<size_t>(m_lexY) < m_firstLine + m_sizeY
-          && static_cast<size_t>(m_lexX) >= m_xOffset   && static_cast<size_t>(m_lexX) < m_xOffset + m_sizeX)
+        if ( static_cast<size_t>(m_lexY) >= m_firstLine && static_cast<size_t>(m_lexY) < m_firstLine + m_clientSizeY
+          && static_cast<size_t>(m_lexX) >= m_xOffset   && static_cast<size_t>(m_lexX) < m_xOffset + m_clientSizeX)
         {
             //if visible
             auto str = m_editor->GetStr(m_lexY);
@@ -816,7 +816,7 @@ bool EditorWnd::HideFound()
         size_t size = m_foundSize;
         m_foundSize = 0;
 
-        if (m_foundY >= m_firstLine && m_foundY < m_firstLine + m_sizeY)
+        if (m_foundY >= m_firstLine && m_foundY < m_firstLine + m_clientSizeY)
         {
             auto str = m_editor->GetStr(m_foundY);
 
@@ -827,9 +827,9 @@ bool EditorWnd::HideFound()
                 x = 0;
             }
 
-            if (static_cast<size_t>(x + size) > static_cast<size_t>(m_sizeX))
+            if (static_cast<size_t>(x + size) > static_cast<size_t>(m_clientSizeX))
             {
-                size -= x + size - m_sizeX;
+                size -= x + size - m_clientSizeX;
             }
 
             if (size > 0)
@@ -1426,11 +1426,11 @@ bool EditorWnd::DelSelected()
     }
 
     int cx = static_cast<int>(x - m_xOffset);
-    if (cx < 0 || cx >= m_sizeX)
+    if (cx < 0 || cx >= m_clientSizeX)
         cx = -1;
 
     int cy = static_cast<int>(y - m_firstLine);
-    if (cy < 0 || cy >= m_sizeY)
+    if (cy < 0 || cy >= m_clientSizeY)
         cy = -1;
 
     if (cx < 0 || cy < 0)
@@ -1459,8 +1459,8 @@ bool EditorWnd::UpdateLexPair()
     {
         //TPRINT(("Match pair x=%d y=%d\n", x, y));
 
-        if (x >= m_xOffset   && x < m_xOffset + m_sizeX
-         && y >= m_firstLine && y < m_firstLine + m_sizeY)
+        if (x >= m_xOffset   && x < m_xOffset + m_clientSizeX
+         && y >= m_firstLine && y < m_firstLine + m_clientSizeY)
         {
             //if visible
             m_lexX = static_cast<int>(x);
@@ -1642,10 +1642,10 @@ bool EditorWnd::FindUp(bool silence)
 
                 m_foundX = offset;
                 m_foundY = line;
-                if (offset - m_xOffset + size < static_cast<size_t>(m_sizeX))
+                if (offset - m_xOffset + size < static_cast<size_t>(m_clientSizeX))
                     m_foundSize = size;
                 else
-                    m_foundSize = m_sizeX - (offset - m_xOffset);
+                    m_foundSize = m_clientSizeX - (offset - m_xOffset);
 
                 Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
 
@@ -1760,10 +1760,10 @@ bool EditorWnd::FindDown(bool silence)
 
                 m_foundX = offset;
                 m_foundY = line;
-                if (offset - m_xOffset + size < static_cast<size_t>(m_sizeX))
+                if (offset - m_xOffset + size < static_cast<size_t>(m_clientSizeX))
                     m_foundSize = size;
                 else
-                    m_foundSize = m_sizeX - (offset - m_xOffset);
+                    m_foundSize = m_clientSizeX - (offset - m_xOffset);
 
                 Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
 

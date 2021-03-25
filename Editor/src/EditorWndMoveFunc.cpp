@@ -43,7 +43,7 @@ bool EditorWnd::MovePos(input_t cmd)
     pos_t x = K_GET_X(cmd);
     pos_t y = K_GET_Y(cmd);
 
-    if (x < m_sizeX && y < m_sizeY)
+    if (x < m_clientSizeX && y < m_clientSizeY)
     {
         m_cursorx = x;
         m_cursory = y;
@@ -87,16 +87,16 @@ bool EditorWnd::MoveLeft(input_t cmd)
 #ifdef USE_SCROLL
         if (dx <= 8
 #ifdef ONLY_SCREEN_SCROLL
-            && m_sizeX > WndManager::getInstance().m_sizex - 8
+            && m_clientSizeX > WndManager::getInstance().m_sizex - 8
 #endif
             )
         {
             Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_RIGHT);
-            InvalidateRect(0, 0, static_cast<pos_t>(dx), m_sizeY);
+            InvalidateRect(0, 0, static_cast<pos_t>(dx), m_clientSizeY);
         }
         else
 #endif
-            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+            InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -109,24 +109,24 @@ bool EditorWnd::MoveRight(input_t cmd)
 
     if (!step)
     {
-        if (m_cursorx < m_sizeX - 1)
+        if (m_cursorx < m_clientSizeX - 1)
             ++m_cursorx;
-        else if (offset < static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
+        else if (offset < static_cast<size_t>(m_editor->GetMaxStrLen() - m_clientSizeX))
             ++offset;
     }
     else
     {
-        if (m_cursorx < m_sizeX - step)
+        if (m_cursorx < m_clientSizeX - step)
             m_cursorx += static_cast<pos_t>(step);
         else
         {
-            step -= m_sizeX - 1 - m_cursorx;
-            m_cursorx = m_sizeX - 1;
+            step -= m_clientSizeX - 1 - m_cursorx;
+            m_cursorx = m_clientSizeX - 1;
 
-            if (offset < static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX - step))
+            if (offset < static_cast<size_t>(m_editor->GetMaxStrLen() - m_clientSizeX - step))
                 offset += step;
             else
-                offset = m_editor->GetMaxStrLen() - m_sizeX;
+                offset = m_editor->GetMaxStrLen() - m_clientSizeX;
         }
     }
 
@@ -138,16 +138,16 @@ bool EditorWnd::MoveRight(input_t cmd)
 #ifdef USE_SCROLL
         if (dx <= 8
 #ifdef ONLY_SCREEN_SCROLL
-            && m_sizeX > WndManager::getInstance().m_sizex - 8
+            && m_clientSizeX > WndManager::getInstance().m_sizex - 8
 #endif
             )
         {
             Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_LEFT);
-            InvalidateRect(static_cast<pos_t>(m_sizeX - dx), 0, static_cast<pos_t>(dx), m_sizeY);
+            InvalidateRect(static_cast<pos_t>(m_clientSizeX - dx), 0, static_cast<pos_t>(dx), m_clientSizeY);
         }
         else
 #endif
-            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+            InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -185,16 +185,16 @@ bool EditorWnd::MoveUp(input_t cmd)
 #ifdef USE_SCROLL
         if (dy <= 8
 #ifdef ONLY_SCREEN_SCROLL
-            && m_sizeX > WndManager::getInstance().m_sizex - 8
+            && m_clientSizeX > WndManager::getInstance().m_sizex - 8
 #endif
             )
         {
             Scroll(static_cast<pos_t>(dy), scroll_t::SCROLL_DOWN);
-            InvalidateRect(0, 0, m_sizeX, static_cast<pos_t>(dy));
+            InvalidateRect(0, 0, m_clientSizeX, static_cast<pos_t>(dy));
         }
         else
 #endif
-            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+            InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
     return true;
 }
@@ -206,7 +206,7 @@ bool EditorWnd::MoveDown(input_t cmd)
 
     if (!step)
     {
-        if (m_cursory < m_sizeY - 1)
+        if (m_cursory < m_clientSizeY - 1)
             ++m_cursory;
         else
             ++line;
@@ -219,7 +219,7 @@ bool EditorWnd::MoveDown(input_t cmd)
     if (m_firstLine != line)
     {
         size_t numLine = m_editor->GetStrCount();
-        if (line < numLine - m_sizeY / 4)
+        if (line < numLine - m_clientSizeY / 4)
         {
             size_t dy = line - m_firstLine;
             m_firstLine = line;
@@ -227,23 +227,23 @@ bool EditorWnd::MoveDown(input_t cmd)
 #ifdef USE_SCROLL
             if (dy <= 8
 #ifdef ONLY_SCREEN_SCROLL
-                && m_sizeX > WndManager::getInstance().m_sizex - 8
+                && m_clientSizeX > WndManager::getInstance().m_sizex - 8
 #endif
                 )
             {
                 Scroll(static_cast<pos_t>(dy), scroll_t::SCROLL_UP);
-                InvalidateRect(0, static_cast<pos_t>(m_sizeY - dy), m_sizeX, static_cast<pos_t>(dy));
+                InvalidateRect(0, static_cast<pos_t>(m_clientSizeY - dy), m_clientSizeX, static_cast<pos_t>(dy));
             }
             else
 #endif
-                InvalidateRect(0, 0, m_sizeX, m_sizeY);
+                InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
         }
-        else if (m_cursory < m_sizeY - 1)
+        else if (m_cursory < m_clientSizeY - 1)
         {
-            if (m_cursory + step < m_sizeY - 1)
+            if (m_cursory + step < m_clientSizeY - 1)
                 m_cursory += static_cast<pos_t>(step);
             else
-                m_cursory = m_sizeY - 1;
+                m_cursory = m_clientSizeY - 1;
         }
     }
     
@@ -268,16 +268,16 @@ bool EditorWnd::MoveScrollLeft(input_t cmd)
 #ifdef USE_SCROLL
         if (dx <= 8
 #ifdef ONLY_SCREEN_SCROLL
-            && m_sizeX > WndManager::getInstance().m_sizex - 8
+            && m_clientSizeX > WndManager::getInstance().m_sizex - 8
 #endif
             )
         {
             Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_RIGHT);
-            InvalidateRect(0, 0, static_cast<pos_t>(dx), m_sizeY);
+            InvalidateRect(0, 0, static_cast<pos_t>(dx), m_clientSizeY);
         }
         else
 #endif
-            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+            InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -287,12 +287,12 @@ bool EditorWnd::MoveScrollRight(input_t cmd)
 {
     size_t step = K_GET_CODE(cmd);
 
-    if (m_xOffset >= static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
+    if (m_xOffset >= static_cast<size_t>(m_editor->GetMaxStrLen() - m_clientSizeX))
         return MoveRight(cmd);
 
     size_t offset = m_xOffset + (step ? step : 1);
-    if (offset > static_cast<size_t>(m_editor->GetMaxStrLen() - m_sizeX))
-        offset = m_editor->GetMaxStrLen() - m_sizeX;
+    if (offset > static_cast<size_t>(m_editor->GetMaxStrLen() - m_clientSizeX))
+        offset = m_editor->GetMaxStrLen() - m_clientSizeX;
 
     if (offset != m_xOffset)
     {
@@ -302,16 +302,16 @@ bool EditorWnd::MoveScrollRight(input_t cmd)
 #ifdef USE_SCROLL
         if (dx <= 8
 #ifdef ONLY_SCREEN_SCROLL
-            && m_sizeX > WndManager::getInstance().m_sizex - 8
+            && m_clientSizeX > WndManager::getInstance().m_sizex - 8
 #endif
             )
         {
             Scroll(static_cast<pos_t>(dx), scroll_t::SCROLL_LEFT);
-            InvalidateRect(static_cast<pos_t>(m_sizeX - dx), 0, static_cast<pos_t>(dx), m_sizeY);
+            InvalidateRect(static_cast<pos_t>(m_clientSizeX - dx), 0, static_cast<pos_t>(dx), m_clientSizeY);
         }
         else
 #endif
-            InvalidateRect(0, 0, m_sizeX, m_sizeY);
+            InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -321,8 +321,8 @@ bool EditorWnd::MovePageUp([[maybe_unused]]input_t cmd)
 {
     size_t line = m_firstLine;
 
-    if (line >= static_cast<size_t>(m_sizeY - 1))
-        line -= m_sizeY - 1;
+    if (line >= static_cast<size_t>(m_clientSizeY - 1))
+        line -= m_clientSizeY - 1;
     else
     {
         line = 0;
@@ -332,7 +332,7 @@ bool EditorWnd::MovePageUp([[maybe_unused]]input_t cmd)
     if (m_firstLine != line)
     {
         m_firstLine = line;
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -341,14 +341,14 @@ bool EditorWnd::MovePageUp([[maybe_unused]]input_t cmd)
 bool EditorWnd::MovePageDown([[maybe_unused]]input_t cmd)
 {
     size_t numLine = m_editor->GetStrCount();
-    if (m_firstLine + m_sizeY - 1 < numLine)
+    if (m_firstLine + m_clientSizeY - 1 < numLine)
     {
-        m_firstLine += m_sizeY - 1;
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        m_firstLine += m_clientSizeY - 1;
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
     else
     {
-        MoveDown(m_sizeY - 1);
+        MoveDown(m_clientSizeY - 1);
     }
 
     return true;
@@ -363,7 +363,7 @@ bool EditorWnd::MoveFileBegin([[maybe_unused]]input_t cmd)
     {
         m_xOffset = 0;
         m_firstLine = 0;
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -376,10 +376,10 @@ bool EditorWnd::MoveFileEnd([[maybe_unused]]input_t cmd)
     size_t x = 0;
     size_t line = 0;
     m_cursorx = 0;
-    if (numLine >= static_cast<size_t>(m_sizeY))
+    if (numLine >= static_cast<size_t>(m_clientSizeY))
     {
-        line = numLine - m_sizeY + 1;
-        m_cursory = m_sizeY - 1;
+        line = numLine - m_clientSizeY + 1;
+        m_cursory = m_clientSizeY - 1;
     }
     else
     {
@@ -390,7 +390,7 @@ bool EditorWnd::MoveFileEnd([[maybe_unused]]input_t cmd)
     {
         m_xOffset = x;
         m_firstLine = line;
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -412,7 +412,7 @@ bool EditorWnd::MoveStrBegin([[maybe_unused]]input_t cmd)
 
     if (x >= curx)
         m_cursorx = 0;
-    else if (x < static_cast<size_t>(m_sizeX))
+    else if (x < static_cast<size_t>(m_clientSizeX))
         m_cursorx = static_cast<pos_t>(x);
     else
     {
@@ -423,7 +423,7 @@ bool EditorWnd::MoveStrBegin([[maybe_unused]]input_t cmd)
     if (m_xOffset != offset)
     {
         m_xOffset = offset;
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -435,9 +435,9 @@ bool EditorWnd::MoveStrEnd([[maybe_unused]]input_t cmd)
 
     auto str = m_editor->GetStr(m_firstLine + m_cursory);
     size_t len = Editor::UStrLen(str);
-    if (len >= static_cast<size_t>(m_sizeX))
+    if (len >= static_cast<size_t>(m_clientSizeX))
     {
-        m_cursorx = m_sizeX - 1;
+        m_cursorx = m_clientSizeX - 1;
         if (len == m_editor->GetMaxStrLen())
             x = len - m_cursorx - 1;
         else
@@ -452,7 +452,7 @@ bool EditorWnd::MoveStrEnd([[maybe_unused]]input_t cmd)
     if (m_xOffset != x)
     {
         m_xOffset = x;
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
 
     return true;
@@ -582,11 +582,11 @@ bool EditorWnd::MoveWordRight([[maybe_unused]]input_t cmd)
 bool EditorWnd::MoveCenter([[maybe_unused]]input_t cmd)
 {
     size_t line = m_firstLine + m_cursory;
-    if (line > static_cast<size_t>(m_sizeY / 2))
+    if (line > static_cast<size_t>(m_clientSizeY / 2))
     {
-        m_cursory = m_sizeY / 2;
+        m_cursory = m_clientSizeY / 2;
         m_firstLine = line - m_cursory;
-        InvalidateRect(0, 0, m_sizeX, m_sizeY);
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
     }
     return true;
 }

@@ -107,8 +107,8 @@ class EditorWnd : public FrameWnd
     //file position
     size_t          m_xOffset{};
     size_t          m_firstLine{};
-    pos_t           m_sizeX{};//???
-    pos_t           m_sizeY{};//???
+    pos_t           m_clientSizeX{};
+    pos_t           m_clientSizeY{};
 
     //select mode variables
     //select coord
