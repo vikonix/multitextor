@@ -155,10 +155,21 @@ bool LexParser::ScanStr(size_t line, std::string_view str, [[maybe_unused]]const
         return true;
 
     //LOG(DEBUG) << "ScanStr(" << line << ") '" << std::string(str) << "'";
+    
+    auto simpleConverter = [](std::string_view str) {
+        std::u16string wstr;
+        for (auto c : str)
+        {
+            if (c < 0x80)
+                wstr += c;
+            else
+                wstr += '_';
+        }
+        return wstr;
+    };
 
-    std::u16string wstr = utf8::utf8to16(std::string{ str });//??? +cp
     std::string lexstr;
-    bool rc = LexicalParse(wstr, lexstr);
+    bool rc = LexicalParse(simpleConverter(str), lexstr);
 
     if (rc && !lexstr.empty())
     {
