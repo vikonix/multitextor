@@ -292,7 +292,7 @@ public:
     virtual input_t SetFocus() override;
     virtual bool LostFocus() override;
     virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = 0, pos_t sizey = 0) override;
-    virtual bool SetName(const std::string& name) override {return SetSelect(m_list.SetName(name));}//???
+    virtual bool SetName(const std::string& name) override {return SetSelect(m_list.SetName(name));}
     virtual std::string GetName() override;
 
     //control list

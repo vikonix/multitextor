@@ -34,12 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iterator>
 #include <cwctype>
 
-std::u16string  EditorWnd::g_findStr;
-bool            EditorWnd::g_findCase{};
-bool            EditorWnd::g_findUp{};
-bool            EditorWnd::g_findReplace{};
-bool            EditorWnd::g_findInSelected{};
-bool            EditorWnd::g_findWord{};
+FindReplaceParam EditorWnd::g_findParams;
 
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode, const std::string& cp)
@@ -350,7 +345,7 @@ bool EditorWnd::Repaint()
 
         for (pos_t i = m_invBeginY; i < m_invEndY; ++i)
         {
-            auto str = m_editor->GetStr(m_firstLine + i);// , 0, m_editor->GetMaxStrLen());//??? , 0, m_xOffset + m_invEndX);
+            auto str = m_editor->GetStr(m_firstLine + i);
             if (str.size() < m_xOffset + m_invEndX)
                 str.resize(m_xOffset + m_invEndX, ' ');
             rc = PrintStr(m_invBeginX, i, str, m_xOffset + m_invBeginX, m_invEndX - m_invBeginX);
@@ -591,7 +586,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             ColorRect(static_cast<pos_t>(bx - m_xOffset), static_cast<pos_t>(y - m_firstLine), static_cast<pos_t>(ex - bx + 1), 1, color);
         else
         {
-            auto str = m_editor->GetStr(y);//??? , 0, ex + 1);
+            auto str = m_editor->GetStr(y);
             std::vector<color_t> colorBuff;
             bool rc = m_editor->GetColor(y, str, colorBuff, ex + 1);
             if (rc)
@@ -613,79 +608,8 @@ input_t EditorWnd::EventProc(input_t code)
     if (code == K_TIME)
     {
         //check for file changing by external program
-    /* //???
-        if (!m_Timer)
-        {
-            m_Timer = 5 * 2;//2 sec
-            int rc = m_pTBuff->CheckAccess();
-            if (rc)
-            {
-                int mode = m_pTBuff->GetAccessInfo();
-                long long size = m_pTBuff->GetSize();
-
-                TPRINT(("File was changed mode=%c size=%lld\n", mode, size));
-                if (mode == 'N' || !size)
-                {
-                    //файл удален
-                    if (!m_fDeleted)
-                    {
-                        //еще одно ожидание
-                        //многие программы сначала удаляют файл
-                        //а потом восстанавливают
-                        TPRINT(("Check deleted\n"));
-                        m_fDeleted = 1;
-                    }
-                    else
-                    {
-                        m_fDeleted = 0;
-                        //нужно проверить изменен ли файл
-                        //если изменен, весь ли он в памяти
-                        FLoadDialog Dlg(GetObjPath(), 1);
-                        int code1 = Dlg.Activate();
-                        if (code1 == ID_OK)
-                        {
-                            //TPRINT(("...Save1\n"));
-                            Save(1);
-                        }
-                    }
-                }
-                else
-                {
-                    m_fDeleted = 0;
-                    if (!m_fLog)
-                    {
-                        FLoadDialog Dlg(GetObjPath());
-                        int code1 = Dlg.Activate();
-                        if (code1 == ID_OK)
-                        {
-                            //TPRINT(("...Reload1\n"));
-                            Reload(0);
-                        }
-                    }
-                    else
-                    {
-                        //???
-                        //TPRINT(("...Reload2\n"));
-                        Reload(0);
-                    }
-                }
-            }
-            else if (m_fDeleted)
-            {
-                m_fDeleted = 0;
-                //нужно проверить изменен ли файл
-                //если изменен, весь ли он в памяти
-                FLoadDialog Dlg(GetObjPath(), 1);
-                int code1 = Dlg.Activate();
-                if (code1 == ID_OK)
-                {
-                    //TPRINT(("...Save2\n"));
-                    Save(1);
-                }
-            }
-        }
-        --m_Timer;
-*/
+        if (WndManager::getInstance().IsVisible(this))
+            CheckFileChanging();
     }
 
     if ( code != K_TIME
@@ -878,7 +802,7 @@ bool EditorWnd::HideFound()
           && static_cast<size_t>(m_lexX) >= m_xOffset   && static_cast<size_t>(m_lexX) < m_xOffset + m_sizeX)
         {
             //if visible
-            auto str = m_editor->GetStr(m_lexY);//??? , 0, m_lexX + 1);
+            auto str = m_editor->GetStr(m_lexY);
             rc = PrintStr(static_cast<pos_t>(m_lexX - m_xOffset), static_cast<pos_t>(m_lexY - m_firstLine), str, m_lexX, 1);
         }
 
@@ -894,7 +818,7 @@ bool EditorWnd::HideFound()
 
         if (m_foundY >= m_firstLine && m_foundY < m_firstLine + m_sizeY)
         {
-            auto str = m_editor->GetStr(m_foundY);//??? , 0, m_xOffset + m_foundX);
+            auto str = m_editor->GetStr(m_foundY);
 
             int x = static_cast<int>(m_foundX) - static_cast<int>(m_xOffset);
             if (x < 0)
@@ -1636,7 +1560,7 @@ bool EditorWnd::IsWord(const std::u16string& str, size_t offset, size_t len)
 
 bool EditorWnd::FindUp(bool silence)
 {
-    if (g_findStr.empty())
+    if (g_findParams.findStr.empty())
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
@@ -1646,8 +1570,8 @@ bool EditorWnd::FindUp(bool silence)
         EditorApp::SetHelpLine("Search. Press any key for cancel");
 
     time_t t{ time(NULL) };
-    std::u16string find{ g_findStr };
-    if (!g_findCase)
+    std::u16string find{ g_findParams.findStr };
+    if (!g_findParams.checkCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1658,7 +1582,7 @@ bool EditorWnd::FindUp(bool silence)
     //search diaps
     size_t line{ m_firstLine + m_cursory };
     size_t end{};
-    if (g_findInSelected && m_selectState == select_state::complete)
+    if (g_findParams.inSelected && m_selectState == select_state::complete)
     {
         if (m_beginY <= m_endY)
         {
@@ -1701,7 +1625,7 @@ bool EditorWnd::FindUp(bool silence)
         {
             if (*it == 0x9)
                 *it = ' ';
-            else if (!g_findCase)
+            else if (!g_findParams.checkCase)
                 *it = std::towupper(*it);
         }
 
@@ -1711,7 +1635,7 @@ bool EditorWnd::FindUp(bool silence)
             itFound != str.rend())
         {
             offset = std::distance(itFound, str.rend()) - size;
-            if (!g_findWord || IsWord(str, offset, size))
+            if (!g_findParams.findWord || IsWord(str, offset, size))
             {
                 LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);
@@ -1758,7 +1682,7 @@ bool EditorWnd::FindUp(bool silence)
 
 bool EditorWnd::FindDown(bool silence)
 {
-    if (g_findStr.empty())
+    if (g_findParams.findStr.empty())
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
@@ -1768,8 +1692,8 @@ bool EditorWnd::FindDown(bool silence)
         EditorApp::SetHelpLine("Search. Press any key for cancel");
 
     time_t t{ time(NULL) };
-    std::u16string find{ g_findStr };
-    if (!g_findCase)
+    std::u16string find{ g_findParams.findStr };
+    if (!g_findParams.checkCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1780,7 +1704,7 @@ bool EditorWnd::FindDown(bool silence)
     //search diaps
     size_t line{ m_firstLine + m_cursory };
     size_t end{m_editor->GetStrCount()};
-    if (g_findInSelected && m_selectState == select_state::complete)
+    if (g_findParams.inSelected && m_selectState == select_state::complete)
     {
         if (m_beginY <= m_endY)
         {
@@ -1819,7 +1743,7 @@ bool EditorWnd::FindDown(bool silence)
         {
             if (*it == 0x9)
                 *it = ' ';
-            else if (!g_findCase)
+            else if (!g_findParams.checkCase)
                 *it = std::towupper(*it);
         }
 
@@ -1829,7 +1753,7 @@ bool EditorWnd::FindDown(bool silence)
             itFound != str.end())
         {
             offset = std::distance(str.begin(), itFound);
-            if (!g_findWord || IsWord(str, offset, size))
+            if (!g_findParams.findWord || IsWord(str, offset, size))
             {
                 LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);
@@ -1871,201 +1795,81 @@ bool EditorWnd::FindDown(bool silence)
     return false;
 }
 
-#if 0
-int WndEdit::FindDown(int fSilence)
+bool EditorWnd::CheckFileChanging()
 {
-    TPRINT(("    FindDown for %s\n", g_sFind));
-    if (!g_sFind[0])
+/* //???
+    if (!m_Timer)
     {
-        TPRINT(("    Nothing to find\n"));
-        SetErrorLine(STR_S(SS_NothingToFind));
-        return 0;
-    }
-
-    if (!fSilence)
-        SetHelpLine(STR_S(SS_SearchPressAnyKeyForCancel));
-
-    int t = time(NULL);
-    int fBreak = 0;
-
-    static wchar sFind[MAX_STRLEN + 1];
-    int n = 0; //длина строки поиска
-    int cs = 0; //контрольная сумма строки поиска
-
-    //переводим в юникод с учетом регистра
-    char* pSrc = g_sFind;
-    wchar* pDest = sFind;
-    while (*pSrc)
-    {
-        wchar wc = char2wchar(g_textCP, *pSrc++);
-        if (g_fCaseSensitive)
-            cs += wc;
-        else
-            cs += wc = wc2upper(wc);
-
-        *pDest++ = wc;
-        ++n;
-    }
-    *pDest = 0;
-    int n2 = n * 2;
-
-    /*
-      Сдвиг плохого символа, используемый в алгоритме Боуера - Мура,
-      не очень эффективен для маленького алфавита, но, когда размер алфавита большой
-      по сравнению с длиной образца, как это часто имеет место с таблицей ASCII и
-      при обычном поиске в текстовом редакторе, он становится чрезвычайно полезен.
-      Использование в алгоритме только его одного может быть весьма эффективным.
-
-      После попытки совмещения x и y [ i , i + m - 1 ], длина сдвига - не менее 1.
-      Таким образом, символ y [ i + m ] обязательно будет вовлечен в следующую
-      попытку, а значит, может быть использован в текущей попытке для сдвига плохого
-      символа. Модифицируем функцию плохого символа, чтобы принять в расчет
-      последний символ х:
-
-      bc[ a ] = min { j | 0 <= j <= m и x[ m - 1 - j ] = a },
-        если a встречается в x,
-      bc[ a ] = m
-        в противоположном случае.
-
-      void QS( char* y, char* x, int n, int m)
-      {
-        int i, qs_bc[ ASIZE ];
-        // Preprocessing
-        for ( i = 0; i < ASIZE; i++ )
-          qs_bc[ i ] = m + 1;
-        for ( i = 0; i < m; i ++ )
-          qs_bc[ x[i] ] = m - i;
-
-        // Searching
-        i = 0;
-        while ( i <= n - m )
+        m_Timer = 5 * 2;//2 sec
+        int rc = m_pTBuff->CheckAccess();
+        if (rc)
         {
-          if ( memcmp( &y[i], x, m ) == 0 )
-            OUTPUT( i );
+            int mode = m_pTBuff->GetAccessInfo();
+            long long size = m_pTBuff->GetSize();
 
-          // shift
-          i += qs_bc[ y[ i + m ] ];
-        }
-      }
-    */
-
-    //#define USE_BCS
-
-#ifdef USE_BCS
-    unsigned char* pBadCharShift = new unsigned char[0x10000];
-    if (!pBadCharShift)
-    {
-        TPRINT(("    ERROR no memory for BC\n"));
-        return 0;
-    }
-    memset(pBadCharShift, n, 0x10000);
-    for (int i = 0; i < n; ++i)
-        pBadCharShift[sFind[i]] = n - i;
-#endif
-
-    //set search diaps
-    int l = m_nFirstLine + m_cursory;//cur line
-    int end = m_pTBuff->GetStrCount();
-    if (g_fInMarked && m_nSelectState == 0x103)
-    {
-        if (m_nBeginY <= m_nEndY)
-        {
-            if (l < m_nBeginY)
-                l = m_nBeginY;
-            end = m_nEndY;
-        }
-        else
-        {
-            if (l < m_nEndY)
-                l = m_nEndY;
-            end = m_nBeginY;
-        }
-    }
-
-    int Begin = l;
-    int offset = m_nXOffset + m_cursorx + 1;
-
-    int progress = 0;
-    while (l <= end)
-    {
-        wchar* pStr = m_pTBuff->GetStr(l, 0, MAX_STRLEN);
-        int slen = m_pTBuff->GetStrLen(pStr);
-        static wchar sStr[MAX_STRLEN + 1];
-
-        int i = 0;
-        if (!g_fCaseSensitive)
-            for (; i < slen; ++i)
-                sStr[i] = pStr[i] != 0x9 ? wc2upper(pStr[i]) : ' ';
-        else
-            for (; i < slen; ++i)
-                sStr[i] = pStr[i] != 0x9 ? pStr[i] : ' ';
-        sStr[i] = 0;
-        pStr = sStr;
-
-        wchar* pEndStr = pStr + offset;
-        int cs1 = 0;
-        if (offset + n <= slen)
-            for (i = 0; i < n; ++i)
-                cs1 += *pEndStr++;
-
-        while (slen - offset >= n)
-        {
-#ifndef USE_BCS
-            if (cs == cs1 && !memcmp(pStr + offset, sFind, n2))
-#else
-            if (!memcmp(pStr + offset, sFind, n2))
-#endif
+            TPRINT(("File was changed mode=%c size=%lld\n", mode, size));
+            if (mode == 'N' || !size)
             {
-                if (!g_fWholeWord || IsWord(pStr, offset, n))
+                //файл удален
+                if (!m_fDeleted)
                 {
-                    TPRINT(("    Found t=%d\n", time(NULL) - t));
-                    _GotoXY(offset, l);
-
-                    m_nFoundX = offset;
-                    m_nFoundY = l;
-                    if (offset - m_nXOffset + n < m_nSizeX)
-                        m_nFoundSize = n;
-                    else
-                        m_nFoundSize = m_nSizeX - (offset - m_nXOffset);
-                    Invalidate(m_nFoundY, 0, m_nFoundX, m_nFoundSize);
-
-                    if (!fSilence)
-                        SetHelpLine();
-                    return 1;
+                    //еще одно ожидание
+                    //многие программы сначала удаляют файл
+                    //а потом восстанавливают
+                    TPRINT(("Check deleted\n"));
+                    m_fDeleted = 1;
+                }
+                else
+                {
+                    m_fDeleted = 0;
+                    //нужно проверить изменен ли файл
+                    //если изменен, весь ли он в памяти
+                    FLoadDialog Dlg(GetObjPath(), 1);
+                    int code1 = Dlg.Activate();
+                    if (code1 == ID_OK)
+                    {
+                        //TPRINT(("...Save1\n"));
+                        Save(1);
+                    }
                 }
             }
-
-#ifndef USE_BCS
-            cs1 += *pEndStr++ - pStr[offset];
-            ++offset;
-#else
-            offset += pBadCharShift[pStr[offset + n]];
-#endif
+            else
+            {
+                m_fDeleted = 0;
+                if (!m_fLog)
+                {
+                    FLoadDialog Dlg(GetObjPath());
+                    int code1 = Dlg.Activate();
+                    if (code1 == ID_OK)
+                    {
+                        //TPRINT(("...Reload1\n"));
+                        Reload(0);
+                    }
+                }
+                else
+                {
+                    //???
+                    //TPRINT(("...Reload2\n"));
+                    Reload(0);
+                }
+            }
         }
-        offset = 0;
-        ++l;
-
-        //if(!fSilence)
-        if (++progress == 1000)
+        else if (m_fDeleted)
         {
-            progress = 0;
-            if ((fBreak = UpdateProgress((l - Begin) * 99 / (end - Begin))) != 0)
-                break;
+            m_fDeleted = 0;
+            //нужно проверить изменен ли файл
+            //если изменен, весь ли он в памяти
+            FLoadDialog Dlg(GetObjPath(), 1);
+            int code1 = Dlg.Activate();
+            if (code1 == ID_OK)
+            {
+                //TPRINT(("...Save2\n"));
+                Save(1);
+            }
         }
     }
-
-    if (!fSilence)
-    {
-        HideFound();
-        if (!fBreak)
-            SetErrorLine(STR_S(SS_StringNotFound));
-        else
-            SetHelpLine(STR_S(SS_UserAbort), 1);
-    }
-
-    if (!fBreak)
-        return 0;
-    else
-        return -1;
+    --m_Timer;
+*/
+    return true;
 }
-#endif
+

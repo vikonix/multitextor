@@ -69,6 +69,7 @@ private:
     std::filesystem::path                       m_file;
     std::filesystem::file_time_type             m_lastWriteTime;
     MemStrBuff<std::string, std::string_view>   m_buffer;
+
     std::unordered_set<FrameWnd*>               m_wndList;
 
     UndoList        m_undoList;
@@ -204,7 +205,6 @@ public:
     std::string             GetParseStyle() const { return m_lexParser.GetParseStyle(); }
     bool                    GetColor(size_t line, const std::u16string& str, std::vector<color_t>& buff, size_t len);
     bool                    CheckLexPair(size_t& line, size_t& pos);
-//    bool                    GetFuncList(List* pList, int* pLine);
 };
 
 using EditorPtr = std::shared_ptr<Editor>;

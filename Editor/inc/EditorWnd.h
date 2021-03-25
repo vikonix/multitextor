@@ -35,6 +35,20 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class Diff;
 
+struct FindReplaceParam
+{
+    std::list<std::string> findList;
+    std::list<std::string> replaceList;
+
+    std::u16string   findStr;
+    std::u16string   replaceStr;
+    bool             checkCase{};
+    bool             directionUp{};
+    bool             replaceMode{};
+    bool             inSelected{};
+    bool             findWord{};
+};
+
 class EditorWnd : public FrameWnd
 {
     enum select_state : int
@@ -159,15 +173,11 @@ class EditorWnd : public FrameWnd
     bool    FindUp(bool silence = false);
     bool    FindDown(bool silence = false);
     bool    IsWord(const std::u16string& str, size_t offset, size_t len);
+    bool    CheckFileChanging();
 
 public:
     //find and replace params
-    static std::u16string   g_findStr;
-    static bool             g_findCase;
-    static bool             g_findUp;
-    static bool             g_findReplace;
-    static bool             g_findInSelected;
-    static bool             g_findWord;
+    static FindReplaceParam g_findParams;
 
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
         : FrameWnd(left, top, sizex, sizey, border) {m_cmdParser.SetCmdMap(g_defaultEditKeyMap);}
@@ -185,11 +195,9 @@ public:
         return true;
     }
 
-    //bool        IsSelected() { return m_selectState != select_state::no; }
-
     input_t     ParseCommand(input_t cmd);
-    virtual input_t EventProc(input_t code) override;
 
+    virtual input_t EventProc(input_t code) override;
     virtual bool            Refresh() override;
     virtual bool            Repaint() override;
     virtual bool            Invalidate(size_t line, invalidate_t type, size_t pos = 0, size_t size = 0) override;
@@ -198,14 +206,14 @@ public:
     { 
         return m_editor ? m_editor->GetFilePath().filename().u8string() : ""; 
     }
+    virtual bool            IsUsedTimer() const override { return true; }
+    virtual bool            IsUsedView() const override { return true; }
+    virtual wnd_t           GetWndType() const override { return wnd_t::editor; }
 
 /*
   virtual Wnd*          CloneWnd() override;
   virtual int           IsClone() override      {return m_fClone;}
-  virtual const char*   GetWndType() override   {return "EDT";}
   virtual const char*   GetObjPath() override   {return m_pTBuff->GetObjPath();}
-  virtual int           IsUsedTimer() override  {return 1;}
-  virtual int           IsUsedView() override   {return 1;}
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
 
   int       IsRO()                   {return m_fReadOnly;}

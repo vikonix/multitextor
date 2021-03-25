@@ -861,7 +861,7 @@ bool EditorWnd::MoveLexMatch([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::Find(bool silence)
 {
-    if (g_findUp)
+    if (g_findParams.directionUp)
         return FindUp(silence);
     else
         return FindDown(silence);
@@ -884,31 +884,31 @@ bool EditorWnd::CtrlFindDown([[maybe_unused]] input_t cmd)
 
 bool EditorWnd::FindUpWord([[maybe_unused]] input_t cmd)
 {
-    if (!GetWord(g_findStr))
+    if (!GetWord(g_findParams.findStr))
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
     }
 
-    //???App SaveFindStr(g_findStr);
+    //???App SaveFindStr(g_findParams.findStr);
     return FindUp();
 }
 
 bool EditorWnd::FindDownWord([[maybe_unused]] input_t cmd)
 {
-    if (!GetWord(g_findStr))
+    if (!GetWord(g_findParams.findStr))
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
     }
 
-    //???App SaveFindStr(g_findStr);
+    //???App SaveFindStr(g_findParams.findStr);
     return FindDown();
 }
 
 bool EditorWnd::Repeat(input_t cmd)
 {
-    if (!g_findReplace)
+    if (!g_findParams.replaceMode)
         return Find();
     else
         return Replace(cmd);

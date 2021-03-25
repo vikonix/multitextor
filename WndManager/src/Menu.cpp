@@ -631,7 +631,6 @@ input_t FrameMenu::EventProc(input_t code)
             m_nextMenu.reset();
             if (code == 0)
             {
-                _assert(0);//???
                 return 0;
             }
             else if(code == K_ESC
