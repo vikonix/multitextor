@@ -171,7 +171,7 @@ public:
 
     bool    SetLoadBuffFunc(LoadBuffFunc func) { m_loadBuffFunc = func; return true; };
     bool    IsChanged() const { return m_changed; }
-    size_t  GetSize();
+    size_t  GetSize() const;
 
     bool    Clear();
     size_t  GetStrCount() const { return m_totalStrCount; }

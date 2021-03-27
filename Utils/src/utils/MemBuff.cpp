@@ -439,7 +439,7 @@ bool MemStrBuff<Tbuff, Tview>::ReleaseBuff()
 }
 
 template <typename Tbuff, typename Tview>
-size_t MemStrBuff<Tbuff, Tview>::GetSize()
+size_t MemStrBuff<Tbuff, Tview>::GetSize() const
 {
     size_t size = 0;
 
@@ -518,10 +518,10 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
     newBuffData->resize(end - begin);
     memcpy(newBuffData->data(), oldBuffData->c_str() + begin, end - begin);
 
-    for (size_t i = 0; i + split <= oldBuff->GetStrCount(); ++i)
+    for (size_t i = 1; i + split <= oldBuff->GetStrCount(); ++i)
         newBuff->m_strOffsetList.push_back((oldBuff->GetStrOffset(i + split) - begin));
 
-    oldBuff->m_strOffsetList.erase(oldBuff->m_strOffsetList.begin() + split);
+    oldBuff->m_strOffsetList.erase(oldBuff->m_strOffsetList.begin() + split, oldBuff->m_strOffsetList.end());
 
     if (buff == m_buffList.end())
         m_buffList.push_back(newBuff);

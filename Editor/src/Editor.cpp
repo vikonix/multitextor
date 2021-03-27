@@ -327,6 +327,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     }
 
     str->resize(i);
+    _assert(i < BUFF_SIZE);
     rest = size - strBuff->GetBuffSize();
     strBuff->ReleaseBuff();
 
@@ -335,13 +336,14 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
 bool Editor::FlushCurStr()
 {
+    bool rc{ true };
     if (m_curChanged)
     {
-        ChangeStr(m_curStr, m_curStrBuff);
+        rc = ChangeStr(m_curStr, m_curStrBuff);
         m_curChanged = false;
     }
 
-    return true;
+    return rc;
 }
 
 bool Editor::SetCurStr(size_t line)
@@ -1126,3 +1128,97 @@ bool Editor::CheckLexPair(size_t& line, size_t& pos)
     str = GetStr(line, 0, m_maxStrlen);
     return m_lexParser.GetLexPair(str, line, c, pos);
 }
+
+bool Editor::Save()
+{
+    LOG(DEBUG) << "Save " << m_file.u8string();
+
+    bool rc = FlushCurStr();
+
+    //make backup
+    //???
+
+    std::filesystem::path filePath = "/tmp/out.txt";//??? for testing
+    //???auto filePath{ m_file };
+
+    //save
+    std::ofstream file{ filePath, std::ios::binary };
+    if (!file)
+        throw std::runtime_error{"open file " + filePath.u8string()};
+
+    EditorApp::SetHelpLine("Wait for file saving");
+
+//    time_t t1{ time(nullptr) };
+//    size_t percent{};
+//    auto step{ GetSize() / 100 };//1%
+
+    size_t buffOffset{ 0 };
+    for (auto buffIt = m_buffer.m_buffList.begin(); buffIt != m_buffer.m_buffList.end(); ++buffIt)
+    {
+        auto& buffPtr = *buffIt;
+        auto buffStr = buffPtr->GetBuff();
+        if (!buffStr)
+        {
+            //error
+            _assert(0);
+            throw std::runtime_error{ "GetBuffer" };
+        }
+        _assert(!buffPtr->m_lostData);
+
+        if(buffPtr->m_strOffsetList.empty())
+        {
+            buffPtr->ClearModifyFlag();
+            buffPtr->ReleaseBuff();
+            continue;
+        }
+
+        rc = ImproveBuff(buffPtr);
+
+        buffPtr->m_fileOffset = buffOffset;
+        size_t buffSize = buffPtr->GetBuffSize();
+
+        auto nextIt = buffIt;
+        while (++nextIt != m_buffer.m_buffList.end())
+        {
+            auto& nextBuffPtr = *nextIt;
+            //check next buffer for begin offset
+            if (nextBuffPtr->m_fileOffset < buffOffset + buffSize)
+            {
+                //read ahead before write    
+                auto nextBuff = nextBuffPtr->GetBuff();
+                if (!nextBuff)
+                {
+                    //error
+                    _assert(0);
+                    throw std::runtime_error{ "GetBuffer" };
+                }
+                _assert(!nextBuffPtr->m_lostData);
+            }
+            else
+                break;
+        }
+
+        file.write(buffStr->data(), buffSize);
+
+        buffPtr->ClearModifyFlag();
+        buffPtr->ReleaseBuff();
+        buffOffset += buffSize;
+    }
+
+    file.close();
+    auto fsize = std::filesystem::file_size(filePath);
+    if (fsize > buffOffset)
+    {
+        std::filesystem::resize_file(filePath, buffOffset);
+    }
+
+    rc = ClearModifyFlag();
+
+    return rc;
+}
+
+bool Editor::ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff)
+{
+    return true;
+}
+

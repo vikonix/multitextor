@@ -1151,7 +1151,7 @@ bool EditorWnd::InsertStr(const std::u16string& str, size_t y, bool save)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    InsertStr";
+    //LOG(DEBUG) << "    InsertStr";
     if (y == STR_NOTDEFINED)
         y = m_firstLine + m_cursory;
 
@@ -1264,7 +1264,7 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
 
         if (copyLine == 1)
         {
-            LOG(DEBUG) << "     Copy first line dy=" << dstY;
+            //LOG(DEBUG) << "     Copy first line dy=" << dstY;
             //split and change first line
             if (!bx1)
             {
@@ -1279,13 +1279,13 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
         }
         else if (copyLine == 2)
         {
-            LOG(DEBUG) << "     Copy line dy=" << dstY;
+            //LOG(DEBUG) << "     Copy line dy=" << dstY;
             //insert full line
             rc = InsertStr(str, dstY, save);
         }
         else
         {
-            LOG(DEBUG) << "     Copy substr dx=" << bx1 << " dy=" << dstY;
+            //LOG(DEBUG) << "     Copy substr dx=" << bx1 << " dy=" << dstY;
             //change line
             m_editor->AddSubstr(save, dstY, bx1, str);
         }

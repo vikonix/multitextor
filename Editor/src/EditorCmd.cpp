@@ -215,7 +215,7 @@ CmdMap g_defaultEditKeyMap
     {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
 
     {'S' | K_CTRL},             {K_ED(E_CTRL_SAVE)},
-    {K_ESC, K_F2},              {K_ED(E_CTRL_SAVE) | 1},
+    {K_ESC, K_F2},              {K_ED(E_CTRL_SAVE)},
     {K_F2 | K_SHIFT},           {K_ED(E_CTRL_SAVEAS)},
     {K_ESC, K_F3},              {K_ED(E_CTRL_RELOAD)},
     {K_F10 | K_SHIFT},          {K_ED(E_CTRL_CLOSE)},

@@ -90,7 +90,7 @@ private:
     std::u16string  m_curStrBuff;
 
     bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);
-//    bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff);
+    bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff);
 
     std::u16string  _GetStr(size_t line, size_t offset, size_t size);
     bool    _AddStr(size_t n, const std::u16string& str);
@@ -161,7 +161,7 @@ public:
     size_t                  GetStrCount() const {return m_buffer.GetStrCount(); }
     bool                    IsChanged() const {return m_curChanged || m_buffer.IsChanged(); }
     bool                    FlushCurStr();
-    uint64_t                GetSize() const;// {return m_pDObject->GetSize(); }
+    uint64_t                GetSize() const {return m_buffer.GetSize(); }
     time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
     //editor API with undo

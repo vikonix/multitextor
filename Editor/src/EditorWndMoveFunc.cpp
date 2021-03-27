@@ -732,7 +732,7 @@ bool EditorWnd::SelectEnd(input_t cmd)
     m_endX = m_xOffset + m_cursorx;
     m_endY = m_firstLine + m_cursory;
 
-    if (m_beginX != m_endX || m_beginY != m_endY)
+    if (m_beginX != m_endX || m_beginY != m_endY || m_selectType == select_t::line)
     {
         //show selection
         Mark(m_beginX, m_beginY, m_endX, m_endY, ColorWindowSelect, m_selectType);

@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/Clipboard.h"
 #include "EditorWnd.h"
 #include "WndManager.h"
+#include "Dialog.h"
 #include "EditorApp.h"
 #include "KeyCodes.h"
 
@@ -734,8 +735,57 @@ bool EditorWnd::Replace(input_t cmd)
     return true;
 }
 
-bool EditorWnd::Save(input_t cmd)
+bool EditorWnd::Save([[maybe_unused]] input_t cmd)
 {
+    LOG(DEBUG) << "    Save " << std::hex << cmd << std::dec;
+
+    if (m_editor->IsChanged())
+    {
+        if (m_untitled)
+        {
+            _assert(0);
+/*            
+            FileDialog Dlg(DIALOG_SAVEAS);
+            int code = Dlg.Activate();
+
+            if (code == ID_OK)
+            {
+                if (FileObject::CheckAccess(g_InputStr))
+                {
+                    code = MsgBox(
+                        STR_S(SS_SaveAs),
+                        g_InputStr,
+                        STR_S(SS_FileAlreadyExistReplace),
+                        MBOX_OK_CANCEL
+                    );
+
+                    if (code != ID_OK)
+                        return 0;
+                }
+
+                m_pTBuff->SetDataObject(g_InputStr);
+            }
+            m_fUntitled = 0;
+*/
+        }
+
+        try
+        {
+            [[maybe_unused]]bool rc = m_editor->Save();
+        }
+        catch (...)
+        {
+            MsgBox(
+                "Save",
+                "File write error",
+                "Check file access and try again",
+                MBOX_OK
+            );
+        }
+
+        UpdateAccessInfo();
+        m_saved = true;//???
+    }
     return true;
 }
 
