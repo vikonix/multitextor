@@ -107,7 +107,7 @@ bool Editor::Load()
         return true;
 
     LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << std::hex << fileSize << std::dec;
-    time_t start = time(NULL);
+    time_t start{ time(NULL) };
 
     std::ifstream file{m_file, std::ios::binary};
     if (!file)
@@ -204,11 +204,11 @@ bool Editor::Load()
     }
     _assert(fileSize == fileOffset);
     
-    LOG(DEBUG) << "loadtime=" << time(NULL) - start;
-    LOG(DEBUG) << "num str=" << m_buffer.m_totalStrCount;
-
     EditorApp::ShowProgressBar();
     EditorApp::SetHelpLine("Ready", stat_color::grayed);
+
+    LOG(DEBUG) << "load time=" << time(NULL) - start;
+    LOG(DEBUG) << "num str=" << m_buffer.m_totalStrCount;
 
     return true;
 }
@@ -1132,6 +1132,7 @@ bool Editor::CheckLexPair(size_t& line, size_t& pos)
 bool Editor::Save()
 {
     LOG(DEBUG) << "Save " << m_file.u8string();
+    time_t start{ time(NULL) };
 
     bool rc = FlushCurStr();
 
@@ -1148,9 +1149,9 @@ bool Editor::Save()
 
     EditorApp::SetHelpLine("Wait for file saving");
 
-//    time_t t1{ time(nullptr) };
-//    size_t percent{};
-//    auto step{ GetSize() / 100 };//1%
+    time_t t1{ time(nullptr) };
+    size_t percent{};
+    auto step{ GetSize() / 100 };//1%
 
     size_t buffOffset{ 0 };
     for (auto buffIt = m_buffer.m_buffList.begin(); buffIt != m_buffer.m_buffList.end(); ++buffIt)
@@ -1203,6 +1204,18 @@ bool Editor::Save()
         buffPtr->ClearModifyFlag();
         buffPtr->ReleaseBuff();
         buffOffset += buffSize;
+
+        time_t t2{ time(NULL) };
+        if (t1 != t2 && step)
+        {
+            t1 = t2;
+            size_t pr{ (size_t)(buffOffset / step) };
+            if (pr != percent)
+            {
+                percent = pr;
+                EditorApp::ShowProgressBar(pr);
+            }
+        }
     }
 
     file.close();
@@ -1213,12 +1226,107 @@ bool Editor::Save()
     }
 
     rc = ClearModifyFlag();
+    EditorApp::ShowProgressBar();
+    EditorApp::SetHelpLine("Ready", stat_color::grayed);
+
+    LOG(DEBUG) << "save time=" << time(nullptr) - start;
 
     return rc;
 }
 
 bool Editor::ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff)
 {
+    // fix EOL
+    // change tabulation
+    // remove spaces at EOL
+    for (size_t n = 0; n < strBuff->m_strOffsetList.size(); ++n)
+    {
+        auto str{ strBuff->GetStr(n) };
+        std::u16string wstr;
+        bool rc = m_converter->Convert(str, wstr);
+
+        std::string outstr;
+        outstr.reserve(str.size());
+
+        bool changed{};
+        size_t usedSize{};//size of string without of trailing spaces
+        size_t wpos{};
+        size_t i;
+        for (i = 0; i < str.size(); ++i)
+        {
+            unsigned char c = str[i];
+            if (c > ' ')
+            {
+                outstr += c;
+                usedSize = outstr.size();
+            }
+            else if (c == ' ')
+                outstr += ' ';
+            else if (c == 0x9)//tab
+            {
+                if (m_saveTab)//??? || !rc)
+                    outstr += 0x9;
+                else
+                {
+                    //change tab with space
+                    wpos = wstr.find(0x9, wpos);
+                    if (wpos == std::string::npos)
+                    {
+                        _assert(0);
+                    }
+                    else
+                    {
+                        auto tabs = m_tab - (wpos + m_tab) % m_tab;
+                        outstr.append(tabs, ' ');
+                        changed = true;
+                    }
+                }
+            }
+            else
+            {
+                if (usedSize != outstr.size())
+                {
+                    //del all spaces at the end of string
+                    outstr.resize(usedSize);
+                    changed = true;
+                }
+                break;
+            }
+        }
+        
+        if (m_eol == eol_t::unix_eol)
+        {
+            outstr += 0xa;
+            if (i == str.size() || str[i] != 0xa)
+                changed = true;
+        }
+        else if (m_eol == eol_t::win_eol)
+        {
+            outstr += "\r\n";
+            if (i == str.size() || (str[i] != 0xd || str[i + 1] != 0xa))
+                changed = true;
+        }
+        else
+        {
+            outstr += 0xd;
+            if (i == str.size() || str[i] != 0xd)
+                changed = true;
+        }
+
+        if (changed)
+        {
+            changed = false;
+
+            rc = strBuff->ChangeStr(n, outstr);
+            if (!rc)
+            {
+                //error
+                _assert(0);
+                throw std::runtime_error{ "ChangeStr" };
+            }
+        }
+    }
+
     return true;
 }
 

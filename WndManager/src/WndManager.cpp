@@ -836,7 +836,7 @@ input_t WndManager::ProcInput(input_t code)
 
 bool WndManager::SetActiveView(int n)
 {
-    LOG(DEBUG) << "SetActiveView st=" << static_cast<int>(m_splitType) << " av=" << m_activeView << " n=" << n;
+    //LOG(DEBUG) << "SetActiveView st=" << static_cast<int>(m_splitType) << " av=" << m_activeView << " n=" << n;
 
     if (m_splitType == split_t::no_split)
         return 0;

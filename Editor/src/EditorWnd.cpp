@@ -857,7 +857,7 @@ bool EditorWnd::SelectClear()
 bool EditorWnd::FindWord(const std::u16string& str, size_t& begin, size_t& end)
 {
     size_t x = m_xOffset + m_cursorx;
-    if (str[x] == ' ')
+    if (x > str.size() || str[x] == ' ')
         return false;
 
     auto type = GetSymbolType(str[x]);

@@ -83,6 +83,7 @@ public:
 
     bool Convert(std::string_view str, std::u16string& out)
     {
+        out.clear();
         if (m_iconvFrom == s_invalidIconv)
             return false;
 
@@ -97,10 +98,11 @@ public:
         char* dstPtr = reinterpret_cast<char*>(outPtr);
         size_t dstSize = outSize * 2;
 
+        bool rc{ true };
         while (srcSize)
         {
-            size_t rc = iconv(m_iconvFrom, &srcPtr, &srcSize, &dstPtr, &dstSize);
-            if (rc == static_cast<size_t>(-1))
+            size_t converted = iconv(m_iconvFrom, &srcPtr, &srcSize, &dstPtr, &dstSize);
+            if (converted == static_cast<size_t>(-1))
             {
                 if (errno == EINVAL)
                 {
@@ -114,13 +116,14 @@ public:
                     *dstPtr++ = '?';
                     *dstPtr++ = 0;
                     dstSize -= 2;
+                    rc = false;
                 }
             }
         }
 
         //resize out str
         out.resize(reserv - dstSize / 2);
-        return true;
+        return rc;
     }
 
     bool Convert(char16_t ch, std::string& out)
@@ -136,10 +139,11 @@ public:
         size_t dstSize = out.size();
         size_t reserv = dstSize;
 
-        size_t rc = iconv(m_iconvTo, &srcPtr, &srcSize, &dstPtr, &dstSize);
-        if (rc == static_cast<size_t>(-1))
+        size_t converted = iconv(m_iconvTo, &srcPtr, &srcSize, &dstPtr, &dstSize);
+        if (converted == static_cast<size_t>(-1))
         {
             _assert(0);
+            out = ' ';
             return false;
         }
 
