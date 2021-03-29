@@ -90,7 +90,7 @@ private:
     std::u16string  m_curStrBuff;
 
     bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);
-    bool    ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff);
+    bool    ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::string_view>>>::iterator strBuff);
 
     std::u16string  _GetStr(size_t line, size_t offset, size_t size);
     bool    _AddStr(size_t n, const std::u16string& str);
@@ -112,6 +112,7 @@ public:
         m_lexParser.SetParseStyle(parseStyle);
         m_tab = m_lexParser.GetTabSize();
         m_saveTab = m_lexParser.GetSaveTab();
+        m_showTab = m_lexParser.GetShowTab();
         SetCP(cp);
     }
 

@@ -327,7 +327,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     }
 
     str->resize(i);
-    _assert(i < BUFF_SIZE);
+    _assert(i <= BUFF_SIZE);
     rest = size - strBuff->GetBuffSize();
     strBuff->ReleaseBuff();
 
@@ -1164,7 +1164,17 @@ bool Editor::Save()
             _assert(0);
             throw std::runtime_error{ "GetBuffer" };
         }
-        _assert(!buffPtr->m_lostData);
+        if (buffPtr->m_lostData)
+        {
+            rc = LoadBuff(buffPtr->m_fileOffset, buffPtr->GetBuffSize(), buffStr);
+            if (!rc)
+            {
+                //error
+                _assert(0);
+                throw std::runtime_error{ "LoadBuff" };
+            }
+            buffPtr->m_lostData = false;
+        }
 
         if(buffPtr->m_strOffsetList.empty())
         {
@@ -1173,7 +1183,7 @@ bool Editor::Save()
             continue;
         }
 
-        rc = ImproveBuff(buffPtr);
+        rc = ImproveBuff(buffIt);
 
         buffPtr->m_fileOffset = buffOffset;
         size_t buffSize = buffPtr->GetBuffSize();
@@ -1186,14 +1196,24 @@ bool Editor::Save()
             if (nextBuffPtr->m_fileOffset < buffOffset + buffSize)
             {
                 //read ahead before write    
-                auto nextBuff = nextBuffPtr->GetBuff();
-                if (!nextBuff)
+                auto nextBuffStr = nextBuffPtr->GetBuff();
+                if (!nextBuffStr)
                 {
                     //error
                     _assert(0);
                     throw std::runtime_error{ "GetBuffer" };
                 }
-                _assert(!nextBuffPtr->m_lostData);
+                if (nextBuffPtr->m_lostData)
+                {
+                    rc = LoadBuff(nextBuffPtr->m_fileOffset, nextBuffPtr->GetBuffSize(), nextBuffStr);
+                    if (!rc)
+                    {
+                        //error
+                        _assert(0);
+                        throw std::runtime_error{ "LoadBuff" };
+                    }
+                    nextBuffPtr->m_lostData = false;
+                }
             }
             else
                 break;
@@ -1234,11 +1254,12 @@ bool Editor::Save()
     return rc;
 }
 
-bool Editor::ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff)
+bool Editor::ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::string_view>>>::iterator strIt)
 {
     // fix EOL
     // change tabulation
     // remove spaces at EOL
+    auto& strBuff = *strIt;
     for (size_t n = 0; n < strBuff->m_strOffsetList.size(); ++n)
     {
         auto str{ strBuff->GetStr(n) };
@@ -1297,32 +1318,37 @@ bool Editor::ImproveBuff(std::shared_ptr<StrBuff<std::string, std::string_view>>
         if (m_eol == eol_t::unix_eol)
         {
             outstr += 0xa;
-            if (i == str.size() || str[i] != 0xa)
+            if (i != str.size() - 1 || str[i] != 0xa)
                 changed = true;
         }
         else if (m_eol == eol_t::win_eol)
         {
             outstr += "\r\n";
-            if (i == str.size() || (str[i] != 0xd || str[i + 1] != 0xa))
+            if (i != str.size() - 2 || (str[i] != 0xd || str[i + 1] != 0xa))
                 changed = true;
         }
         else
         {
             outstr += 0xd;
-            if (i == str.size() || str[i] != 0xd)
+            if (i != str.size() - 1 || str[i] != 0xd)
                 changed = true;
         }
 
         if (changed)
         {
+            _assert(str != outstr);
             changed = false;
 
             rc = strBuff->ChangeStr(n, outstr);
             if (!rc)
             {
-                //error
-                _assert(0);
-                throw std::runtime_error{ "ChangeStr" };
+                rc = m_buffer.SplitBuff(strIt, n);
+                if (!rc)
+                {
+                    //error
+                    _assert(0);
+                    throw std::runtime_error{ "SplitBuff" };
+                }
             }
         }
     }
