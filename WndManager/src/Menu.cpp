@@ -293,7 +293,7 @@ input_t LineMenu::EventProc(input_t code)
         }
         else if(0 == (code & K_TYPEMASK) && 0 == (code & K_CTRL) && 0 == (code & K_ALT))
         {
-            char16_t wc = std::towupper((char16_t)code);
+            char16_t wc = std::towupper(static_cast<char16_t>(code));
             int n = 0;
             for (const auto& m : m_menu)
             {
@@ -697,7 +697,7 @@ input_t FrameMenu::EventProc(input_t code)
         }
         else if(0 == (code & K_TYPEMASK) && 0 == (code & K_CTRL) && 0 == (code & K_ALT))
         {
-            char16_t wc = std::towupper((char16_t)code);
+            char16_t wc = std::towupper(static_cast<char16_t>(code));
             int n = 0;
             for (auto mi = m_menu.cbegin(); mi != m_menu.cend(); ++mi, ++n)
             {

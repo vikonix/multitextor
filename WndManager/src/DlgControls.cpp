@@ -371,17 +371,17 @@ bool CtrlGroup::Refresh(CtrlState)
         ++size;
 
     std::u16string buff;
-    buff = (char16_t)ACS_ULCORNER + m_name;
-    buff.resize(size - 1, (char16_t)ACS_HLINE);
-    buff += (char16_t)ACS_URCORNER;
+    buff = static_cast<char16_t>(ACS_ULCORNER) + m_name;
+    buff.resize(size - 1, static_cast<char16_t>(ACS_HLINE));
+    buff += static_cast<char16_t>(ACS_URCORNER);
     Paint(buff, 0);
 
     m_dialog.FillRect(m_posx,               m_posy + 1, 1, m_sizey - 2, ACS_VLINE, color);
     m_dialog.FillRect(m_posx - 1 + m_sizex, m_posy + 1, 1, m_sizey - 2, ACS_VLINE, color);
 
-    buff = (char16_t)ACS_LLCORNER;
-    buff.resize(static_cast<size_t>(m_sizex) - 1, (char16_t)ACS_HLINE);
-    buff += (char16_t)ACS_LRCORNER;
+    buff = static_cast<char16_t>(ACS_LLCORNER);
+    buff.resize(static_cast<size_t>(m_sizex) - 1, static_cast<char16_t>(ACS_HLINE));
+    buff += static_cast<char16_t>(ACS_LRCORNER);
     m_dialog.WriteWStr(m_posx, m_posy + m_sizey - 1, buff, color);
 
     return true;
@@ -669,9 +669,9 @@ bool CtrlList::Refresh(CtrlState state)
         ++size;
 
     std::u16string buff;
-    buff = (char16_t)ACS_ULCORNER + m_name;
-    buff.resize(size - 1, (char16_t)ACS_HLINE);
-    buff += (char16_t)ACS_URCORNER;
+    buff = static_cast<char16_t>(ACS_ULCORNER) + m_name;
+    buff.resize(size - 1, static_cast<char16_t>(ACS_HLINE));
+    buff += static_cast<char16_t>(ACS_URCORNER);
     Paint(buff, m_type);
 
     pos_t sliderPos = -1;
@@ -720,9 +720,9 @@ bool CtrlList::Refresh(CtrlState state)
             m_dialog.WriteChar(m_posx + m_sizex - 1, m_posy + 1 + y, '+', color);
     }
 
-    buff = (char16_t)ACS_LLCORNER;
-    buff.resize(static_cast<size_t>(m_sizex) - 1, (char16_t)ACS_HLINE);
-    buff += (char16_t)ACS_LRCORNER;
+    buff = static_cast<char16_t>(ACS_LLCORNER);
+    buff.resize(static_cast<size_t>(m_sizex) - 1, static_cast<char16_t>(ACS_HLINE));
+    buff += static_cast<char16_t>(ACS_LRCORNER);
     m_dialog.WriteWStr(m_posx, m_posy + m_sizey - 1, buff, color);
 
     m_dialog.BeginPaint();
@@ -1354,9 +1354,9 @@ bool CtrlColor::Refresh(CtrlState state)
     
     std::u16string buff;
 
-    buff = (char16_t)ACS_ULCORNER + m_name;
+    buff = static_cast<char16_t>(ACS_ULCORNER) + m_name;
     buff.resize(size - 1, ACS_HLINE);
-    buff += (char16_t)ACS_URCORNER;
+    buff += static_cast<char16_t>(ACS_URCORNER);
     Paint(buff, 0);
 
     m_dialog.FillRect(m_posx,               m_posy + 1, 1, m_sizey - 2, ACS_VLINE, color);
@@ -1368,9 +1368,9 @@ bool CtrlColor::Refresh(CtrlState state)
 
     PaintSelect(true, 0 != (state & CTRL_SELECTED));
 
-    buff = (char16_t)ACS_LLCORNER;
+    buff = static_cast<char16_t>(ACS_LLCORNER);
     buff.resize(static_cast<size_t>(m_sizex) - 1, ACS_HLINE);
-    buff += (char16_t)ACS_LRCORNER;
+    buff += static_cast<char16_t>(ACS_LRCORNER);
     m_dialog.WriteWStr(m_posx, m_posy + m_sizey - 1, buff, color);
 
     return true;

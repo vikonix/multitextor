@@ -438,7 +438,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                         {
                             if (str[end] == '\\')
                             {
-                                buff += (char)m_stringSymbol;
+                                buff += static_cast<char>(m_stringSymbol);
                                 buff += '\\';
                             }
                         }
