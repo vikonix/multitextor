@@ -479,6 +479,8 @@ Tview MemStrBuff<Tbuff, Tview>::GetStr(size_t n)
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator buff, size_t line)
 {
+    _assert(buff != m_buffList.end());
+
     auto oldBuff = *buff;
     size_t offset = oldBuff->GetStrOffset(line);
     size_t split = 0;
@@ -524,19 +526,7 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
     oldBuff->m_strOffsetList.erase(oldBuff->m_strOffsetList.begin() + split, oldBuff->m_strOffsetList.end());
     oldBuffData->resize(begin);
 
-    if (buff == m_buffList.end())
-        m_buffList.push_back(newBuff);
-    else if (buff != m_buffList.begin())
-        m_buffList.insert(++buff, newBuff);
-    else
-    {
-        //buff == begin
-        if (m_curBuff == buff)
-            m_curBuff = m_buffList.end();
-        m_buffList.pop_front();
-        m_buffList.push_front(newBuff);
-        m_buffList.push_front(oldBuff);
-    }
+    m_buffList.insert(++buff, newBuff);
 
     //LOG(DEBUG) << "n=" << oldBuff->m_strCount << " old=" << split << " new=" << newBuff->m_strCount;
 

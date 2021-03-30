@@ -545,7 +545,7 @@ bool Editor::AddStr(size_t n, const std::u16string& wstr)
     bool rc;
     if (n > GetStrCount())
     {
-        LOG(DEBUG) << "Fill end of file";
+        //LOG(DEBUG) << "Fill end of file";
 
         for (size_t i = GetStrCount(); i < n; ++i)
             rc = _AddStr(i, {});
@@ -708,7 +708,7 @@ bool Editor::AddLine(bool save, size_t line, const std::u16string& str)
     size_t count{};
     if (line >= GetStrCount())
     {
-        LOG(DEBUG) << "Fill end of file";
+        //LOG(DEBUG) << "Fill end of file";
 
         count = line - GetStrCount();
 
