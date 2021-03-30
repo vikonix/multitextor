@@ -105,7 +105,7 @@ int Menu::GetPrevItem(int n)
     {
         --n;
         if(n < 0)
-            n = (int)(size - 1);
+            n = static_cast<int>(size - 1);
 
         auto type = m_menu[n].type;
         if((type & MENU_TYPE_MASK)  == MENU_ITEM
@@ -289,7 +289,7 @@ input_t LineMenu::EventProc(input_t code)
         }
         else if(code == K_END)
         {
-            select = (int)(m_menu.size() - 1);
+            select = static_cast<int>(m_menu.size() - 1);
         }
         else if(0 == (code & K_TYPEMASK) && 0 == (code & K_CTRL) && 0 == (code & K_ALT))
         {

@@ -773,7 +773,7 @@ size_t CtrlList::SetSelect(size_t pos, bool refresh)
 
 input_t CtrlList::EventProc(input_t code)
 {
-    int n = (int)(m_firstLine + m_selected);//can be negative
+    int n = static_cast<int>(m_firstLine + m_selected);//can be negative
     size_t size = m_list.size();
     if (size == 0)
         return code;
@@ -814,17 +814,17 @@ input_t CtrlList::EventProc(input_t code)
     else if(code == K_PAGEUP)
     {
         step = sizey > 0 ? sizey : 1;
-        n -= (int)step;
+        n -= static_cast<int>(step);
     }
     else if(code == K_PAGEDN)
     {
         step = sizey > 0 ? sizey : 1;
-        n += (int)step;
+        n += static_cast<int>(step);
     }
     else if(code == K_HOME || code == K_HOME + K_CTRL)
         n = 0;
     else if(code == K_END || code == K_END + K_CTRL)
-        n = (int)(size - 1);
+        n = static_cast<int>(size - 1);
     else if(code & K_MOUSE)
     {
         if((code & K_TYPEMASK) == K_MOUSEKUP)
@@ -847,7 +847,7 @@ input_t CtrlList::EventProc(input_t code)
             else
                 m_mouseCmd = 0;
 
-            n = (int)m_firstLine + p - 1;
+            n = static_cast<int>(m_firstLine) + p - 1;
             if(code & K_MOUSE2 && !m_mouseCmd)
             {
                 m_mouse2 = true;
@@ -857,12 +857,12 @@ input_t CtrlList::EventProc(input_t code)
         else if((code & K_TYPEMASK) == K_MOUSEWUP)
         {
             step = sizey / 3 > 0 ? sizey / 3 : 1;
-            n -= (int)step;
+            n -= static_cast<int>(step);
         }
         else if((code & K_TYPEMASK) == K_MOUSEWDN)
         {
             step = sizey / 3 > 0 ? sizey / 3 : 1;
-            n += (int)step;
+            n += static_cast<int>(step);
         }
     }
     else if(code == K_SPACE)
@@ -873,7 +873,7 @@ input_t CtrlList::EventProc(input_t code)
     size_t pos;
     if (n < 0)
         pos = 0;
-    else if (n >= (int)size)
+    else if (n >= static_cast<int>(size))
         pos = size - 1;
     else
         pos = static_cast<size_t>(n);

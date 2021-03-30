@@ -643,7 +643,7 @@ Wnd* WndManager::GetWnd(int n, int view)
     if (view == 1 || n < 0)
         return m_view[2].wnd;
 
-    if (n < (int)m_wndList.size())
+    if (n < static_cast<int>(m_wndList.size()))
         return m_wndList[n];
     else
         return nullptr;
@@ -658,7 +658,7 @@ bool WndManager::SetTopWnd(int n, int view)
 
     if (n < 0)
         return SetTopWnd(m_view[2].wnd);
-    else if (n < (int)m_wndList.size())
+    else if (n < static_cast<int>(m_wndList.size()))
         return SetTopWnd(m_wndList[n], view);
     else
         return false;
