@@ -114,7 +114,7 @@ bool CtrlStatic::Refresh([[maybe_unused]]CtrlState state)
         if (m_name.find('&') != std::string::npos)
             amp = 1;
 
-        std::u16string str((size_t)m_sizex + amp, acs_t::ACS_HLINE);
+        std::u16string str(static_cast<size_t>(m_sizex) + amp, acs_t::ACS_HLINE);
         if (!m_name.empty())
             str.replace(1, m_name.size(), m_name);
         Paint(str, m_type);
@@ -380,7 +380,7 @@ bool CtrlGroup::Refresh(CtrlState)
     m_dialog.FillRect(m_posx - 1 + m_sizex, m_posy + 1, 1, m_sizey - 2, ACS_VLINE, color);
 
     buff = (char16_t)ACS_LLCORNER;
-    buff.resize((size_t)m_sizex - 1, (char16_t)ACS_HLINE);
+    buff.resize(static_cast<size_t>(m_sizex) - 1, (char16_t)ACS_HLINE);
     buff += (char16_t)ACS_LRCORNER;
     m_dialog.WriteWStr(m_posx, m_posy + m_sizey - 1, buff, color);
 
@@ -486,7 +486,7 @@ input_t CtrlEdit::EventProc(input_t code)
     else if(code == K_END)
     {
         Unselect();
-        if (len < (size_t)m_sizex)
+        if (len < static_cast<size_t>(m_sizex))
         {
             m_offset = 0;
             x = (pos_t)len;
@@ -626,7 +626,7 @@ bool CtrlEdit::SetName(const std::string& name)
     m_dcursorx = (pos_t)m_name.size();
     if (m_dcursorx >= m_sizex)
     {
-        m_offset = (size_t)m_dcursorx - m_sizex;
+        m_offset = static_cast<size_t>(m_dcursorx) - m_sizex;
         m_dcursorx = m_sizex;
     }
 
@@ -678,32 +678,32 @@ bool CtrlList::Refresh(CtrlState state)
     if(m_sizey - 2 > 3)
     {
         size_t listSize = m_list.size();
-        if(listSize >= (size_t)m_sizey - 2)
-            sliderPos = (pos_t)(GetSelected() * ((size_t)m_sizey - 2) / listSize);
+        if(listSize >= static_cast<size_t>(m_sizey) - 2)
+            sliderPos = (pos_t)(GetSelected() * (static_cast<size_t>(m_sizey) - 2) / listSize);
     }
 
     for(pos_t y = 0; y < m_sizey - 2; ++y)
     {
         m_dialog.WriteChar(m_posx, m_posy + 1 + y, ACS_VLINE, color);
 
-        auto line = GetStr((size_t)m_firstLine + y);
+        auto line = GetStr(static_cast<size_t>(m_firstLine) + y);
 
         std::u16string wstr = utf8::utf8to16(std::string(line));
-        if (wstr.size() < (size_t)m_sizex - 2)
+        if (wstr.size() < static_cast<size_t>(m_sizex) - 2)
         {
-            wstr.resize((size_t)m_sizex - 2, ' ');
+            wstr.resize(static_cast<size_t>(m_sizex) - 2, ' ');
         }
         else
         {
             //cut line
-            wstr.resize((size_t)m_sizex - 3);
+            wstr.resize(static_cast<size_t>(m_sizex) - 3);
             wstr += '~';
         }
 
         color_t lineColor = ColorDialogField;
         if(m_type & CTRL_DISABLED)
             lineColor = ColorDialogDisabled;
-        else if((size_t)y == m_selected)
+        else if(static_cast<size_t>(y) == m_selected)
         {
             if(state & CTRL_SELECTED)
                 lineColor = ColorDialogSelect;
@@ -721,7 +721,7 @@ bool CtrlList::Refresh(CtrlState state)
     }
 
     buff = (char16_t)ACS_LLCORNER;
-    buff.resize((size_t)m_sizex - 1, (char16_t)ACS_HLINE);
+    buff.resize(static_cast<size_t>(m_sizex) - 1, (char16_t)ACS_HLINE);
     buff += (char16_t)ACS_LRCORNER;
     m_dialog.WriteWStr(m_posx, m_posy + m_sizey - 1, buff, color);
 
@@ -747,7 +747,7 @@ size_t CtrlList::SetSelect(size_t pos, bool refresh)
     size_t size = m_list.size();
     if (pos > size)
         pos = size;
-    size_t sizey = (size_t)m_sizey - 3;
+    size_t sizey = static_cast<size_t>(m_sizey) - 3;
 
     if (pos != m_firstLine + m_selected)
     {
@@ -778,7 +778,7 @@ input_t CtrlList::EventProc(input_t code)
     if (size == 0)
         return code;
 
-    size_t sizey = (size_t)m_sizey - 3;
+    size_t sizey = static_cast<size_t>(m_sizey) - 3;
     size_t step = 0;
 
     if(code == K_TIME)
@@ -876,7 +876,7 @@ input_t CtrlList::EventProc(input_t code)
     else if (n >= (int)size)
         pos = size - 1;
     else
-        pos = (size_t)n;
+        pos = static_cast<size_t>(n);
 
     if(pos != m_firstLine + m_selected)
     {
@@ -1025,7 +1025,7 @@ bool CtrlDropList::Refresh(CtrlState state)
     auto n = GetSelected();
     std::u16string buff{ utf8::utf8to16(std::string(GetStr(n))) };
 
-    buff.resize((size_t)m_sizex - 3, ' ');
+    buff.resize(static_cast<size_t>(m_sizex) - 3, ' ');
 
     color_t color;
     if(0 != (state & CTRL_SELECTED))
@@ -1369,7 +1369,7 @@ bool CtrlColor::Refresh(CtrlState state)
     PaintSelect(true, 0 != (state & CTRL_SELECTED));
 
     buff = (char16_t)ACS_LLCORNER;
-    buff.resize((size_t)m_sizex - 1, ACS_HLINE);
+    buff.resize(static_cast<size_t>(m_sizex) - 1, ACS_HLINE);
     buff += (char16_t)ACS_LRCORNER;
     m_dialog.WriteWStr(m_posx, m_posy + m_sizey - 1, buff, color);
 

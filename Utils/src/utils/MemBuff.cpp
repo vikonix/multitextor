@@ -221,7 +221,7 @@ bool SBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
     auto offset_end = GetBuffSize();
     int dl = (int)str.size() - (int)(offset_n1 - offset_n);
 
-    if(dl > 0 && (size_t)offset_end + dl > m_buff->capacity())
+    if(dl > 0 && static_cast<size_t>(offset_end) + dl > m_buff->capacity())
         return false;
 
     m_buff->replace(offset_n, offset_n1 - offset_n, str);

@@ -417,8 +417,8 @@ bool ScreenWin32::WriteBlock(
     //LOG(DEBUG) << "WriteBlock l=" << left << " t=" << top << " r=" << right << " b=" << bottom << " xoffset=" << xoffset << " yoffset=" << yoffset;
     _assert(left == xoffset && top == yoffset);
 
-    size_t sizex = (size_t)right - left + 1;
-    size_t sizey = (size_t)bottom - top + 1;
+    size_t sizex = static_cast<size_t>(right - left + 1);
+    size_t sizey = static_cast<size_t>(bottom - top + 1);
 
     cell_array outBuff(sizex * sizey);
 

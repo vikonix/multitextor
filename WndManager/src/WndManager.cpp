@@ -425,7 +425,7 @@ bool WndManager::WriteWChar(char16_t c)
         rc = CallConsole(WriteChar(c));
     else
     {
-        char16_t PrevC = GET_CTEXT(m_screenBuff.GetCell((size_t)m_cursorx - 1, m_cursory));
+        char16_t PrevC = GET_CTEXT(m_screenBuff.GetCell(static_cast<size_t>(m_cursorx) - 1, m_cursory));
         rc = CallConsole(WriteLastChar(PrevC, c));
     }
 
@@ -445,7 +445,7 @@ bool WndManager::FillRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, input
     {
         for (pos_t x = 0; x < sizex; ++x)
         {
-            m_screenBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+            m_screenBuff.SetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y, cl);
         }
     }
 
@@ -462,8 +462,8 @@ bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, colo
     {
         for (pos_t x = 0; x < sizex; ++x)
         {
-            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell((size_t)left + x, (size_t)top + y));
-            m_screenBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y));
+            m_screenBuff.SetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y, cl);
         }
     }
 
@@ -480,9 +480,9 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
     {
         for (pos_t x = 0; x < sizex; ++x)
         {
-            color_t color = COLOR_INVERSE(GET_CCOLOR(m_screenBuff.GetCell((size_t)left + x, (size_t)top + y)));
-            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell((size_t)left + x, (size_t)top + y));
-            m_screenBuff.SetCell((size_t)left + x, (size_t)top + y, cl);
+            color_t color = COLOR_INVERSE(GET_CCOLOR(m_screenBuff.GetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y)));
+            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y));
+            m_screenBuff.SetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y, cl);
         }
     }
 

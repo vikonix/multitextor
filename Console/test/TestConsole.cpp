@@ -109,7 +109,7 @@ void ConsoleTest()
     waitKey();
     console.SetCursor(cursor_t::CURSOR_OVERWRITE);
 
-    ScreenBuffer cell2((size_t)r - l + 1, (size_t)b - t + 1);
+    ScreenBuffer cell2(static_cast<size_t>(r) - l + 1, static_cast<size_t>(b) - t + 1);
     cell2.Fill(MAKE_CELL(0, TEXT_RED | FON_BLUE, 'X'));
     console.WriteBlock(l, t, r, b, cell2);
     waitKey();

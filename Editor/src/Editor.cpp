@@ -138,7 +138,7 @@ bool Editor::Load()
         if (t1 != t2 && step)
         {
             t1 = t2;
-            size_t pr{ (size_t)((fileOffset + read) / step) };
+            size_t pr{ static_cast<size_t>((fileOffset + read) / step) };
             if (pr != percent)
             {
                 percent = pr;
@@ -167,7 +167,7 @@ bool Editor::Load()
                 _assert(0);
                 return false;
             }
-            size_t tocopy{ std::min((size_t)BUFF_SIZE - strOffset, read) };
+            size_t tocopy{ std::min(static_cast<size_t>(BUFF_SIZE) - strOffset, read) };
             strBuffData->resize(strOffset + tocopy);
             std::memcpy(strBuffData->data() + strOffset, buff->data() + buffOffset, tocopy);
             strBuff->ReleaseBuff();
@@ -1244,7 +1244,7 @@ bool Editor::Save()
         if (t1 != t2 && step)
         {
             t1 = t2;
-            size_t pr{ (size_t)(buffOffset / step) };
+            size_t pr{ static_cast<size_t>(buffOffset / step) };
             if (pr != percent)
             {
                 percent = pr;

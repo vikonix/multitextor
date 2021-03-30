@@ -309,7 +309,7 @@ bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
     if((pos_t)str.size() <= GetWSizeX() - (wleft - m_left))
         rc = WndManager::getInstance().WriteStr(str);
     else
-        rc = WndManager::getInstance().WriteStr(str.substr(0, (size_t)GetWSizeX() - (wleft - m_left)));
+        rc = WndManager::getInstance().WriteStr(str.substr(0, static_cast<size_t>(GetWSizeX()) - (wleft - m_left)));
 
     return rc;
 }
