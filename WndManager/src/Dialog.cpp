@@ -687,8 +687,8 @@ bool Dialog::CtrlRadioSelect(size_t pos)
 /////////////////////////////////////////////////////////////////////////////
 input_t MsgBox(const std::string& title, const std::string& line1, const std::string& line2, int type)
 {
-    pos_t len1 = (pos_t)line1.size();
-    pos_t len2 = (pos_t)line2.size();
+    pos_t len1 = static_cast<pos_t>(line1.size());
+    pos_t len2 = static_cast<pos_t>(line2.size());
     if(len1 > 70)
         len1 = 70;
     if(len2 > 70)
@@ -701,7 +701,7 @@ input_t MsgBox(const std::string& title, const std::string& line1, const std::st
 
     std::list<control> MBox 
     {
-    /*0*/ {CTRL_TITLE,                       title,    0,         nullptr,  1, 0, (pos_t)(len + 4), 8},
+    /*0*/ {CTRL_TITLE,                       title,    0,         nullptr,  1, 0, static_cast<pos_t>(len + 4), 8},
 
     /*1*/ {CTRL_STATIC,                      line1,    0,         nullptr,  1, 1, len1},
     /*2*/ {CTRL_STATIC,                      line2,    0,         nullptr,  1, 2, len2},

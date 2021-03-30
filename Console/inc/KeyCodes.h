@@ -102,8 +102,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //sync with MAX_COORD !!!
 
 #define K_MAKE_COORD_CODE(k, x, y) ((k) | (((input_t)(x) & MAX_COORD) << K_MASK_SIZE) | ((y) & MAX_COORD))
-#define K_GET_X(k)      (pos_t)(((k) & K_X_MASK) >> K_MASK_SIZE)
-#define K_GET_Y(k)      (pos_t)((k) & K_Y_MASK)
+#define K_GET_X(k)      static_cast<pos_t>(((k) & K_X_MASK) >> K_MASK_SIZE)
+#define K_GET_Y(k)      static_cast<pos_t>((k) & K_Y_MASK)
 #define K_GET_CODE(k)   (char16_t)((k) & K_CODEMASK)
 #define K_MASK_CODE(k)  ((k) & (K_TYPEMASK + K_MODMASK))
 

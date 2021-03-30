@@ -37,7 +37,7 @@ bool Control::SetName(const std::string& name)
 {
     //LOG(DEBUG) << __FUNC__ << " '" << name << "'";
     m_name = utf8::utf8to16(name);
-    m_sizex = (pos_t)m_name.size() + m_addSize;
+    m_sizex = static_cast<pos_t>(m_name.size()) + m_addSize;
     return true;
 }
 
@@ -87,8 +87,8 @@ CtrlStatic::CtrlStatic(Dialog& dialog, const control& control, size_t pos)
         control.id, control.x, control.y, control.sizex, 1, "")
 {
     if(m_sizex == 0)
-        m_sizex = (pos_t)m_name.size();
-    else if (m_sizex < (pos_t)m_name.size())
+        m_sizex = static_cast<pos_t>(m_name.size());
+    else if (m_sizex < static_cast<pos_t>(m_name.size()))
         m_name.resize(m_sizex);
 }
 
@@ -103,7 +103,7 @@ bool CtrlStatic::Refresh([[maybe_unused]]CtrlState state)
         std::string str{ ' ' + utf8::utf16to8(m_name) + ' ' };
         pos_t x = m_posx;
         if(m_posx == MAX_COORD)
-            x = m_dialog.GetWSizeX() - (pos_t)m_name.size() / 2;
+            x = m_dialog.GetWSizeX() - static_cast<pos_t>(m_name.size() / 2);
 
         m_dialog.WriteWnd(x, m_posy, str, color);
     }
@@ -160,7 +160,7 @@ CtrlButton::CtrlButton(Dialog& dialog, const control& control, size_t pos)
     : Control(dialog, pos, control.type, control.name, control.var, control.id
         , control.x, control.y, 1, 1, control.helpLine)
 {
-    m_sizex = (pos_t)m_name.size();
+    m_sizex = static_cast<pos_t>(m_name.size());
     if(m_name.find('&') != std::string::npos)
         --m_sizex;
 
@@ -215,7 +215,7 @@ CtrlCheck::CtrlCheck(Dialog& dialog, const control& control, size_t pos)
 {
     m_dcursorx = 1;
     m_addSize = 4;
-    m_sizex = (pos_t)m_name.size() + m_addSize;
+    m_sizex = static_cast<pos_t>(m_name.size()) + m_addSize;
 
     if(m_var.has_value())
         m_checked = *std::any_cast<bool*>(m_var);
@@ -277,7 +277,7 @@ CtrlRadio::CtrlRadio(Dialog& dialog, const control& control, size_t pos, size_t 
 {
     m_dcursorx = 1;
     m_addSize = 4;
-    m_sizex = (pos_t)m_name.size() + m_addSize;
+    m_sizex = static_cast<pos_t>(m_name.size()) + m_addSize;
 
     if(m_var.has_value())
     {
@@ -489,7 +489,7 @@ input_t CtrlEdit::EventProc(input_t code)
         if (len < static_cast<size_t>(m_sizex))
         {
             m_offset = 0;
-            x = (pos_t)len;
+            x = static_cast<pos_t>(len);
         }
         else
         {
@@ -623,7 +623,7 @@ bool CtrlEdit::SetName(const std::string& name)
     m_name = utf8::utf8to16(name);
     m_offset = 0;
 
-    m_dcursorx = (pos_t)m_name.size();
+    m_dcursorx = static_cast<pos_t>(m_name.size());
     if (m_dcursorx >= m_sizex)
     {
         m_offset = static_cast<size_t>(m_dcursorx) - m_sizex;
@@ -638,7 +638,7 @@ bool CtrlEdit::SetName(const std::string& name)
 input_t CtrlEdit::SetFocus()
 {
     m_selected = true;
-    m_dcursorx = (pos_t)m_name.size() < m_sizex ? (pos_t)m_name.size() : m_sizex - 1;
+    m_dcursorx = static_cast<pos_t>(m_name.size()) < m_sizex ? static_cast<pos_t>(m_name.size()) : m_sizex - 1;
 
     m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
     return K_SELECT;
@@ -679,7 +679,7 @@ bool CtrlList::Refresh(CtrlState state)
     {
         size_t listSize = m_list.size();
         if(listSize >= static_cast<size_t>(m_sizey) - 2)
-            sliderPos = (pos_t)(GetSelected() * (static_cast<size_t>(m_sizey) - 2) / listSize);
+            sliderPos = static_cast<pos_t>(GetSelected() * (static_cast<size_t>(m_sizey) - 2) / listSize);
     }
 
     for(pos_t y = 0; y < m_sizey - 2; ++y)
@@ -759,7 +759,7 @@ size_t CtrlList::SetSelect(size_t pos, bool refresh)
             m_firstLine = pos - sizey / 2;
 
         m_selected = pos - m_firstLine;
-        m_dcursory = (pos_t)(m_selected + 1);
+        m_dcursory = static_cast<pos_t>(m_selected + 1);
 
         if (refresh)
         {
@@ -908,7 +908,7 @@ input_t CtrlList::EventProc(input_t code)
         }
 
         m_selected = pos - m_firstLine;
-        m_dcursory = (pos_t)(m_selected + 1);
+        m_dcursory = static_cast<pos_t>(m_selected + 1);
 
         m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
         Refresh(CTRL_SELECTED);

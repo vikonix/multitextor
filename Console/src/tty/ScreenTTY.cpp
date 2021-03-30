@@ -166,8 +166,8 @@ bool ScreenTTY::GetScreenSize(pos_t& sizex, pos_t& sizey) const
          || (ioctl(0, TIOCGWINSZ, &win_struct) == 0)
          || (ioctl(2, TIOCGWINSZ, &win_struct) == 0))
         {
-            x = (pos_t) win_struct.ws_col;
-            y = (pos_t) win_struct.ws_row;
+            x = static_cast<pos_t>(win_struct.ws_col);
+            y = static_cast<pos_t>(win_struct.ws_row);
             break;
         }
     }

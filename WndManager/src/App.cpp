@@ -170,7 +170,7 @@ bool Application::ShowProgressBar(size_t n)
 
     pos_t y = m_wndManager.m_sizey - 1;
 
-    bool rc = m_wndManager.ColorRect(0, y, (pos_t)n, 1, ColorStatusLineB)
+    bool rc = m_wndManager.ColorRect(0, y, static_cast<pos_t>(n), 1, ColorStatusLineB)
     && PrintClock();
 
     return rc;
@@ -246,7 +246,7 @@ bool  Application::PrintClock(bool print)
     else
         stream << std::put_time(&_tm, "%H %M");
 
-    pos_t len = (pos_t)stream.str().size();
+    pos_t len = static_cast<pos_t>(stream.str().size());
     pos_t y = (clock_pos::bottom == m_clock) ? m_wndManager.m_sizey - 1 : 0;
 
     m_wndManager.StopPaint();
@@ -281,7 +281,7 @@ bool  Application::PrintStatusLine()
         else
             rc = m_wndManager.SetTextAttr(ColorStatusLineB);
         rc = m_wndManager.WriteStr(li->text);
-        x += (pos_t)li->text.size();
+        x += static_cast<pos_t>(li->text.size());
     }
 
     //fill rest of line
@@ -300,7 +300,7 @@ bool  Application::PrintStatusLine()
         sstr << "|";
     }
 
-    rc = m_wndManager.GotoXY(m_wndManager.m_sizex - (pos_t)sstr.str().size() - 5, y); //reserv 5 positions for clock
+    rc = m_wndManager.GotoXY(m_wndManager.m_sizex - static_cast<pos_t>(sstr.str().size()) - 5, y); //reserv 5 positions for clock
     li = m_sLine.cbegin();
     for (auto c : sstr.str())
     {

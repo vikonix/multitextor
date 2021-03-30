@@ -383,7 +383,7 @@ input_t LineMenu::EventProc(input_t code)
                     auto menu = Application::getInstance().GetMenu(m_menu[m_selected].code - K_MENU);
                     if (menu)
                     {
-                        m_nextMenu = std::make_unique<FrameMenu>(*menu, m_menu[m_selected].x, (pos_t)1);
+                        m_nextMenu = std::make_unique<FrameMenu>(*menu, m_menu[m_selected].x, static_cast<pos_t>(1));
                         if (m_nextMenu)
                             m_nextMenu->Activate();
                     }
@@ -426,13 +426,13 @@ input_t FrameMenu::Activate(bool capture)
             auto pos = name.find(';');
             if(pos == std::string::npos)
             {
-                strLen = (pos_t)name.size();
-                keyLen = (pos_t)Application::getInstance().GetKeyName(m.code).size();
+                strLen = static_cast<pos_t>(name.size());
+                keyLen = static_cast<pos_t>(Application::getInstance().GetKeyName(m.code).size());
             }
             else
             {
-                strLen = (pos_t)pos;
-                keyLen = (pos_t)(name.size() - pos);
+                strLen = static_cast<pos_t>(pos);
+                keyLen = static_cast<pos_t>(name.size() - pos);
             }
 
             if (m_sizex < strLen)
@@ -572,7 +572,7 @@ bool FrameMenu::Refresh()
             auto klen = key.size();
             mi->size = m_sizex - 2;
 
-            for(; x < mi->size - (pos_t)klen - 1; ++x)
+            for(; x < mi->size - static_cast<pos_t>(klen) - 1; ++x)
                 WndManager::getInstance().WriteChar();
 
             auto ki = key.cbegin();

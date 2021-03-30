@@ -136,9 +136,9 @@ bool WndManager::Refresh()
         pos_t y = m_logo.y;
 
         if (x < 0)
-            x = (m_sizex - (pos_t)m_logo.logoStr.front().size()) / 2;
+            x = (m_sizex - static_cast<pos_t>(m_logo.logoStr.front().size())) / 2;
         if (y < 0)
-            y = (m_sizey - (pos_t)m_logo.logoStr.size()) / 2;
+            y = (m_sizey - static_cast<pos_t>(m_logo.logoStr.size())) / 2;
 
         SetTextAttr(m_logo.logoColor);
 
@@ -319,7 +319,7 @@ bool WndManager::WriteWStr(const std::u16string& wstr)
 
     size_t l = wstr.size();
     bool rc;
-    if (m_cursory != m_sizey - 1 || m_cursorx + (pos_t)l <= m_sizex - 1)
+    if (m_cursory != m_sizey - 1 || m_cursorx + static_cast<pos_t>(l) <= m_sizex - 1)
         rc = CallConsole(WriteStr(wstr));
     else
     {

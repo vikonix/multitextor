@@ -170,7 +170,7 @@ bool EditorWnd::UpdatePosInfo()
 
     m_infoStrSize = str.size() - 14;
 
-    WriteWnd(m_clientSizeX - (pos_t)len, 0, str.substr(str.size() - len), *m_pColorWindowTitle);
+    WriteWnd(m_clientSizeX - static_cast<pos_t>(len), 0, str.substr(str.size() - len), *m_pColorWindowTitle);
     return true;
 }
 
