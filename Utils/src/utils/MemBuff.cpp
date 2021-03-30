@@ -522,11 +522,12 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
         newBuff->m_strOffsetList.push_back((oldBuff->GetStrOffset(i + split) - begin));
 
     oldBuff->m_strOffsetList.erase(oldBuff->m_strOffsetList.begin() + split, oldBuff->m_strOffsetList.end());
+    oldBuffData->resize(begin);
 
     if (buff == m_buffList.end())
         m_buffList.push_back(newBuff);
     else if (buff != m_buffList.begin())
-        m_buffList.insert(--buff, newBuff);
+        m_buffList.insert(++buff, newBuff);
     else
     {
         //buff == begin

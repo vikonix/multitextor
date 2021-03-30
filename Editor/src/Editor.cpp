@@ -74,9 +74,9 @@ bool Editor::LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string>
     }
     
     file.seekg(offset);
-
     buff->resize(size);
     file.read(buff->data(), size);
+    _assert(file.good());
     auto read = file.gcount();
     if (size != static_cast<size_t>(read))
     {
@@ -1139,15 +1139,28 @@ bool Editor::Save()
     //make backup
     //???
 
-    std::filesystem::path filePath = "/tmp/out.txt";//??? for testing
-    //???auto filePath{ m_file };
-
-    //save
-    std::ofstream file{ filePath, std::ios::binary };
+    auto filePath{ m_file };
+    std::fstream file{ filePath, std::ios::binary|std::ios::in|std::ios::out };
     if (!file)
         throw std::runtime_error{"open file " + filePath.u8string()};
+    _assert(file.good());
 
     EditorApp::SetHelpLine("Wait for file saving");
+
+    auto Load = [&file](uint64_t offset, size_t size, std::shared_ptr<std::string> buff) {
+        file.seekg(offset);
+        buff->resize(size);
+        file.read(buff->data(), size);
+        _assert(file.good());
+        auto read = file.gcount();
+        if (size != static_cast<size_t>(read))
+        {
+            _assert(0);
+            return false;
+        }
+
+        return true;
+    };
 
     time_t t1{ time(nullptr) };
     size_t percent{};
@@ -1166,7 +1179,7 @@ bool Editor::Save()
         }
         if (buffPtr->m_lostData)
         {
-            rc = LoadBuff(buffPtr->m_fileOffset, buffPtr->GetBuffSize(), buffStr);
+            rc = Load(buffPtr->m_fileOffset, buffPtr->GetBuffSize(), buffStr);
             if (!rc)
             {
                 //error
@@ -1205,7 +1218,7 @@ bool Editor::Save()
                 }
                 if (nextBuffPtr->m_lostData)
                 {
-                    rc = LoadBuff(nextBuffPtr->m_fileOffset, nextBuffPtr->GetBuffSize(), nextBuffStr);
+                    rc = Load(nextBuffPtr->m_fileOffset, nextBuffPtr->GetBuffSize(), nextBuffStr);
                     if (!rc)
                     {
                         //error
@@ -1219,7 +1232,9 @@ bool Editor::Save()
                 break;
         }
 
+        file.seekp(buffOffset);
         file.write(buffStr->data(), buffSize);
+        _assert(file.good());
 
         buffPtr->ClearModifyFlag();
         buffPtr->ReleaseBuff();
