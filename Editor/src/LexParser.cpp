@@ -194,6 +194,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
     CheckForOpenComments(line);
 
     std::string lexstr;
+    lexstr.reserve(strLen);
     LexicalParse(std::u16string_view(wstr).substr(0, strLen), lexstr, true);
 
     //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
@@ -472,11 +473,8 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                         char fill = '0' + static_cast<char>(type);
                         if (IsNumeric(str.substr(begin)))
                             fill = 'N';
-                        else
-                        {
-                            if (IsKeyWord(str.substr(begin, end - begin + 1)))
-                                fill = 'K';
-                        }
+                        else if (IsKeyWord(str.substr(begin, end - begin + 1)))
+                            fill = 'K';
 
                         buff.resize(end + 1, fill);
                     }
@@ -616,7 +614,8 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
             {
                 //begin of the string
                 m_stringSymbol = str[begin];
-                ++end;
+                if(end < strSize - 1)
+                    ++end;
             }
 
             lex_t t;
@@ -674,10 +673,10 @@ bool LexParser::IsNumeric(std::u16string_view lexem)
 
 bool LexParser::IsKeyWord(std::u16string_view lexem)
 {
-    if (m_keyWords.find(std::u16string(lexem)) != m_keyWords.end())
-        return true;
-    else
+    if (m_keyWords.empty() || m_keyWords.find(std::u16string(lexem)) == m_keyWords.end())
         return false;
+    else
+        return true;
 }
 
 //line comment shields opened and hides closed

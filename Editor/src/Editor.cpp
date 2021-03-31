@@ -235,14 +235,15 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
     for (i = 0; i < maxsize; ++i)
     {
+        unsigned char ch = buff[i];
         ++len;
-        if (buff[i] == 0x9)//TAB
+        if (ch == 0x9)//TAB
         {
             --len;
             //calc len with max tabulation for possible changing in future
             len = (len + maxtab) - (len + maxtab) % maxtab;
         }
-        else if (buff[i] == 0xd)//CR
+        else if (ch == 0xd)//CR
         {
             if (buff[i + 1] == 0xa)//LF
             {
@@ -258,7 +259,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             len = 0;
             cut = 0;
         }
-        else if (buff[i] == 0xa)
+        else if (ch == 0xa)
         {
             ++lf;
             m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
@@ -267,10 +268,10 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             len = 0;
             cut = 0;
         }
-        else if (buff[i] > 0)
+        else
         {
             //check symbol type
-            if (GetSymbolType(buff[i]) != symbol_t::alnum)
+            if (GetSymbolType(ch) != symbol_t::alnum)
                 cut = i;
         }
 
