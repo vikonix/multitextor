@@ -138,6 +138,7 @@ public:
 
     static bool SetLexConfig(const std::list<LexConfig>& config) { s_lexConfig = config; return true; }
 
+    bool    EnableParsing(bool scan)    { return m_scan = scan; }
     bool    SetParseStyle(const std::string& style = "");
     std::string GetParseStyle() const   {return m_parseStyle;}
 

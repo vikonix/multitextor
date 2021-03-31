@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "EditorApp.h"
 
+constexpr uintmax_t MAX_PARSED_SIZE{ 0x2000000 }; // 32 MB
+
 
 bool Editor::SetCP(const std::string& cp) 
 {
@@ -148,6 +150,10 @@ bool Editor::Load()
         return static_cast<size_t>(read);
     };
 
+    
+    if (fileSize > MAX_PARSED_SIZE)
+        m_lexParser.EnableParsing(false);
+
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
     size_t strOffset{};
     size_t read;
@@ -262,6 +268,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
         else if (ch == S_LF)
         {
             ++lf;
+
             m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
             strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
             begin = i + 1;
