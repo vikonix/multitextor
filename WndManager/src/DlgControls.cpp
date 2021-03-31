@@ -578,7 +578,7 @@ input_t CtrlEdit::EventProc(input_t code)
             unsigned char c = (unsigned char) pBuff[i];
             if(c >= ' ')
                 pBuff1[j++] = c;
-            else if(c == 0x9)//tab
+            else if(c == S_TAB)
                 pBuff1[j++] = ' ';
             else
                 break;

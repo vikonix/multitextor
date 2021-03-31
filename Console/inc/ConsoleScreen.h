@@ -61,11 +61,11 @@ enum acs_t
     ACS_LLCORNER        = 6,
     ACS_TTEE            = 7,
     ACS_RTEE            = 8,
-    S_TAB               = 9,  //symbol TAB
-    S_LF                = 10, //symbol LF
+    CS_TAB              = 9,  //symbol TAB
+    CS_LF               = 10, //symbol LF
     ACS_LTEE            = 11,
     ACS_BTEE            = 12,
-    S_CR                = 13, //symbol CR
+    CS_CR               = 13, //symbol CR
     ACS_PLUS            = 14,
     ACS_SQUARE          = 15,
 

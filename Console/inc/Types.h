@@ -51,3 +51,9 @@ enum class scroll_t
 
 #define MAX_COORD       0x1ff //maximal X Y coordinate
 
+//special symbols
+constexpr char S_TAB{ 0x9 };
+constexpr char S_LF { 0xa };
+constexpr char S_CR { 0xd };
+constexpr char S_EOF{ 0x1a };
+

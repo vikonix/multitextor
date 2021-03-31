@@ -237,15 +237,15 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     {
         unsigned char ch = buff[i];
         ++len;
-        if (ch == 0x9)//TAB
+        if (ch == S_TAB)
         {
             --len;
             //calc len with max tabulation for possible changing in future
             len = (len + maxtab) - (len + maxtab) % maxtab;
         }
-        else if (ch == 0xd)//CR
+        else if (ch == S_CR)
         {
-            if (buff[i + 1] == 0xa)//LF
+            if (buff[i + 1] == S_LF)
             {
                 ++i;
                 ++crlf;
@@ -259,7 +259,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             len = 0;
             cut = 0;
         }
-        else if (ch == 0xa)
+        else if (ch == S_LF)
         {
             ++lf;
             m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
@@ -278,9 +278,9 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
         if (len >= m_maxStrlen)
         {
             //wrap for long string
-            if (buff[i + 1] == 0xd)
+            if (buff[i + 1] == S_CR)
             {
-                if (buff[i + 2] == 0xa)
+                if (buff[i + 2] == S_LF)
                 {
                     ++i;
                     ++crlf;
@@ -289,7 +289,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
                     ++cr;
                 ++i;
             }
-            else if (buff[i + 1] == 0xa)
+            else if (buff[i + 1] == S_LF)
             {
                 ++i;
                 ++lf;
@@ -408,7 +408,7 @@ std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
                 outstr[pos - offset] = c;
             }
         }
-        if (c == 0x9)//tab
+        if (c == S_TAB)
         {
             size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
             outstr.resize(std::min(outstr.size() + tabpos, size), ' ');
@@ -417,11 +417,11 @@ std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
                 while (pos < tabpos)
                 {
                     if (pos < offset + size)
-                        outstr[pos++ - offset] = 0x9;
+                        outstr[pos++ - offset] = S_TAB;
                 }
             pos = tabpos;
         }
-        else if (c == 0xd || c == 0x0a || c == 0x1a)//cr/lf/eof
+        else if (c == S_CR || c == S_LF || c == S_EOF)//cr/lf/eof
             break;
         else
             ++pos;
@@ -442,7 +442,7 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
     //convert string
     for (size_t i = 0; i < len; ++i)
     {
-        if (str[i] != 0x9)//tab
+        if (str[i] != S_TAB)
         {
             std::string cpStr;
             [[maybe_unused]]bool rc = m_converter->Convert(str[i], cpStr);
@@ -451,12 +451,12 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
         else if (m_saveTab)
         {
             size_t first = i;
-            while (str[i] == 0x9)
+            while (str[i] == S_TAB)
             {
                 ++i;
                 if (i % m_tab == 0)
                 {
-                    buff += 0x9;
+                    buff += S_TAB;
                     first = i;
                 }
             }
@@ -477,17 +477,17 @@ bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
     //LOG(DEBUG) << "ConvertStr '" << buff << "'";
     if (m_eol == eol_t::unix_eol)
     {
-        buff += 0xa;
+        buff += S_LF;
     }
     else if (m_eol == eol_t::win_eol)
     {
-        buff += 0xd;
-        buff += 0xa;
+        buff += S_CR;
+        buff += S_LF;
     }
     else
     {
         //apple
-        buff += 0xd;
+        buff += S_CR;
     }
 
     return true;
@@ -667,10 +667,10 @@ bool Editor::CorrectTab(bool save, size_t line, std::u16string& str)
 
     for(size_t i = 0; i < len; ++i)
     {
-        if (str[i] == 0x9)
+        if (str[i] == S_TAB)
         {
             size_t first = i;
-            while (str[i] == 0x9)
+            while (str[i] == S_TAB)
             {
                 ++i;
                 if (i % m_tab == 0)
@@ -888,7 +888,7 @@ bool Editor::SaveTab(bool save, size_t line)
     std::u16string tabs;
 
     for (size_t i = 0; i < m_curStrBuff.size(); ++i)
-        if (m_curStrBuff[i] == 0x9)
+        if (m_curStrBuff[i] == S_TAB)
             tabs += static_cast<char16_t>(i);
 
     if (save && !tabs.empty())
@@ -909,7 +909,7 @@ bool Editor::RestoreTab([[maybe_unused]]bool save, size_t line, const std::u16st
 
     SetCurStr(line);
     for(auto pos : str)
-        m_curStrBuff[pos] = 0x9;//set tab
+        m_curStrBuff[pos] = S_TAB;//set tab
 
     InvalidateWnd(line, invalidate_t::change);
     return 0;
@@ -1299,14 +1299,14 @@ bool Editor::ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::str
             }
             else if (c == ' ')
                 outstr += ' ';
-            else if (c == 0x9)//tab
+            else if (c == S_TAB)
             {
                 if (m_saveTab)//??? || !rc)
-                    outstr += 0x9;
+                    outstr += S_TAB;
                 else
                 {
                     //change tab with space
-                    wpos = wstr.find(0x9, wpos);
+                    wpos = wstr.find(S_TAB, wpos);
                     if (wpos == std::string::npos)
                     {
                         _assert(0);
@@ -1333,20 +1333,20 @@ bool Editor::ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::str
         
         if (m_eol == eol_t::unix_eol)
         {
-            outstr += 0xa;
-            if (i != str.size() - 1 || str[i] != 0xa)
+            outstr += S_LF;
+            if (i != str.size() - 1 || str[i] != S_LF)
                 changed = true;
         }
         else if (m_eol == eol_t::win_eol)
         {
             outstr += "\r\n";
-            if (i != str.size() - 2 || (str[i] != 0xd || str[i + 1] != 0xa))
+            if (i != str.size() - 2 || (str[i] != S_CR || str[i + 1] != S_LF))
                 changed = true;
         }
         else
         {
-            outstr += 0xd;
-            if (i != str.size() - 1 || str[i] != 0xd)
+            outstr += S_CR;
+            if (i != str.size() - 1 || str[i] != S_CR)
                 changed = true;
         }
 

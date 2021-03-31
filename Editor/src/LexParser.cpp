@@ -238,7 +238,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
             //case '1'://space
             //case '3'://back slash
             //case '6'://symbol
-            if (wstr[i] != 0x9 || !m_showTab)
+            if (wstr[i] != S_TAB || !m_showTab)
                 color.push_back(ColorWindow);
             else
                 color.push_back(ColorWindowTab);//tab

@@ -224,7 +224,7 @@ bool EditorWnd::EditTab(input_t cmd)
 
     if (Application::getInstance().IsInsertMode() && y < m_editor->GetStrCount())
     {
-        char16_t ch = m_editor->GetSaveTab() ? 0x9 : ' ';
+        char16_t ch = m_editor->GetSaveTab() ? S_TAB : ' ';
         std::u16string str;
         str.resize(len, ch);
         

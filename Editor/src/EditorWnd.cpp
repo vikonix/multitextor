@@ -1506,7 +1506,7 @@ bool EditorWnd::GetWord(std::u16string& str)
             for (size_t i = m_beginX; i <= m_endX; ++i)
             {
                 auto c = curStr[i];
-                str += c != 0x9 ? c : ' ';
+                str += c != S_TAB ? c : ' ';
             }
 
             return true;
@@ -1520,7 +1520,7 @@ bool EditorWnd::GetWord(std::u16string& str)
     for (size_t i = b; i <= e; ++i)
     {
         auto c = curStr[m_beginX + i];
-        str += c != 0x9 ? c : ' ';
+        str += c != S_TAB ? c : ' ';
     }
 
     return true;
@@ -1623,7 +1623,7 @@ bool EditorWnd::FindUp(bool silence)
 
         for (auto it = str.begin(); it < str.end(); ++it)
         {
-            if (*it == 0x9)
+            if (*it == S_TAB)
                 *it = ' ';
             else if (!g_findParams.checkCase)
                 *it = std::towupper(*it);
@@ -1741,7 +1741,7 @@ bool EditorWnd::FindDown(bool silence)
 
         for (auto it = str.begin(); it < str.end(); ++it)
         {
-            if (*it == 0x9)
+            if (*it == S_TAB)
                 *it = ' ';
             else if (!g_findParams.checkCase)
                 *it = std::towupper(*it);
