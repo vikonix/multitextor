@@ -104,19 +104,19 @@ public:
             size_t converted = iconv(m_iconvFrom, &srcPtr, &srcSize, &dstPtr, &dstSize);
             if (converted == static_cast<size_t>(-1))
             {
+                rc = false;
                 if (errno == EINVAL)
                 {
-                    //continue converting
+                    break;
                 }
                 else
                 {
-                    //skip it
+                    //skip symbol
                     ++srcPtr;
                     --srcSize;
                     *dstPtr++ = '?';
                     *dstPtr++ = 0;
                     dstSize -= 2;
-                    rc = false;
                 }
             }
         }

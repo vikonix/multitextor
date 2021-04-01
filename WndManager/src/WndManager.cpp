@@ -401,7 +401,12 @@ bool WndManager::WriteConsoleTitle(bool set)
         if (m_view[2].wnd && m_activeView == 1)
             name = m_view[2].wnd->GetObjName();
         else
-            name = m_wndList[0]->GetObjName();
+        {
+            if (m_wndList[0]->GetWndType() == wnd_t::editor)
+                name = m_wndList[0]->GetObjName();
+            else
+                return true;
+        }
     }
 
     bool rc = m_console.WriteConsoleTitle(name + " - " + Application::getInstance().m_appName);
