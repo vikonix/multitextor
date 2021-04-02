@@ -130,7 +130,7 @@ size_t WindowListDialog::GetWndList(bool skip)
         auto edWnd = dynamic_cast<EditorWnd*>(wnd);
         if (m_mode == WindowsDlgMode::List || m_mode == WindowsDlgMode::CompareWith || edWnd->IsMarked())
         {
-            auto path = wnd->GetFilePath();// .relative_path();
+            auto path = wnd->GetFilePath();
             auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX());
             if (active.empty())
                 active = shortPath;
