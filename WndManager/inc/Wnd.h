@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Invalidate.h"
 
 #include <string>
+#include <filesystem>
 
 //////////////////////////////////////////////////////////////////////////////
 using border_t = uint32_t;
@@ -76,8 +77,8 @@ public:
     virtual input_t         Destroy()               { return K_CLOSE; };
 
 
+    virtual std::filesystem::path   GetFilePath() const { return ""; }
     virtual wnd_t           GetWndType() const      {return wnd_t::wnd;}
-    virtual std::string     GetObjPath() const      {return "...";}
     virtual std::string     GetObjName() const      {return {};}
     virtual char            GetAccessInfo() const   {return ' ';}
     virtual bool            IsClone() const         {return false;}

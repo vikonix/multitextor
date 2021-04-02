@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
 #include "Dialogs/StdDialogs.h"
+#include "Dialogs/EditorDialogs.h"
 #include "utfcpp/utf8.h"
 
 
@@ -134,11 +135,6 @@ bool    EditorApp::WndCloseAllProc(input_t cmd)
     return true;
 }
 
-bool    EditorApp::WndListProc(input_t cmd)
-{
-    return true;
-}
-
 bool    EditorApp::FindInFilesProc(input_t cmd)
 {
     return true;
@@ -154,13 +150,24 @@ bool    EditorApp::FoundFilesProc(input_t cmd)
     return true;
 }
 
-bool    EditorApp::WndCopyProc(input_t cmd)
+bool    EditorApp::WndListProc([[maybe_unused]] input_t cmd)
 {
+    WindowListDialog Dlg;
+    [[maybe_unused]] auto code = Dlg.Activate();
     return true;
 }
 
-bool    EditorApp::WndMoveProc(input_t cmd)
+bool    EditorApp::WndCopyProc([[maybe_unused]] input_t cmd)
 {
+    WindowListDialog Dlg(WindowsDlgMode::CopyFrom);
+    [[maybe_unused]] auto code = Dlg.Activate();
+    return true;
+}
+
+bool    EditorApp::WndMoveProc([[maybe_unused]] input_t cmd)
+{
+    WindowListDialog Dlg(WindowsDlgMode::MoveFrom);
+    [[maybe_unused]] auto code = Dlg.Activate();
     return true;
 }
 

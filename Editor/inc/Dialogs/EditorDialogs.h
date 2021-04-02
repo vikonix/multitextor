@@ -27,21 +27,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #include "Dialog.h"
 
-/*
-extern control dlgWindowList[];
+#include <map>
+
+
+enum class WindowsDlgMode
+{
+    List,
+    CopyFrom,
+    MoveFrom,
+    CompareWith
+};
+
 class WindowListDialog : public Dialog
 {
-  int m_nMode;//0-select 1-copy 2-move 3-list
-  FileList m_WndList;
+    WindowsDlgMode m_mode;
+    std::map<std::string, Wnd*> m_wndList;
 
-  int ListWnd(int skip = 0);
+    size_t GetWndList(bool skip = false);
 
 public:
-  WindowListDialog(int mode = 0, control* pControl = dlgWindowList, short x = -1, short y = -1)
-  : Dialog(pControl, x, y) {m_nMode = mode;}
+    WindowListDialog(WindowsDlgMode mode = WindowsDlgMode::List, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
-  int OnActivate();
-  int DialogProc(int code);
-  int OnClose(int id);
+    virtual input_t DialogProc(input_t code) override;
+    virtual bool OnActivate() override;
+    virtual bool OnClose(int id) override;
 };
-*/

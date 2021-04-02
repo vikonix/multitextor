@@ -34,7 +34,6 @@ extern menu_list g_menuRecentFiles;
 extern menu_list g_menuRecentSessions;
 extern std::vector<menu_list> g_mainMenu;
 
-
 class EditorApp : public Application
 {
     using AppFunc = std::function<bool(EditorApp*, input_t)>;

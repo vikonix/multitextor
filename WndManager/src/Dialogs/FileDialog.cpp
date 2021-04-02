@@ -45,29 +45,30 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 FileDialogVars FileDialog::s_vars;
 
-std::list<control> fileDialog {
-  {CTRL_TITLE,                      "",             0,              nullptr,                    1,  0, 70, 21},
+std::list<control> fileDialog 
+{
+    {CTRL_TITLE,                        "",             0,              nullptr,                    1,  0, 70, 21},
 
-  {CTRL_STATIC,                     "File &name:",  0,              nullptr,                    1,  1, 14},
-  {CTRL_EDITDROPLIST,               "",             ID_OF_NAME,     &FileDialog::s_vars.file,  15,  1, 52,  7, "Input file name or mask"},
+    {CTRL_STATIC,                       "File &name:",  0,              nullptr,                    1,  1, 14},
+    {CTRL_EDITDROPLIST,                 "",             ID_OF_NAME,     &FileDialog::s_vars.file,  15,  1, 52,  7, "Input file name or mask"},
 
-  {CTRL_STATIC | CTRL_NOCOLOR,      "",             ID_OF_PATH,     nullptr,                    1,  3, 66},
+    {CTRL_STATIC | CTRL_NOCOLOR,        "",             ID_OF_PATH,     nullptr,                    1,  3, 66},
 
-  {CTRL_LIST,                       "&Directories", ID_OF_DIRLIST,  (size_t*)nullptr,           0,  4, 19, 14, "Select directory"},
-  {CTRL_LIST,                       "&Files",       ID_OF_FILELIST, (size_t*)nullptr,          19,  4, 34, 14, "Select file name"},
+    {CTRL_LIST,                         "&Directories", ID_OF_DIRLIST,  (size_t*)nullptr,           0,  4, 19, 14, "Select directory"},
+    {CTRL_LIST,                         "&Files",       ID_OF_FILELIST, (size_t*)nullptr,          19,  4, 34, 14, "Select file name"},
 
-  {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT,"",             ID_OK,          nullptr,                   54,  5},
-  {CTRL_BUTTON | CTRL_ALIGN_LEFT,   "Cancel",       ID_CANCEL,      nullptr,                   54,  7},
+    {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT,  "",             ID_OK,          nullptr,                   54,  5},
+    {CTRL_BUTTON | CTRL_ALIGN_LEFT,     "Cancel",       ID_CANCEL,      nullptr,                   54,  7},
 
-  {CTRL_STATIC,                     "File &type:",  ID_OF_STAT_TYPE,nullptr,                   54,  9, 14},
-  {CTRL_DROPLIST,                   "",             ID_OF_TYPE,     &FileDialog::s_vars.type,  54, 10, 13,  6, "Select file type"},
-  {CTRL_STATIC,                     "Code &page:",  ID_OF_STAT_CP,  nullptr,                   54, 12, 14},
-  {CTRL_DROPLIST,                   "",             ID_OF_CP,       &FileDialog::s_vars.cp,    54, 13, 13,  6, "Select file code page"},
+    {CTRL_STATIC,                       "File &type:",  ID_OF_STAT_TYPE,nullptr,                   54,  9, 14},
+    {CTRL_DROPLIST,                     "",             ID_OF_TYPE,     &FileDialog::s_vars.type,  54, 10, 13,  6, "Select file type"},
+    {CTRL_STATIC,                       "Code &page:",  ID_OF_STAT_CP,  nullptr,                   54, 12, 14},
+    {CTRL_DROPLIST,                     "",             ID_OF_CP,       &FileDialog::s_vars.cp,    54, 13, 13,  6, "Select file code page"},
 
-  {CTRL_CHECK,                      "&Read only",   ID_OF_RO,       &FileDialog::s_vars.ro,    54, 15,  0,  0, "Open file as read only"},
-  {CTRL_CHECK,                      "&Log file",    ID_OF_LOG,      &FileDialog::s_vars.log,   54, 16,  0,  0, "Open file that can grow"},
-  {CTRL_STATIC,                     "",             ID_OF_INFO,     nullptr,                   20, 18, 34},
-  {CTRL_LINE,                       "",             0,              nullptr,                   54, 17, 13}
+    {CTRL_CHECK,                        "&Read only",   ID_OF_RO,       &FileDialog::s_vars.ro,    54, 15,  0,  0, "Open file as read only"},
+    {CTRL_CHECK,                        "&Log file",    ID_OF_LOG,      &FileDialog::s_vars.log,   54, 16,  0,  0, "Open file that can grow"},
+    {CTRL_STATIC,                       "",             ID_OF_INFO,     nullptr,                   20, 18, 34},
+    {CTRL_LINE,                         "",             0,              nullptr,                   54, 17, 13}
 };
 
 FileDialog::FileDialog(FileDlgMode mode, pos_t x, pos_t y)

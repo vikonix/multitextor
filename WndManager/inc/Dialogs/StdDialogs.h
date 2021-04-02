@@ -59,6 +59,8 @@ class FileDialog : public Dialog
     FileDlgMode     m_mode;
     DirectoryList   m_dirList;
 
+    bool ScanDir(const std::string& mask);
+
 public:
     static FileDialogVars s_vars;
 
@@ -67,7 +69,4 @@ public:
     virtual input_t DialogProc(input_t code) override;
     virtual bool OnActivate() override;
     virtual bool OnClose(int id) override;
-
-protected:
-    bool ScanDir(const std::string& mask);
 };

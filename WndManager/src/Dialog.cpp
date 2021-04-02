@@ -632,7 +632,7 @@ input_t Dialog::EventProc(input_t code)
     if(refresh)
         _Refresh();
 
-    return code;
+    return 0;
 }
 
 bool Dialog::CtrlRadioSelect(size_t pos)

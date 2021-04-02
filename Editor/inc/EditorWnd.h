@@ -209,11 +209,13 @@ public:
     virtual bool            IsUsedTimer() const override { return true; }
     virtual bool            IsUsedView() const override { return true; }
     virtual wnd_t           GetWndType() const override { return wnd_t::editor; }
+    virtual std::filesystem::path   GetFilePath() const override { return m_editor->GetFilePath(); }
+    
+    bool    IsMarked() { return IsSelectComplete(); }
 
 /*
   virtual Wnd*          CloneWnd() override;
   virtual int           IsClone() override      {return m_fClone;}
-  virtual const char*   GetObjPath() override   {return m_pTBuff->GetObjPath();}
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
 
   int       IsRO()                   {return m_fReadOnly;}

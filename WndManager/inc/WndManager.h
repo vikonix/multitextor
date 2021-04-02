@@ -138,7 +138,7 @@ public:
     bool    SetTopWnd(Wnd* pWnd, int view = -1);
     bool    SetTopWnd(int pos, int view = -1);
     size_t  GetWndCount() const;
-    Wnd*    GetWnd(int pos = 0, int view = -1);
+    Wnd*    GetWnd(size_t pos = 0, int view = -1);
 
     bool    Show(Wnd* wnd, bool refresh = true, int view = 0);
     bool    Hide(Wnd* wnd, bool refresh = true);

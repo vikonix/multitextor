@@ -640,15 +640,15 @@ size_t WndManager::GetWndCount() const
 }
 
 
-Wnd* WndManager::GetWnd(int n, int view)
+Wnd* WndManager::GetWnd(size_t n, int view)
 {
     if (view == -1)
         view = m_activeView;
 
-    if (view == 1 || n < 0)
+    if (view == 1)
         return m_view[2].wnd;
 
-    if (n < static_cast<int>(m_wndList.size()))
+    if (n < m_wndList.size())
         return m_wndList[n];
     else
         return nullptr;
