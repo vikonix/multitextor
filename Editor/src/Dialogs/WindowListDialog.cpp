@@ -101,10 +101,6 @@ bool WindowListDialog::OnActivate()
         GetItem(ID_WL_CLOSE)->SetMode(CTRL_HIDE);
     }
 
-    std::stringstream sstr;
-    sstr << count << " window(s)";
-    GetItem(ID_WL_COUNT)->SetName(sstr.str());
-
     return true;
 }
 
@@ -113,8 +109,10 @@ size_t WindowListDialog::GetWndList(bool skip)
     m_wndList.clear();
 
     auto listCtrl = GetItem(ID_WL_WNDLIST);
-    auto ListPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
-    ListPtr->Clear();
+    auto listPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
+    listPtr->Clear();
+
+    std::string active;
 
     size_t count{};
     Wnd* wnd;
@@ -128,27 +126,134 @@ size_t WindowListDialog::GetWndList(bool skip)
         }
         if (wnd->GetWndType() != wnd_t::editor)
             continue;
-        if (m_mode == WindowsDlgMode::List || m_mode == WindowsDlgMode::CompareWith || dynamic_cast<EditorWnd*>(wnd)->IsMarked())
+
+        auto edWnd = dynamic_cast<EditorWnd*>(wnd);
+        if (m_mode == WindowsDlgMode::List || m_mode == WindowsDlgMode::CompareWith || edWnd->IsMarked())
         {
             auto path = wnd->GetFilePath();// .relative_path();
             auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX());
-            m_wndList[shortPath] = wnd;
+            if (active.empty())
+                active = shortPath;
+            m_wndList[shortPath] = edWnd;
         }
     }
 
-    for(auto& [path, w] : m_wndList)
-        ListPtr->AppendStr(path);
+    size_t n{};
+    for (auto& [path, w] : m_wndList)
+    {
+        listPtr->AppendStr(path);
+        if (path == active)
+            listPtr->SetSelect(n);
+        ++n;
+    }
+
+    std::stringstream sstr;
+    sstr << m_wndList.size() << " window(s)";
+    GetItem(ID_WL_COUNT)->SetName(sstr.str());
 
     return m_wndList.size();
 }
 
 input_t WindowListDialog::DialogProc(input_t code)
 {
+    if (code == ID_WL_CLOSE || code == K_DELETE || code == '-')
+    {
+        code = 0;
+
+        auto listCtrl = GetItem(ID_WL_WNDLIST);
+        auto listPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
+        auto n = listPtr->GetSelected();
+        std::string path{ listPtr->GetStr(n) };
+        auto wndIt = m_wndList.find({ path });
+        if (wndIt == m_wndList.end())
+        {
+            _assert(0);
+            return 0;
+        }
+        auto& [p, wnd] = *wndIt;
+
+        if (m_mode == WindowsDlgMode::List)
+        {
+            Application::getInstance().CloseWindow(wnd);
+//???            if (wnd < 0)
+//                m_activeView = 0;
+        }
+        else
+        {
+            wnd->SelectClear();
+            WndManager::getInstance().Invalidate();
+        }
+
+        if (GetWndList() == 0)
+        {
+            GetItem(ID_WL_WNDLIST)->SetMode(CTRL_DISABLED);
+            GetItem(ID_OK)->SetMode(CTRL_DISABLED);
+            GetItem(ID_WL_CLOSE)->SetMode(CTRL_DISABLED);
+            SelectItem(ID_CANCEL);
+            if (m_mode == WindowsDlgMode::List)
+            {
+                GetItem(ID_CANCEL)->SetHelpLine("All windows are closed");
+                EditorApp::SetErrorLine("All windows are closed");
+            }
+            else
+            {
+                GetItem(ID_CANCEL)->SetHelpLine("No windows with marked block");
+                EditorApp::SetErrorLine("No windows with marked block");
+            }
+        }
+        else
+            listPtr->SetSelect(n);
+    }
+
     return code;
 }
 
 bool WindowListDialog::OnClose(int id)
 {
+    if (id == ID_OK)
+    {
+        //уберем свое окно из списка
+        WndManager::getInstance().DelWnd(this);
+
+        auto listCtrl = GetItem(ID_WL_WNDLIST);
+        auto listPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
+        auto n = listPtr->GetSelected();
+        std::string path{ listPtr->GetStr(n) };
+        auto wndIt = m_wndList.find({ path });
+        if (wndIt == m_wndList.end())
+        {
+            _assert(0);
+            return 0;
+        }
+        auto& [p, wnd] = *wndIt;
+
+        if (m_mode == WindowsDlgMode::List)
+        {
+            WndManager::getInstance().SetTopWnd(wnd, m_activeView);
+        }
+        else if (m_mode == WindowsDlgMode::CopyFrom)
+        {
+            //window copy
+            EditorWnd* to = reinterpret_cast<EditorWnd*>(WndManager::getInstance().GetWnd(0, m_activeView));
+            if (to)
+                to->EditWndCopy(wnd);
+        }
+        else if (m_mode == WindowsDlgMode::MoveFrom)
+        {
+            //window move
+            EditorWnd* to = reinterpret_cast<EditorWnd*>(WndManager::getInstance().GetWnd(0, m_activeView));
+            if (to)
+                to->EditWndMove(wnd);
+        }
+        else
+        {
+//            TPRINT(("Select Wnd %d\n", wnd));
+//            //skip 2 dialogs
+//            WndEdit* pWnd = (WndEdit*)g_WndManager->GetWnd(wnd + 1);
+//            g_WndManager->ChangeViewMode();
+//            g_WndManager->SetTopWnd(pWnd, 1);
+        }
+    }
     return true;
 }
 

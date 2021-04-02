@@ -165,7 +165,6 @@ class EditorWnd : public FrameWnd
     bool    Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color = 0, select_t selectType = select_t::stream);
     bool    IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey) const;
     bool    HideFound();
-    bool    SelectClear();
     bool    FindWord(const std::u16string& str, size_t& begin, size_t& end);
     bool    GetWord(std::u16string& buff);
     bool    GetSelectedPos(size_t line, size_t& begin, size_t& end, select_line& type) const;
@@ -187,6 +186,7 @@ public:
         const std::string& parseMode = "", const std::string& cp = "");
     bool        SetEditor(EditorPtr editor);
     EditorPtr   GetEditor() { return m_editor; }
+    bool        SelectClear();
 
     bool        SetDiffMode(std::shared_ptr<Diff> diff = nullptr, int buff = -1)
     {
@@ -212,6 +212,8 @@ public:
     virtual std::filesystem::path   GetFilePath() const override { return m_editor->GetFilePath(); }
     
     bool    IsMarked() { return IsSelectComplete(); }
+    bool    EditWndCopy(EditorWnd* from);
+    bool    EditWndMove(EditorWnd* from);
 
 /*
   virtual Wnd*          CloneWnd() override;
@@ -237,8 +239,6 @@ public:
   size_t    GetCurPos()  {return m_nXOffset + m_cursorx;}
   size_t    GetCurLine() {return m_nFirstLine + m_cursory;}
   int       ReplaceSubstr(int nline, int pos, int len, wchar* pSubstr, int size);
-  int       EditWndCopy(WndEdit* pWFrom);
-  int       EditWndMove(WndEdit* pWFrom);
 */
     ///////////////////////////////////////////////////////////////////////////
     //editor functions

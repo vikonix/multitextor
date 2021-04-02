@@ -656,7 +656,6 @@ input_t EditorWnd::EventProc(input_t code)
     return 0;
 }
 
-
 input_t EditorWnd::ParseCommand(input_t cmd)
 {
     if (cmd == K_TIME)
@@ -1873,3 +1872,35 @@ bool EditorWnd::CheckFileChanging()
     return true;
 }
 
+bool EditorWnd::EditWndCopy(EditorWnd* from)
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditWndCopy";
+
+    std::vector<std::u16string> buff;
+    select_t type;
+
+    bool rc = from->CopySelected(buff, type)
+    && PasteSelected(buff, type);
+
+    return rc;
+}
+
+bool EditorWnd::EditWndMove(EditorWnd* from)
+{
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    EditWndMove";
+
+    std::vector<std::u16string> buff;
+    select_t type;
+
+    bool rc = from->CopySelected(buff, type)
+        && PasteSelected(buff, type)
+        && from->DelSelected();
+
+    return rc;
+}

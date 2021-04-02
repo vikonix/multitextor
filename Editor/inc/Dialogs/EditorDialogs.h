@@ -38,10 +38,11 @@ enum class WindowsDlgMode
     CompareWith
 };
 
+class EditorWnd;
 class WindowListDialog : public Dialog
 {
     WindowsDlgMode m_mode;
-    std::map<std::string, Wnd*> m_wndList;
+    std::map<std::string, EditorWnd*> m_wndList;
 
     size_t GetWndList(bool skip = false);
 
