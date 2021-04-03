@@ -1116,7 +1116,7 @@ must_use_null_useddefaultchar(int codepage)
 static char *
 strrstr(const char *str, const char *token)
 {
-    int len = strlen(token);
+    size_t len = strlen(token);
     const char *p = str + strlen(str);
 
     while (str <= --p)
@@ -1819,8 +1819,8 @@ iso2022jp_wctomb(csconv_t *cv, ushort *wbuf, int wbufsize, uchar *buf, int bufsi
     HRESULT hr;
     DWORD dummy = 0;
     int len;
-    int esc_len;
-    int cs;
+    int esc_len = 0;
+    int cs = 0;
     int shift;
     int i;
 

@@ -111,9 +111,9 @@ class LexParser
     size_t      m_commentOpen{};
 
     //function check
-    bool        m_funcCheck{};
-    size_t      m_funcLine{};
-    size_t      m_curlyBracketCount{}; //{
+//    bool        m_funcCheck{};
+//    size_t      m_funcLine{};
+//    size_t      m_curlyBracketCount{}; //{
 
 protected:
     bool    CheckForOpenComments(size_t line);
