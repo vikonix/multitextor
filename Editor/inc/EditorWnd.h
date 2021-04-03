@@ -95,6 +95,7 @@ class EditorWnd : public FrameWnd
     static std::unordered_map<EditorCmd, std::pair<EditorFunc, select_state>> s_funcMap;
 
     EditorPtr       m_editor;
+    std::shared_ptr<EditorWnd>  m_clonedWnd;
 
     bool            m_close{};    //close window at EventProc return
     bool            m_deleted{};  //file was deleted by external program
@@ -111,11 +112,11 @@ class EditorWnd : public FrameWnd
     pos_t           m_clientSizeY{};
 
     //select mode variables
-    //select coord
     select_t        m_selectType{select_t::stream};
     select_state    m_selectState{select_state::no};    //current selection state
     bool            m_selectKeyShift{};                 //select with shift key pressed
     bool            m_selectMouse{};                    //select by mouse
+    //select coord
     size_t          m_beginX{};
     size_t          m_beginY{};
     size_t          m_endX{};
@@ -197,7 +198,8 @@ public:
 
     input_t     ParseCommand(input_t cmd);
 
-    virtual input_t EventProc(input_t code) override;
+    virtual bool            Destroy() override;
+    virtual input_t         EventProc(input_t code) override;
     virtual bool            Refresh() override;
     virtual bool            Repaint() override;
     virtual bool            Invalidate(size_t line, invalidate_t type, size_t pos = 0, size_t size = 0) override;
@@ -210,14 +212,14 @@ public:
     virtual bool            IsUsedView() const override { return true; }
     virtual wnd_t           GetWndType() const override { return wnd_t::editor; }
     virtual std::filesystem::path   GetFilePath() const override { return m_editor->GetFilePath(); }
-    
+    virtual Wnd*            CloneWnd() override;
+    virtual bool            IsClone() const override { return m_clone; }
+
     bool    IsMarked() { return IsSelectComplete(); }
     bool    EditWndCopy(EditorWnd* from);
     bool    EditWndMove(EditorWnd* from);
 
 /*
-  virtual Wnd*          CloneWnd() override;
-  virtual int           IsClone() override      {return m_fClone;}
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
 
   int       IsRO()                   {return m_fReadOnly;}

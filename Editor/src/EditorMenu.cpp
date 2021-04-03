@@ -166,10 +166,10 @@ static menu_list menuWindows
     {MENU_ITEM,         "&Close Window",                K_ED(E_CTRL_CLOSE),         "Close current window"},
     {MENU_ITEM,         "Close &All Windows",           K_APP_WND_CLOSEALL,         "Close all windows"},
     {MENU_SEPARATOR},
-    {MENU_DISABLED | MENU_ITEM,         "Split/Merge &View",            K_APP_VIEW_SPLIT,           "Split/Merge window view"},
-    {MENU_DISABLED | MENU_ITEM,         "Split &Horizontal/Vertical",   K_APP_VIEW_MODE,            "Change split type horizontal <-> vertical"},
-    {MENU_DISABLED | MENU_ITEM,         "&Move Split Line",             K_APP_VIEW_SIZE,            "Change split line position"},
-    {MENU_DISABLED | MENU_ITEM,         "&Change Active View;Alt+Page", K_APP_VIEW_SET,             "Set another view as active"},
+    {MENU_ITEM,         "Split/Merge &View",            K_APP_VIEW_SPLIT,           "Split/Merge window view"},
+    {MENU_ITEM,         "Split &Horizontal/Vertical",   K_APP_VIEW_MODE,            "Change split type horizontal <-> vertical"},
+    {MENU_ITEM,         "&Move Split Line",             K_APP_VIEW_SIZE,            "Change split line position"},
+    {MENU_ITEM,         "&Change Active View;Alt+Page", K_APP_VIEW_SET,             "Set another view as active"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "Windows &List...",             K_APP_WND_LIST,             "Get windows list"}
 };

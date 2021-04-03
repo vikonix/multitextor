@@ -77,7 +77,7 @@ bool EditorApp::StatusMark(mark_status mark)
         s_mark = mark;
     }
 
-    return 0;
+    return true;
 }
 
 std::string EditorApp::GetKeyName(input_t code) const

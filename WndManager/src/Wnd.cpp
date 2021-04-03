@@ -416,7 +416,7 @@ bool FrameWnd::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, color_
 bool FrameWnd::WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color)
 {
     if (!m_visible)
-        return 0;
+        return true;
 
     ClientToScreen(x, y);
 
@@ -430,7 +430,7 @@ bool FrameWnd::WriteColorStr(pos_t x, pos_t y, const std::u16string& str, const 
         return true;
 
     if (x < 0 || y < 0 || x > GetCSizeX() || y > GetCSizeY())
-        return 0;
+        return true;
 
     ClientToScreen(x, y);
 

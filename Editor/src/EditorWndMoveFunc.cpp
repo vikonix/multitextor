@@ -717,7 +717,7 @@ bool EditorWnd::SelectBegin(input_t cmd)
 bool EditorWnd::SelectEnd(input_t cmd)
 {
     if (m_selectState == select_state::no || IsSelectFinished())
-        return 0;
+        return true;
 
     //LOG(DEBUG) << "    SelectEnd code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
     InputRelease();

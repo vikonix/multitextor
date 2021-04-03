@@ -766,7 +766,7 @@ bool Editor::DelSubstr(bool save, size_t line, size_t pos, size_t len)
 
     CorrectTab(save, line, m_curStrBuff);
 
-    return 0;
+    return true;
 }
 
 bool Editor::DelLine(bool save, size_t line, size_t count)
@@ -919,7 +919,7 @@ bool Editor::RestoreTab([[maybe_unused]]bool save, size_t line, const std::u16st
         m_curStrBuff[pos] = S_TAB;//set tab
 
     InvalidateWnd(line, invalidate_t::change);
-    return 0;
+    return true;
 }
 
 bool Editor::ClearSubstr(bool save, size_t line, size_t pos, size_t len)
@@ -1379,3 +1379,13 @@ bool Editor::ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::str
     return true;
 }
 
+std::list<FrameWnd*> Editor::GetLinkedWnd(FrameWnd* wnd) const
+{
+    std::list<FrameWnd*> list;
+    for (auto w : m_wndList)
+    {
+        if (w != wnd)
+            list.push_back(w);
+    }
+    return list;
+}

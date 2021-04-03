@@ -387,7 +387,7 @@ bool WndManager::CheckRefresh()
         WriteConsoleTitle();
         Refresh();
     }
-    return 0;
+    return true;
 }
 
 bool WndManager::WriteConsoleTitle(bool set)
@@ -555,7 +555,7 @@ const View& WndManager::GetView(const Wnd* wnd) const
     return m_view[view];
 }
 
-bool WndManager::CloneView(const Wnd* wnd)
+bool WndManager::CloneView(Wnd* wnd)
 {
     LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
 
@@ -574,7 +574,7 @@ bool WndManager::CloneView(const Wnd* wnd)
 
     if (!wnd)
     {
-        m_activeView = false;
+        m_activeView = 0;
         m_splitType = split_t::no_split;
         m_view[2].wnd = nullptr;
     }
@@ -583,7 +583,7 @@ bool WndManager::CloneView(const Wnd* wnd)
         m_view[2].wnd = wnd->CloneWnd();
     }
 
-    return 0;
+    return true;
 }
 
 bool WndManager::AddWnd(Wnd* wnd)
@@ -844,7 +844,7 @@ bool WndManager::SetActiveView(int n)
     //LOG(DEBUG) << "SetActiveView st=" << static_cast<int>(m_splitType) << " av=" << m_activeView << " n=" << n;
 
     if (m_splitType == split_t::no_split)
-        return 0;
+        return true;
 
     if (n < 0)
         m_activeView = m_activeView ? 0 : 1;
@@ -887,7 +887,7 @@ bool WndManager::ChangeViewMode(int mode)//0-create/del 1-horiz/vert
     else
     {
         if (m_splitType == split_t::no_split)
-            return 0;
+            return true;
 
         if (m_splitType == split_t::split_h)
             m_splitType = split_t::split_v;
@@ -927,7 +927,7 @@ bool WndManager::SetView(pos_t x, pos_t y, split_t type)
     m_splitType = type;
 
     CalcView();
-    return 0;
+    return true;
 }
 
 bool WndManager::TrackView(const std::string& msg)

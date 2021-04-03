@@ -74,20 +74,19 @@ protected:
 public:
     Wnd() = default;
     virtual ~Wnd() {Hide();}
-    virtual input_t         Destroy()               { return K_CLOSE; };
-
-
+    
+    virtual bool            Destroy()                   { return true; }
     virtual std::filesystem::path   GetFilePath() const { return ""; }
-    virtual wnd_t           GetWndType() const      {return wnd_t::wnd;}
-    virtual std::string     GetObjName() const      {return {};}
-    virtual char            GetAccessInfo() const   {return ' ';}
-    virtual bool            IsClone() const         {return false;}
-    virtual bool            IsUsedTimer() const     {return false;}
-    virtual bool            IsUsedView() const      {return false;}
-    virtual Wnd*            CloneWnd() const        {return nullptr;}
-    virtual Wnd*            GetLinkedWnd() const    {return nullptr;}
+    virtual wnd_t           GetWndType() const          {return wnd_t::wnd;}
+    virtual std::string     GetObjName() const          {return {};}
+    virtual char            GetAccessInfo() const       {return ' ';}
+    virtual bool            IsClone() const             {return false;}
+    virtual bool            IsUsedTimer() const         {return false;}
+    virtual bool            IsUsedView() const          {return false;}
+    virtual Wnd*            CloneWnd()                  {return nullptr;}
+    virtual Wnd*            GetLinkedWnd() const        {return nullptr;}
 
-    virtual bool            Refresh()               {return true;}
+    virtual bool            Refresh()                   {return true;}
 
     virtual bool            CheckWndPos(pos_t /*x*/, pos_t /*y*/) const {return false;}
     virtual bool            CheckClientPos(pos_t x, pos_t y) const;

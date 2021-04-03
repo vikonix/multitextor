@@ -69,6 +69,8 @@ protected:
     Console             m_console;
 #define CallConsole(p) ((m_disablePaint) ? true : m_console. p)
 
+    //view 0 - dialog (top wnd)
+    //view 1/2 - splited view
     std::array<View, 3> m_view {};
     std::deque<Wnd*>    m_wndList;  //windows list sorted in Z order with them activity
 
@@ -146,7 +148,7 @@ public:
     bool    SetView(pos_t x = 40, pos_t y = 11, split_t type = split_t::no_split);
     bool    ChangeViewMode(int mode = 0);//0-create/del 1-horiz/vert
     bool    CalcView();
-    bool    CloneView(const Wnd* wnd = nullptr);
+    bool    CloneView(Wnd* wnd = nullptr);
     bool    SetActiveView(int n = -1);
     int     GetActiveView() {return m_activeView;}
     bool    TrackView(const std::string& msg);

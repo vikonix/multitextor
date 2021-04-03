@@ -850,7 +850,7 @@ bool EditorWnd::SelectClear()
         m_selectType = select_t::stream;
     }
 
-    return 0;
+    return true;
 }
 
 bool EditorWnd::FindWord(const std::u16string& str, size_t& begin, size_t& end)
@@ -1903,4 +1903,42 @@ bool EditorWnd::EditWndMove(EditorWnd* from)
         && from->DelSelected();
 
     return rc;
+}
+
+Wnd* EditorWnd::CloneWnd()
+{
+    LOG(DEBUG) << "CloneWnd";
+
+    m_clonedWnd = std::make_shared<EditorWnd>();
+    EditorWnd* wnd = m_clonedWnd.get();
+    if (!wnd)
+    {
+        _assert(0);
+        return nullptr;
+    }
+
+    wnd->SetEditor(m_editor);
+    wnd->m_clone = true;
+    wnd->m_visible = true;
+    wnd->_GotoXY(m_xOffset + m_cursorx, m_firstLine + m_cursory);
+
+    return wnd;
+}
+
+bool EditorWnd::Destroy() 
+{ 
+    if (m_clone)
+    {
+        auto list = m_editor->GetLinkedWnd(this);
+        for (auto wnd : list)
+        {
+            if (!wnd->IsClone())
+            {
+                auto editorWnd = reinterpret_cast<EditorWnd*>(wnd);
+                editorWnd->m_clonedWnd = nullptr;
+                break;
+            }
+        }
+    }
+    return true; 
 }

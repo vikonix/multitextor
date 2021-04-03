@@ -136,7 +136,7 @@ bool Application::ChangeStatusLine(size_t n, std::optional<const std::string> te
         PrintStatusLine();
     }
 
-    return 0;
+    return true;
 }
 
 bool Application::ChangeStatusLine(size_t n, stat_color color)

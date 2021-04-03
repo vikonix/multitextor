@@ -78,7 +78,7 @@ bool Control::Paint(const std::u16string& wstr, int type)
         ++x;
     }
 
-    return 0;
+    return true;
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -303,7 +303,7 @@ bool CtrlRadio::Refresh(CtrlState state)
 
     Paint(name, state | (m_type & CTRL_STATE_MASK));
 
-    return 0;
+    return true;
 }
 
 input_t CtrlRadio::EventProc(input_t code)
@@ -953,9 +953,9 @@ bool CtrlDropList::LostFocus()
 
 size_t CtrlDropList::SetSelect(size_t n)
 {
-    m_list.SetSelect(n, false);
+    auto pos = m_list.SetSelect(n, false);
     Refresh();
-    return 0;
+    return pos;
 }
 
 input_t CtrlDropList::EventProc(input_t code)
@@ -1317,7 +1317,7 @@ bool CtrlColor::SetCursor()
     m_dcursorx = 1 + (m_color % 4) * 4;
     m_dcursory = 1 + m_color / 4;
     m_dialog.GotoXY(m_posx + m_dcursorx, m_posy + m_dcursory);
-    return 0;
+    return true;
 }
 
 bool CtrlColor::PaintSelect(bool visible, bool selected)

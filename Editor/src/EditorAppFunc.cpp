@@ -171,24 +171,24 @@ bool    EditorApp::WndMoveProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::ViewSplitProc(input_t cmd)
+bool    EditorApp::ViewSplitProc([[maybe_unused]] input_t cmd)
 {
-    return true;
+    return WndManager::getInstance().ChangeViewMode();
 }
 
-bool    EditorApp::ViewModeProc(input_t cmd)
+bool    EditorApp::ViewModeProc([[maybe_unused]] input_t cmd)
 {
-    return true;
+    return WndManager::getInstance().ChangeViewMode(1);
 }
 
-bool    EditorApp::ViewSelectProc(input_t cmd)
+bool    EditorApp::ViewSelectProc([[maybe_unused]] input_t cmd)
 {
-    return true;
+    return WndManager::getInstance().SetActiveView();
 }
 
-bool    EditorApp::ViewMoveProc(input_t cmd)
+bool    EditorApp::ViewMoveProc([[maybe_unused]] input_t cmd)
 {
-    return true;
+    return WndManager::getInstance().TrackView("Track view");
 }
 
 bool    EditorApp::DiffProc(input_t cmd)

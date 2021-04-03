@@ -32,9 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorApp.h"
 
 
-#define ID_WL_WNDLIST  (ID_USER +  1)
-#define ID_WL_COUNT    (ID_USER +  2)
-#define ID_WL_CLOSE    (ID_USER +  3)
+#define ID_WL_WNDLIST  (ID_USER + 1)
+#define ID_WL_COUNT    (ID_USER + 2)
+#define ID_WL_CLOSE    (ID_USER + 3)
 
 std::list<control> dlgWindowList
 {
@@ -212,7 +212,7 @@ bool WindowListDialog::OnClose(int id)
 {
     if (id == ID_OK)
     {
-        //уберем свое окно из списка
+        //remove current dialog wnd from list
         WndManager::getInstance().DelWnd(this);
 
         auto listCtrl = GetItem(ID_WL_WNDLIST);

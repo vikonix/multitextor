@@ -59,6 +59,6 @@ public:
 
     bool Paint();
     bool Hide();
-    bool Discard() {m_mode = 0; return 0;}
+    bool Discard() {m_mode = 0; return true;}
 };
 

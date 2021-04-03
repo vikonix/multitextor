@@ -760,7 +760,7 @@ bool EditorWnd::Save([[maybe_unused]] input_t cmd)
                     );
 
                     if (code != ID_OK)
-                        return 0;
+                        return false;
                 }
 
                 m_pTBuff->SetDataObject(g_InputStr);
