@@ -438,7 +438,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
     if (!m_diff)
         rc = Mark(bx, line, ex, line, ColorWindowSelect, m_selectType);
     else
-        ;//???        rc = Mark(bx, posy, ex, posy, ColorWindowCurDiff, m_selectType);
+        rc = Mark(bx, line, ex, line, ColorWindowCurDiff, m_selectType);
 
     MarkFound();
 
