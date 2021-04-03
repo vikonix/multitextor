@@ -44,7 +44,7 @@ set_target_properties(${PROJECT_NAME}
 if(MSVC)
     # warning level 4
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Zc:__cplusplus)
-    if(VLD)
+    if(USE_VLD)
         target_compile_definitions(${PROJECT_NAME} PUBLIC USE_VLD)
         target_include_directories(${PROJECT_NAME} PUBLIC
             #"../../ThirdParty/inc/vld"
