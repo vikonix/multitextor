@@ -1818,8 +1818,8 @@ iso2022jp_wctomb(csconv_t *cv, ushort *wbuf, int wbufsize, uchar *buf, int bufsi
     HRESULT hr;
     DWORD dummy = 0;
     int len;
-    int esc_len;
-    int cs;
+    int esc_len = 0;
+    int cs = 0;
     int shift;
     int i;
 
