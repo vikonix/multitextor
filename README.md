@@ -23,11 +23,12 @@ Minimal requirenment: gcc 8.0 or MSVS 2017
  - sudo apt-get install -y libgpm-dev
  - sudo apt-get install -y gpm
  
-## What is ready now:
- - Third party library (easyloggingpp, utfcpp, termdb).
- - Console input/output library.
- - Console windows library.
- - Main editor components.
+## Used third party libraries:
+ - easyloggingpp
+ - termdb
+ - utfcpp
+ - win-iconv
+ - iconv
  
 ## In progress:
  - Editor alpha version.
