@@ -138,6 +138,20 @@ size_t WindowListDialog::GetWndList(bool skip)
         }
     }
 
+    wnd = WndManager::getInstance().GetWnd(0, 1);
+    if (wnd && ((m_mode == WindowsDlgMode::List && !wnd->IsClone()) 
+        || (m_activeView == 0 && (m_mode == WindowsDlgMode::CopyFrom || m_mode == WindowsDlgMode::MoveFrom))))
+    {
+        auto edWnd = dynamic_cast<EditorWnd*>(wnd);
+        if (m_mode == WindowsDlgMode::List || m_mode == WindowsDlgMode::CompareWith 
+            || (wnd->GetWndType() == wnd_t::editor && edWnd->IsMarked()))
+        {
+            auto path = wnd->GetFilePath();
+            auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX());
+            m_wndList[shortPath] = edWnd;
+        }
+    }
+
     size_t n{};
     for (auto& [path, w] : m_wndList)
     {

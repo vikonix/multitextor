@@ -1930,6 +1930,7 @@ bool EditorWnd::Destroy()
     if (m_clone)
     {
         auto list = m_editor->GetLinkedWnd(this);
+        m_editor->UnlinkWnd(this);
         for (auto wnd : list)
         {
             if (!wnd->IsClone())
