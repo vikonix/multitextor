@@ -40,7 +40,8 @@ class EditorApp : public Application
     static std::unordered_map<AppCmd, AppFunc> s_funcMap;
 
     std::unordered_map<Wnd*, std::shared_ptr<EditorWnd>> m_editors;
-    bool s_wait{};
+    bool m_wait{};
+    bool m_run{};
 
 public:
     virtual input_t AppProc(input_t code) override final;
@@ -49,9 +50,10 @@ public:
 
     virtual bool    Init() override final;
     virtual void    Deinit() override final;
-    virtual bool    StatusWaitKey(bool wait) override final;
     virtual bool    CloseWindow(Wnd* wnd) override final;
     virtual std::string GetKeyName(input_t code) const override final;
+    virtual void    StatusWaitKey(bool wait) override final;
+    virtual void    StatusRecordMacro(bool run) override final;
 
     static bool SetHelpLine(std::optional<const std::string> help = std::nullopt, stat_color color = stat_color::normal)
     {

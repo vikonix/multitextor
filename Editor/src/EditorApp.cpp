@@ -48,19 +48,30 @@ void EditorApp::Deinit()
     Application::Deinit();
 }
 
-bool EditorApp::StatusWaitKey(bool wait)
+void EditorApp::StatusWaitKey(bool wait)
 {
-    if (s_wait != wait)
+    if (m_wait != wait)
     {
         ChangeStatusLine(1, wait ? stat_color::normal : stat_color::grayed);
         if (wait)
             ChangeStatusLine(0, "Press next key of sequence");
         else
             ChangeStatusLine(0);
-        s_wait = wait;
+        m_wait = wait;
     }
+}
 
-    return true;
+void EditorApp::StatusRecordMacro(bool run)
+{
+    if (m_run != run)
+    {
+        ChangeStatusLine(3, run ? stat_color::normal : stat_color::grayed);
+        if (run)
+            ChangeStatusLine(0, "Press Ctrl+K for end record macro");//??? Ctrl+K
+        else
+            ChangeStatusLine(0);
+        m_run = run;
+    }
 }
 
 bool EditorApp::StatusMark(mark_status mark)
@@ -71,7 +82,7 @@ bool EditorApp::StatusMark(mark_status mark)
         //this will clear all other help line
         getInstance().ChangeStatusLine(2, mark != mark_status::no ? stat_color::normal : stat_color::grayed);
         if (mark == mark_status::mark_by_key)
-            getInstance().ChangeStatusLine(0, "Press F4 for to end selection");
+            getInstance().ChangeStatusLine(0, "Press F4 for to end selection");//??? F4
         else
             getInstance().ChangeStatusLine(0);
         s_mark = mark;

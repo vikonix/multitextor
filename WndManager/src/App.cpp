@@ -539,3 +539,26 @@ bool Application::CloseWindow([[maybe_unused]] Wnd* wnd)
     return true;
 }
 
+bool Application::RecordMacro()
+{
+    if (!m_recordMacro)
+    {
+        //start record
+        m_recordMacro = true;
+        m_wndManager.m_console.ClearMacro();
+        StatusRecordMacro(true);
+    }
+    else
+    {
+        //stop record
+        m_recordMacro = false;
+        StatusRecordMacro(false);
+    }
+    return true;
+}
+
+bool Application::PlayMacro()
+{
+    return m_wndManager.m_console.PlayMacro();
+}
+

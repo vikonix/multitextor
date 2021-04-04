@@ -94,9 +94,10 @@ public:
 
     virtual bool    Init();
     virtual void    Deinit();
-    virtual bool    StatusWaitKey([[maybe_unused]]bool wait = false) { return true; }
     virtual std::string GetKeyName(input_t code) const;
     virtual bool    CloseWindow(Wnd* wnd);
+    virtual void    StatusWaitKey([[maybe_unused]] bool wait = false) {}
+    virtual void    StatusRecordMacro([[maybe_unused]] bool run) {}
 
     input_t MainProc(input_t exit_code = K_EXIT);//input treatment loop
     input_t CheckMouse(input_t code);
@@ -126,8 +127,8 @@ public:
 
     bool    PutCode(input_t code) { return m_wndManager.m_console.PutInput(code); }
     bool    RecordMacro();
+    bool    PlayMacro();
     bool    PutMacro(input_t code);
-    input_t PlayMacro();
     bool    IsRecordMacro() {return m_recordMacro;}
 
     CaptureInput* Capture(CaptureInput* input)

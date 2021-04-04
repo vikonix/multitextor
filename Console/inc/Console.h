@@ -83,6 +83,10 @@ public:
         {return m_input.GetInputLen();}
     input_t GetInput()
         {return m_input.GetInput();}
+    void ClearMacro()
+        {m_input.ClearMacro();}
+    bool PlayMacro()
+        {return m_input.PlayMacro();}
 
     bool WriteConsoleTitle(const std::string& title)
         {return m_screen.WriteConsoleTitle(title);}

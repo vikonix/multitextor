@@ -73,31 +73,6 @@ std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
 };
 
 
-bool    EditorApp::AboutProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::HelpProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::HelpKeymapProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::FileNewProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::FileSaveAllProc(input_t cmd)
-{
-    return true;
-}
-
 bool    EditorApp::FileOpenProc(input_t cmd)
 {
     FileDialog dlg{ FileDlgMode::Open };
@@ -122,31 +97,6 @@ bool    EditorApp::FileOpenProc(input_t cmd)
         }
     }
 
-    return true;
-}
-
-bool    EditorApp::FileLoadProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::WndCloseAllProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::FindInFilesProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::ReplaceInFilesProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::FoundFilesProc(input_t cmd)
-{
     return true;
 }
 
@@ -191,6 +141,79 @@ bool    EditorApp::ViewMoveProc([[maybe_unused]] input_t cmd)
     return WndManager::getInstance().TrackView("Track view");
 }
 
+bool    EditorApp::RecordMacroProc(input_t cmd)
+{
+    auto rc = MsgBox(
+        "Macro Recording",
+        "Warning!",
+        !IsRecordMacro() ?
+            "Do you want to start macro recording?" :
+            "Do you want to stop macro recording?",
+        MBOX_OK_CANCEL
+    );
+
+    if (rc == ID_OK)
+        RecordMacro();
+
+    return true;
+}
+
+bool    EditorApp::PlayMacroProc(input_t cmd)
+{
+    PlayMacro();
+    return true;
+}
+
+bool    EditorApp::FileLoadProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::WndCloseAllProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::FindInFilesProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::ReplaceInFilesProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::FoundFilesProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::AboutProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::HelpProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::HelpKeymapProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::FileNewProc(input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::FileSaveAllProc(input_t cmd)
+{
+    return true;
+}
+
 bool    EditorApp::DiffProc(input_t cmd)
 {
     return true;
@@ -212,16 +235,6 @@ bool    EditorApp::NewSessionProc(input_t cmd)
 }
 
 bool    EditorApp::OpenSessionProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::RecordMacroProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::PlayMacroProc(input_t cmd)
 {
     return true;
 }
