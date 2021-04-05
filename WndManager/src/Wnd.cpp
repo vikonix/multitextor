@@ -306,10 +306,10 @@ bool FrameWnd::WriteWnd(pos_t x, pos_t y, const std::string& str, color_t color)
 
     bool rc = WndManager::getInstance().GotoXY(wleft, wtop);
     rc = WndManager::getInstance().SetTextAttr(color);
-    if(static_cast<pos_t>(str.size()) <= GetWSizeX() - (wleft - m_left))
+    if(static_cast<pos_t>(str.size()) <= GetWSizeX() - x)
         rc = WndManager::getInstance().WriteStr(str);
     else
-        rc = WndManager::getInstance().WriteStr(str.substr(0, static_cast<size_t>(GetWSizeX()) - (wleft - m_left)));
+        rc = WndManager::getInstance().WriteStr(str.substr(0, static_cast<size_t>(GetWSizeX()) - x));
 
     return rc;
 }

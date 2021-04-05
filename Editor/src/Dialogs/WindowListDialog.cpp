@@ -148,6 +148,8 @@ size_t WindowListDialog::GetWndList(bool skip)
         {
             auto path = wnd->GetFilePath();
             auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX());
+            if(m_activeView == 1)
+                active = shortPath;
             m_wndList[shortPath] = edWnd;
         }
     }
