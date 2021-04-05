@@ -105,6 +105,32 @@ bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
 
 bool    EditorApp::FileLoadProc([[maybe_unused]] input_t cmd)
 {
+    FileDialog dlg{ FileDlgMode::Load };
+    auto rc = dlg.Activate();
+    if (rc == ID_OK)
+    {
+        try
+        {
+            std::filesystem::path path{ utf8::utf8to16(dlg.s_vars.path) };
+            path /= utf8::utf8to16(dlg.s_vars.file);
+
+            if (auto wnd = GetEditorWnd(path))
+                return WndManager::getInstance().SetTopWnd(wnd);
+
+            _assert(0);//???
+            auto editor = std::make_shared<EditorWnd>();
+            editor->Show(true, -1);
+            if (editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
+                m_editors[editor.get()] = editor;
+        }
+        catch (...)
+        {
+            _assert(0);
+            LOG(ERROR) << "Error file loading";
+            EditorApp::SetErrorLine("Error file loading");
+        }
+    }
+
     return true;
 }
 

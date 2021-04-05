@@ -745,8 +745,11 @@ bool CtrlList::UpdateVar()
 size_t CtrlList::SetSelect(size_t pos, bool refresh)
 {
     size_t size = m_list.size();
-    if (pos > size)
-        pos = size;
+    if (size == 0)
+        pos = 0;
+    else if (pos >= size)
+        pos = size - 1;
+
     size_t sizey = static_cast<size_t>(m_sizey) - 3;
 
     if (pos != m_firstLine + m_selected)

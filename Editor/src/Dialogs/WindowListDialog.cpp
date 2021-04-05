@@ -113,7 +113,6 @@ size_t WindowListDialog::GetWndList(bool skip)
     listPtr->Clear();
 
     std::string active;
-
     size_t count{};
     Wnd* wnd;
     while ((wnd = WndManager::getInstance().GetWnd(count, 0)) != nullptr)
@@ -190,9 +189,9 @@ input_t WindowListDialog::DialogProc(input_t code)
 
         if (m_mode == WindowsDlgMode::List)
         {
+            if (wnd == WndManager::getInstance().GetWnd(0, 1))
+                m_activeView = 0;
             Application::getInstance().CloseWindow(wnd);
-//???            if (wnd < 0)
-//                m_activeView = 0;
         }
         else
         {
@@ -263,6 +262,7 @@ bool WindowListDialog::OnClose(int id)
         }
         else
         {
+//??? diff
 //            TPRINT(("Select Wnd %d\n", wnd));
 //            //skip 2 dialogs
 //            WndEdit* pWnd = (WndEdit*)g_WndManager->GetWnd(wnd + 1);
