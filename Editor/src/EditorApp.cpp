@@ -187,6 +187,22 @@ bool EditorApp::CloseWindow(Wnd* wnd)
     return false;
 }
 
+Wnd* EditorApp::GetEditorWnd(std::filesystem::path path)
+{
+    for (auto& [ptr, wnd] : m_editors)
+    {
+        if (path == wnd->GetFilePath())
+            return ptr;
+    }
+    return nullptr;
+}
+
+bool EditorApp::CloseAllWindows()
+{
+    m_editors.clear();
+    return true;
+}
+
 input_t EditorApp::AppProc(input_t code)
 { 
     //input treatment in user function
@@ -209,7 +225,7 @@ input_t EditorApp::AppProc(input_t code)
     }
     else if (code == K_EXIT)
     {
-        m_editors.clear();
+        CloseAllWindows();
     }
     else if(code >= K_APP && code <= K_APP_END)
     {

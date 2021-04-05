@@ -43,6 +43,9 @@ class EditorApp : public Application
     bool m_wait{};
     bool m_run{};
 
+    Wnd* GetEditorWnd(std::filesystem::path path);
+    bool CloseAllWindows();
+
 public:
     virtual input_t AppProc(input_t code) override final;
     virtual bool    LoadCfg() override final;

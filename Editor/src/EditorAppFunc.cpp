@@ -73,7 +73,7 @@ std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
 };
 
 
-bool    EditorApp::FileOpenProc(input_t cmd)
+bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
 {
     FileDialog dlg{ FileDlgMode::Open };
     auto rc = dlg.Activate();
@@ -83,6 +83,9 @@ bool    EditorApp::FileOpenProc(input_t cmd)
         {
             std::filesystem::path path{ utf8::utf8to16(dlg.s_vars.path) };
             path /= utf8::utf8to16(dlg.s_vars.file);
+
+            if (auto wnd = GetEditorWnd(path))
+                return WndManager::getInstance().SetTopWnd(wnd);
 
             auto editor = std::make_shared<EditorWnd>();
             editor->Show(true, -1);
@@ -98,6 +101,35 @@ bool    EditorApp::FileOpenProc(input_t cmd)
     }
 
     return true;
+}
+
+bool    EditorApp::FileLoadProc([[maybe_unused]] input_t cmd)
+{
+    return true;
+}
+
+bool    EditorApp::FileNewProc([[maybe_unused]] input_t cmd)
+{
+    for (size_t n = 0; n < 1000; ++n)
+    {
+        std::filesystem::path path{ "untitled_" + std::to_string(n) + ".txt" };
+
+        if (!std::filesystem::exists(path) && GetEditorWnd(path) == nullptr)
+        {
+            auto editor = std::make_shared<EditorWnd>();
+            editor->Show(true, -1);
+            if (editor->SetFileName(path, true))
+                m_editors[editor.get()] = editor;
+            
+            return true;
+        }
+    }
+    return false;
+}
+
+bool    EditorApp::WndCloseAllProc([[maybe_unused]] input_t cmd)
+{
+    return CloseAllWindows();
 }
 
 bool    EditorApp::WndListProc([[maybe_unused]] input_t cmd)
@@ -164,16 +196,6 @@ bool    EditorApp::PlayMacroProc(input_t cmd)
     return true;
 }
 
-bool    EditorApp::FileLoadProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::WndCloseAllProc(input_t cmd)
-{
-    return true;
-}
-
 bool    EditorApp::FindInFilesProc(input_t cmd)
 {
     return true;
@@ -200,11 +222,6 @@ bool    EditorApp::HelpProc(input_t cmd)
 }
 
 bool    EditorApp::HelpKeymapProc(input_t cmd)
-{
-    return true;
-}
-
-bool    EditorApp::FileNewProc(input_t cmd)
 {
     return true;
 }

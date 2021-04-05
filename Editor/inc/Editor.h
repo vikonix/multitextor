@@ -114,6 +114,7 @@ public:
         m_saveTab = m_lexParser.GetSaveTab();
         m_showTab = m_lexParser.GetShowTab();
         SetCP(cp);
+        Clear();
     }
 
     static size_t UStrLen(const std::u16string& str) 
