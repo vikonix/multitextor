@@ -3237,10 +3237,10 @@ class Writer : base::NoCopy {
  protected:
   LogMessage* m_msg;
   Level m_level;
-  const char* m_file;
+  const char* m_file{};
   const base::type::LineNumber m_line;
-  const char* m_func;
-  base::type::VerboseLevel m_verboseLevel;
+  const char* m_func{};
+  base::type::VerboseLevel m_verboseLevel{};
   Logger* m_logger;
   bool m_proceed;
   base::MessageBuilder m_messageBuilder;

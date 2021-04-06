@@ -396,19 +396,24 @@ bool EditorWnd::MoveFileEnd([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool EditorWnd::MoveStrBegin([[maybe_unused]]input_t cmd)
+bool EditorWnd::MoveStrBegin(input_t cmd)
 {
-    size_t curx = m_xOffset + m_cursorx;
+    size_t begin{ K_GET_CODE(cmd) };
 
-    auto str = m_editor->GetStr(m_firstLine + m_cursory);
-    size_t x;
-    for (x = 0; x < str.size(); ++x)
-        if (str[x] > ' ')
-            break;
-    if (x == str.size())
-        x = 0;
+    size_t curx{ m_xOffset + m_cursorx };
 
-    size_t offset = 0;
+    size_t x{};
+    if (begin == 0)
+    {
+        auto str = m_editor->GetStr(m_firstLine + m_cursory);
+        for (x = 0; x < str.size(); ++x)
+            if (str[x] > ' ')
+                break;
+        if (x == str.size())
+            x = 0;
+    }
+
+    size_t offset{};
 
     if (x >= curx)
         m_cursorx = 0;

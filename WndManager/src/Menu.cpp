@@ -564,7 +564,7 @@ bool FrameMenu::Refresh()
                 }
 
                 if (i < name.size())
-                    key = name.substr(i);
+                    key = name.substr(++i);
                 else
                     key = utf8::utf8to16(Application::getInstance().GetKeyName(mi->code));
             }

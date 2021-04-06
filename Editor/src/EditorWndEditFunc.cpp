@@ -264,7 +264,7 @@ bool EditorWnd::EditDelBegin(input_t cmd)
     if (0 == x)
         return true;
 
-    bool rc = MoveStrBegin(0);
+    bool rc = MoveStrBegin(1);
 
     if (y < m_editor->GetStrCount())
     {

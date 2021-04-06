@@ -36,8 +36,8 @@ CmdMap g_defaultAppKeyMap
 {
     {K_F1},                     {K_APP_HELP},
 
-    {'S' | K_ALT},              {K_APP_SAVE_ALL},
     {K_F2},                     {K_APP_SAVE_ALL},
+    {'S' | K_ALT},              {K_APP_SAVE_ALL},
 
     {K_F3},                     {K_APP_DLG_OPEN},
 
@@ -48,10 +48,9 @@ CmdMap g_defaultAppKeyMap
     {K_ESC, K_F7},              {K_APP_FINDFILE},
     {K_ESC, 'f'},               {K_APP_FINDFILE},
     {K_ESC, 'F'},               {K_APP_FINDFILE},
-    {'R' | K_ALT},              {K_APP_REPLACEFILE},
     {'H' | K_ALT},              {K_APP_REPLACEFILE},
-    {K_ESC, 'r'},               {K_APP_REPLACEFILE},
-    {K_ESC, 'R'},               {K_APP_REPLACEFILE},
+    {K_ESC, 'h'},               {K_APP_REPLACEFILE},
+    {K_ESC, 'H'},               {K_APP_REPLACEFILE},
 
     {'L' | K_CTRL},             {K_APP_FOUNDFILE},
     {'L' | K_ALT},              {K_APP_FOUNDFILE},
@@ -137,6 +136,7 @@ CmdMap g_defaultEditKeyMap
     {K_ESC, ','},               {K_ED(E_MOVE_WORD_LEFT)},
     {K_ESC, '.'},               {K_ED(E_MOVE_WORD_RIGHT)},
     {']' | K_CTRL},             {K_ED(E_MOVE_LEX_MATCH)},
+    {'[' | K_CTRL},             {K_ED(E_MOVE_LEX_MATCH)},
     {'T' | K_CTRL},             {K_ED(E_MOVE_CENTER)},
 
     {K_UP | K_ALT},             {K_ED(E_MOVE_UP) + 1},
@@ -147,8 +147,6 @@ CmdMap g_defaultEditKeyMap
     {K_DELETE},                 {K_ED(E_EDIT_DEL_C)},
     {K_ESC, K_BS},              {K_ED(E_EDIT_DEL_C)},
     {'Y' | K_CTRL},             {K_ED(E_EDIT_DEL_STR)},
-    {'B' | K_CTRL},             {K_ED(E_EDIT_DEL_BEGIN)},
-    {'E' | K_CTRL},             {K_ED(E_EDIT_DEL_END)},
 
     {K_MOUSEKL | K_MOUSE2},     {K_ED(E_SELECT_WORD)},
     {K_MOUSEKL | K_MOUSE3},     {K_ED(E_SELECT_LINE)},
@@ -199,7 +197,6 @@ CmdMap g_defaultEditKeyMap
     {'G' | K_CTRL},             {K_ED(E_DLG_GOTO)},
     {'F' | K_CTRL},             {K_ED(E_DLG_FIND)},
     {K_F7},                     {K_ED(E_DLG_FIND)},
-    {'R' | K_CTRL},             {K_ED(E_DLG_REPLACE)},
     {'H' | K_CTRL},             {K_ED(E_DLG_REPLACE)},
 
     {K_F7 | K_CTRL},            {K_ED(E_CTRL_FIND)},
@@ -210,12 +207,13 @@ CmdMap g_defaultEditKeyMap
     {'N' | K_ALT},              {K_ED(E_CTRL_FINDDNW)},
 
     {'J' | K_CTRL},             {K_ED(E_CTRL_FUNC_LIST)},
-    {'A' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
-    {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
+//???    {'A' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
+//???    {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
 
     {'S' | K_CTRL},             {K_ED(E_CTRL_SAVE)},
     {K_ESC, K_F2},              {K_ED(E_CTRL_SAVE)},
     {K_F2 | K_SHIFT},           {K_ED(E_CTRL_SAVEAS)},
+    {K_F3 | K_SHIFT},           {K_ED(E_CTRL_RELOAD)},
     {K_ESC, K_F3},              {K_ED(E_CTRL_RELOAD)},
     {K_F10 | K_SHIFT},          {K_ED(E_CTRL_CLOSE)},
     {K_ESC, K_F10},             {K_ED(E_CTRL_CLOSE)},
@@ -225,7 +223,7 @@ CmdMap g_defaultEditKeyMap
     {K_ESC, 'M'},               {K_ED(E_POPUP_MENU)},
 
     //for testing
-    { 'T' | K_ALT },            {K_ED(E_CTRL_REFRESH)}
+    { 'R' | K_ALT },            {K_ED(E_CTRL_REFRESH)}
 };
 
 std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap 
