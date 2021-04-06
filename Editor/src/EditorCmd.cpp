@@ -40,7 +40,6 @@ CmdMap g_defaultAppKeyMap
     {K_F2},                     {K_APP_SAVE_ALL},
 
     {K_F3},                     {K_APP_DLG_OPEN},
-    {K_F3 | K_SHIFT},           {K_APP_DLG_LOAD},
 
     {K_F5 | K_SHIFT},           {K_APP_WND_COPY},
     {K_F6 | K_SHIFT},           {K_APP_WND_MOVE},
@@ -360,7 +359,6 @@ std::unordered_map<input_t, std::string> g_CmdNames
     {K_APP_NEW,                     "APP_NEW"},
     {K_APP_SAVE_ALL,                "APP_SAVE_ALL"},
     {K_APP_DLG_OPEN,                "APP_DLG_OPEN"},
-    {K_APP_DLG_LOAD,                "APP_DLG_LOAD"},
 
     {K_APP_FINDFILE,                "APP_DLG_FINDFILE"},
     {K_APP_REPLACEFILE,             "APP_DLG_REPLACEFILE"},

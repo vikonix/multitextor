@@ -39,7 +39,6 @@ std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
     {K_APP_NEW,             &EditorApp::FileNewProc},
     {K_APP_SAVE_ALL,        &EditorApp::FileSaveAllProc},
     {K_APP_DLG_OPEN,        &EditorApp::FileOpenProc},
-    {K_APP_DLG_LOAD,        &EditorApp::FileLoadProc},
     {K_APP_WND_CLOSEALL,    &EditorApp::WndCloseAllProc},
     {K_APP_WND_LIST,        &EditorApp::WndListProc},
 
@@ -90,37 +89,6 @@ bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
             auto editor = std::make_shared<EditorWnd>();
             editor->Show(true, -1);
             if(editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
-                m_editors[editor.get()] = editor;
-        }
-        catch (...)
-        {
-            _assert(0);
-            LOG(ERROR) << "Error file loading";
-            EditorApp::SetErrorLine("Error file loading");
-        }
-    }
-
-    return true;
-}
-
-bool    EditorApp::FileLoadProc([[maybe_unused]] input_t cmd)
-{
-    FileDialog dlg{ FileDlgMode::Load };
-    auto rc = dlg.Activate();
-    if (rc == ID_OK)
-    {
-        try
-        {
-            std::filesystem::path path{ utf8::utf8to16(dlg.s_vars.path) };
-            path /= utf8::utf8to16(dlg.s_vars.file);
-
-            if (auto wnd = GetEditorWnd(path))
-                return WndManager::getInstance().SetTopWnd(wnd);
-
-            _assert(0);//???
-            auto editor = std::make_shared<EditorWnd>();
-            editor->Show(true, -1);
-            if (editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
                 m_editors[editor.get()] = editor;
         }
         catch (...)

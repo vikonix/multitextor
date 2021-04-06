@@ -89,7 +89,6 @@ public:
     bool    FileNewProc(input_t cmd);
     bool    FileSaveAllProc(input_t cmd);
     bool    FileOpenProc(input_t cmd);
-    bool    FileLoadProc(input_t cmd);
     bool    WndCloseAllProc(input_t cmd);
     bool    WndListProc(input_t cmd);
     bool    FindInFilesProc(input_t cmd);

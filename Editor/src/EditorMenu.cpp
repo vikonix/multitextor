@@ -70,7 +70,6 @@ static menu_list menuFile
 {
     {MENU_ITEM,         "&New",                         K_APP_NEW,                  "Open new empty file"},
     {MENU_ITEM,         "&Open...",                     K_APP_DLG_OPEN,             "Open file in new window"},
-    {MENU_ITEM,         "&Load...",                     K_APP_DLG_LOAD,             "Load file in current window"},
     {MENU_ITEM,         "&Reload",                      K_ED(E_CTRL_RELOAD),        "Reload current file"},
     {MENU_ITEM,         "&Close",                       K_ED(E_CTRL_CLOSE),         "Close current file"},
     {MENU_SEPARATOR},
@@ -115,10 +114,10 @@ static menu_list menuBlock
     {MENU_ITEM,         "Window Cop&y...",              K_APP_WND_COPY,             "Copy block selected in another window"},
     {MENU_ITEM,         "Window Mo&ve...",              K_APP_WND_MOVE,             "Move block selected in another window"},
     {MENU_SEPARATOR},
-    {MENU_ITEM,         "Select &Line",                 K_ED(E_SELECT_MODE),        "Begin of line selection"},
-    {MENU_ITEM,         "Select C&olumn",               K_ED(E_SELECT_MODE) | 1,    "Begin of column selection"},
-    {MENU_ITEM,         "Select &Stream;Esc Arrows",    K_ED(E_SELECT_BEGIN),       "Begin of stream selection"},
+    {MENU_ITEM,         "&Select;Shift+Arrows|Esc Arrows",    K_ED(E_SELECT_BEGIN),       "Begin of stream selection"},
     {MENU_ITEM,         "Select &All",                  K_ED(E_SELECT_ALL),         "Select whole file"},
+    {MENU_ITEM,         "Select &Line Mode",            K_ED(E_SELECT_MODE),        "Begin of line selection mode"},
+    {MENU_ITEM,         "Select C&olumn Mode",          K_ED(E_SELECT_MODE) | 1,    "Begin of column selection mode"},
     {MENU_ITEM,         "&End Select Mode",             K_ED(E_SELECT_END),         "End of selection mode"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "U&nselect",                    K_ED(E_SELECT_UNSELECT),    "Hide selection"}

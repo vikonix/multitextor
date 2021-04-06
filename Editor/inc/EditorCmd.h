@@ -41,7 +41,6 @@ enum AppCmd : input_t
     K_APP_NEW,
     K_APP_SAVE_ALL,
     K_APP_DLG_OPEN,
-    K_APP_DLG_LOAD,
     K_APP_WND_CLOSEALL,
     K_APP_WND_LIST,
 
