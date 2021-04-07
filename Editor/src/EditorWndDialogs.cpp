@@ -24,9 +24,11 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "utfcpp/utf8.h"
 #include "EditorWnd.h"
 #include "WndManager.h"
 #include "EditorApp.h"
+#include "Dialogs/StdDialogs.h"
 
 
 bool EditorWnd::DlgGoto(input_t cmd)
@@ -49,7 +51,41 @@ bool EditorWnd::DlgReplace(input_t cmd)
 
 bool EditorWnd::SaveAs(input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    FileDialog dlg{ FileDlgMode::Save };
+    auto rc = dlg.Activate();
+    if (rc == ID_OK)
+    {
+        try
+        {
+            std::filesystem::path path{ utf8::utf8to16(dlg.s_vars.path) };
+            path /= utf8::utf8to16(dlg.s_vars.file);
+            
+            auto& app = Application::getInstance();
+            auto& editorApp = reinterpret_cast<EditorApp&>(app);
+
+            if (auto wnd = editorApp.GetEditorWnd(path))
+            {
+                _assert(0);
+            }
+
+/*            
+            if (auto wnd = GetEditorWnd(path))
+                return WndManager::getInstance().SetTopWnd(wnd);
+
+            auto editor = std::make_shared<EditorWnd>();
+            editor->Show(true, -1);
+            if (editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
+                m_editors[editor.get()] = editor;
+*/        
+        }
+        catch (...)
+        {
+            _assert(0);
+            LOG(ERROR) << "Error file saving as";
+            EditorApp::SetErrorLine("Error file saving as");
+        }
+    }
+
     return true;
 }
 

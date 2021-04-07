@@ -32,8 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum class FileDlgMode
 {
     Open,
-    Load,
-    Save
+    Save,
+    NewSess,
+    OpenSess
 };
 
 #define MAX_MASK_LIST 16

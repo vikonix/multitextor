@@ -88,16 +88,19 @@ bool FileDialog::OnActivate()
         GetItem(ID_OK)->SetName("Open");
         GetItem(ID_OK)->SetHelpLine("Open file in new place");
         break;
-    case FileDlgMode::Load:
-        GetItem(0)->SetName("Load File");
-        GetItem(ID_OK)->SetName("Load");
-        GetItem(ID_OK)->SetHelpLine("Load file in same place");
-        break;
     case FileDlgMode::Save:
         GetItem(0)->SetName("Save File As");
         GetItem(ID_OK)->SetName("Save");
         GetItem(ID_OK)->SetHelpLine("Save file with new name");
         hide = true;
+
+        Wnd* wnd = WndManager::getInstance().GetWnd();
+        auto path = wnd->GetFilePath();
+        
+        auto name = GetItem(ID_OF_NAME);
+        auto ctrlName = std::dynamic_pointer_cast<CtrlEditDropList>(name);
+        ctrlName->SetName(path.filename().u8string());
+        s_vars.path = path.parent_path().u8string();
         break;
     }
 
@@ -131,12 +134,12 @@ bool FileDialog::OnActivate()
         }
     }
 
-    auto type = GetItem(ID_OF_NAME);
-    auto ctrlType = std::dynamic_pointer_cast<CtrlEditDropList>(type);
+    auto name = GetItem(ID_OF_NAME);
+    auto ctrlName = std::dynamic_pointer_cast<CtrlEditDropList>(name);
     if (s_vars.maskList.empty())
         s_vars.maskList.push_front("*.*");
     for (const std::string& str : s_vars.maskList)
-        ctrlType->AppendStr(str);
+        ctrlName->AppendStr(str);
 
     m_dirList.SetMask(s_vars.maskList.front());
     ScanDir(s_vars.path);
@@ -150,7 +153,8 @@ bool FileDialog::ScanDir(const std::string& mask)
     m_dirList.SetMask(wmask);
     m_dirList.Scan();
 
-    GetItem(ID_OF_NAME)->SetName("");
+    if (m_mode != FileDlgMode::Save && m_mode != FileDlgMode::NewSess)
+        GetItem(ID_OF_NAME)->SetName("");
     GetItem(ID_OF_INFO)->SetName("");
 
     auto path = m_dirList.GetPath() / utf8::utf8to16(m_dirList.GetMask());
@@ -277,7 +281,7 @@ input_t FileDialog::DialogProc(input_t code)
                 auto name = GetItem(ID_OF_NAME)->GetName();
                 auto found = ScanDir(std::string(name));
 
-                if (!found)
+                if (!found && !m_dirList.IsSingleMask())
                 {
                     //if not simple mask or found many files
                     auto mask = m_dirList.GetMask();

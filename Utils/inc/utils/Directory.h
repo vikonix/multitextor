@@ -152,6 +152,7 @@ public:
     bool    SetMask(const path_t& mask);
     bool    Scan();
     bool    IsFound();
+    bool    IsSingleMask() { return m_single; }
 
 protected:
     bool    AddMask(const path_t& mask);

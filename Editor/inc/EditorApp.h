@@ -43,7 +43,6 @@ class EditorApp : public Application
     bool m_wait{};
     bool m_run{};
 
-    Wnd* GetEditorWnd(std::filesystem::path path);
     bool CloseAllWindows();
 
 public:
@@ -81,6 +80,8 @@ public:
     };
 
     static bool StatusMark(mark_status mark = mark_status::no);
+
+    Wnd* GetEditorWnd(std::filesystem::path path);
 
     //editor app commands
     bool    AboutProc(input_t cmd);
