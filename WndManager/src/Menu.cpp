@@ -38,7 +38,7 @@ input_t Menu::Close(input_t code)
     if(m_menu.empty())
         return 0;
 
-    LOG(DEBUG) << __FUNC__ << " k=" << std::hex << code << std::dec;
+    //LOG(DEBUG) << __FUNC__ << " k=" << std::hex << code << std::dec;
 
     if(m_nextMenu)
     {
@@ -266,7 +266,7 @@ input_t LineMenu::EventProc(input_t code)
 
     if(!m_menu.empty() && code)
     {
-        LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
+        //LOG(DEBUG) << __FUNC__ << " code=" << std::hex << code << std::dec;
         if(code == K_ESC)
         {
             close = true;
@@ -369,14 +369,14 @@ input_t LineMenu::EventProc(input_t code)
 
             if(open)
             {
-                LOG(DEBUG) << "LineMenu::Select open=" << open;
+                //LOG(DEBUG) << "LineMenu::Select open=" << open;
                 code = m_menu[m_selected].code;
 
                 if((code & K_TYPEMASK) == K_MENU)
                 {
                     if (m_nextMenu)
                     {
-                        LOG(DEBUG) << "next menu close 3";
+                        //LOG(DEBUG) << "next menu close 3";
                         m_nextMenu.reset();
                     }
 
@@ -441,8 +441,8 @@ input_t FrameMenu::Activate(bool capture)
                 maxKey = keyLen;
             ++n;
 
-            LOG(DEBUG) << "menu code=" << std::hex << m.code << std::dec 
-                << " key=" << Application::getInstance().GetKeyName(m.code) << ";";
+//            LOG(DEBUG) << "menu code=" << std::hex << m.code << std::dec 
+//                << " key=" << Application::getInstance().GetKeyName(m.code) << ";";
         }
     }
 
@@ -627,7 +627,7 @@ input_t FrameMenu::EventProc(input_t code)
         code = m_nextMenu->EventProc(code);
         if(!m_nextMenu->IsActive())
         {
-            LOG(DEBUG) << "next not active code=" << std::hex << code << std::dec;
+            //LOG(DEBUG) << "next not active code=" << std::hex << code << std::dec;
             m_nextMenu.reset();
             if (code == 0)
             {
@@ -655,7 +655,7 @@ input_t FrameMenu::EventProc(input_t code)
 
     if(!m_menu.empty() && code)
     {
-        LOG(DEBUG) << "FrameMenu::Proc menu code=" << std::hex << code << std::dec;
+        //LOG(DEBUG) << "FrameMenu::Proc menu code=" << std::hex << code << std::dec;
         if (code == K_ESC || code == K_LEFT)
         {
             return Close(code);
@@ -800,7 +800,7 @@ input_t FrameMenu::EventProc(input_t code)
                 {
                     if(m_nextMenu)
                     {
-                        LOG(DEBUG) << "next menu close 2";
+                        //LOG(DEBUG) << "next menu close 2";
                         m_nextMenu.reset();
                     }
                     
@@ -820,7 +820,7 @@ input_t FrameMenu::EventProc(input_t code)
                 else if(open == 4 || open == 3)
                 {
                     //menu by mouse key release
-                    LOG(DEBUG) << "FrameMenu::Select open" << open;
+                    //LOG(DEBUG) << "FrameMenu::Select open" << open;
                     return Close(code);
                 }
             }

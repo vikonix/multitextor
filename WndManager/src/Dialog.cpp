@@ -495,7 +495,7 @@ input_t Dialog::EventProc(input_t code)
     if(code == K_TIME && !m_mouseKey)
         return 0;
 
-    LOG(DEBUG) << "    Dialog::EventProc " << std::hex << code << std::dec;
+    //LOG(DEBUG) << "    Dialog::EventProc " << std::hex << code << std::dec;
     size_t n = m_selected;
 
     if(code & K_MOUSE)

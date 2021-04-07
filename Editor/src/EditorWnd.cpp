@@ -96,13 +96,12 @@ bool EditorWnd::SetEditor(EditorPtr editor)
 
 bool EditorWnd::Refresh()
 {
-    LOG(DEBUG) << "    EditorWnd::Refresh " << this;
-
     if (!WndManager::getInstance().IsVisible(this))
         return true;
 
     m_clientSizeX = GetCSizeX();
     m_clientSizeY = GetCSizeY();
+    //LOG(DEBUG) << "    EditorWnd::Refresh " << this;
     //LOG(DEBUG) << "sx=" << m_clientSizeX << " sy=" << m_clientSizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
 
     if (m_clientSizeX <= m_cursorx || m_clientSizeY <= m_cursory)

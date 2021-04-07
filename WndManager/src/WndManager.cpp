@@ -72,7 +72,7 @@ bool WndManager::Deinit()
 
 bool WndManager::CalcView()
 {
-    LOG(DEBUG) << __FUNC__ << " t=" << static_cast<int>(m_splitType);
+    //LOG(DEBUG) << __FUNC__ << " t=" << static_cast<int>(m_splitType);
 
     //for dialogs
     m_view[0].left  = 0;
@@ -178,7 +178,7 @@ bool WndManager::Refresh()
 
 bool WndManager::Cls()
 {
-    LOG(DEBUG) << "  M::Cls";
+    //LOG(DEBUG) << "  M::Cls";
 
     HideCursor();
     bool rc = CallConsole(ClrScr());
@@ -478,7 +478,7 @@ bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, colo
 
 bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
 {
-    LOG(DEBUG) << "  M::InvColorRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
+    //LOG(DEBUG) << "  M::InvColorRect l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
 
     HideCursor();
     for (pos_t y = 0; y < sizey; ++y)
@@ -497,7 +497,7 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
 
 bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 {
-    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " refresh=" << refresh << " view=" << view;
+    //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " refresh=" << refresh << " view=" << view;
 
     //save current state before change wnd list
     bool inv = m_invalidate;
@@ -517,7 +517,7 @@ bool WndManager::Show(Wnd* wnd, bool refresh, int view)
 
 bool WndManager::Hide(Wnd* wnd, bool refresh)
 {
-    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " refresh=" << refresh;
+    //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " refresh=" << refresh;
 
     if (wnd == m_view[2].wnd)
     {
@@ -557,7 +557,7 @@ const View& WndManager::GetView(const Wnd* wnd) const
 
 bool WndManager::CloneView(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
+    //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
 
     if (m_view[2].wnd)
     {
@@ -588,7 +588,7 @@ bool WndManager::CloneView(Wnd* wnd)
 
 bool WndManager::AddWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
+    //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
 
     //add to top
     m_wndList.push_front(wnd);
@@ -599,7 +599,7 @@ bool WndManager::AddWnd(Wnd* wnd)
 
 bool WndManager::AddLastWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
+    //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
     //add to bottom
     if (m_wndList.empty())
     {
@@ -613,7 +613,7 @@ bool WndManager::AddLastWnd(Wnd* wnd)
 
 bool WndManager::DelWnd(Wnd* wnd)
 {
-    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
+    //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
 
     //del from list
     if (wnd == m_view[2].wnd)
@@ -656,7 +656,7 @@ Wnd* WndManager::GetWnd(size_t n, int view)
 
 bool WndManager::SetTopWnd(int n, int view)
 {
-    LOG(DEBUG) << __FUNC__ << " n=" << n << " view=" <<view;
+    //LOG(DEBUG) << __FUNC__ << " n=" << n << " view=" <<view;
 
     if ((n == 0 && view == 0) || (n < 0 && view != 0))
         return true;
@@ -674,10 +674,10 @@ bool WndManager::SetTopWnd(Wnd* wnd, int view)
     if (!wnd)
         return true;
 
-    LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " view=" << view;
+    //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd << " view=" << view;
     if (!m_wndList.empty())
     {
-        LOG(DEBUG) << "top=" << m_wndList[0] << " view2=" << m_view[2].wnd << " aview=" << m_activeView;
+        //LOG(DEBUG) << "top=" << m_wndList[0] << " view2=" << m_view[2].wnd << " aview=" << m_activeView;
     }
 
     if (split_t::no_split == m_splitType)
@@ -858,7 +858,7 @@ bool WndManager::SetActiveView(int n)
 
 bool WndManager::ChangeViewMode(int mode)//0-create/del 1-horiz/vert
 {
-    LOG(DEBUG) << "ChangeViewMode split type=" << static_cast<int>(m_splitType) << " mode=" << mode;
+    //LOG(DEBUG) << "ChangeViewMode split type=" << static_cast<int>(m_splitType) << " mode=" << mode;
 
     if (m_wndList.empty())
         return true;
@@ -904,7 +904,7 @@ bool WndManager::ChangeViewMode(int mode)//0-create/del 1-horiz/vert
 
 bool WndManager::SetView(pos_t x, pos_t y, split_t type)
 {
-    LOG(DEBUG) << "SetView x=" << x << " y=" << y << " type=" << static_cast<int>(type);
+    //LOG(DEBUG) << "SetView x=" << x << " y=" << y << " type=" << static_cast<int>(type);
 
     if (!x || !y)
         return true;
@@ -951,7 +951,7 @@ bool WndManager::TrackView(const std::string& msg)
         if (iKey)
         {
             iKey = m_console.GetInput();
-            LOG(DEBUG) << "TrackView " << std::hex << iKey << std::dec;
+            //LOG(DEBUG) << "TrackView " << std::hex << iKey << std::dec;
             if (iKey == K_ESC || iKey == K_ENTER || iKey == K_SPACE)
                 break;
 

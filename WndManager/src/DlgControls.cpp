@@ -572,7 +572,7 @@ input_t CtrlEdit::EventProc(input_t code)
         bool rc = PasteFromClipboard(strArray);
         if (rc)
         {
-            LOG(DEBUG) << "     Paste";
+            //LOG(DEBUG) << "     Paste";
             rc = Unselect(true);
             x = m_dcursorx;
 
