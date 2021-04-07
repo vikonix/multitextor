@@ -31,40 +31,48 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool EditorWnd::DlgGoto(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool EditorWnd::DlgFind(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool EditorWnd::DlgReplace(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool EditorWnd::SaveAs(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool EditorWnd::CtrlProperties(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool EditorWnd::CtrlChangeCP(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool EditorWnd::CtrlFuncList(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool EditorWnd::TrackPopupMenu(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }

@@ -167,7 +167,7 @@ bool    EditorApp::ViewMoveProc([[maybe_unused]] input_t cmd)
     return WndManager::getInstance().TrackView("Track view");
 }
 
-bool    EditorApp::RecordMacroProc(input_t cmd)
+bool    EditorApp::RecordMacroProc([[maybe_unused]] input_t cmd)
 {
     auto rc = MsgBox(
         "Macro Recording",
@@ -184,7 +184,7 @@ bool    EditorApp::RecordMacroProc(input_t cmd)
     return true;
 }
 
-bool    EditorApp::PlayMacroProc(input_t cmd)
+bool    EditorApp::PlayMacroProc([[maybe_unused]] input_t cmd)
 {
     PlayMacro();
     return true;
@@ -192,85 +192,102 @@ bool    EditorApp::PlayMacroProc(input_t cmd)
 
 bool    EditorApp::FindInFilesProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::ReplaceInFilesProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::FoundFilesProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::AboutProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::HelpProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::HelpKeymapProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::FileSaveAllProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::DiffProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::BookmarkListProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::KeygenProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::NewSessionProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::OpenSessionProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::ColorDlgProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::SettingsDlgProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::SelectBookmarkProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::SelectRecentFileProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
 bool    EditorApp::SelectRecentSessionProc(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }

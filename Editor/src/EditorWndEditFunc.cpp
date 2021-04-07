@@ -717,9 +717,9 @@ bool EditorWnd::Reload([[maybe_unused]]input_t cmd)
     LOG(DEBUG) << "    Reload";
 
     m_selectState = select_state::no;
+    m_selectType = select_t::stream;
     m_beginX = m_endX = 0;
     m_beginY = m_endY = 0;
-    m_selectType = select_t::stream;
 
     bool rc = m_editor->Load();
     rc = Refresh();
@@ -740,6 +740,7 @@ bool EditorWnd::CtrlRefresh([[maybe_unused]] input_t cmd)
 
 bool EditorWnd::Replace(input_t cmd)
 {
+    LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
 
