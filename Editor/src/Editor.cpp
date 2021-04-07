@@ -56,12 +56,10 @@ bool Editor::Clear()
 {
     m_buffer.Clear();
     m_undoList.Clear();
-    m_wndList.clear();
     m_lexParser.Clear();
-
+    m_curStrBuff.clear();
     m_curStr = STR_NOTDEFINED;
     m_curChanged = false;
-    m_curStrBuff.clear();
 
     return true;
 }

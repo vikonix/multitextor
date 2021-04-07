@@ -76,7 +76,7 @@ private:
     LexParser       m_lexParser;
 
     //config variables
-    std::string     m_cp{""};
+    std::string     m_cp{};
     size_t          m_maxStrlen{0x800};
     eol_t           m_eol{DEF_EOL};
     size_t          m_tab{8};   //tab position
@@ -85,9 +85,9 @@ private:
     bool            m_ro{};
 
     //editor variables
+    std::u16string  m_curStrBuff;
     size_t          m_curStr{STR_NOTDEFINED};
     bool            m_curChanged{};
-    std::u16string  m_curStrBuff;
 
     bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);
     bool    ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::string_view>>>::iterator strBuff);
@@ -101,6 +101,7 @@ private:
 
     bool    LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string> buff);
     bool    BackupFile();
+    bool    Clear();
 
 public:
     Editor(const Editor&) = delete;
@@ -140,7 +141,6 @@ public:
     bool                    InvalidateWnd(size_t line, invalidate_t type, pos_t pos = 0, pos_t size = 0) const;
     bool                    RefreshAllWnd(FrameWnd* wnd) const;
 
-    bool                    Clear();
     bool                    Load();
     bool                    Save();
     bool                    SaveAs(const std::string& name);
