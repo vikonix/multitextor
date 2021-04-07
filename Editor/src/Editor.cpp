@@ -1058,8 +1058,7 @@ bool Editor::AddUndoCommand(const EditCmd& editCmd, const EditCmd& undoCmd)
 
 bool Editor::ClearModifyFlag()
 {
-    //???m_pDObject->CheckAccess(1);
-    m_buffer.m_changed = false;
+    m_buffer.ClearModifyFlag();
     m_curChanged = false;
     return true;
 }

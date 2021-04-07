@@ -147,6 +147,9 @@ CmdMap g_defaultEditKeyMap
     {K_DELETE},                 {K_ED(E_EDIT_DEL_C)},
     {K_ESC, K_BS},              {K_ED(E_EDIT_DEL_C)},
     {'Y' | K_CTRL},             {K_ED(E_EDIT_DEL_STR)},
+    {K_ENTER},                  {K_ED(E_EDIT_ENTER)},
+    {K_TAB},                    {K_ED(E_EDIT_TAB)},
+    {K_BS},                     {K_ED(E_EDIT_BS)},
 
     {K_MOUSEKL | K_MOUSE2},     {K_ED(E_SELECT_WORD)},
     {K_MOUSEKL | K_MOUSE3},     {K_ED(E_SELECT_LINE)},
@@ -172,9 +175,8 @@ CmdMap g_defaultEditKeyMap
 
     {K_F5},                     {K_ED(E_EDIT_BLOCK_COPY)},
     {K_F6},                     {K_ED(E_EDIT_BLOCK_MOVE)},
-    {K_F8 | K_SHIFT},           {K_ED(E_EDIT_BLOCK_DEL)},
     {'Y' | K_ALT},              {K_ED(E_EDIT_BLOCK_DEL)},
-    {K_ESC, K_F8},              {K_ED(E_EDIT_BLOCK_DEL)},
+
     {'X' | K_CTRL},             {K_ED(E_EDIT_CB_CUT)},
     {'C' | K_CTRL},             {K_ED(E_EDIT_CB_COPY)},
     {'V' | K_CTRL},             {K_ED(E_EDIT_CB_PASTE)},
@@ -206,10 +208,6 @@ CmdMap g_defaultEditKeyMap
     {'P' | K_ALT},              {K_ED(E_CTRL_FINDUPW)},
     {'N' | K_ALT},              {K_ED(E_CTRL_FINDDNW)},
 
-    {'J' | K_CTRL},             {K_ED(E_CTRL_FUNC_LIST)},
-//???    {'A' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
-//???    {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
-
     {'S' | K_CTRL},             {K_ED(E_CTRL_SAVE)},
     {K_ESC, K_F2},              {K_ED(E_CTRL_SAVE)},
     {K_F2 | K_SHIFT},           {K_ED(E_CTRL_SAVEAS)},
@@ -221,6 +219,10 @@ CmdMap g_defaultEditKeyMap
     {'M' | K_ALT},              {K_ED(E_POPUP_MENU)},
     {K_ESC, 'm'},               {K_ED(E_POPUP_MENU)},
     {K_ESC, 'M'},               {K_ED(E_POPUP_MENU)},
+
+    { 'J' | K_CTRL },           { K_ED(E_CTRL_FUNC_LIST) },
+//???    {'A' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
+//???    {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
 
     //for testing
     { 'R' | K_ALT },            {K_ED(E_CTRL_REFRESH)}

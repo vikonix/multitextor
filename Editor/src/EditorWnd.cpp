@@ -733,15 +733,6 @@ input_t EditorWnd::ParseCommand(input_t cmd)
         {
         case K_ESC:
             break;
-        case K_ENTER:
-            EditEnter(cmd);
-            break;
-        case K_TAB:
-            EditTab(cmd);
-            break;
-        case K_BS:
-            EditBS(cmd);
-            break;
         default:
             EditC(cmd);
             break;

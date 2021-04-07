@@ -174,6 +174,7 @@ public:
     size_t  GetSize() const;
 
     bool    Clear();
+    bool    ClearModifyFlag();
     size_t  GetStrCount() const { return m_totalStrCount; }
     Tview   GetStr(size_t n);
     bool    AddStr(size_t n, const Tview str);

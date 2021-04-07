@@ -452,6 +452,17 @@ size_t MemStrBuff<Tbuff, Tview>::GetSize() const
 }
 
 template <typename Tbuff, typename Tview>
+bool MemStrBuff<Tbuff, Tview>::ClearModifyFlag()
+{
+    m_changed = false;
+    for (auto& buff : m_buffList)
+    {
+        buff->ClearModifyFlag();
+    }
+    return true;
+}
+
+template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::Clear()
 {
     m_buffList.clear();

@@ -39,6 +39,8 @@ bool EditorWnd::EditC(input_t cmd)
         return true;
 
     LOG(DEBUG) << "    EditC " << std::hex << cmd << std::dec;
+    EditBlockDel(cmd);
+
     char16_t c = K_GET_CODE(cmd);
     if (c < ' ')
         c = '?';
@@ -69,6 +71,11 @@ bool EditorWnd::EditDelC(input_t cmd)
         return true;
 
     LOG(DEBUG) << "    EditDelC " << std::hex << cmd << std::dec;
+    if (m_selectState == select_state::complete)
+    {
+        EditBlockDel(cmd);
+        return true;
+    }
 
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
@@ -348,6 +355,8 @@ bool EditorWnd::EditBlockDel(input_t cmd)
     LOG(DEBUG) << "    EditBlockDel " << std::hex << cmd << std::dec << " ss=" << static_cast<int>(m_selectState) << " t=" << static_cast<int>(m_selectType)
         << " bx=" << m_beginX << " by=" << m_beginY << " ex=" << m_endX << " ey=" << m_endY;
 
+    CorrectSelection();
+    _GotoXY(m_beginX, m_beginY);
     bool rc = DelSelected();
 
     return rc;
@@ -362,7 +371,13 @@ bool EditorWnd::EditUndo(input_t cmd)
 
     auto editCmd = m_editor->PeekUndo();
     if (!editCmd)
+    {
+        EditorApp::SetErrorLine("Undo command absents");
+        m_editor->SetCurStr(STR_NOTDEFINED);
+        if (!m_saved)
+            m_editor->ClearModifyFlag();
         return true;
+    }
 
     if (editCmd->line != m_firstLine + m_cursory)
     {
@@ -418,13 +433,6 @@ bool EditorWnd::EditUndo(input_t cmd)
             rc = m_editor->Command(*editCmd);
         }
     }
-    else
-    {
-        EditorApp::SetErrorLine("Undo command absents");
-        m_editor->SetCurStr(STR_NOTDEFINED);
-        if (!m_saved)
-            m_editor->ClearModifyFlag();
-    }
 
     return rc;
 }
@@ -438,7 +446,10 @@ bool EditorWnd::EditRedo(input_t cmd)
 
     auto redoCmd = m_editor->PeekRedo();
     if (!redoCmd)
+    {
+        EditorApp::SetErrorLine("Redo command absents");
         return true;
+    }
 
     if (redoCmd->line != m_firstLine + m_cursory)
     {
@@ -492,10 +503,6 @@ bool EditorWnd::EditRedo(input_t cmd)
 
             rc = m_editor->Command(*redoCmd);
         }
-    }
-    else
-    {
-        EditorApp::SetErrorLine("Redo command absents");
     }
 
     return rc;
@@ -694,6 +701,7 @@ bool EditorWnd::EditPasteFromClipboard(input_t cmd)
         return true;
 
     LOG(DEBUG) << "    EditPasteFromClipboard " << std::hex << cmd << std::dec;
+    EditBlockDel(cmd);
 
     std::vector<std::u16string> strArray;
     bool rc = PasteFromClipboard(strArray)
@@ -784,7 +792,7 @@ bool EditorWnd::Save([[maybe_unused]] input_t cmd)
         }
 
         UpdateAccessInfo();
-        m_saved = true;//???
+        m_saved = true;
     }
     return true;
 }
