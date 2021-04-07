@@ -558,7 +558,6 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
 template <typename Tbuff, typename Tview>
 bool MemStrBuff<Tbuff, Tview>::DelBuff(typename std::list<std::shared_ptr<StrBuff<Tbuff, Tview>>>::iterator& buff)
 {
-    //TPRINT(("DelBuff\n"));
     if (buff == m_curBuff)
         m_curBuff = m_buffList.end();
 

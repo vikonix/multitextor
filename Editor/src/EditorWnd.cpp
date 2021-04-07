@@ -1451,8 +1451,6 @@ bool EditorWnd::UpdateLexPair()
     size_t y = m_firstLine + m_cursory;
     if (m_editor->CheckLexPair(y, x))
     {
-        //TPRINT(("Match pair x=%d y=%d\n", x, y));
-
         if (x >= m_xOffset   && x < m_xOffset + m_clientSizeX
          && y >= m_firstLine && y < m_firstLine + m_clientSizeY)
         {

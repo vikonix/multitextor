@@ -1142,9 +1142,7 @@ bool Editor::Save()
     time_t start{ time(NULL) };
 
     bool rc = FlushCurStr();
-
-    //make backup
-    //???
+    rc = BackupFile();
 
     auto filePath{ m_file };
     std::fstream file{ filePath, std::ios::binary|std::ios::in|std::ios::out };
@@ -1274,6 +1272,12 @@ bool Editor::Save()
     LOG(DEBUG) << "save time=" << time(nullptr) - start;
 
     return rc;
+}
+
+bool Editor::BackupFile()
+{
+    //???
+    return true;
 }
 
 bool Editor::ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::string_view>>>::iterator strIt)

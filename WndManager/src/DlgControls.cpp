@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "App.h"
 #include "ConsoleScreen.h"
 #include "utils/logger.h"
+#include "utils/Clipboard.h"
 
 #include <cwctype>
 
@@ -564,28 +565,33 @@ input_t CtrlEdit::EventProc(input_t code)
         else
             return code;
     }
-/* ???
-    else if(code == (K_INSERT | K_SHIFT)
-        || code == ('V' | K_CTRL))
+    else if (code == (K_INSERT | K_SHIFT)
+          || code == ('V' | K_CTRL))
     {
-        LOG(DEBUG) << "     Paste";
-        x = Unselect(true);
-
-        ???PasteFromClipboard(pBuff, l)
-        //convert string
-        for(int i = 0; i < l; ++i)
+        std::vector<std::u16string> strArray;
+        bool rc = PasteFromClipboard(strArray);
+        if (rc)
         {
-            unsigned char c = (unsigned char) pBuff[i];
-            if(c >= ' ')
-                pBuff1[j++] = c;
-            else if(c == S_TAB)
-                pBuff1[j++] = ' ';
-            else
-                break;
+            LOG(DEBUG) << "     Paste";
+            rc = Unselect(true);
+            x = m_dcursorx;
+
+            std::u16string str;
+            for (auto ch : strArray.front())
+            {
+                //convert string
+                if (ch >= ' ')
+                    str += ch;
+                else if (ch == S_TAB)
+                    str += ' ';
+                else
+                    break;
+            }
+
+            m_name.insert(m_offset + x, str);
+            changed = true;
         }
-        f = 1;
     }
-*/
     else
         return code;
 
@@ -600,7 +606,6 @@ input_t CtrlEdit::EventProc(input_t code)
         Refresh(CTRL_SELECTED);
     }
 
-    //TPRINT(("x=%d len=%d s=%d\n", m_nPos, m_nLen, m_nBuffLen));
     return 0;
 }
 

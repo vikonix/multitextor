@@ -637,7 +637,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (!IsNormalSelection(m_endX, m_endY, x, y))
                 {
-                    //TPRINT(("+-\n"));
                     Mark(m_endX, m_endY, x, y, 0, m_selectType);
                 }
             }
@@ -645,7 +644,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (IsNormalSelection(m_endX, m_endY, x, y))
                 {
-                    //TPRINT(("-+\n"));
                     Mark(m_endX, m_endY, x, y, 0, m_selectType);
                 }
             }
@@ -657,7 +655,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (!IsNormalSelection(0, m_endY, 0, y))
                 {
-                    //TPRINT(("+-\n"));
                     Mark(0, m_endY, 0, y + 1, 0, m_selectType);
                 }
             }
@@ -665,7 +662,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (y != m_endY && IsNormalSelection(0, m_endY, 0, y))
                 {
-                    //TPRINT(("-+\n"));
                     Mark(0, m_endY, 0, y - 1, 0, m_selectType);
                 }
             }
@@ -677,7 +673,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (x < m_endX)
                 {
-                    //TPRINT(("Column clear X1\n"));
                     Mark(x, m_beginY, m_endX, m_endY, 0, m_selectType);
                 }
             }
@@ -685,7 +680,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (x > m_endX)
                 {
-                    //TPRINT(("Column clear X2\n"));
                     Mark(x, m_beginY, m_endX, m_endY, 0, m_selectType);
                 }
             }
@@ -694,7 +688,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (y < m_endY)
                 {
-                    //TPRINT(("Column clear Y1\n"));
                     Mark(m_beginX, y, m_endX, m_endY, 0, m_selectType);
                 }
             }
@@ -702,7 +695,6 @@ bool EditorWnd::SelectBegin(input_t cmd)
             {
                 if (y > m_endY)
                 {
-                    //TPRINT(("Column clear Y2\n"));
                     Mark(m_beginX, y, m_endX, m_endY, 0, m_selectType);
                 }
             }

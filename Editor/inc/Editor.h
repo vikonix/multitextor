@@ -100,6 +100,7 @@ private:
     bool    ConvertStr(const std::u16string& str, std::string& buff) const;
 
     bool    LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string> buff);
+    bool    BackupFile();
 
 public:
     Editor(const Editor&) = delete;
