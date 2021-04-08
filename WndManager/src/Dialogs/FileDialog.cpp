@@ -88,7 +88,8 @@ bool FileDialog::OnActivate()
         GetItem(ID_OK)->SetName("Open");
         GetItem(ID_OK)->SetHelpLine("Open file in new place");
         break;
-    case FileDlgMode::Save:
+    case FileDlgMode::SaveAs:
+        {
         GetItem(0)->SetName("Save File As");
         GetItem(ID_OK)->SetName("Save");
         GetItem(ID_OK)->SetHelpLine("Save file with new name");
@@ -96,12 +97,15 @@ bool FileDialog::OnActivate()
 
         Wnd* wnd = WndManager::getInstance().GetWnd();
         auto path = wnd->GetFilePath();
-        
+
         auto name = GetItem(ID_OF_NAME);
         auto ctrlName = std::dynamic_pointer_cast<CtrlEditDropList>(name);
         ctrlName->SetName(path.filename().u8string());
         s_vars.path = path.parent_path().u8string();
+        }
         break;
+    default: //???
+        return false;
     }
 
     if (hide)
@@ -153,7 +157,7 @@ bool FileDialog::ScanDir(const std::string& mask)
     m_dirList.SetMask(wmask);
     m_dirList.Scan();
 
-    if (m_mode != FileDlgMode::Save && m_mode != FileDlgMode::NewSess)
+    if (m_mode != FileDlgMode::SaveAs && m_mode != FileDlgMode::NewSess)
         GetItem(ID_OF_NAME)->SetName("");
     GetItem(ID_OF_INFO)->SetName("");
 
@@ -225,7 +229,7 @@ input_t FileDialog::DialogProc(input_t code)
 
             GetItem(ID_OF_INFO)->SetName(sinfo.str());
 
-            if (m_mode != FileDlgMode::Save)
+            if (m_mode != FileDlgMode::SaveAs)
             {
                 GetItem(ID_OF_NAME)->SetName(info.path().filename().u8string());
                 /*???
@@ -240,7 +244,7 @@ input_t FileDialog::DialogProc(input_t code)
         else if (GetSelectedId() == ID_OF_DIRLIST)
         {
             //dir list selected
-            if (m_mode != FileDlgMode::Save)
+            if (m_mode != FileDlgMode::SaveAs)
             {
                 size_t item = K_GET_CODE(code);
                 auto list = GetItem(ID_OF_DIRLIST);

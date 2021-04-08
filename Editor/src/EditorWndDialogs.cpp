@@ -51,7 +51,7 @@ bool EditorWnd::DlgReplace(input_t cmd)
 
 bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
 {
-    FileDialog dlg{ FileDlgMode::Save };
+    FileDialog dlg{ FileDlgMode::SaveAs };
     auto ret = dlg.Activate();
     if (ret == ID_OK)
     {

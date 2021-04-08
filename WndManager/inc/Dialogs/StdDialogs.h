@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 enum class FileDlgMode
 {
     Open,
-    Save,
+    SaveAs,
     NewSess,
     OpenSess
 };

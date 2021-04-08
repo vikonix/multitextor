@@ -113,7 +113,7 @@ bool Application::ChangeStatusLine(size_t n, std::optional<const std::string> te
     if (m_sLine.empty())
         return true;
 
-    auto& msg = text.has_value() ? text.value() : "";
+    std::string msg = text.has_value() ? text.value() : "";
     //LOG(DEBUG) << " A::ChangeStatusLine n=" << n << " '" << msg << "' c=" << static_cast<int>(color);
 
     if (n >= m_sLine.size())
@@ -129,7 +129,7 @@ bool Application::ChangeStatusLine(size_t n, std::optional<const std::string> te
     if (m_sLine[n].text.empty() && !text.has_value())
         return true;
 
-    if (m_sLine[n].text.empty() || !text.has_value() || m_sLine[n].text != msg || m_sLine[n].color != color)
+    if (m_sLine[n].text != msg || m_sLine[n].color != color)
     {
         m_sLine[n].text = msg;
         m_sLine[n].color = color;

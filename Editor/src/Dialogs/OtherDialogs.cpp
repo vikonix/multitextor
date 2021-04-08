@@ -35,7 +35,7 @@ std::list<control> dlgAbout
     {CTRL_STATIC,                       EDITOR_NAME_C " Version " EDITOR_VERSION,               0, NULL,  1,  1, 51},
     {CTRL_STATIC,                       "Cross-platform text editor",                           0, NULL,  1,  2, 41},
     {CTRL_STATIC,                       "https://github.com/vikonix/multitextor",               0, NULL,  1,  4, 41},
-    {CTRL_STATIC,                       u8"Copyright © " COPYRIGHT_YEAR " " COPYRIGTH_OWNER,    0, NULL,  1,  5, 41},
+    {CTRL_STATIC,                       "Copyright (C) " COPYRIGHT_YEAR " " COPYRIGTH_OWNER,    0, NULL,  1,  5, 41},
     {CTRL_LINE,                         "",                                                     0, NULL,  1,  7, 41},
 
     {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT,  "Ok",                                               ID_OK, NULL, 29, 8}
