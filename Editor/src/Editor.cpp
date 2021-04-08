@@ -1390,3 +1390,17 @@ std::list<FrameWnd*> Editor::GetLinkedWnd(FrameWnd* wnd) const
     }
     return list;
 }
+
+bool Editor::SetName(const std::filesystem::path& file, bool copy)
+{
+    if(copy)
+        std::filesystem::copy(m_file, file, std::filesystem::copy_options::overwrite_existing);
+    if (!std::filesystem::exists(file))
+    {
+        std::ofstream create(file);
+    }
+
+    m_file = file;
+    return true;
+}
+

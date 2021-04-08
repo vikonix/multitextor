@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorWnd.h"
 #include "WndManager.h"
 #include "EditorApp.h"
+#include "Dialog.h"
 
 #include <algorithm>
 #include <iterator>
@@ -48,7 +49,12 @@ bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, co
         bool rc = editor->Load();
         if (!rc)
         {
-            _assert(0);
+            MsgBox(
+                "Load",
+                "File load error",
+                "Check file and try again",
+                MBOX_OK
+            );
             return rc;
         }
     }

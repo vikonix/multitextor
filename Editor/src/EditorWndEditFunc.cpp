@@ -751,45 +751,22 @@ bool EditorWnd::Save([[maybe_unused]] input_t cmd)
     if (m_editor->IsChanged())
     {
         if (m_untitled)
-        {
-            _assert(0);
-/*            
-            FileDialog Dlg(DIALOG_SAVEAS);
-            int code = Dlg.Activate();
-
-            if (code == ID_OK)
-            {
-                if (FileObject::CheckAccess(g_InputStr))
-                {
-                    code = MsgBox(
-                        STR_S(SS_SaveAs),
-                        g_InputStr,
-                        STR_S(SS_FileAlreadyExistReplace),
-                        MBOX_OK_CANCEL
-                    );
-
-                    if (code != ID_OK)
-                        return false;
-                }
-
-                m_pTBuff->SetDataObject(g_InputStr);
-            }
-            m_fUntitled = 0;
-*/
-        }
+            return SaveAs(0);
 
         try
         {
             [[maybe_unused]]bool rc = m_editor->Save();
         }
-        catch (...)
+        catch (const std::exception& ex)
         {
+            LOG(ERROR) << "save as: exception " << ex.what();
             MsgBox(
                 "Save",
                 "File write error",
                 "Check file access and try again",
                 MBOX_OK
             );
+            return false;
         }
 
         UpdateAccessInfo();

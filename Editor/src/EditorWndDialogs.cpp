@@ -49,11 +49,11 @@ bool EditorWnd::DlgReplace(input_t cmd)
     return true;
 }
 
-bool EditorWnd::SaveAs(input_t cmd)
+bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
 {
     FileDialog dlg{ FileDlgMode::Save };
-    auto rc = dlg.Activate();
-    if (rc == ID_OK)
+    auto ret = dlg.Activate();
+    if (ret == ID_OK)
     {
         try
         {
@@ -63,26 +63,63 @@ bool EditorWnd::SaveAs(input_t cmd)
             auto& app = Application::getInstance();
             auto& editorApp = reinterpret_cast<EditorApp&>(app);
 
-            if (auto wnd = editorApp.GetEditorWnd(path))
+            if (auto wnd = editorApp.GetEditorWnd(path); wnd != nullptr && wnd != this)
             {
-                _assert(0);
+                MsgBox(
+                    "Save As",
+                    "Error: File with the same name is opened in editor",
+                    "Close it first!",
+                    MBOX_OK
+                );
+                throw std::runtime_error{"File with the same name is opened in editor"};
             }
 
-/*            
-            if (auto wnd = GetEditorWnd(path))
-                return WndManager::getInstance().SetTopWnd(wnd);
+            if (std::filesystem::exists(path))
+            {
+                ret = MsgBox(
+                    "Save As",
+                    "File with the same name already exists",
+                    "Replace it?",
+                    MBOX_OK_CANCEL
+                );
+                if (ret != ID_OK)
+                    return false;
+            }
+            
+            try
+            {
+                if (!m_untitled)
+                {
+                    [[maybe_unused]] bool rc = m_editor->Save()
+                        && m_editor->SetName(path, true);
+                }
+                else
+                {
+                    [[maybe_unused]] bool rc = m_editor->SetName(path, false)
+                        && m_editor->Save();
+                }
+                m_untitled = false;
+            }
+            catch (const std::exception& ex)
+            {
+                LOG(ERROR) << "save as: exception " << ex.what();
+                MsgBox(
+                    "Save As",
+                    "File write error",
+                    "Check file access and try again",
+                    MBOX_OK
+                );
+                throw std::runtime_error{ "File saveing error" };
+            }
 
-            auto editor = std::make_shared<EditorWnd>();
-            editor->Show(true, -1);
-            if (editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
-                m_editors[editor.get()] = editor;
-*/        
+            UpdateAccessInfo();
+            m_saved = true;
         }
         catch (...)
         {
-            _assert(0);
-            LOG(ERROR) << "Error file saving as";
-            EditorApp::SetErrorLine("Error file saving as");
+            LOG(ERROR) << "Error in file Saving As";
+            EditorApp::SetErrorLine("Error in file Saving As");
+            return false;
         }
     }
 

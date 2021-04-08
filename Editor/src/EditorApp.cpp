@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
-
+#include "Dialogs/EditorDialogs.h"
 
 sline_list g_statusLine
 {
@@ -225,6 +225,11 @@ input_t EditorApp::AppProc(input_t code)
     }
     else if (code == K_EXIT)
     {
+        ExitDialog dlg;
+        auto ret = dlg.Activate();
+        if (ret != ID_OK)
+            return 0;
+
         CloseAllWindows();
     }
     else if(code >= K_APP && code <= K_APP_END)

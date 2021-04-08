@@ -143,7 +143,7 @@ public:
 
     bool                    Load();
     bool                    Save();
-    bool                    SaveAs(const std::string& name);
+    bool                    SetName(const std::filesystem::path& file, bool copy);
     bool                    ClearModifyFlag();
     bool                    CheckFileAccess();
     char                    GetAccessInfo();

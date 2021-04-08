@@ -733,6 +733,6 @@ input_t MsgBox(const std::string& title, const std::string& line1, const std::st
     }
 
     Dialog Dlg(MBox);
-    input_t rc = Dlg.Activate();
-    return rc;
+    input_t ret = Dlg.Activate();
+    return ret;
 }

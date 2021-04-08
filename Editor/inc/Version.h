@@ -25,43 +25,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
-#include "Dialog.h"
 
-#include <map>
-
-
-enum class WindowsDlgMode
-{
-    List,
-    CopyFrom,
-    MoveFrom,
-    CompareWith
-};
-
-class EditorWnd;
-class WindowListDialog : public Dialog
-{
-    WindowsDlgMode m_mode;
-    std::map<std::string, EditorWnd*> m_wndList;
-
-    size_t GetWndList(bool skip = false);
-
-public:
-    WindowListDialog(WindowsDlgMode mode = WindowsDlgMode::List, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
-
-    virtual input_t DialogProc(input_t code) override;
-    virtual bool OnActivate() override;
-    virtual bool OnClose(int id) override;
-};
-
-class AboutDialog : public Dialog
-{
-public:
-    AboutDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
-};
-
-class ExitDialog : public Dialog
-{
-public:
-    ExitDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
-};
+#define EDITOR_NAME     "Multitextor"
+#define EDITOR_NAME_C   "&M&u&l&t&i&t&e&x&t&o&r"
+#define EDITOR_VERSION  "2.0.1 alpha"
+#define COPYRIGHT_YEAR  "2020-2021"
+#define COPYRIGTH_OWNER "vikonix"

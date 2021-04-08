@@ -256,7 +256,7 @@ bool DirectoryList::Scan()
 {
     if (m_path.empty())
         m_path = Directory::CurPath();
-    LOG(DEBUG) << "ReadDir " << m_path.u8string();
+    //LOG(DEBUG) << "ReadDir " << m_path.u8string();
 
     m_drvList.clear();
     m_dirList.clear();

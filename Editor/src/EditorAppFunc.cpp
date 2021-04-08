@@ -75,8 +75,8 @@ std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
 bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
 {
     FileDialog dlg{ FileDlgMode::Open };
-    auto rc = dlg.Activate();
-    if (rc == ID_OK)
+    auto ret = dlg.Activate();
+    if (ret == ID_OK)
     {
         try
         {
@@ -91,10 +91,10 @@ bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
             if(editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
                 m_editors[editor.get()] = editor;
         }
-        catch (...)
+        catch (const std::exception& ex)
         {
             _assert(0);
-            LOG(ERROR) << "Error file loading";
+            LOG(ERROR) << "Error file loading: " << ex.what();
             EditorApp::SetErrorLine("Error file loading");
         }
     }
@@ -129,21 +129,21 @@ bool    EditorApp::WndCloseAllProc([[maybe_unused]] input_t cmd)
 bool    EditorApp::WndListProc([[maybe_unused]] input_t cmd)
 {
     WindowListDialog Dlg;
-    [[maybe_unused]] auto code = Dlg.Activate();
+    [[maybe_unused]] auto ret = Dlg.Activate();
     return true;
 }
 
 bool    EditorApp::WndCopyProc([[maybe_unused]] input_t cmd)
 {
     WindowListDialog Dlg(WindowsDlgMode::CopyFrom);
-    [[maybe_unused]] auto code = Dlg.Activate();
+    [[maybe_unused]] auto ret = Dlg.Activate();
     return true;
 }
 
 bool    EditorApp::WndMoveProc([[maybe_unused]] input_t cmd)
 {
     WindowListDialog Dlg(WindowsDlgMode::MoveFrom);
-    [[maybe_unused]] auto code = Dlg.Activate();
+    [[maybe_unused]] auto ret = Dlg.Activate();
     return true;
 }
 
@@ -169,7 +169,7 @@ bool    EditorApp::ViewMoveProc([[maybe_unused]] input_t cmd)
 
 bool    EditorApp::RecordMacroProc([[maybe_unused]] input_t cmd)
 {
-    auto rc = MsgBox(
+    auto ret = MsgBox(
         "Macro Recording",
         "Warning!",
         !IsRecordMacro() ?
@@ -178,7 +178,7 @@ bool    EditorApp::RecordMacroProc([[maybe_unused]] input_t cmd)
         MBOX_OK_CANCEL
     );
 
-    if (rc == ID_OK)
+    if (ret == ID_OK)
         RecordMacro();
 
     return true;
@@ -187,6 +187,13 @@ bool    EditorApp::RecordMacroProc([[maybe_unused]] input_t cmd)
 bool    EditorApp::PlayMacroProc([[maybe_unused]] input_t cmd)
 {
     PlayMacro();
+    return true;
+}
+
+bool    EditorApp::AboutProc([[maybe_unused]] input_t cmd)
+{
+    AboutDialog dlg;
+    dlg.Activate();
     return true;
 }
 
@@ -203,12 +210,6 @@ bool    EditorApp::ReplaceInFilesProc(input_t cmd)
 }
 
 bool    EditorApp::FoundFilesProc(input_t cmd)
-{
-    LOG(DEBUG) << __FUNC__ << " not implemented";
-    return true;
-}
-
-bool    EditorApp::AboutProc(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
