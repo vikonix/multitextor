@@ -65,22 +65,18 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
 
             if (auto wnd = editorApp.GetEditorWnd(path); wnd != nullptr && wnd != this)
             {
-                MsgBox(
-                    "Save As",
-                    "Error: File with the same name is opened in editor",
-                    "Close it first!",
-                    MBOX_OK
+                MsgBox(MBoxKey::OK, "Save As",
+                    {"Error: File with the same name is opened in editor",
+                    "Close it first!"}
                 );
                 throw std::runtime_error{"File with the same name is opened in editor"};
             }
 
             if (std::filesystem::exists(path))
             {
-                ret = MsgBox(
-                    "Save As",
-                    "File with the same name already exists",
-                    "Replace it?",
-                    MBOX_OK_CANCEL
+                ret = MsgBox(MBoxKey::OK_CANCEL, "Save As",
+                    {"File with the same name already exists",
+                    "Replace it?"}
                 );
                 if (ret != ID_OK)
                     return false;
@@ -103,11 +99,9 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
             catch (const std::exception& ex)
             {
                 LOG(ERROR) << "save as: exception " << ex.what();
-                MsgBox(
-                    "Save As",
-                    "File write error",
-                    "Check file access and try again",
-                    MBOX_OK
+                MsgBox(MBoxKey::OK, "Save As",
+                    {"File write error",
+                    "Check file access and try again"}
                 );
                 throw std::runtime_error{ "File saveing error" };
             }

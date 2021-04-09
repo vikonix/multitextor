@@ -53,15 +53,3 @@ public:
     virtual bool OnActivate() override;
     virtual bool OnClose(int id) override;
 };
-
-class AboutDialog : public Dialog
-{
-public:
-    AboutDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
-};
-
-class ExitDialog : public Dialog
-{
-public:
-    ExitDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
-};

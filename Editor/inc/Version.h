@@ -28,6 +28,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define EDITOR_NAME     "Multitextor"
 #define EDITOR_NAME_C   "&M&u&l&t&i&t&e&x&t&o&r"
-#define EDITOR_VERSION  "2.0.1 alpha"
+#define EDITOR_VERSION  "2.0.1 (alpha)"
 #define COPYRIGHT_YEAR  "2020-2021"
 #define COPYRIGTH_OWNER "vikonix"

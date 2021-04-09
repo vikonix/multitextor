@@ -79,11 +79,11 @@ enum CtrlDefId
     ID_USER         = 0x2000
 };
 
-enum MBoxKey
+enum class MBoxKey
 {
-    MBOX_OK               = 1,
-    MBOX_OK_CANCEL        = 2,
-    MBOX_OK_CANCEL_IGNORE = 3
+    OK               = 1,
+    OK_CANCEL        = 2,
+    OK_CANCEL_IGNORE = 3
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -159,4 +159,4 @@ protected:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-input_t MsgBox(const std::string& title, const std::string& line1, const std::string& line2, int type);
+input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::string>& message);

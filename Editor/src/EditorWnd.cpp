@@ -49,11 +49,9 @@ bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, co
         bool rc = editor->Load();
         if (!rc)
         {
-            MsgBox(
-                "Load",
-                "File load error",
-                "Check file and try again",
-                MBOX_OK
+            MsgBox(MBoxKey::OK, "Load",
+                { "File load error",
+                "Check file and try again" }
             );
             return rc;
         }

@@ -760,11 +760,9 @@ bool EditorWnd::Save([[maybe_unused]] input_t cmd)
         catch (const std::exception& ex)
         {
             LOG(ERROR) << "save as: exception " << ex.what();
-            MsgBox(
-                "Save",
-                "File write error",
-                "Check file access and try again",
-                MBOX_OK
+            MsgBox(MBoxKey::OK, "Save",
+                {"File write error",
+                "Check file access and try again"}
             );
             return false;
         }

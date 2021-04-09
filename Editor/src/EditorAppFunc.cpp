@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Dialogs/StdDialogs.h"
 #include "Dialogs/EditorDialogs.h"
 #include "utfcpp/utf8.h"
+#include "Version.h"
 
 
 std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
@@ -169,13 +170,11 @@ bool    EditorApp::ViewMoveProc([[maybe_unused]] input_t cmd)
 
 bool    EditorApp::RecordMacroProc([[maybe_unused]] input_t cmd)
 {
-    auto ret = MsgBox(
-        "Macro Recording",
-        "Warning!",
+    auto ret = MsgBox(MBoxKey::OK_CANCEL, "Macro Recording",
+        { "Warning!",
         !IsRecordMacro() ?
             "Do you want to start macro recording?" :
-            "Do you want to stop macro recording?",
-        MBOX_OK_CANCEL
+            "Do you want to stop macro recording?" }
     );
 
     if (ret == ID_OK)
@@ -192,8 +191,13 @@ bool    EditorApp::PlayMacroProc([[maybe_unused]] input_t cmd)
 
 bool    EditorApp::AboutProc([[maybe_unused]] input_t cmd)
 {
-    AboutDialog dlg;
-    dlg.Activate();
+    MsgBox(MBoxKey::OK, "About",
+        { EDITOR_NAME_C " Version " EDITOR_VERSION,
+        "Cross-platform text editor",
+        "",
+        "https://github.com/vikonix/multitextor",
+        "Copyright (C) " COPYRIGHT_YEAR " " COPYRIGTH_OWNER}
+    );
     return true;
 }
 

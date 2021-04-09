@@ -225,8 +225,9 @@ input_t EditorApp::AppProc(input_t code)
     }
     else if (code == K_EXIT)
     {
-        ExitDialog dlg;
-        auto ret = dlg.Activate();
+        auto ret = MsgBox(MBoxKey::OK_CANCEL, "Exit",
+            {"Do you want to exit program ?"}
+        );
         if (ret != ID_OK)
             return 0;
 

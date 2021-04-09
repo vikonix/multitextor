@@ -142,11 +142,9 @@ input_t Dialog::Activate()
 {
     if(!m_sizex || !m_sizey)
     {
-        MsgBox(
-            "Dialog Box",
-            "Error !",
-            "Very small screen size.",
-            MBOX_OK
+        MsgBox(MBoxKey::OK, "Dialog Box",
+            { "Error !", 
+            "Very small screen size." }
         );
         return ID_CANCEL;
     }
@@ -685,54 +683,35 @@ bool Dialog::CtrlRadioSelect(size_t pos)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-input_t MsgBox(const std::string& title, const std::string& line1, const std::string& line2, int type)
+input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::string>& message)
 {
-    pos_t len1 = static_cast<pos_t>(line1.size());
-    pos_t len2 = static_cast<pos_t>(line2.size());
-    if(len1 > 70)
-        len1 = 70;
-    if(len2 > 70)
-        len2 = 70;
+    size_t len{};
+    for (auto& str : message)
+        len = std::max(len, str.size());
 
-    pos_t len = len1 > len2 ? len1 : len2;
-
+    if(len > 70)
+        len = 70;
     if(len < 30)
         len = 30;
 
-    std::list<control> MBox 
+    pos_t line{};
+    std::list<control> box;
+
+    box.push_back({ CTRL_TITLE, title, 0, nullptr, 1, line++, static_cast<pos_t>(len + 4), static_cast<pos_t>(message.size() + 6) });
+    for (auto& str : message)
+        box.push_back({ CTRL_STATIC, str, 0, nullptr, 1, line++ });
+    box.push_back({ CTRL_LINE, "", 0, nullptr, 1, ++line, static_cast<pos_t>(len) });
+    ++line;
+
+    box.push_back({ CTRL_DEFBUTTON | CTRL_ALIGN_LEFT, "OK", ID_OK, nullptr, 1, line });
+    if(type != MBoxKey::OK)
     {
-    /*0*/ {CTRL_TITLE,                       title,    0,         nullptr,  1, 0, static_cast<pos_t>(len + 4), 8},
-
-    /*1*/ {CTRL_STATIC,                      line1,    0,         nullptr,  1, 1, len1},
-    /*2*/ {CTRL_STATIC,                      line2,    0,         nullptr,  1, 2, len2},
-    /*3*/ {CTRL_LINE,                        "",       0,         nullptr,  1, 4, len},
-
-    /*4*/ {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT, "OK",     ID_OK,     nullptr,  1, 5},
-    /*5*/ {CTRL_BUTTON | CTRL_ALIGN_LEFT,    "Cancel", ID_CANCEL, nullptr,  2, 5},
-    /*6*/ {CTRL_BUTTON | CTRL_ALIGN_LEFT,    "Ignore", ID_IGNORE, nullptr,  3, 5}
-    };
-
-    auto it {MBox.begin()};
-    ++it;
-    ++it;
-    ++it;
-    ++it;
-    ++it;
-    switch(type)
-    {
-    default:
-    case MBOX_OK:
-        it->type = 0;
-        [[fallthrough]];
-    case MBOX_OK_CANCEL:
-        ++it;
-        it->type = 0;
-        [[fallthrough]];
-    case MBOX_OK_CANCEL_IGNORE:
-        break;
+        box.push_back({ CTRL_BUTTON | CTRL_ALIGN_LEFT, "Cancel", ID_CANCEL, nullptr, 2, line });
+        if(type != MBoxKey::OK_CANCEL)
+            box.push_back({ CTRL_BUTTON | CTRL_ALIGN_LEFT, "Ignore", ID_IGNORE, nullptr, 3, line });
     }
 
-    Dialog Dlg(MBox);
+    Dialog Dlg(box);
     input_t ret = Dlg.Activate();
     return ret;
 }
