@@ -187,7 +187,7 @@ bool Dialog::AllignButtons()
             pos_t x, y, sx, sy;
             control->GetPos(x, y, sx, sy);
 
-            if(t & CTRL_ALIGN_LEFT)
+            if(t & CTRL_ALIGN_RIGHT)
             {
                 if(prevy != y)
                     x = m_sizex - sx - 3;
@@ -703,12 +703,12 @@ input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::stri
     box.push_back({ CTRL_LINE, "", 0, nullptr, 1, ++line, static_cast<pos_t>(len) });
     ++line;
 
-    box.push_back({ CTRL_DEFBUTTON | CTRL_ALIGN_LEFT, "OK", ID_OK, nullptr, 1, line });
+    box.push_back({ CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "OK", ID_OK, nullptr, 1, line });
     if(type != MBoxKey::OK)
     {
-        box.push_back({ CTRL_BUTTON | CTRL_ALIGN_LEFT, "Cancel", ID_CANCEL, nullptr, 2, line });
+        box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, "Cancel", ID_CANCEL, nullptr, 1, line });
         if(type != MBoxKey::OK_CANCEL)
-            box.push_back({ CTRL_BUTTON | CTRL_ALIGN_LEFT, "Ignore", ID_IGNORE, nullptr, 3, line });
+            box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, "Ignore", ID_IGNORE, nullptr, 1, line });
     }
 
     Dialog Dlg(box);

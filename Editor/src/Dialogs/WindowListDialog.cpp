@@ -43,9 +43,9 @@ std::list<control> dlgWindowList
     {CTRL_LIST,                         "",             ID_WL_WNDLIST,  (size_t*)nullptr,    0,  0, 68, 18, "Select window"},
     {CTRL_STATIC,                       "",             ID_WL_COUNT,    nullptr,             1, 18, 35},
 
-    {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT,  "Select",       ID_OK,          nullptr,            36, 18,  0,  0, "Activate selected window"},
-    {CTRL_BUTTON | CTRL_ALIGN_LEFT,     "Close",        ID_WL_CLOSE,    nullptr,            47, 18,  0,  0, "Close selected window"},
-    {CTRL_BUTTON | CTRL_ALIGN_LEFT,     "Cancel",       ID_CANCEL,      nullptr,            57, 18}
+    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Select",       ID_OK,          nullptr,            36, 18,  0,  0, "Activate selected window"},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Close",        ID_WL_CLOSE,    nullptr,            47, 18,  0,  0, "Close selected window"},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",       ID_CANCEL,      nullptr,            57, 18}
 };
 
 WindowListDialog::WindowListDialog(WindowsDlgMode mode, pos_t x, pos_t y)

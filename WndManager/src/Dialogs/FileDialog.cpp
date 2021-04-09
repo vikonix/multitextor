@@ -57,8 +57,8 @@ std::list<control> fileDialog
     {CTRL_LIST,                         "&Directories", ID_OF_DIRLIST,  (size_t*)nullptr,           0,  4, 19, 14, "Select directory"},
     {CTRL_LIST,                         "&Files",       ID_OF_FILELIST, (size_t*)nullptr,          19,  4, 34, 14, "Select file name"},
 
-    {CTRL_DEFBUTTON | CTRL_ALIGN_LEFT,  "",             ID_OK,          nullptr,                   54,  5},
-    {CTRL_BUTTON | CTRL_ALIGN_LEFT,     "Cancel",       ID_CANCEL,      nullptr,                   54,  7},
+    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "",             ID_OK,          nullptr,                   54,  5},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",       ID_CANCEL,      nullptr,                   54,  7},
 
     {CTRL_STATIC,                       "File &type:",  ID_OF_STAT_TYPE,nullptr,                   54,  9, 14},
     {CTRL_DROPLIST,                     "",             ID_OF_TYPE,     &FileDialog::s_vars.type,  54, 10, 13,  6, "Select file type"},

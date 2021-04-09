@@ -56,34 +56,34 @@ enum CtrlType
 
 enum CtrlState
 {
-    CTRL_NORMAL     =      0,
-    CTRL_DISABLED   =      1,
-    CTRL_NOCOLOR    =      2,
-    CTRL_HIDE       =      5,
-    CTRL_SELECTED   =      8,
-    CTRL_SORTED     =   0x10, 
-    CTRL_STATE_MASK = 0x001f
+    CTRL_NORMAL         =      0,
+    CTRL_DISABLED       =      1,
+    CTRL_NOCOLOR        =      2,
+    CTRL_HIDE           =      5,
+    CTRL_SELECTED       =      8,
+    CTRL_SORTED         =   0x10, 
+    CTRL_STATE_MASK     = 0x001f
 };
 
 enum CtrlAlign
 {
-    CTRL_ALIGN_LEFT = 0x0080,
-    CTRL_ALIGN_MASK = 0x0080
+    CTRL_ALIGN_RIGHT    = 0x0080,
+    CTRL_ALIGN_MASK     = 0x0080
 };
 
 enum CtrlDefId
 {
-    ID_OK           = 0x1000,
-    ID_CANCEL       = 0x1001,
-    ID_IGNORE       = 0x1002,
-    ID_USER         = 0x2000
+    ID_OK               = 0x1000,
+    ID_CANCEL           = 0x1001,
+    ID_IGNORE           = 0x1002,
+    ID_USER             = 0x2000
 };
 
 enum class MBoxKey
 {
-    OK               = 1,
-    OK_CANCEL        = 2,
-    OK_CANCEL_IGNORE = 3
+    OK                  = 1,
+    OK_CANCEL           = 2,
+    OK_CANCEL_IGNORE    = 3
 };
 
 /////////////////////////////////////////////////////////////////////////////
