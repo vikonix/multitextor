@@ -746,30 +746,31 @@ bool EditorWnd::Replace(input_t cmd)
 
 bool EditorWnd::Save([[maybe_unused]] input_t cmd)
 {
+    if (!m_editor->IsChanged())
+        return true;
+
     LOG(DEBUG) << "    Save " << std::hex << cmd << std::dec;
 
-    if (m_editor->IsChanged())
+    if (m_untitled)
+        return SaveAs(0);
+
+    try
     {
-        if (m_untitled)
-            return SaveAs(0);
-
-        try
-        {
-            [[maybe_unused]]bool rc = m_editor->Save();
-        }
-        catch (const std::exception& ex)
-        {
-            LOG(ERROR) << "save as: exception " << ex.what();
-            MsgBox(MBoxKey::OK, "Save",
-                {"File write error",
-                "Check file access and try again"}
-            );
-            return false;
-        }
-
-        UpdateAccessInfo();
-        m_saved = true;
+        [[maybe_unused]]bool rc = m_editor->Save();
     }
+    catch (const std::exception& ex)
+    {
+        LOG(ERROR) << "save as: exception " << ex.what();
+        MsgBox(MBoxKey::OK, "Save",
+            {"File write error",
+            "Check file access and try again"}
+        );
+        return false;
+    }
+
+    UpdateAccessInfo();
+    m_saved = true;
+
     return true;
 }
 

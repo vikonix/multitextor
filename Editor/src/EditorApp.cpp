@@ -199,6 +199,7 @@ Wnd* EditorApp::GetEditorWnd(std::filesystem::path path)
 
 bool EditorApp::CloseAllWindows()
 {
+    FileSaveAllProc(0);
     m_editors.clear();
     return true;
 }

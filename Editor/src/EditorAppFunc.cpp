@@ -231,9 +231,12 @@ bool    EditorApp::HelpKeymapProc(input_t cmd)
     return true;
 }
 
-bool    EditorApp::FileSaveAllProc(input_t cmd)
+bool    EditorApp::FileSaveAllProc([[maube_unused]]input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    for (auto & [w, wnd] : m_editors)
+    {
+        wnd->Save(0);
+    }
     return true;
 }
 
