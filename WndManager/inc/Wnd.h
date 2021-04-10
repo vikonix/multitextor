@@ -78,7 +78,7 @@ public:
     virtual bool            Destroy()                   { return true; }
     virtual std::filesystem::path   GetFilePath() const { return ""; }
     virtual wnd_t           GetWndType() const          {return wnd_t::wnd;}
-    virtual std::string     GetObjName() const          {return {};}
+    virtual std::string     GetObjectName() const       {return {};}
     virtual char            GetAccessInfo() const       {return ' ';}
     virtual bool            IsClone() const             {return false;}
     virtual bool            IsUsedTimer() const         {return false;}

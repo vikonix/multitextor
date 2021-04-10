@@ -199,7 +199,19 @@ Wnd* EditorApp::GetEditorWnd(std::filesystem::path path)
 
 bool EditorApp::CloseAllWindows()
 {
-    FileSaveAllProc(0);
+    for (auto& [w, wnd] : m_editors)
+    {
+        if (!wnd->IsChanged())
+            continue;
+
+        auto ret = MsgBox(MBoxKey::OK_CANCEL, "Close: " + wnd->GetObjectName(),
+            { "File was changed.",
+            "Do you want to save it?" }
+        );
+        if (ret == ID_OK)
+            wnd->Save(0);
+    }
+
     m_editors.clear();
     return true;
 }

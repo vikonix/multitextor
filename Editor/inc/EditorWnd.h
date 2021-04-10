@@ -204,7 +204,7 @@ public:
     virtual bool            Repaint() override;
     virtual bool            Invalidate(size_t line, invalidate_t type, size_t pos = 0, size_t size = 0) override;
     virtual char            GetAccessInfo() const override { return m_editor->GetAccessInfo(); }
-    virtual std::string     GetObjName() const override 
+    virtual std::string     GetObjectName() const override 
     { 
         return m_editor ? m_editor->GetFilePath().filename().u8string() : ""; 
     }
@@ -216,6 +216,7 @@ public:
     virtual bool            IsClone() const override { return m_clone; }
 
     bool    IsMarked() { return IsSelectComplete(); }
+    bool    IsChanged() { return m_editor->IsChanged(); }
     bool    EditWndCopy(EditorWnd* from);
     bool    EditWndMove(EditorWnd* from);
 
@@ -229,7 +230,6 @@ public:
 
   int       IsUntitled()             {return m_fUntitled;}
   int       IsMarked()               {return m_nSelectState;}
-  int       IsChanged()              {return m_pTBuff->IsChanged();}
   long long GetSize()                {return m_pTBuff->GetSize();}
 
   int       SaveCfg(SSave* pSave);

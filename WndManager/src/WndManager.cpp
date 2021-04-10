@@ -399,11 +399,11 @@ bool WndManager::WriteConsoleTitle(bool set)
     if (!m_wndList.empty())
     {
         if (m_view[2].wnd && m_activeView == 1)
-            name = m_view[2].wnd->GetObjName();
+            name = m_view[2].wnd->GetObjectName();
         else
         {
             if (m_wndList[0]->GetWndType() == wnd_t::editor)
-                name = m_wndList[0]->GetObjName();
+                name = m_wndList[0]->GetObjectName();
             else
                 return true;
         }
