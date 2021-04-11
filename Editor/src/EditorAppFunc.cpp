@@ -231,7 +231,7 @@ bool    EditorApp::HelpKeymapProc(input_t cmd)
     return true;
 }
 
-bool    EditorApp::FileSaveAllProc([[maube_unused]]input_t cmd)
+bool    EditorApp::FileSaveAllProc([[maybe_unused]]input_t cmd)
 {
     for (auto & [w, wnd] : m_editors)
     {

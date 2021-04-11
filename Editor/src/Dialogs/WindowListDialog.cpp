@@ -56,8 +56,8 @@ WindowListDialog::WindowListDialog(WindowsDlgMode mode, pos_t x, pos_t y)
 
 bool WindowListDialog::OnActivate()
 {
-    Wnd* pWnd = WndManager::getInstance().GetWnd();
-    if (!pWnd)
+    Wnd* wnd = WndManager::getInstance().GetWnd();
+    if (!wnd)
     {
         BeginPaint();
         EditorApp::SetErrorLine("All windows are closed");

@@ -75,7 +75,8 @@ bool GotoDialog::OnClose(int id)
         Application::getInstance().SetErrorLine(error);
         SelectItem(ID_GL_NUMBER);
         Refresh();
+        return false;
     }
 
-    return false;
+    return true;
 }
