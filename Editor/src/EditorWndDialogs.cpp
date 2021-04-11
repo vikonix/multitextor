@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager.h"
 #include "EditorApp.h"
 #include "Dialogs/StdDialogs.h"
+#include "Dialogs/EditorDialogs.h"
 
 
 bool EditorWnd::DlgGoto([[maybe_unused]]input_t cmd)

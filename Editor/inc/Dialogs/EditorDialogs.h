@@ -53,3 +53,44 @@ public:
     virtual bool OnActivate() override;
     virtual bool OnClose(int id) override;
 };
+
+class GotoDialog : public Dialog
+{
+    size_t m_maxLine;
+
+public:
+    static std::string m_line;
+
+    GotoDialog(size_t maxLine, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+    virtual bool OnClose(int id) override final;
+
+    size_t GetLine() { return std::stoull(m_line); }
+};
+
+struct FindReplaceVars
+{
+    std::list<std::string> findList;
+    std::list<std::string> replaceList;
+
+    std::string findStr;
+    std::string replaceStr;
+    bool        checkCase{};
+    bool        directionUp{};
+    bool        replaceMode{};
+    bool        inSelected{};
+    bool        findWord{};
+    bool        noPrompt{};
+};
+
+class FindDialog : public Dialog
+{
+    bool m_replace;//false-find true-replace
+
+public:
+    static FindReplaceVars s_vars;
+
+    FindDialog(bool replace, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+
+    bool OnActivate();
+    bool OnClose(int id);
+};
