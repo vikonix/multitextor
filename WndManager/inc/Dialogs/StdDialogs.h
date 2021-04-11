@@ -71,3 +71,18 @@ public:
     virtual bool OnActivate() override;
     virtual bool OnClose(int id) override;
 };
+
+
+class GotoDialog : public Dialog
+{
+    size_t m_maxLine;
+
+public:
+    static std::string m_line;
+
+    GotoDialog(size_t maxLine, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+    virtual bool OnClose(int id) override final;
+
+    size_t GetLine() { return std::stoull(m_line); }
+};
+

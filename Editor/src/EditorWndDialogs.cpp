@@ -31,9 +31,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Dialogs/StdDialogs.h"
 
 
-bool EditorWnd::DlgGoto(input_t cmd)
+bool EditorWnd::DlgGoto([[maybe_unused]]input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    GotoDialog Dlg(m_editor->GetStrCount());
+    auto ret = Dlg.Activate();
+    if (ret == ID_OK)
+    {
+        auto line = Dlg.GetLine();
+        _GotoXY(0, line - 1);
+    }
     return true;
 }
 
