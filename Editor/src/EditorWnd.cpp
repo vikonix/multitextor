@@ -30,12 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager.h"
 #include "EditorApp.h"
 #include "Dialog.h"
+#include "Dialogs/EditorDialogs.h"
 
 #include <algorithm>
 #include <iterator>
 #include <cwctype>
-
-FindReplaceParam EditorWnd::g_findParams;
 
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode, const std::string& cp)
@@ -1555,7 +1554,7 @@ bool EditorWnd::IsWord(const std::u16string& str, size_t offset, size_t len)
 
 bool EditorWnd::FindUp(bool silence)
 {
-    if (g_findParams.findStr.empty())
+    if (FindDialog::s_vars.findStrW.empty())
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
@@ -1565,8 +1564,8 @@ bool EditorWnd::FindUp(bool silence)
         EditorApp::SetHelpLine("Search. Press any key for cancel");
 
     time_t t{ time(NULL) };
-    std::u16string find{ g_findParams.findStr };
-    if (!g_findParams.checkCase)
+    std::u16string find{ FindDialog::s_vars.findStrW };
+    if (!FindDialog::s_vars.checkCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1577,7 +1576,7 @@ bool EditorWnd::FindUp(bool silence)
     //search diaps
     size_t line{ m_firstLine + m_cursory };
     size_t end{};
-    if (g_findParams.inSelected && m_selectState == select_state::complete)
+    if (FindDialog::s_vars.inSelected && m_selectState == select_state::complete)
     {
         if (m_beginY <= m_endY)
         {
@@ -1620,7 +1619,7 @@ bool EditorWnd::FindUp(bool silence)
         {
             if (*it == S_TAB)
                 *it = ' ';
-            else if (!g_findParams.checkCase)
+            else if (!FindDialog::s_vars.checkCase)
                 *it = std::towupper(*it);
         }
 
@@ -1630,7 +1629,7 @@ bool EditorWnd::FindUp(bool silence)
             itFound != str.rend())
         {
             offset = std::distance(itFound, str.rend()) - size;
-            if (!g_findParams.findWord || IsWord(str, offset, size))
+            if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
             {
                 LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);
@@ -1677,7 +1676,7 @@ bool EditorWnd::FindUp(bool silence)
 
 bool EditorWnd::FindDown(bool silence)
 {
-    if (g_findParams.findStr.empty())
+    if (FindDialog::s_vars.findStrW.empty())
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
@@ -1687,8 +1686,8 @@ bool EditorWnd::FindDown(bool silence)
         EditorApp::SetHelpLine("Search. Press any key for cancel");
 
     time_t t{ time(NULL) };
-    std::u16string find{ g_findParams.findStr };
-    if (!g_findParams.checkCase)
+    std::u16string find{ FindDialog::s_vars.findStrW };
+    if (!FindDialog::s_vars.checkCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
@@ -1699,7 +1698,7 @@ bool EditorWnd::FindDown(bool silence)
     //search diaps
     size_t line{ m_firstLine + m_cursory };
     size_t end{m_editor->GetStrCount()};
-    if (g_findParams.inSelected && m_selectState == select_state::complete)
+    if (FindDialog::s_vars.inSelected && m_selectState == select_state::complete)
     {
         if (m_beginY <= m_endY)
         {
@@ -1738,7 +1737,7 @@ bool EditorWnd::FindDown(bool silence)
         {
             if (*it == S_TAB)
                 *it = ' ';
-            else if (!g_findParams.checkCase)
+            else if (!FindDialog::s_vars.checkCase)
                 *it = std::towupper(*it);
         }
 
@@ -1748,7 +1747,7 @@ bool EditorWnd::FindDown(bool silence)
             itFound != str.end())
         {
             offset = std::distance(str.begin(), itFound);
-            if (!g_findParams.findWord || IsWord(str, offset, size))
+            if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
             {
                 LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
                 _GotoXY(offset, line);

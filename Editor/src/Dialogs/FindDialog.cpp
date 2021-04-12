@@ -76,6 +76,7 @@ FindDialog::FindDialog(bool replace, pos_t x, pos_t y)
     : Dialog(findDialog, x, y)
     , m_replace{ replace }
 {
+    s_vars.replaceMode = replace;
 }
 
 bool FindDialog::OnActivate()
@@ -94,6 +95,8 @@ bool FindDialog::OnActivate()
         auto ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
         if (ctrlSearch)
         {
+            for(auto& str : s_vars.findList)
+                ctrlSearch->AppendStr(str);
             auto firstWord = ctrlSearch->GetStr(0);
             if (firstWord != word)
                 ctrlSearch->AddStr(0, word);
@@ -105,6 +108,8 @@ bool FindDialog::OnActivate()
             ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
             if (ctrlSearch)
             {
+                for (auto& str : s_vars.replaceList)
+                    ctrlSearch->AppendStr(str);
                 auto firstWord = ctrlSearch->GetStr(0);
                 if (firstWord != word)
                     ctrlSearch->AddStr(0, word);
@@ -156,11 +161,17 @@ bool FindDialog::OnClose(int id)
             auto str = ctrlSearch->GetName();
             if (str.empty())
             {
-                Application::getInstance().SetErrorLine("Search string absent");
+                Application::getInstance().SetErrorLine("Search string empty");
                 SelectItem(ID_FF_SEARCH);
                 Refresh();
                 return false;
             }
+            s_vars.findStrW = utf8::utf8to16(str);
+
+            size_t n = ctrlSearch->GetStrCount();
+            s_vars.findList.clear();
+            for (size_t i = 0; i < n && i < 16; ++i)
+                s_vars.findList.emplace_back(ctrlSearch->GetStr(i));
         }
         
         if (m_replace)
@@ -172,11 +183,17 @@ bool FindDialog::OnClose(int id)
                 auto str = ctrlSearch->GetName();
                 if (str.empty())
                 {
-                    Application::getInstance().SetErrorLine("Replace string absent");
+                    Application::getInstance().SetErrorLine("Replace string empty");
                     SelectItem(ID_FF_REPLACE);
                     Refresh();
                     return false;
                 }
+                s_vars.replaceStrW = utf8::utf8to16(str);
+
+                size_t n = ctrlSearch->GetStrCount();
+                s_vars.replaceList.clear();
+                for (size_t i = 0; i < n && i < 16; ++i)
+                    s_vars.replaceList.emplace_back(ctrlSearch->GetStr(i));
             }
         }
     }

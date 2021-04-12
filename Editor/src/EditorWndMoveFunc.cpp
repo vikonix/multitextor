@@ -24,12 +24,13 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-
+#include "utfcpp/utf8.h"
 #include "utils/SymbolType.h"
 #include "EditorWnd.h"
 #include "EditorCmd.h"
 #include "WndManager.h"
 #include "EditorApp.h"
+#include "Dialogs/EditorDialogs.h"
 
 #define USE_SCROLL
 
@@ -858,7 +859,7 @@ bool EditorWnd::MoveLexMatch([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::Find(bool silence)
 {
-    if (g_findParams.directionUp)
+    if (FindDialog::s_vars.directionUp)
         return FindUp(silence);
     else
         return FindDown(silence);
@@ -881,31 +882,31 @@ bool EditorWnd::CtrlFindDown([[maybe_unused]] input_t cmd)
 
 bool EditorWnd::FindUpWord([[maybe_unused]] input_t cmd)
 {
-    if (!GetWord(g_findParams.findStr))
+    if (!GetWord(FindDialog::s_vars.findStrW))
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
     }
 
-    //???App SaveFindStr(g_findParams.findStr);
+    FindDialog::s_vars.findList.push_back(utf8::utf16to8(FindDialog::s_vars.findStrW));
     return FindUp();
 }
 
 bool EditorWnd::FindDownWord([[maybe_unused]] input_t cmd)
 {
-    if (!GetWord(g_findParams.findStr))
+    if (!GetWord(FindDialog::s_vars.findStrW))
     {
         EditorApp::SetErrorLine("Nothing to find");
         return false;
     }
 
-    //???App SaveFindStr(g_findParams.findStr);
+    FindDialog::s_vars.findList.push_back(utf8::utf16to8(FindDialog::s_vars.findStrW));
     return FindDown();
 }
 
 bool EditorWnd::Repeat(input_t cmd)
 {
-    if (!g_findParams.replaceMode)
+    if (!FindDialog::s_vars.replaceMode)
         return Find();
     else
         return Replace(cmd);

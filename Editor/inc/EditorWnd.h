@@ -35,20 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 class Diff;
 
-struct FindReplaceParam
-{
-    std::list<std::string> findList;
-    std::list<std::string> replaceList;
-
-    std::u16string   findStr;
-    std::u16string   replaceStr;
-    bool             checkCase{};
-    bool             directionUp{};
-    bool             replaceMode{};
-    bool             inSelected{};
-    bool             findWord{};
-};
-
 class EditorWnd : public FrameWnd
 {
     enum select_state : int
@@ -175,9 +161,6 @@ class EditorWnd : public FrameWnd
     bool    CheckFileChanging();
 
 public:
-    //find and replace params
-    static FindReplaceParam g_findParams;
-
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
         : FrameWnd(left, top, sizex, sizey, border) {m_cmdParser.SetCmdMap(g_defaultEditKeyMap);}
     virtual ~EditorWnd() = default;

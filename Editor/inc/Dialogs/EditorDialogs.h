@@ -69,17 +69,20 @@ public:
 
 struct FindReplaceVars
 {
-    std::list<std::string> findList;
-    std::list<std::string> replaceList;
+    std::list<std::string>  findList;
+    std::list<std::string>  replaceList;
 
-    std::string findStr;
-    std::string replaceStr;
-    bool        checkCase{};
-    bool        directionUp{};
-    bool        replaceMode{};
-    bool        inSelected{};
-    bool        findWord{};
-    bool        noPrompt{};
+    std::string     findStr;
+    std::string     replaceStr;
+    std::u16string  findStrW;
+    std::u16string  replaceStrW;
+
+    bool            checkCase{};
+    bool            directionUp{};
+    bool            replaceMode{};
+    bool            inSelected{};
+    bool            findWord{};
+    bool            noPrompt{};
 };
 
 class FindDialog : public Dialog

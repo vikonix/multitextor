@@ -48,8 +48,10 @@ bool EditorWnd::DlgFind([[maybe_unused]] input_t cmd)
 {
     FindDialog dlg(false);
     auto ret = dlg.Activate();
+    WndManager::getInstance().CheckRefresh();
     if (ret == ID_OK)
     {
+        Find();
     }
     return true;
 }
@@ -58,8 +60,10 @@ bool EditorWnd::DlgReplace([[maybe_unused]] input_t cmd)
 {
     FindDialog dlg(true);
     auto ret = dlg.Activate();
+    WndManager::getInstance().CheckRefresh();
     if (ret == ID_OK)
     {
+        Replace(0);
     }
     return true;
 }
