@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorWnd.h"
 #include "WndManager.h"
 #include "EditorApp.h"
-#include "Dialogs/StdDialogs.h"
+#include "StdDialogs.h"
 #include "Dialogs/EditorDialogs.h"
 
 

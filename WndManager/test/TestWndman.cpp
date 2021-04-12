@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/Directory.h"
 #include "App.h"
 #include "DlgControls.h"
-#include "Dialogs/StdDialogs.h"
+#include "StdDialogs.h"
 
 #include <iostream>
 
