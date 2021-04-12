@@ -167,7 +167,6 @@ class EditorWnd : public FrameWnd
     bool    IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey) const;
     bool    HideFound();
     bool    FindWord(const std::u16string& str, size_t& begin, size_t& end);
-    bool    GetWord(std::u16string& buff);
     bool    GetSelectedPos(size_t line, size_t& begin, size_t& end, select_line& type) const;
     bool    Find(bool silence = false);
     bool    FindUp(bool silence = false);
@@ -219,6 +218,8 @@ public:
     bool    IsChanged() { return m_editor->IsChanged(); }
     bool    EditWndCopy(EditorWnd* from);
     bool    EditWndMove(EditorWnd* from);
+    bool    GetWord(std::u16string& buff);
+    bool    GetSelectedLines(size_t& begin, size_t& end);
 
 /*
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
@@ -236,7 +237,6 @@ public:
   int       LoadCfg();
 
   int       SelectAndGoto(int nline, int size);
-  int       GetSelectedLines(int* pBegin, int* pEnd);
   int       ScrollWnd(int iCode, int size = 1);
   size_t    GetCurPos()  {return m_nXOffset + m_cursorx;}
   size_t    GetCurLine() {return m_nFirstLine + m_cursory;}

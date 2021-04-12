@@ -24,10 +24,12 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "utfcpp/utf8.h"
 #include "Dialogs/EditorDialogs.h"
 #include "DlgControls.h"
 #include "App.h"
 #include "WndManager.h"
+#include "EditorWnd.h"
 
 
 /////////////////////////////////////////////////////////////////////////////
@@ -79,36 +81,49 @@ FindDialog::FindDialog(bool replace, pos_t x, pos_t y)
 bool FindDialog::OnActivate()
 {
     Wnd* wnd = WndManager::getInstance().GetWnd();
-    if (wnd && wnd->GetWndType() == wnd_t::editor)
+    if (wnd && wnd->GetWndType() != wnd_t::editor)
         return false;
 
-    /*        
-        char buff[MAX_STRLEN];
-        WndEdit* pEdit = (WndEdit*)pWnd;
-        if (pEdit->GetWord(buff))
+    auto editor = dynamic_cast<EditorWnd*>(wnd);
+    
+    std::u16string curWord;
+    if (editor->GetWord(curWord))
+    {
+        auto word = utf8::utf16to8(curWord);
+        auto seach = GetItem(ID_FF_SEARCH);
+        auto ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
+        if (ctrlSearch)
         {
-            CtrlCombo* pFind = (CtrlCombo*)GetItem(ID_FF_SEARCH);
-            char* pStr = pFind->GetSelectedStr(0, NULL);
-            if (!pStr || strcmp(buff, pStr))
-                pFind->AddStr(0, buff);
-
-            CtrlCombo* pReplace = (CtrlCombo*)GetItem(ID_FF_REPLACE);
-            pStr = pReplace->GetSelectedStr(0, NULL);
-            if (!pStr || strcmp(buff, pStr))
-                pReplace->AddStr(0, buff);
+            auto firstWord = ctrlSearch->GetStr(0);
+            if (firstWord != word)
+                ctrlSearch->AddStr(0, word);
         }
 
-        int first, last;
-        pEdit->GetSelectedLines(&first, &last);
-
-        if (!pEdit->IsMarked() || first == last)
+        if (m_replace)
         {
-            CtrlCheck* pInMarked = (CtrlCheck*)GetItem(ID_FF_INMARKED);
-            pInMarked->SetMode(CTRL_DISABLED);
-            pInMarked->SetCheck(0);
+            seach = GetItem(ID_FF_REPLACE);
+            ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
+            if (ctrlSearch)
+            {
+                auto firstWord = ctrlSearch->GetStr(0);
+                if (firstWord != word)
+                    ctrlSearch->AddStr(0, word);
+            }
         }
     }
-*/
+
+    size_t begin, end;
+    if (!editor->IsMarked() || !editor->GetSelectedLines(begin, end) || begin == end)
+    {
+        auto inmarked = GetItem(ID_FF_INMARKED);
+        auto ctrlInmarked = std::dynamic_pointer_cast<CtrlCheck>(inmarked);
+        if (ctrlInmarked)
+        {
+            ctrlInmarked->SetMode(CTRL_DISABLED);
+            ctrlInmarked->SetCheck(0);
+        }
+    }
+
     if (!m_replace)
     {
         GetItem(0)->SetName("Find");
@@ -160,5 +175,5 @@ bool FindDialog::OnClose(int id)
 */
     }
 
-    return false;
+    return true;
 }

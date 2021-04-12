@@ -1514,7 +1514,7 @@ bool EditorWnd::GetWord(std::u16string& str)
 
     for (size_t i = b; i <= e; ++i)
     {
-        auto c = curStr[m_beginX + i];
+        auto c = curStr[i];
         str += c != S_TAB ? c : ' ';
     }
 
@@ -1938,4 +1938,22 @@ bool EditorWnd::Destroy()
         }
     }
     return true; 
+}
+
+bool EditorWnd::GetSelectedLines(size_t& begin, size_t& end)
+{
+    if (!IsMarked())
+        return false;
+    if (m_beginY >= m_endY)
+    {
+        begin = m_beginY;
+        end = m_endY;
+    }
+    else
+    {
+        begin = m_endY;
+        end = m_beginY;
+    }
+
+    return true;
 }

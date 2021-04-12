@@ -34,25 +34,33 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 bool EditorWnd::DlgGoto([[maybe_unused]]input_t cmd)
 {
-    GotoDialog Dlg(m_editor->GetStrCount());
-    auto ret = Dlg.Activate();
+    GotoDialog dlg(m_editor->GetStrCount());
+    auto ret = dlg.Activate();
     if (ret == ID_OK)
     {
-        auto line = Dlg.GetLine();
+        auto line = dlg.GetLine();
         _GotoXY(0, line - 1);
     }
     return true;
 }
 
-bool EditorWnd::DlgFind(input_t cmd)
+bool EditorWnd::DlgFind([[maybe_unused]] input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    FindDialog dlg(false);
+    auto ret = dlg.Activate();
+    if (ret == ID_OK)
+    {
+    }
     return true;
 }
 
-bool EditorWnd::DlgReplace(input_t cmd)
+bool EditorWnd::DlgReplace([[maybe_unused]] input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    FindDialog dlg(true);
+    auto ret = dlg.Activate();
+    if (ret == ID_OK)
+    {
+    }
     return true;
 }
 
