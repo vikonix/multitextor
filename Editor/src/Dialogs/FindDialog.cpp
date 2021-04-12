@@ -149,30 +149,36 @@ bool FindDialog::OnClose(int id)
 {
     if (id == ID_OK)
     {
-/*
-        CtrlCombo* pFind = (CtrlCombo*)GetItem(ID_FF_SEARCH);
-        if (!pFind->GetName())
+        auto seach = GetItem(ID_FF_SEARCH);
+        auto ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
+        if (ctrlSearch)
         {
-            TPRINT(("err search absent\n"));
-            SetErrorLine(STR_D(RDE_SearchStringAbsent));
-            SelectItem(ID_FF_SEARCH);
-            Refresh();
-            return -1;
-        }
-
-        if (m_nMode)
-        {
-            CtrlCombo* pReplace = (CtrlCombo*)GetItem(ID_FF_REPLACE);
-            if (!pReplace->GetName())
+            auto str = ctrlSearch->GetName();
+            if (str.empty())
             {
-                TPRINT(("err replace absent\n"));
-                SetErrorLine(STR_D(RDE_ReplaceStringAbsent));
-                SelectItem(ID_FF_REPLACE);
+                Application::getInstance().SetErrorLine("Search string absent");
+                SelectItem(ID_FF_SEARCH);
                 Refresh();
-                return -1;
+                return false;
             }
         }
-*/
+        
+        if (m_replace)
+        {
+            seach = GetItem(ID_FF_REPLACE);
+            ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
+            if (ctrlSearch)
+            {
+                auto str = ctrlSearch->GetName();
+                if (str.empty())
+                {
+                    Application::getInstance().SetErrorLine("Replace string absent");
+                    SelectItem(ID_FF_REPLACE);
+                    Refresh();
+                    return false;
+                }
+            }
+        }
     }
 
     return true;
