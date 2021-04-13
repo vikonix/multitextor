@@ -807,6 +807,7 @@ bool EditorWnd::Replace(input_t cmd)
 
     size_t count{};
     size_t progress{};
+    size_t fx{}, fy{}, fs{};
     while (1)
     {
         bool found{};
@@ -817,6 +818,21 @@ bool EditorWnd::Replace(input_t cmd)
         {
             reverce = false;
             found = FindUp(!prompt);
+        }
+
+        if (found)
+        {
+            fx = m_foundX;
+            fy = m_foundY;
+            fs = m_foundSize;
+        }
+        else if (fs != 0)
+        {
+            //restore last found pos
+            m_foundX = fx;
+            m_foundY = fy;
+            m_foundSize = fs;
+            Invalidate(fy, invalidate_t::find, fx, fs);
         }
 
         if (!found && !prompt)
