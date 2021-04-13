@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Dialog.h"
 #include "EditorApp.h"
 #include "KeyCodes.h"
+#include "Dialogs/EditorDialogs.h"
 
 bool EditorWnd::EditC(input_t cmd)
 {
@@ -740,7 +741,153 @@ bool EditorWnd::CtrlRefresh([[maybe_unused]] input_t cmd)
 
 bool EditorWnd::Replace(input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    if (m_readOnly)
+        return true;
+
+    LOG(DEBUG) << "    Replace " << std::hex << cmd << std::dec;
+
+    EditCmd edit{ cmd_t::CMD_BEGIN };
+    EditCmd undo{ cmd_t::CMD_BEGIN };
+
+    m_editor->SetUndoRemark("Replace");
+    bool undoCmd{};
+
+    auto prevMenu = std::move(Application::getInstance().SetAccessMenu(g_replaceMenu));
+    WndManager::getInstance().Refresh();
+
+    size_t begin = m_firstLine + m_cursory;
+    size_t lines = m_editor->GetStrCount();
+    
+    bool userBreak{};
+    bool reverce{};
+    bool prompt{true};
+
+    auto ProcInput = [this, &userBreak, &prompt, &reverce](bool found) -> bool {
+        while(1)
+        {
+            if (found && !userBreak)
+                EditorApp::SetErrorLine("Enter-Replace, Esc-Cancel");
+            else
+            {
+                EditorApp::SetErrorLine("Esc-Cancel");
+                Beep();
+            }
+
+            input_t code;
+            while ((code = CheckInput()) == 0);
+
+            EditorApp::SetHelpLine();
+
+            if (found && code == K_ENTER)
+                return true;
+            else if (found && (code == 'a' || code == 'A'))
+            {
+                prompt = false;
+                return true;
+            }
+            else if (code == K_ESC || code == 'q' || code == 'Q')
+            {
+                userBreak = true;
+                break;
+            }
+            else if (code == 'n' || code == 'N' || code == K_DOWN || code == K_RIGHT)
+            {
+                reverce = false;
+                break;
+            }
+            else if (code == 'p' || code == 'P' || code == K_UP || code == K_LEFT)
+            {
+                reverce = true;
+                break;
+            }
+        }
+
+        return false;
+    };
+
+    size_t count{};
+    size_t progress{};
+    while (1)
+    {
+        bool found{};
+        HideFound();
+        if (!reverce)
+            found = FindDown(!prompt);
+        else
+        {
+            reverce = false;
+            found = FindUp(!prompt);
+        }
+
+        if (!found && !prompt)
+            break;
+
+        if (prompt)
+        {
+            Repaint();
+            auto replace = ProcInput(found);
+            if (!replace)
+            {
+                if (userBreak)
+                    break;
+                else
+                    continue;
+            }
+        }
+
+        if (!found)
+            break;
+
+        if (!prompt && !undoCmd)
+        {
+            undoCmd = true;
+
+            edit.line = m_foundY;
+            edit.pos  = m_foundX;
+            undo.line = m_foundY;
+            undo.pos  = m_foundX;
+            m_editor->AddUndoCommand(edit, undo);
+            EditorApp::SetHelpLine("Replace. Press any key for cancel.");
+        }
+
+        if (!prompt)
+        {
+            if (++progress == 1000)
+            {
+                progress = 0;
+                userBreak = UpdateProgress((m_foundY - begin) * 99 / (lines - begin));
+
+                if (userBreak)
+                    break;
+            }
+        }
+
+        ++count;
+        [[maybe_unused]]bool rc = ReplaceSubstr(m_foundY, m_foundX, FindDialog::s_vars.findStrW.size(), FindDialog::s_vars.replaceStrW);
+        
+        m_foundSize = FindDialog::s_vars.replaceStrW.size();
+        _GotoXY(m_foundX + m_foundSize, m_foundY);
+    }
+
+    if (undoCmd)
+    {
+        edit.command = cmd_t::CMD_END;
+        undo.command = cmd_t::CMD_END;
+        m_editor->AddUndoCommand(edit, undo);
+
+        if (!count)
+            EditorApp::SetErrorLine("String not found");
+    }
+    
+    Application::getInstance().SetAccessMenu(prevMenu);
+
+    if (userBreak)
+        EditorApp::SetHelpLine("User Abort", stat_color::grayed);
+    else
+        EditorApp::SetHelpLine("Ready");
+
+    WndManager::getInstance().Refresh();
+
     return true;
 }
 

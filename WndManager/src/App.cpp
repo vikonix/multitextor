@@ -94,8 +94,9 @@ bool Application::SetStatusLine(const sline_list& line)
     return rc;
 }
 
-bool Application::SetAccessMenu(const menu_list& menu)
+menu_list Application::SetAccessMenu(const menu_list& menu)
 {
+    menu_list prevMenu = std::move(m_accessMenu);
     m_accessMenu = menu;
 
     m_wndManager.m_bottomLines = 0;
@@ -104,8 +105,9 @@ bool Application::SetAccessMenu(const menu_list& menu)
     if (!m_sLine.empty())
         ++m_wndManager.m_bottomLines;
     
-    bool rc = m_wndManager.CalcView();
-    return rc;
+    m_wndManager.CalcView();
+
+    return prevMenu;
 }
 
 bool Application::ChangeStatusLine(size_t n, std::optional<const std::string> text, stat_color color)

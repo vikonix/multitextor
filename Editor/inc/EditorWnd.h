@@ -159,6 +159,7 @@ class EditorWnd : public FrameWnd
     bool    FindDown(bool silence = false);
     bool    IsWord(const std::u16string& str, size_t offset, size_t len);
     bool    CheckFileChanging();
+    bool    ReplaceSubstr(size_t line, size_t pos, size_t len, const std::u16string& substr);
 
 public:
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
@@ -223,7 +224,6 @@ public:
   int       ScrollWnd(int iCode, int size = 1);
   size_t    GetCurPos()  {return m_nXOffset + m_cursorx;}
   size_t    GetCurLine() {return m_nFirstLine + m_cursory;}
-  int       ReplaceSubstr(int nline, int pos, int len, wchar* pSubstr, int size);
 */
     ///////////////////////////////////////////////////////////////////////////
     //editor functions

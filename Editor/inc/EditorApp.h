@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 extern Logo g_logo;
 extern sline_list g_statusLine;
 extern menu_list g_accessMenu;
+extern menu_list g_replaceMenu;
 extern menu_list g_menuRecentFiles;
 extern menu_list g_menuRecentSessions;
 extern std::vector<menu_list> g_mainMenu;

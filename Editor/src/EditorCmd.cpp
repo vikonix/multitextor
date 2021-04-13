@@ -199,6 +199,7 @@ CmdMap g_defaultEditKeyMap
     {'G' | K_CTRL},             {K_ED(E_DLG_GOTO)},
     {'F' | K_CTRL},             {K_ED(E_DLG_FIND)},
     {K_F7},                     {K_ED(E_DLG_FIND)},
+    {'R' | K_CTRL},             {K_ED(E_DLG_REPLACE)},
     {'H' | K_CTRL},             {K_ED(E_DLG_REPLACE)},
 
     {K_F7 | K_CTRL},            {K_ED(E_CTRL_FIND)},

@@ -110,7 +110,7 @@ public:
     void    WriteAppName(std::string name) { m_appName = name; }
     bool    IsInsertMode() {return m_insert;}
     void    SetLogo(const Logo& logo) { m_wndManager.SetLogo(logo); }
-    bool    SetAccessMenu(const menu_list& menu);
+    menu_list SetAccessMenu(const menu_list& menu);
     void    SetClock(clock_pos set = clock_pos::off) {m_clock = set;}
     bool    SetStatusLine(const sline_list& line);
     bool    ChangeStatusLine(size_t n, std::optional<const std::string> text = std::nullopt, stat_color color = stat_color::normal);

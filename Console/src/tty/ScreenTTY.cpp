@@ -340,7 +340,7 @@ bool ScreenTTY::Flush()
         break;
     }
 
-    LOG(DEBUG) << "Flush buff size=" << m_OutBuff.size() << "->" << rc;
+    //LOG(DEBUG) << "Flush buff size=" << m_OutBuff.size() << "->" << rc;
     //LOG(DEBUG) << m_OutBuff;
     m_OutBuff.clear();
 

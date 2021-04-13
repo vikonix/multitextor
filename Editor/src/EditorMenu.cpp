@@ -51,18 +51,34 @@ Logo g_logo
 };
 
 /////////////////////////////////////////////////////////////////////////////
+//MAIN access menu
 menu_list g_accessMenu
 {
-  {MENU_ITEM, "&F&1Help"},
-  {MENU_ITEM, "&F&2Save"},
-  {MENU_ITEM, "&F&3Open"},
-  {MENU_ITEM, "&F&4Mark"},
-  {MENU_ITEM, "&F&5Copy"},
-  {MENU_ITEM, "&F&6Move"},
-  {MENU_ITEM, "&F&7Search"},
-  {MENU_ITEM, "&F&8Unmark"},
-  {MENU_ITEM, "&F&9Menu"},
-  {MENU_ITEM, "&F&1&0Exit"}
+    {MENU_ITEM, "&F&1Help"},
+    {MENU_ITEM, "&F&2Save"},
+    {MENU_ITEM, "&F&3Open"},
+    {MENU_ITEM, "&F&4Mark"},
+    {MENU_ITEM, "&F&5Copy"},
+    {MENU_ITEM, "&F&6Move"},
+    {MENU_ITEM, "&F&7Search"},
+    {MENU_ITEM, "&F&8Unmark"},
+    {MENU_ITEM, "&F&9Menu"},
+    {MENU_ITEM, "&F&1&0Exit"}
+};
+
+//REPLACE access menu
+menu_list g_replaceMenu
+{
+    {MENU_ITEM, "&Prev"},
+    {MENU_ITEM, "&Next"},
+    {MENU_ITEM, "&All"},
+    //{MENU_ITEM, "& "},
+    //{MENU_ITEM, "& "},
+    //{MENU_ITEM, "& "},
+    //{MENU_ITEM, "& "},
+    {MENU_ITEM, "& "},
+    {MENU_ITEM, "&Quit Rep"},
+    {MENU_ITEM, "lace"}
 };
 
 /////////////////////////////////////////////////////////////////////////////

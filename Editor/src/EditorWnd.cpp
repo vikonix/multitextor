@@ -1956,3 +1956,18 @@ bool EditorWnd::GetSelectedLines(size_t& begin, size_t& end)
 
     return true;
 }
+
+bool EditorWnd::ReplaceSubstr(size_t line, size_t pos, size_t len, const std::u16string& substr)
+{
+    if (m_readOnly)
+        return true;
+
+    size_t newSize = substr.size();
+    bool rc = m_editor->ReplaceSubstr(true, line, pos, len, substr);
+    if (len > newSize)
+        ChangeSelected(select_change::delete_ch, line, pos, len - newSize);
+    else if (newSize > len)
+        ChangeSelected(select_change::insert_ch, line, pos, newSize - len);
+
+    return rc;
+}
