@@ -752,11 +752,11 @@ bool EditorWnd::Replace(input_t cmd)
     m_editor->SetUndoRemark("Replace");
     bool undoCmd{};
 
-    auto prevMenu = std::move(Application::getInstance().SetAccessMenu(g_replaceMenu));
+    auto prevMenu = Application::getInstance().SetAccessMenu(g_replaceMenu);
     WndManager::getInstance().Refresh();
 
     size_t begin = m_firstLine + m_cursory;
-    size_t lines = m_editor->GetStrCount();
+    size_t strCount = m_editor->GetStrCount();
     
     bool userBreak{};
     bool reverce{};
@@ -855,7 +855,7 @@ bool EditorWnd::Replace(input_t cmd)
             if (++progress == 1000)
             {
                 progress = 0;
-                userBreak = UpdateProgress((m_foundY - begin) * 99 / (lines - begin));
+                userBreak = UpdateProgress((m_foundY - begin) * 99 / (strCount - begin));
 
                 if (userBreak)
                     break;

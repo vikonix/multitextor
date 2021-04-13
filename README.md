@@ -10,7 +10,7 @@ This project is attempt of recreating my old text editor.
 
 Need compiler with C++ 0x17 full support.
 
-Minimal requirenment: gcc 8.0 or MSVS 2017
+Minimal requirement: gcc 8.0 or MSVS 2017
 
 [![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)][travis]
 [![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)][license]
@@ -23,7 +23,7 @@ Minimal requirenment: gcc 8.0 or MSVS 2017
  - sudo apt-get install -y libgpm-dev
  - sudo apt-get install -y gpm
  
-## Used third party libraries:
+## Used third-party libraries:
  - easyloggingpp
  - termdb
  - utfcpp
