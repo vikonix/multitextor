@@ -97,3 +97,33 @@ public:
     bool OnActivate();
     bool OnClose(int id);
 };
+
+struct PropertiesVars
+{
+    std::list<std::string> typeList{ "Text", "C++" };
+    std::list<std::string> cpList{ "UTF-8", "CP437", "CP866", "CP1251" };
+    std::list<std::string> eolList{ "UNIX    (LF)", "WINDOWS (CR+LF)", "MAC     (CR)" };
+    std::string tabs;
+    size_t type{};
+    size_t cp{};
+
+    std::string typeName;
+    std::string cpName;
+    size_t eol{};
+    size_t tabSize{ 4 };
+    size_t saveTab{};
+    bool showTab{};
+    bool ro{};
+    bool log{};
+};
+
+class PropertiesDialog : public Dialog
+{
+public:
+    static PropertiesVars s_vars;
+
+    PropertiesDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+
+    bool OnActivate();
+    bool OnClose(int id);
+};
