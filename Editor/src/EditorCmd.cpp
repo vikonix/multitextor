@@ -221,12 +221,10 @@ CmdMap g_defaultEditKeyMap
     {K_ESC, 'm'},               {K_ED(E_POPUP_MENU)},
     {K_ESC, 'M'},               {K_ED(E_POPUP_MENU)},
 
-    { 'J' | K_CTRL },           { K_ED(E_CTRL_FUNC_LIST) },
-//???    {'A' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
-//???    {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
+    {'E' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
 
-    //for testing
-    { 'R' | K_ALT },            {K_ED(E_CTRL_REFRESH)}
+    {'J' | K_CTRL},             {K_ED(E_CTRL_FUNC_LIST)},
+//???    {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
 };
 
 std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap 

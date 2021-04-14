@@ -139,9 +139,11 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool EditorWnd::CtrlProperties(input_t cmd)
+bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    PropertiesDialog dlg;
+    auto ret = dlg.Activate();
+
     return true;
 }
 
