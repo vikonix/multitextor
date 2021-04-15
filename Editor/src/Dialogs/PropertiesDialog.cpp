@@ -25,6 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Dialogs/EditorDialogs.h"
+#include "utils/Directory.h"
 #include "DlgControls.h"
 #include "App.h"
 
@@ -33,9 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define ID_DP_PATH         (ID_USER +  1)
 #define ID_DP_NAME         (ID_USER +  2)
 #define ID_DP_INFO         (ID_USER +  3)
-#define ID_DP_COLOR        (ID_USER +  4)
+#define ID_DP_TYPE         (ID_USER +  4)
 #define ID_DP_CP           (ID_USER +  5)
-#define ID_DP_CRLF         (ID_USER +  6)
+#define ID_DP_EOL          (ID_USER +  6)
 #define ID_DP_TAB          (ID_USER +  7)
 #define ID_DP_TAB_CONVERT  (ID_USER +  8)
 #define ID_DP_TAB_SAVE     (ID_USER +  9)
@@ -55,7 +56,7 @@ std::list<control> propertiesDialog
     {CTRL_LINE,                         "",                     0,                  nullptr,                           1,  5, 66},
 
     {CTRL_STATIC,                       "&File type:",          0,                  nullptr,                           1,  6, 14},
-    {CTRL_DROPLIST,                     "",                     ID_DP_COLOR,        &PropertiesDialog::s_vars.type,   15,  6, 17,  7, "Select file type"},
+    {CTRL_DROPLIST,                     "",                     ID_DP_TYPE,         &PropertiesDialog::s_vars.type,   15,  6, 17,  7, "Select file type"},
     {CTRL_STATIC,                       "Code &page:",          0,                  nullptr,                           1,  7, 14},
     {CTRL_DROPLIST,                     "",                     ID_DP_CP,           &PropertiesDialog::s_vars.cp,     15,  7, 17,  7, "Select encoding page"},
 
@@ -63,10 +64,10 @@ std::list<control> propertiesDialog
     {CTRL_CHECK,                        "&Log file",            ID_DP_LOG,          &PropertiesDialog::s_vars.log,     1, 10, 30,  1, "File will be reload without confirmation if it changed"},
 
     {CTRL_STATIC,                       "&End of line:",        0,                  nullptr,                          35,  6, 13},
-    {CTRL_DROPLIST,                     "",                     ID_DP_CRLF,         &PropertiesDialog::s_vars.eol,    50,  6, 17,  6, "Select the end of line type"},
+    {CTRL_DROPLIST,                     "",                     ID_DP_EOL,          &PropertiesDialog::s_vars.eol,    49,  6, 18,  6, "Select the end of line type"},
 
     {CTRL_STATIC,                       "&Tab size:",           0,                  nullptr,                          35,  8, 13},
-    {CTRL_EDIT,                         "",                     ID_DP_TAB,          &PropertiesDialog::s_vars.tabs,   64,  8,  3,  7, "Input tabulation size (1-10)"},
+    {CTRL_EDIT,                         "",                     ID_DP_TAB,          (std::string*)nullptr,            64,  8,  3,  7, "Input tabulation size (1-10)"},
     {CTRL_RADIO,                        "Convert tabs to &space",ID_DP_TAB_CONVERT, &PropertiesDialog::s_vars.saveTab,35,  9, 30,  1, "Convert all tabulations to space"},
     {CTRL_RADIO,                        "&Use tabs as space",   ID_DP_TAB_SAVE,     &PropertiesDialog::s_vars.saveTab,35, 10, 30,  1, "Save tabulations"},
     {CTRL_CHECK,                        "S&how tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,35, 11, 30,  1, "Highlight tabulations"},
@@ -83,96 +84,82 @@ PropertiesDialog::PropertiesDialog(pos_t x, pos_t y)
 
 bool PropertiesDialog::OnActivate()
 {
+    auto ctrlPath = GetItem(ID_DP_PATH);
+    size_t ctrlSize = ctrlPath->GetSizeX();
+
+    Wnd* wnd = WndManager::getInstance().GetWnd();
+    auto path = wnd->GetFilePath();
+    if (path.u16string().size() < ctrlSize)
+        ctrlPath->SetName(path.u8string());
+    else
+    {
+        ctrlPath->SetName(path.parent_path().u8string());
+        GetItem(ID_DP_NAME)->SetName(path.filename().u8string());
+    }
+
+    auto ftime = std::filesystem::last_write_time(path);
+    std::time_t cftime = to_time_t(ftime);
+    std::tm tm = *std::localtime(&cftime);
+
+    std::stringstream sinfo;
+    sinfo << std::put_time(&tm, "%d %b %Y %H:%M:%S");
+
+    auto size = std::filesystem::file_size(path);
+    if (size > 10 * 1024 * 1024)
+    {
+        auto s = size / (1024 * 1024);
+        sinfo << " " << std::setw(10) << s << "M";
+    }
+    else if (size > 100 * 1024)
+    {
+        auto s = size / 1024;
+        sinfo << " " << std::setw(10) << s << "K";
+    }
+    else
+    {
+        sinfo << " " << std::setw(11) << size;
+    }
+
+    GetItem(ID_DP_INFO)->SetName(sinfo.str());
+
+    auto ctrl = GetItem(ID_DP_TYPE);
+    auto listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);
+    for (const auto& str : s_vars.typeList)
+    {
+        listPtr->AppendStr(str);
+        if (str == s_vars.typeName)
+            listPtr->SetSelect(listPtr->GetStrCount() - 1);
+    }
+
+    ctrl = GetItem(ID_DP_CP);
+    listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);
+    for (const auto& str : s_vars.cpList)
+    {
+        listPtr->AppendStr(str);
+        if (str == s_vars.cpName)
+            listPtr->SetSelect(listPtr->GetStrCount() - 1);
+    }
+
+    ctrl = GetItem(ID_DP_EOL);
+    listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);
+    for (const auto& str : s_vars.eolList)
+        listPtr->AppendStr(str);
+    listPtr->SetSelect(s_vars.eol);
+
+    GetItem(ID_DP_TAB)->SetName(std::to_string(std::min(s_vars.tabSize, static_cast<size_t>(10))));
+
     return true;
 }
 
 bool PropertiesDialog::OnClose(int id)
 {
+    if (id == ID_OK)
+    {
+    }
     return true;
 }
 
 /*
-int PropertiesDialog::OnActivate()
-{
-    CtrlStatic* pPath = (CtrlStatic*)GetItem(ID_DP_PATH);
-
-    short x, y, sizex, sizey;
-    pPath->GetPos(&x, &y, &sizex, &sizey);
-
-    char* pFile = g_WndProp.path;
-    char buff[MAX_PATH + 1];
-
-    if (strlen(pFile) <= sizex)
-    {
-        pPath->SetName(pFile);
-    }
-    else
-    {
-        char* pName = SDir::FindLastName(pFile);
-        char c = *pName;
-        *pName = 0;
-
-        SDir::CutPath(pFile, buff, sizex);
-        pPath->SetName(buff);
-
-        pPath = (CtrlStatic*)GetItem(ID_DP_NAME);
-        *pName = c;
-        SDir::CutPath(pName, buff, sizex);
-        pPath->SetName(buff);
-    }
-
-    CtrlStatic* pInfo = (CtrlStatic*)GetItem(ID_DP_INFO);
-
-
-    char ts[128];
-    int rc = ctime_s(ts, sizeof(ts), &g_WndProp.time);
-    assert(rc == 0);
-    (void)rc;
-
-    char* pTime = ts;
-    while (*pTime != ' ')
-        //skip week day
-        ++pTime;
-    while (*pTime == ' ')
-        //skip week day
-        ++pTime;
-    //del EOL
-    pTime[strlen(pTime) - 1] = 0;
-
-    sprintf_s(buff, sizeof(buff), GetSStr(STR_D(PRDS_Bytes)), g_WndProp.size, pTime);
-    pInfo->SetName(buff);
-
-    CtrlSList* pCtrl = (CtrlSList*)GetItem(ID_DP_COLOR);
-    size_t jeton = 0;
-    const char* pLex;
-    while ((pLex = g_LexCfg.Enum(&jeton)) != NULL)
-        pCtrl->AppendStr((char*)pLex);
-    pCtrl->SetSelect(g_LexCfg.GetCfgN(g_WndProp.parsemode));
-
-    pCtrl = (CtrlSList*)GetItem(ID_DP_CRLF);
-    pCtrl->AppendStr("UNIX  (LF)");
-    pCtrl->AppendStr("DOS   (CR+LF)");
-    pCtrl->AppendStr("MAC   (CR)");
-    pCtrl->SetSelect(g_WndProp.crlf);
-
-    pCtrl = (CtrlSList*)GetItem(ID_DP_CP);
-    for (int i = 0; ; ++i)
-    {
-        const char* pCP = EnumCPname(i);
-        if (!pCP)
-            break;
-        pCtrl->AppendStr(pCP);
-    }
-    pCtrl->SetSelect(GetCPindex(g_WndProp.cp));
-
-    CtrlEdit* pTab = (CtrlEdit*)GetItem(ID_DP_TAB);
-    sprintf_s(buff, sizeof(buff), "%d", g_WndProp.tabsize);
-    pTab->SetName(buff);
-
-    return 0;
-}
-
-
 int PropertiesDialog::OnClose(int id)
 {
     if (id == ID_OK)

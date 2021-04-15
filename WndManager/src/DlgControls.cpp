@@ -218,8 +218,12 @@ CtrlCheck::CtrlCheck(Dialog& dialog, const control& control, size_t pos)
     m_addSize = 4;
     m_sizex = static_cast<pos_t>(m_name.size()) + m_addSize;
 
-    if(m_var.has_value())
-        m_checked = *std::any_cast<bool*>(m_var);
+    if (m_var.has_value())
+    {
+        auto var = std::any_cast<bool*>(m_var);
+        if (var)
+            m_checked = *var;
+    }
 }
 
 bool CtrlCheck::Refresh(CtrlState state)
@@ -264,7 +268,7 @@ bool CtrlCheck::UpdateVar()
     if (m_var.has_value())
     {
         auto var = std::any_cast<bool*>(m_var);
-        if(var)
+        if (var)
             *var = m_checked;
     }
     return true;
@@ -282,10 +286,14 @@ CtrlRadio::CtrlRadio(Dialog& dialog, const control& control, size_t pos, size_t 
 
     if(m_var.has_value())
     {
-        if(*std::any_cast<size_t*>(m_var) == m_index)//???
-            m_checked = true;
-        else
-            m_checked = false;
+        auto var = std::any_cast<size_t*>(m_var);
+        if (var)
+        {
+            if (*var == m_index)
+                m_checked = true;
+            else
+                m_checked = false;
+        }
     }
     else if(!m_index)
         m_checked = true;
@@ -396,7 +404,8 @@ CtrlEdit::CtrlEdit(Dialog& dialog, const control& control, size_t pos)
     if(m_var.has_value())
     {
         auto str = std::any_cast<std::string*>(m_var);
-        m_name = utf8::utf8to16(*str);
+        if (str)
+            m_name = utf8::utf8to16(*str);
     }
 }
 
@@ -615,9 +624,7 @@ bool CtrlEdit::UpdateVar()
     {
         auto var = std::any_cast<std::string*>(m_var);
         if (var)
-        {
             *var = utf8::utf16to8(m_name);
-        }
     }
 
     return true;
@@ -741,7 +748,7 @@ bool CtrlList::UpdateVar()
     if (m_var.has_value())
     {
         auto var = std::any_cast<size_t*>(m_var);
-        if(var)
+        if (var)
             *var = m_firstLine + m_selected;
     }
     return true;
@@ -1289,7 +1296,8 @@ CtrlColor::CtrlColor(Dialog& dialog, const control& control, size_t pos)
     if (m_var.has_value())
     {
         auto var = std::any_cast<color_t*>(m_var);
-        m_color = *var;
+        if (var)
+            m_color = *var;
     }
     SetCursor();
 }

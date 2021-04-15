@@ -102,8 +102,7 @@ struct PropertiesVars
 {
     std::list<std::string> typeList{ "Text", "C++" };
     std::list<std::string> cpList{ "UTF-8", "CP437", "CP866", "CP1251" };
-    std::list<std::string> eolList{ "UNIX    (LF)", "WINDOWS (CR+LF)", "MAC     (CR)" };
-    std::string tabs;
+    std::list<std::string> eolList{ "Unix (LF)", "Windows (CR+LF)", "Mac (CR)" };
     size_t type{};
     size_t cp{};
 
