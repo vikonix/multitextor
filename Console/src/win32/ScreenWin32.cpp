@@ -151,7 +151,7 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
 
 bool ScreenWin32::WriteConsoleTitle(const std::string& title)
 {
-    LOG(DEBUG) << "WriteConsoleTitle '" << title << "'";
+    //LOG(DEBUG) << "WriteConsoleTitle '" << title << "'";
     auto str = utf8::utf8to16(title);
     bool rc = SetConsoleTitle(reinterpret_cast<LPCTSTR>(str.c_str()));
     return rc;

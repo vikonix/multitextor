@@ -151,14 +151,14 @@ bool PropertiesDialog::OnClose(int id)
 {
     if (id == ID_OK)
     {
-        auto tab = GetItem(ID_DP_TAB)->GetName();
+        auto tabStr = GetItem(ID_DP_TAB)->GetName();
 
         size_t tabSize{};
         bool badFormat{};
         try
         {
-            tabSize = std::stoul(tab);
-            if (std::to_string(tabSize) != tab)
+            tabSize = std::stoul(tabStr);
+            if (std::to_string(tabSize) != tabStr)
                 badFormat = true;
         }
         catch (...)

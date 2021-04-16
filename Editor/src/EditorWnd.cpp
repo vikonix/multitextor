@@ -61,7 +61,7 @@ bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, co
 
 bool EditorWnd::SetEditor(EditorPtr editor) 
 { 
-    LOG(DEBUG) << "    SetTextBuff";
+    //LOG(DEBUG) << "    SetTextBuff";
     if (m_editor)
     {
         Save(K_ED(E_CTRL_SAVE));

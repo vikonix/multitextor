@@ -211,7 +211,7 @@ bool DirectoryList::AddMask(const path_t& mask)
 
 bool DirectoryList::SetMask(const path_t& mask)
 {
-    LOG(DEBUG) << "SetMask " << mask.u8string();
+    //LOG(DEBUG) << "SetMask " << mask.u8string();
 
     path_t path;
     if (mask.has_parent_path())
@@ -248,7 +248,7 @@ bool DirectoryList::SetMask(const path_t& mask)
         m_path = "/";
     }
 
-    LOG(DEBUG) << "path=" << m_path.u8string() << " single mask=" << m_single;
+    //LOG(DEBUG) << "path=" << m_path.u8string() << " single mask=" << m_single;
     return true;
 }
 
