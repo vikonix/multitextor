@@ -48,33 +48,29 @@ PropertiesVars PropertiesDialog::s_vars;
 
 std::list<control> propertiesDialog
 {
-    {CTRL_TITLE,                        "File Properties",      0,                  nullptr,                           1,  0, 70, 17},
+    {CTRL_TITLE,                        "File Properties",      0,                  {},                                 1,  0, 70, 17},
 
-    {CTRL_STATIC,                       "",                     ID_DP_PATH,         nullptr,                           1,  1, 66,  7},
-    {CTRL_STATIC,                       "",                     ID_DP_NAME,         nullptr,                           1,  2, 66,  7},
-    {CTRL_STATIC,                       "",                     ID_DP_INFO,         nullptr,                           1,  3, 66,  7},
-    {CTRL_LINE,                         "",                     0,                  nullptr,                           1,  5, 66},
+    {CTRL_STATIC,                       "",                     ID_DP_PATH,         {},                                 1,  1, 66,  7},
+    {CTRL_STATIC,                       "",                     ID_DP_NAME,         {},                                 1,  2, 66,  7},
+    {CTRL_STATIC,                       "",                     ID_DP_INFO,         {},                                 1,  3, 66,  7},
+    {CTRL_LINE,                         "",                     0,                  {},                                 1,  5, 66},
+    {CTRL_STATIC,                       "&File type:",          0,                  {},                                 1,  6, 14},
+    {CTRL_DROPLIST,                     "",                     ID_DP_TYPE,         &PropertiesDialog::s_vars.type,    15,  6, 17,  7, "Select file type"},
+    {CTRL_STATIC,                       "Code &page:",          0,                  {},                                 1,  7, 14},
+    {CTRL_DROPLIST,                     "",                     ID_DP_CP,           &PropertiesDialog::s_vars.cp,      15,  7, 17,  7, "Select encoding page"},
+    {CTRL_CHECK,                        "&Read only",           ID_DP_RO,           &PropertiesDialog::s_vars.ro,       1,  9, 30,  1, "Protect file from changing"},
+    {CTRL_CHECK,                        "&Log file",            ID_DP_LOG,          &PropertiesDialog::s_vars.log,      1, 10, 30,  1, "File will be reload without confirmation if it changed"},
+    {CTRL_STATIC,                       "&End of line:",        0,                  {},                                 35,  6, 13},
+    {CTRL_DROPLIST,                     "",                     ID_DP_EOL,          &PropertiesDialog::s_vars.eol,      49,  6, 18,  6, "Select the end of line type"},
+    {CTRL_STATIC,                       "&Tab size:",           0,                  {},                                 35,  8, 13},
+    {CTRL_EDIT,                         "",                     ID_DP_TAB,          {},                                 64,  8,  3,  7, "Input tabulation size (1-10)"},
+    {CTRL_RADIO,                        "Convert tabs to &space",ID_DP_TAB_CONVERT, &PropertiesDialog::s_vars.saveTab,  35,  9, 30,  1, "Convert all tabulations to space"},
+    {CTRL_RADIO,                        "&Use tabs as space",   ID_DP_TAB_SAVE,     &PropertiesDialog::s_vars.saveTab,  35, 10, 30,  1, "Save tabulations"},
+    {CTRL_CHECK,                        "S&how tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,  35, 11, 30,  1, "Highlight tabulations"},
 
-    {CTRL_STATIC,                       "&File type:",          0,                  nullptr,                           1,  6, 14},
-    {CTRL_DROPLIST,                     "",                     ID_DP_TYPE,         &PropertiesDialog::s_vars.type,   15,  6, 17,  7, "Select file type"},
-    {CTRL_STATIC,                       "Code &page:",          0,                  nullptr,                           1,  7, 14},
-    {CTRL_DROPLIST,                     "",                     ID_DP_CP,           &PropertiesDialog::s_vars.cp,     15,  7, 17,  7, "Select encoding page"},
-
-    {CTRL_CHECK,                        "&Read only",           ID_DP_RO,           &PropertiesDialog::s_vars.ro,      1,  9, 30,  1, "Protect file from changing"},
-    {CTRL_CHECK,                        "&Log file",            ID_DP_LOG,          &PropertiesDialog::s_vars.log,     1, 10, 30,  1, "File will be reload without confirmation if it changed"},
-
-    {CTRL_STATIC,                       "&End of line:",        0,                  nullptr,                          35,  6, 13},
-    {CTRL_DROPLIST,                     "",                     ID_DP_EOL,          &PropertiesDialog::s_vars.eol,    49,  6, 18,  6, "Select the end of line type"},
-
-    {CTRL_STATIC,                       "&Tab size:",           0,                  nullptr,                          35,  8, 13},
-    {CTRL_EDIT,                         "",                     ID_DP_TAB,          (std::string*)nullptr,            64,  8,  3,  7, "Input tabulation size (1-10)"},
-    {CTRL_RADIO,                        "Convert tabs to &space",ID_DP_TAB_CONVERT, &PropertiesDialog::s_vars.saveTab,35,  9, 30,  1, "Convert all tabulations to space"},
-    {CTRL_RADIO,                        "&Use tabs as space",   ID_DP_TAB_SAVE,     &PropertiesDialog::s_vars.saveTab,35, 10, 30,  1, "Save tabulations"},
-    {CTRL_CHECK,                        "S&how tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,35, 11, 30,  1, "Highlight tabulations"},
-
-    {CTRL_LINE,                         "",                     0,                  nullptr,                           1, 13, 66},
-    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Ok",                   ID_OK,              nullptr,                          50, 14,  0,  0, "Apply changes and reload file if need"},
-    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",               ID_CANCEL,          nullptr,                          60, 14}
+    {CTRL_LINE,                         "",                     0,                  {},                                  1, 13, 66},
+    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Ok",                   ID_OK,              {},                                 50, 14,  0,  0, "Apply changes and reload file if need"},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",               ID_CANCEL,          {},                                 60, 14}
 };
 
 PropertiesDialog::PropertiesDialog(pos_t x, pos_t y)

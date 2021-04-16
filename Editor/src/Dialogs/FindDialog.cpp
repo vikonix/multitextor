@@ -53,23 +53,21 @@ FindReplaceVars FindDialog::s_vars;
 
 std::list<control> findDialog 
 {
-    {CTRL_TITLE,                        "",                         0,              nullptr,                         1, 0, 70, 12},
+    {CTRL_TITLE,                        "",                         0,              {},                              1, 0, 70, 12},
 
-    {CTRL_STATIC,                       "&Search for:",             0,              nullptr,                         1, 1, 14},
+    {CTRL_STATIC,                       "&Search for:",             0,              {},                              1, 1, 14},
     {CTRL_EDITDROPLIST,                 "",                         ID_FF_SEARCH,   &FindDialog::s_vars.findStr,    15, 1, 52,  7, "Input string for search"},
-    {CTRL_STATIC,                       "&Replace with:",           ID_FF_SREPLACE, nullptr,                         1, 2, 14},
+    {CTRL_STATIC,                       "&Replace with:",           ID_FF_SREPLACE, {},                              1, 2, 14},
     {CTRL_EDITDROPLIST,                 "",                         ID_FF_REPLACE,  &FindDialog::s_vars.replaceStr, 15, 2, 52,  7, "Input string for replace"},
-
     {CTRL_CHECK,                        "C&ase sensitive",          2,              &FindDialog::s_vars.checkCase,   1, 4,  0,  0, "Search case sensitive or not"},
     {CTRL_CHECK,                        "&Whole word",              3,              &FindDialog::s_vars.findWord,    1, 5,  0,  0, "Search whole word or phrase"},
     {CTRL_CHECK,                        "Restrict in &marked lines",ID_FF_INMARKED, &FindDialog::s_vars.inSelected,  1, 6,  0,  0, "Find/Replace in marked lines only"},
-
     {CTRL_CHECK,                        "Reverse &direction",       ID_FF_REVERSE,  &FindDialog::s_vars.directionUp,35, 4,  0,  0, "Search in up direction"},
     {CTRL_CHECK,                        "Replace without &prompt",  ID_FF_PROMPT,   &FindDialog::s_vars.noPrompt,   35, 4,  0,  0, "Replace in whole file without prompt"},
 
-    {CTRL_LINE,                         "",                         0,              nullptr,                         1, 8, 66},
-    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "",                         ID_OK,          nullptr,                        43, 9,  0,  0, "Start search process"},
-    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",                   ID_CANCEL,      nullptr,                        57, 9}
+    {CTRL_LINE,                         "",                         0,              {},                              1, 8, 66},
+    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "",                         ID_OK,          {},                             43, 9,  0,  0, "Start search process"},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",                   ID_CANCEL,      {},                             57, 9}
 };
 
 FindDialog::FindDialog(bool replace, pos_t x, pos_t y)

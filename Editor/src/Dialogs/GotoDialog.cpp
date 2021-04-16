@@ -36,14 +36,14 @@ std::string GotoDialog::m_line{};
 
 std::list<control> gotoDialog
 {
-    {CTRL_TITLE,                        "Go to Line",       0, nullptr,              1, 0, 34,  7},
+    {CTRL_TITLE,                        "Go to Line",   0,              {},                   1, 0, 34,  7},
 
-    {CTRL_STATIC,                       "Line number:",     0, nullptr,              1, 1, 15},
-    {CTRL_EDIT,                         "",      ID_GL_NUMBER, &GotoDialog::m_line, 16, 1, 15,  0, "Input line number"},
-    {CTRL_LINE,                         "",                 0, nullptr,              1, 3, 30},
+    {CTRL_STATIC,                       "Line number:", 0,              {},                   1, 1, 15},
+    {CTRL_EDIT,                         "",             ID_GL_NUMBER,   &GotoDialog::m_line, 16, 1, 15,  0, "Input line number"},
 
-    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Goto",         ID_OK, nullptr,             10, 4,  0,  0, "Goto selected line"},
-    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",   ID_CANCEL, nullptr,             21, 4}
+    {CTRL_LINE,                         "",             0,              {},                   1, 3, 30},
+    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Goto",         ID_OK,          {},                  10, 4,  0,  0, "Goto selected line"},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",       ID_CANCEL,      {},                  21, 4}
 };
 
 GotoDialog::GotoDialog(size_t maxLine, pos_t x, pos_t y)
