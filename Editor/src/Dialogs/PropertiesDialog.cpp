@@ -151,41 +151,36 @@ bool PropertiesDialog::OnClose(int id)
 {
     if (id == ID_OK)
     {
+        auto tab = GetItem(ID_DP_TAB)->GetName();
+
+        size_t tabSize{};
+        bool badFormat{};
+        try
+        {
+            tabSize = std::stoul(tab);
+            if (std::to_string(tabSize) != tab)
+                badFormat = true;
+        }
+        catch (...)
+        {
+            badFormat = true;
+        }
+        if (badFormat || tabSize > 10)
+        {
+            Application::getInstance().SetErrorLine("Bad tab size");
+            SelectItem(ID_DP_TAB);
+            Refresh();
+            return false;
+        }
+
+        s_vars.tabSize = tabSize;
+        s_vars.typeName = GetItem(ID_DP_TYPE)->GetName();
+        s_vars.cpName = GetItem(ID_DP_CP)->GetName();
+
+        auto ctrl = GetItem(ID_DP_EOL);
+        auto listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);
+        if (listPtr)
+            s_vars.eol = listPtr->GetSelected();
     }
     return true;
 }
-
-/*
-int PropertiesDialog::OnClose(int id)
-{
-    if (id == ID_OK)
-    {
-        char buff[15] = { 0 };
-        int tab = 0;
-
-        CtrlEdit* pEdit = (CtrlEdit*)GetItem(ID_DP_TAB);
-        if (pEdit && pEdit->GetName(buff, sizeof(buff))
-            && ScanDec(buff, 1, 10, &tab))
-        {
-            TPRINT(("err buff=%s tab=%d\n", buff, tab));
-            SetErrorLine(STR_D(PRDE_BadTabSize));
-            SelectItem(ID_DP_TAB);
-            Refresh();
-            return -1;
-        }
-
-        g_WndProp.tabsize = tab;
-
-        CtrlSList* pCtrl = (CtrlSList*)GetItem(ID_DP_CP);
-        g_WndProp.cp = EnumCP(pCtrl->GetSelect());
-
-        pCtrl = (CtrlSList*)GetItem(ID_DP_COLOR);
-        g_WndProp.parsemode = g_LexCfg.GetCfgName(pCtrl->GetSelect());
-
-        pCtrl = (CtrlSList*)GetItem(ID_DP_CRLF);
-        g_WndProp.crlf = pCtrl->GetSelect();
-    }
-
-    return 0;
-}
-*/

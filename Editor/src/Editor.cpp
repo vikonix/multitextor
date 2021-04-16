@@ -1404,3 +1404,23 @@ bool Editor::SetName(const std::filesystem::path& file, bool copy)
     return true;
 }
 
+bool Editor::SetParseStyle(const std::string& style)
+{
+    if (style != GetParseStyle())
+    {
+        LOG(DEBUG) << "Change parse mode to " << style;
+
+        m_lexParser.SetParseStyle(style);
+        m_tab = m_lexParser.GetTabSize();
+        m_saveTab = m_lexParser.GetSaveTab();
+
+        FlushCurStr();
+        for (size_t n = 0; n < GetStrCount(); ++n)
+        {
+            auto str = m_buffer.GetStr(n);
+            m_lexParser.ScanStr(n, str, m_cp);
+        }
+    }
+    
+    return true;
+}

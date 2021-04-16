@@ -143,6 +143,21 @@ bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
 {
     PropertiesDialog dlg;
     auto ret = dlg.Activate();
+    if (ret == ID_OK)
+    {
+        m_editor->FlushCurStr();
+
+        m_readOnly = dlg.s_vars.ro;
+        m_log = dlg.s_vars.log;
+
+        m_editor->SetCP(dlg.s_vars.cpName);
+        m_editor->SetEol(static_cast<eol_t>(dlg.s_vars.eol));
+        m_editor->SetTab(dlg.s_vars.tabSize);
+        m_editor->SetSaveTab(dlg.s_vars.saveTab);
+        m_editor->SetShowTab(dlg.s_vars.showTab);
+
+        m_editor->SetParseStyle(dlg.s_vars.typeName);//???
+    }
 
     return true;
 }
