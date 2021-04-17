@@ -26,8 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#include "Types.h"
-#include "Invalidate.h"
+#include "Console/Types.h"
+#include "WndManager/Invalidate.h"
 #include "utils/SymbolType.h"
 
 #include <string>

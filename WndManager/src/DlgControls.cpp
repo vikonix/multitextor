@@ -24,9 +24,9 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "DlgControls.h"
-#include "App.h"
-#include "ConsoleScreen.h"
+#include "WndManager/DlgControls.h"
+#include "WndManager/App.h"
+#include "Console/ConsoleScreen.h"
 #include "utils/logger.h"
 #include "utils/Clipboard.h"
 

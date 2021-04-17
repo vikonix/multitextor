@@ -26,9 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "utfcpp/utf8.h"
 #include "EditorWnd.h"
-#include "WndManager.h"
+#include "WndManager/WndManager.h"
 #include "EditorApp.h"
-#include "StdDialogs.h"
+#include "WndManager/StdDialogs.h"
 #include "Dialogs/EditorDialogs.h"
 
 
@@ -184,8 +184,9 @@ bool EditorWnd::CtrlFuncList(input_t cmd)
     return true;
 }
 
-bool EditorWnd::TrackPopupMenu(input_t cmd)
+bool EditorWnd::TrackPopupMenu([[maybe_unused]]input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    PopupMenu menu(g_popupMenu, m_cursorx, m_cursory + 3);
+    menu.Activate();
     return true;
 }

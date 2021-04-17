@@ -24,7 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
-#include "App.h"
+#include "WndManager/App.h"
 #include "EditorWnd.h"
 
 extern Logo g_logo;
@@ -33,6 +33,7 @@ extern menu_list g_accessMenu;
 extern menu_list g_replaceMenu;
 extern menu_list g_menuRecentFiles;
 extern menu_list g_menuRecentSessions;
+extern menu_list g_popupMenu;
 extern std::vector<menu_list> g_mainMenu;
 
 class EditorApp : public Application

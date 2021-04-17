@@ -25,7 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "LexParser.h"
-#include "ColorMap.h"
+#include "WndManager/ColorMap.h"
 #include "Editor.h"
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"

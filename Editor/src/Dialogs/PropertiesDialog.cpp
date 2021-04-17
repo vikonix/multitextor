@@ -26,8 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "Dialogs/EditorDialogs.h"
 #include "utils/Directory.h"
-#include "DlgControls.h"
-#include "App.h"
+#include "WndManager/DlgControls.h"
+#include "WndManager/App.h"
 
 
 /////////////////////////////////////////////////////////////////////////////

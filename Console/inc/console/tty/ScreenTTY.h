@@ -27,8 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #ifndef WIN32
 
-#include "ConsoleScreen.h"
-#include "tty/TermcapMap.h"
+#include "Console/ConsoleScreen.h"
+#include "Console/tty/TermcapMap.h"
 
 #include <array>
 

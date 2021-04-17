@@ -30,8 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #define USE_GPM
 #endif
 
-#include "tty/Mouse.h"
-#include "KeyCodes.h"
+#include "Console/tty/Mouse.h"
+#include "Console/KeyCodes.h"
 
 #ifndef HAVE_MAIN
   #include "utils/logger.h"

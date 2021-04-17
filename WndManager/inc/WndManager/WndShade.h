@@ -26,7 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#include "Types.h"
+#include "Console/Types.h"
+
 #include <vector>
 
 #define SHADE_PAINT  0x20

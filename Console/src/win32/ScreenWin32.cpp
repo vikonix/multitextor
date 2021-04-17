@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifdef WIN32
 
-#include "win32/ScreenWin32.h"
+#include "Console/win32/ScreenWin32.h"
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
 

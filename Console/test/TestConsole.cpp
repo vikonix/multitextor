@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "utils/logger.h"
-#include "Console.h"
+#include "Console/Console.h"
 
 #include <iostream>
 

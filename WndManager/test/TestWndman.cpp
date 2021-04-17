@@ -30,9 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "utils/logger.h"
 #include "utils/Directory.h"
-#include "App.h"
-#include "DlgControls.h"
-#include "StdDialogs.h"
+#include "WndManager/App.h"
+#include "WndManager/DlgControls.h"
+#include "WndManager/StdDialogs.h"
 
 #include <iostream>
 

@@ -27,9 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #ifndef WIN32
 
-#include "ConsoleInput.h"
+#include "Console/ConsoleInput.h"
 #include "utils/logger.h"
-#include "tty/TermcapMap.h"
+#include "Console/tty/TermcapMap.h"
 
 #include <termios.h>
 #include <time.h>

@@ -28,7 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/SymbolType.h"
 #include "EditorWnd.h"
 #include "EditorCmd.h"
-#include "WndManager.h"
+#include "WndManager/WndManager.h"
 #include "EditorApp.h"
 #include "Dialogs/EditorDialogs.h"
 

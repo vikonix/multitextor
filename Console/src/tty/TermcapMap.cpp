@@ -27,8 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifndef WIN32
 
 #define TERMDB_IMPLEMENTATION
-#include "tty/TermcapMap.h"
-#include "KeyCodes.h"
+#include "Console/tty/TermcapMap.h"
+#include "Console/KeyCodes.h"
 
 
 //////////////////////////////////////////////////////////////////////////////

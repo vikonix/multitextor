@@ -27,9 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "utils/SymbolType.h"
 #include "EditorWnd.h"
-#include "WndManager.h"
+#include "WndManager/WndManager.h"
 #include "EditorApp.h"
-#include "Dialog.h"
+#include "WndManager/Dialog.h"
 #include "Dialogs/EditorDialogs.h"
 
 #include <algorithm>
@@ -685,7 +685,7 @@ input_t EditorWnd::ParseCommand(input_t cmd)
 
             if (m_popupMenu)
             {
-                m_popupMenu = true;
+                m_popupMenu = false;
                 TrackPopupMenu(0);
             }
         }

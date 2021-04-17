@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef WIN32
 
-#include "tty/ScreenTTY.h"
+#include "Console/tty/ScreenTTY.h"
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
 

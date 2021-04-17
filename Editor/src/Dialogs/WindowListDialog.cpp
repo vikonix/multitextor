@@ -27,8 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "utils/Directory.h"
 #include "Dialogs/EditorDialogs.h"
-#include "DlgControls.h"
-#include "WndManager.h"
+#include "WndManager/DlgControls.h"
+#include "WndManager/WndManager.h"
 #include "EditorApp.h"
 
 

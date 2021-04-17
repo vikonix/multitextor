@@ -26,25 +26,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#define USE_MOUSE
-#ifdef USE_MOUSE
-  #include "Types.h"
+#include "Console/Types.h"
 
-  #define InitMouse()   _InitMouse()
-  #define DeinitMouse() _DeinitMouse()
-  #define GetMouseFD()  _GetMouseFD()
-  #define ReadMouse()   _ReadMouse()
+#include <memory>
 
-bool    _InitMouse();
-bool    _DeinitMouse();
-int     _GetMouseFD();
-input_t _ReadMouse();
+class CaptureInput
+{
+    CaptureInput*   m_prevCaptured{};
+    bool            m_captured{false};
 
-  //#define OLD_MOUSE //define in case "SGR extended mouse reporting" not working
+public:
+    CaptureInput() = default;
+    virtual ~CaptureInput() {InputRelease();}
 
-#else
-  #define InitMouse()   ((void) false)
-  #define DeinitMouse() ((void) false)
-  #define GetMouseFD()  -1
-  #define ReadMouse()   0
-#endif
+    virtual input_t EventProc(input_t code) {return code;}
+    virtual bool  InputCapture();
+    virtual bool  InputRelease();
+
+    bool IsInputCaptured() {return nullptr != m_prevCaptured;}
+};

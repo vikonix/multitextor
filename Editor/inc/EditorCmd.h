@@ -26,8 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#include "Types.h"
-#include "KeyCodes.h"
+#include "Console/Types.h"
+#include "Console/KeyCodes.h"
 
 #include <unordered_map>
 

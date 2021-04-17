@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef WIN32
 
-#include "tty/KeyMap.h"
+#include "Console/tty/KeyMap.h"
 
 
 KeyMap g_keyMap[]

@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "CaptureInput.h"
-#include "KeyCodes.h"
+#include "Console/KeyCodes.h"
 #include "ColorMap.h"
 #include "CmdParser.h"
 #include "Invalidate.h"

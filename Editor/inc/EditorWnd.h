@@ -26,7 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#include "Wnd.h"
+#include "WndManager/Wnd.h"
 #include "Editor.h"
 #include "EditorCmd.h"
 

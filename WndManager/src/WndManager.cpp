@@ -26,8 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
-#include "WndManager.h"
-#include "App.h"
+#include "WndManager/WndManager.h"
+#include "WndManager/App.h"
 
 static const pos_t SPLIT_WIDTH { 1 };
 

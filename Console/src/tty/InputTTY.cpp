@@ -26,10 +26,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #ifndef WIN32
 
-#include "tty/InputTTY.h"
-#include "tty/KeyMap.h"
-#include "tty/TermcapMap.h"
-#include "tty/Mouse.h"
+#include "Console/tty/InputTTY.h"
+#include "Console/tty/KeyMap.h"
+#include "Console/tty/TermcapMap.h"
+#include "Console/tty/Mouse.h"
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
 

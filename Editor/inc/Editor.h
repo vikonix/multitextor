@@ -27,9 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "utils/MemBuff.h"
-#include "Types.h"
+#include "Console/Types.h"
 #include "UndoList.h"
-#include "Wnd.h"
+#include "WndManager/Wnd.h"
 #include "LexParser.h"
 
 #include <unordered_set>

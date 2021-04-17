@@ -28,10 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/SymbolType.h"
 #include "utils/Clipboard.h"
 #include "EditorWnd.h"
-#include "WndManager.h"
-#include "Dialog.h"
+#include "WndManager/WndManager.h"
+#include "WndManager/Dialog.h"
 #include "EditorApp.h"
-#include "KeyCodes.h"
+#include "Console/KeyCodes.h"
 #include "Dialogs/EditorDialogs.h"
 
 bool EditorWnd::EditC(input_t cmd)

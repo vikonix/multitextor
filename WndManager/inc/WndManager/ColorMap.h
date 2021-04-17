@@ -26,8 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#include "Types.h"
-#include "Color.h"
+#include "Console/Types.h"
+#include "Console/Color.h"
 
 
 //////////////////////////////////////////////////////////////////////////////

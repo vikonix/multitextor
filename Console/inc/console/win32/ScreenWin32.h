@@ -27,7 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 #ifdef WIN32
 
-#include "ConsoleScreen.h"
+#include "Console/ConsoleScreen.h"
 
 #include "windows.h"
 
