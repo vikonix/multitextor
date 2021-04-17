@@ -302,7 +302,7 @@ input_t FileDialog::DialogProc(input_t code)
                 }
                 else
                 {
-                    LOG(DEBUG) << "Found";
+                    //LOG(DEBUG) << "File Found";
                 }
             }
         }

@@ -785,7 +785,7 @@ input_t FrameMenu::EventProc(input_t code)
                 m_selected = selected;
                 if(m_nextMenu)
                 {
-                    LOG(DEBUG) << "next menu close 1";
+                    //LOG(DEBUG) << "next menu close 1";
                     m_nextMenu.reset();
                     open = 1;
                 }

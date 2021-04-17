@@ -99,7 +99,7 @@ class LineMenu : public Menu
 public:
     LineMenu() = delete;
     explicit LineMenu(const menu_list& menu, pos_t x = 0, pos_t y = 0) : Menu(menu, x, y) {}
-    virtual ~LineMenu() = default; //{ LOG(DEBUG) << __FUNC__; }
+    virtual ~LineMenu() = default;//{ LOG(DEBUG) << __FUNC__; }
 
     virtual input_t Close(input_t code) override final;
     virtual input_t Activate(bool fCapture = false) override final;
@@ -112,7 +112,7 @@ class FrameMenu : public Menu
 public:
     FrameMenu() = delete;
     explicit FrameMenu(const menu_list& menu, pos_t x, pos_t y) : Menu(menu, x, y) {}
-    virtual ~FrameMenu() = default; //{ LOG(DEBUG) << __FUNC__; }
+    virtual ~FrameMenu() = default;//{ LOG(DEBUG) << __FUNC__; }
 
     virtual input_t Activate(bool fCapture = false) override;
     virtual bool    Refresh() override;
@@ -124,7 +124,7 @@ class PopupMenu final : public FrameMenu
 public:
     PopupMenu() = delete;
     explicit PopupMenu(const menu_list& menu, pos_t x, pos_t y) : FrameMenu(menu, x, y) {}
-    virtual ~PopupMenu() { LOG(DEBUG) << __FUNC__; }
+    virtual ~PopupMenu() = default;//{ LOG(DEBUG) << __FUNC__; }
 
     virtual input_t Activate(bool fCapture = true) override final;
 };
