@@ -29,6 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/DlgControls.h"
 #include "WndManager/WndManager.h"
 
+namespace _WndManager 
+{
 
 /////////////////////////////////////////////////////////////////////////////
 #define ID_OF_NAME      (ID_USER + 1)
@@ -333,3 +335,5 @@ bool FileDialog::OnClose(int id)
     }
     return true;
 }
+
+} //namespace _WndManager 

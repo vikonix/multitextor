@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
     : FrameWnd(
         x = (x != MAX_COORD) ? x : (WndManager::getInstance().m_sizex - controls.front().sizex) / 2,
@@ -715,3 +718,5 @@ input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::stri
     input_t ret = Dlg.Activate();
     return ret;
 }
+
+} //namespace _WndManager 

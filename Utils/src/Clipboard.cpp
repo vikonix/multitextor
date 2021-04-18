@@ -39,6 +39,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     static const std::string s_clipFile = "/tmp/m.clp";
 #endif
 
+namespace _Utils
+{
 
 bool CopyToClipboard(const std::vector<std::u16string>& strArray, bool eol)
 {
@@ -176,3 +178,4 @@ bool IsClipboardReady()
 #endif
 }
 
+} //namespace _Utils

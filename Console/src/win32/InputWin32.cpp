@@ -29,6 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Console/win32/InputWin32.h"
 #include "utils/logger.h"
 
+namespace _Console
+{
 
 std::atomic_bool ConsoleInput::s_fExit {false};
 std::atomic_bool InputWin32::s_fCtrlC {false};
@@ -566,5 +568,7 @@ void InputWin32::ProcessMenuEvent([[maybe_unused]]MENU_EVENT_RECORD* pMenuEvent)
 {
     //LOG(DEBUG) << "MenuEvent id=" << pMenuEvent->dwCommandId;
 }
+
+} //namespace _Console
 
 #endif //WIN32

@@ -29,8 +29,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Console/Types.h"
 #include "Console/Color.h"
 
+using namespace _Console;
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 enum 
 {
   C_SCREEN = 0,
@@ -122,3 +126,4 @@ extern color_t g_ColorMap[];
 #define ColorDialogFieldAct     (g_ColorMap[C_DIALOG_FIELD_ACT])
 #define ColorShade              (g_ColorMap[C_SHADE])
 
+} // namespace _WndManager

@@ -32,8 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "EditorApp.h"
 
-constexpr uintmax_t MAX_PARSED_SIZE{ 0x2000000 }; // 32 MB
+namespace _Editor
+{
 
+constexpr uintmax_t MAX_PARSED_SIZE{ 0x2000000 }; // 32 MB
 
 bool Editor::SetCP(const std::string& cp) 
 {
@@ -1424,3 +1426,5 @@ bool Editor::SetParseStyle(const std::string& style)
     
     return true;
 }
+
+} //namespace _Editor

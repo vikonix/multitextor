@@ -29,8 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/WndManager.h"
 #include "WndManager/App.h"
 
-static const pos_t SPLIT_WIDTH { 1 };
+namespace _WndManager
+{
 
+static const pos_t SPLIT_WIDTH { 1 };
 
 bool WndManager::Init()
 {
@@ -1049,3 +1051,5 @@ bool WndManager::Scroll(pos_t left, pos_t top, pos_t right, pos_t bottom, pos_t 
 
     return rc;
 }
+
+} //namespace _WndManager 

@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/CmdParser.h"
 #include "WndManager/App.h"
 
+namespace _WndManager
+{
 
 bool CmdParser::SetCmdMap(const CmdMap& cmdMap)
 {
@@ -119,3 +121,5 @@ std::vector<input_t> CmdParser::GetCommand()
     m_savedKeys.clear();
     return ret;
 }
+
+} //namespace _WndManager 

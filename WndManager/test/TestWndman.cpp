@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
+using namespace _WndManager;
+
 /////////////////////////////////////////////////////////////////////////////
 Logo g_Logo {
   ColorScreen,

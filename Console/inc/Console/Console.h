@@ -32,6 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _Console
+{
+
+using keybuff_t = std::list<input_t>;
+
+
 class Console final
 {
 #ifdef WIN32
@@ -134,3 +140,5 @@ public:
         sizey = m_screen.m_sizey;
     }
 };
+
+} //namespace _Console

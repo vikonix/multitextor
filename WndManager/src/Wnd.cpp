@@ -27,6 +27,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/WndManager.h"
 #include "WndManager/App.h"
 
+namespace _WndManager
+{
 
 bool CaptureInput::InputCapture()
 {
@@ -471,3 +473,5 @@ input_t FrameWnd::CheckInput(const std::chrono::milliseconds& waitTime)
 {
     return WndManager::getInstance().CheckInput(waitTime);
 }
+
+} //namespace _WndManager 

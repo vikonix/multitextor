@@ -35,10 +35,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #define GetMouseFD()  _GetMouseFD()
   #define ReadMouse()   _ReadMouse()
 
+namespace _Console
+{
+
 bool    _InitMouse();
 bool    _DeinitMouse();
 int     _GetMouseFD();
 input_t _ReadMouse();
+
+} //namespace _Console
 
   //#define OLD_MOUSE //define in case "SGR extended mouse reporting" not working
 

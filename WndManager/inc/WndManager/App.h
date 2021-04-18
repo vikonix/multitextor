@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 enum class stat_color
 {
     normal = 0,
@@ -141,3 +144,4 @@ public:
     bool SetCmdParser(const CmdMap& cmdMap);
 };
 
+} // namespace _WndManager

@@ -30,6 +30,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <memory>
 
+using namespace _Console;
+
+namespace _WndManager
+{
+
 class CaptureInput
 {
     CaptureInput*   m_prevCaptured{};
@@ -45,3 +50,5 @@ public:
 
     bool IsInputCaptured() {return nullptr != m_prevCaptured;}
 };
+
+} // namespace _WndManager

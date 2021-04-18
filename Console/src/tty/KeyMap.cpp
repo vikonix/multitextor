@@ -28,8 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Console/tty/KeyMap.h"
 
+namespace _Console
+{
 
-KeyMap g_keyMap[]
+std::list<KeyMap> g_keyMap
 {
   {K_BS,           "\x08"},
   {K_BS,           "\x7f"},
@@ -101,14 +103,12 @@ KeyMap g_keyMap[]
   {K_F1,           "\x1bOP"},
   {K_F2,           "\x1bOQ"},
   {K_F3,           "\x1bOR"},
-  {K_F4,           "\x1bOS"},
+  {K_F4,           "\x1bOS"}
 #endif
-
-  {}
 };
 
 //linux terminal default
-KeyMap g_keyMap1[]
+std::list<KeyMap> g_keyMap1
 {
   {K_F11,          "\x1b[23~"},
   {K_F12,          "\x1b[24~"},
@@ -119,11 +119,10 @@ KeyMap g_keyMap1[]
   {K_F5 | K_SHIFT, "\x1b[31~"},
   {K_F6 | K_SHIFT, "\x1b[32~"},
   {K_F7 | K_SHIFT, "\x1b[33~"},
-  {K_F8 | K_SHIFT, "\x1b[34~"},
-  {}
+  {K_F8 | K_SHIFT, "\x1b[34~"}
 };
 
-KeyMap g_keyMap2[]
+std::list<KeyMap> g_keyMap2
 {
   {K_F1 | K_SHIFT, "\x1b[23~"},
   {K_F2 | K_SHIFT, "\x1b[24~"},
@@ -134,8 +133,9 @@ KeyMap g_keyMap2[]
   {K_F7 | K_SHIFT, "\x1b[31~"},
   {K_F8 | K_SHIFT, "\x1b[32~"},
   {K_F9 | K_SHIFT, "\x1b[33~"},
-  {K_F10| K_SHIFT, "\x1b[34~"},
-  {}
+  {K_F10| K_SHIFT, "\x1b[34~"}
 };
+
+} //namespace _Console
 
 #endif

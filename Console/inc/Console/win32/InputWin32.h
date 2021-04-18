@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <atomic>
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _Console
+{
+
 class InputWin32 final : public ConsoleInput
 {
     HANDLE  m_hStdin { INVALID_HANDLE_VALUE };
@@ -73,5 +76,7 @@ protected:
 
     void WriteResize(pos_t x, pos_t y);
 };
+
+} //namespace _Console
 
 #endif //WIN32

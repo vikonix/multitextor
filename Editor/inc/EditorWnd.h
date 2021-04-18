@@ -33,6 +33,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 #include <unordered_map>
 
+using namespace _WndManager;
+
+namespace _Editor
+{
+
 class Diff;
 
 class EditorWnd : public FrameWnd
@@ -299,3 +304,4 @@ public:
     bool TrackPopupMenu(input_t cmd);
 };
 
+} //namespace _Editor

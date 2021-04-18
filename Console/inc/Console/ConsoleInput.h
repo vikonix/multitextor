@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 #include <atomic>
 
+namespace _Console
+{
+
 using keybuff_t = std::list<input_t>;
 
 class InputBuffer
@@ -139,3 +142,4 @@ public:
     static std::string CastKeyCode(input_t code);
 };
 
+} //namespace _Console

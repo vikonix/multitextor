@@ -27,6 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "UndoList.h"
 #include "Editor.h"
 
+namespace _Editor
+{
+
 bool UndoList::Clear()
 {
     m_rem.clear();
@@ -99,3 +102,5 @@ std::optional<EditCmd> UndoList::PeekUndoCmd()
     --it;
     return *it;
 }
+
+} //namespace _Editor

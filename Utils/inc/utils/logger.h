@@ -31,18 +31,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "easyloggingpp/easylogging++.h"
 
-void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize = 0x1000000, const bool logScreen = false);
-std::string CastEscString(const std::string& string);
-
 #ifdef WIN32
 #define __FUNC__ __FUNCTION__
 #ifdef _DEBUG
-	#define _assert(v) _ASSERT(v)
+#define _assert(v) _ASSERT(v)
 #else
-	#define _assert(v) if(!(v)){LOG(ERROR) << __FUNC__ << ":" << __LINE__ << " '" << #v << "'";}
+#define _assert(v) if(!(v)){LOG(ERROR) << __FUNC__ << ":" << __LINE__ << " '" << #v << "'";}
 #endif
 #else
 #define __FUNC__ __PRETTY_FUNCTION__ 
 #define _assert(v) if(!(v)){LOG(ERROR) << __FUNC__ << ":" << __LINE__ << " '" << #v << "'";}
 #endif
 
+namespace _Utils
+{
+
+void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize = 0x1000000, const bool logScreen = false);
+std::string CastEscString(const std::string& string);
+
+} //namespace _Utils

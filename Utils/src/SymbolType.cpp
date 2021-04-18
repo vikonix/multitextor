@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cwctype>
 
+namespace _Utils
+{
 
 symbol_t GetSymbolType(char16_t wc)
 {
@@ -62,3 +64,5 @@ symbol_t GetSymbolType(char16_t wc)
             return symbol_t::other;
     }
 }
+
+} //namespace _Utils

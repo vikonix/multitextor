@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <sstream>
 
+namespace _Console
+{
 
 std::string ConsoleInput::CastKeyCode(input_t code)
 {
@@ -268,3 +270,4 @@ std::string ConsoleInput::CastKeyCode(input_t code)
     return out.str();
 }
 
+} //namespace _Console

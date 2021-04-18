@@ -29,7 +29,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <vector>
 
+namespace _Utils
+{
+
 bool    CopyToClipboard(const std::vector<std::u16string>& strArray, bool eol);
 bool    PasteFromClipboard(std::vector<std::u16string>& strArray);
 bool    IsClipboardReady();
 
+} //namespace _Utils

@@ -27,6 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorApp.h"
 #include "Dialogs/EditorDialogs.h"
 
+namespace _Editor
+{
+
 sline_list g_statusLine
 {
     {"",     "",     stat_color::normal},//0
@@ -280,3 +283,5 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
     LOG(DEBUG) << __FUNC__;
     return true;
 } 
+
+} //namespace _Editor

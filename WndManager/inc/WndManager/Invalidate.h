@@ -26,6 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
+namespace _WndManager
+{
+
 enum class invalidate_t
 {
     find,
@@ -34,3 +37,5 @@ enum class invalidate_t
     insert,
     full
 };
+
+} // namespace _WndManager

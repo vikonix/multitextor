@@ -32,7 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //////////////////////////////////////////////////////////////////////////////
-KeyCap g_keyCap[]
+namespace _Console
+{
+
+std::list<KeyCap> g_keyCap
 {
   {"kb", K_BS},
 
@@ -66,13 +69,12 @@ KeyCap g_keyCap[]
   {"F7", K_F7  | K_SHIFT},
   {"F8", K_F8  | K_SHIFT},
   {"F9", K_F9  | K_SHIFT},
-  {"FA", K_F10 | K_SHIFT},
-  {}
+  {"FA", K_F10 | K_SHIFT}
 };
 
 
 //////////////////////////////////////////////////////////////////////////////
-ScreenCap g_screenCap[]
+std::list<ScreenCap> g_screenCap
 {
   {"cl", S_ClrScr,        "\x1b[2J\x1b[H"},
   {"bl", S_Beep,          ""},
@@ -122,9 +124,9 @@ ScreenCap g_screenCap[]
 
   {"ti", S_TermInit,      ""},
   {"te", S_TermReset,     ""},
-  {"r1", S_Reset1str,     "\x1b""c"},//"\x1b]R",// need for linux in UTF8
-
-  {}
+  {"r1", S_Reset1str,     "\x1b""c"}//"\x1b]R",// need for linux in UTF8
 };
+
+} //namespace _Console
 
 #endif //WIN32

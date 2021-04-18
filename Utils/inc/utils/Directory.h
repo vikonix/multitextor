@@ -30,6 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cwctype>
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _Utils
+{
+
 using path_t = std::filesystem::path;
 using direntry_t = std::filesystem::directory_entry;
 
@@ -166,3 +169,5 @@ std::time_t to_time_t(TP tp)
         + system_clock::now());
     return system_clock::to_time_t(sctp);
 }
+
+} //namespace _Utils

@@ -48,6 +48,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #define NULL_VALUE 255
 #endif
 
+namespace _Console
+{
 
 std::atomic_bool ConsoleInput::s_fExit {false};
 std::atomic_bool InputTTY::s_fResize {false};
@@ -61,33 +63,32 @@ bool InputTTY::LoadKeyCode()
 
     //load predefined keys first
     //for solveing XTERM key mapping error
-    size_t i;
-    for(i = 0; g_keyMap[i].code; ++i)
-        m_KeyMap.AddKey(g_keyMap[i].sequence, g_keyMap[i].code);
+    for(const auto& map : g_keyMap)
+        m_KeyMap.AddKey(map.sequence, map.code);
     
 #ifdef __linux__
     if(!strcmp(getenv("TERM"), "linux"))
     {
         LOG(DEBUG) << "keyMap default linux";
-    for(i = 0; g_keyMap1[i].code; ++i)
-        m_KeyMap.AddKey(g_keyMap1[i].sequence, g_keyMap1[i].code);
+        for(const auto& map : g_keyMap1)
+            m_KeyMap.AddKey(map.sequence, map.code);
     }
     else
 #endif
     {
         LOG(DEBUG) << "keyMap 2";
-        for(i = 0; g_keyMap2[i].code; ++i)
-            m_KeyMap.AddKey(g_keyMap2[i].sequence, g_keyMap2[i].code);
+        for(const auto& map : g_keyMap2)
+            m_KeyMap.AddKey(map.sequence, map.code);
     }
 
     LOG(DEBUG) << "keyCap";
-    for(i = 0; g_keyCap[i].id; ++i)
+    for(const auto& cap: g_keyCap)
     {
         char buff[16];
         char* pbuff = buff;
-        char* str = tgetstr(const_cast<char*>(g_keyCap[i].id), &pbuff);
+        char* str = tgetstr(const_cast<char*>(cap.id), &pbuff);
         if(str)
-            m_KeyMap.AddKey(str, g_keyCap[i].code);
+            m_KeyMap.AddKey(str, cap.code);
     }
 
     return true;
@@ -675,5 +676,7 @@ void InputTTY::ProcessSignals()
         PutInput('C' | K_CTRL);
     }
 }
+
+} //namespace _Console
 
 #endif //!WIN32

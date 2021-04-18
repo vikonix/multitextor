@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <vector>
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 enum CtrlType
 {
     CTRL_END            = 0x0000,
@@ -160,3 +163,5 @@ protected:
 
 /////////////////////////////////////////////////////////////////////////////
 input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::string>& message);
+
+} // namespace _WndManager

@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iterator>
 #include <cwctype>
 
+namespace _Editor
+{
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode, const std::string& cp)
 {
@@ -1971,3 +1973,5 @@ bool EditorWnd::ReplaceSubstr(size_t line, size_t pos, size_t len, const std::u1
 
     return rc;
 }
+
+} //namespace _Editor

@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <iostream>
 
+using namespace _Utils;
+using namespace _Console;
 
 void ConsoleTest()
 {

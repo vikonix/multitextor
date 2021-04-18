@@ -50,7 +50,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define MAX_STRLEN (BUFF_SIZE / 2)
 
+namespace _Editor
+{
+class Editor;
+}
+
 /////////////////////////////////////////////////////////////////////////////
+namespace _Utils
+{
+
 struct _hbuff
 {
     uint64_t    index   : 32;
@@ -121,7 +129,7 @@ template <typename Tbuff, typename Tview>
 class StrBuff : public SBuff<Tbuff, Tview>
 {
     friend class MemStrBuff<std::string, std::string_view>;
-    friend class Editor;
+    friend class _Editor::Editor;
 
     //we save string in buffer as in file
     hbuff_t     m_buffHandle{0};
@@ -143,7 +151,7 @@ template <typename Tbuff, typename Tview>
 class MemStrBuff
 {
     using LoadBuffFunc = std::function<bool(uint64_t offset, size_t size, std::shared_ptr<Tbuff> buff)>;
-    friend class Editor;
+    friend class _Editor::Editor;
 
 protected:
     LoadBuffFunc    m_loadBuffFunc;
@@ -186,3 +194,5 @@ public:
 
     //std::pair<size_t, bool> FindStr(const std::string& str);
 };
+
+} //namespace _Utils

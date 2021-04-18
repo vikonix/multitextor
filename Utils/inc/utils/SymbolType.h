@@ -26,6 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
+namespace _Utils
+{
+
 enum class symbol_t : int
 {
     eol         = 0,
@@ -42,3 +45,4 @@ enum class symbol_t : int
 
 symbol_t  GetSymbolType(char16_t wc);
 
+} //namespace _Utils

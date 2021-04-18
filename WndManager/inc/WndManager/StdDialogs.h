@@ -28,6 +28,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Dialog.h"
 #include "utils/Directory.h"
 
+using namespace _Utils;
+
+namespace _WndManager
+{
 
 enum class FileDlgMode
 {
@@ -72,3 +76,4 @@ public:
     virtual bool OnClose(int id) override;
 };
 
+} // namespace _WndManager

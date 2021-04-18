@@ -30,6 +30,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "Version.h"
 
+namespace _Editor
+{
 
 std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
 {
@@ -299,3 +301,5 @@ bool    EditorApp::SelectRecentSessionProc(input_t cmd)
     LOG(DEBUG) << __FUNC__ << " not implemented";
     return true;
 }
+
+} //namespace _Editor

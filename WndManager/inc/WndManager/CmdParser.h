@@ -31,6 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <vector>
 
+using namespace _Console;
+
+namespace _WndManager
+{
+
 enum class scancmd_t
 {
     not_found = 0,
@@ -53,3 +58,5 @@ public:
     scancmd_t   ScanKey(input_t key);
     std::vector<input_t>    GetCommand();
 };
+
+} // namespace _WndManager

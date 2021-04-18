@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Console/KeyCodes.h"
 #include "Dialogs/EditorDialogs.h"
 
+namespace _Editor
+{
+
 bool EditorWnd::EditC(input_t cmd)
 {
     if (m_readOnly)
@@ -937,3 +940,4 @@ bool EditorWnd::Save([[maybe_unused]] input_t cmd)
     return true;
 }
 
+} //namespace _Editor

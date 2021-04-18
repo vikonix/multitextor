@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 class Control : public CaptureInput
 {
 friend class Dialog;
@@ -367,3 +370,4 @@ public:
     color_t SetMaxColor(color_t max) {return m_maxColor = max;}
 };
 
+} // namespace _WndManager

@@ -42,7 +42,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define MENU_SELECTED        4
 #define MENU_CHECKED         8
 
-//
+namespace _WndManager
+{
+
 struct menu
 {
     int         type{};
@@ -128,3 +130,5 @@ public:
 
     virtual input_t Activate(bool fCapture = true) override final;
 };
+
+} // namespace _WndManager

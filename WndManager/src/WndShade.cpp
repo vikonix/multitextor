@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/WndManager.h"
 #include "utils/logger.h"
 
+namespace _WndManager
+{
 
 Shade::Shade(pos_t x, pos_t y, pos_t sizex, pos_t sizey, int mode)
 {
@@ -123,3 +125,4 @@ bool Shade::Paint()
     return true;
 }
 
+} //namespace _WndManager 

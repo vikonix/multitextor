@@ -29,6 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/DlgControls.h"
 #include "WndManager/App.h"
 
+using namespace _Utils;
+
+namespace _Editor
+{
 
 /////////////////////////////////////////////////////////////////////////////
 #define ID_DP_PATH         (ID_USER +  1)
@@ -184,3 +188,5 @@ bool PropertiesDialog::OnClose(int id)
     }
     return true;
 }
+
+} //namespace _Editor

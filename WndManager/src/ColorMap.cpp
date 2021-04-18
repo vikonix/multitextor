@@ -26,6 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "WndManager/ColorMap.h"
 
+namespace _WndManager
+{
+
 color_t g_ColorMap[C_COUNT] 
 {
     /*C_SCREEN           */                                  TEXT_RED | TEXT_GREEN | TEXT_BLUE,
@@ -75,3 +78,4 @@ color_t g_ColorMap[C_COUNT]
     /*C_SHADE            */                       FON_BLUE,
 };
 
+} //namespace _WndManager 

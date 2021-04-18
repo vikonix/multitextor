@@ -29,8 +29,15 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Console/Types.h"
 //#include "termdb/termdb.hpp"
 
+#ifndef WIN32
+    #include <term.h>
+    #include <cstdlib>
+#endif
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _Console
+{
+
 enum ScreenCapType
 {
     S_ClrScr = 0,
@@ -90,25 +97,22 @@ enum ScreenCapType
 //////////////////////////////////////////////////////////////////////////////
 struct KeyCap
 {
-    const char*     id;
-    input_t         code;
+    const char*     id{};
+    input_t         code{};
 };
 
 struct ScreenCap 
 {
-    const char*     id;
-    ScreenCapType   cap;
-    const char*     sDefCap;
+    const char*     id{};
+    ScreenCapType   cap{};
+    const char*     sDefCap{};
 };
 
 //////////////////////////////////////////////////////////////////////////////
-extern KeyCap    g_keyCap[];
-extern ScreenCap g_screenCap[];
+extern std::list<KeyCap>    g_keyCap;
+extern std::list<ScreenCap> g_screenCap;
 
 #ifndef WIN32
-
-#include <term.h>
-#include <cstdlib>
 
 class TermcapBuffer
 {
@@ -136,6 +140,9 @@ public:
 private:
     TermcapBuffer() {LoadTermcap();}
 };
+
+} //namespace _Console
+
 #endif //WIN32
 
 

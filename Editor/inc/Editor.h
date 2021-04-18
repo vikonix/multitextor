@@ -38,6 +38,22 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <algorithm>
 
 
+
+using namespace _Utils;
+using namespace _WndManager;
+
+namespace _WndManager
+{
+class FrameWnd;
+}
+namespace iconvpp
+{
+class CpConverter;
+}
+
+namespace _Editor
+{
+
 enum class eol_t
 {
     unix_eol,
@@ -51,15 +67,8 @@ enum class eol_t
     #define DEF_EOL eol_t::unix_eol
 #endif
 
-class FrameWnd;
-
 /////////////////////////////////////////////////////////////////////////////
 #define STR_NOTDEFINED std::numeric_limits<size_t>::max()
-
-namespace iconvpp
-{
-class CpConverter;
-}
 
 class Editor
 {
@@ -212,3 +221,4 @@ public:
 
 using EditorPtr = std::shared_ptr<Editor>;
 
+} //namespace _Editor

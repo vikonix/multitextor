@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorApp.h"
 
 
+namespace _Editor
+{
+
+/////////////////////////////////////////////////////////////////////////////
 #define ID_WL_WNDLIST  (ID_USER + 1)
 #define ID_WL_COUNT    (ID_USER + 2)
 #define ID_WL_CLOSE    (ID_USER + 3)
@@ -273,4 +277,4 @@ bool WindowListDialog::OnClose(int id)
     return true;
 }
 
-
+} //namespace _Editor

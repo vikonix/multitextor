@@ -32,6 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <array>
 #include <deque>
 
+using namespace _Console;
+
+namespace _WndManager
+{
 
 enum class split_t
 {
@@ -183,3 +187,4 @@ protected:
     bool    WriteBlock(pos_t left, pos_t top, pos_t right, pos_t bottom, const ScreenBuffer& block);
 };
 
+} // namespace _WndManager

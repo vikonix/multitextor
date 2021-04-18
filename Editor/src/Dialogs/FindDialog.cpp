@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/WndManager.h"
 #include "EditorWnd.h"
 
+namespace _Editor
+{
 
 /////////////////////////////////////////////////////////////////////////////
 #define ID_FF_SEARCH   (ID_USER +  1)
@@ -198,3 +200,5 @@ bool FindDialog::OnClose(int id)
 
     return true;
 }
+
+} //namespace _Editor

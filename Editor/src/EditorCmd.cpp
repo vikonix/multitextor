@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorCmd.h"
 #include "EditorWnd.h"
 
+namespace _Editor
+{
 
 /////////////////////////////////////////////////////////////////////////////
 //first array is key array
@@ -476,3 +478,5 @@ std::unordered_map<input_t, std::string> g_CmdNames
     { K_ED(E_MOVE_UP) + 3,          "EDIT_MOVE_SCROLL3_UP"},
     { K_ED(E_MOVE_DOWN) + 3,        "EDIT_MOVE_SCROLL3_DOWN"}
 };
+
+} //namespace _Editor

@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "windows.h"
 
+namespace _Console
+{
+
 class ScreenWin32 final : public ConsoleScreen
 {
     HANDLE  m_hStdout { INVALID_HANDLE_VALUE };
@@ -75,5 +78,6 @@ public:
     virtual bool Flush() override { return true; };
 };
 
-#endif //WIN32
+} //namespace _Console
 
+#endif //WIN32

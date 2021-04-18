@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "EditorApp.h"
 
+using namespace _Editor;
 
 /////////////////////////////////////////////////////////////////////////////
 EditorApp app;

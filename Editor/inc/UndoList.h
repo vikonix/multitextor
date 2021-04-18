@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <optional>
 
 
+namespace _Editor
+{
+
 enum class cmd_t
 {
     CMD_NULL,
@@ -95,3 +98,5 @@ public:
   std::optional<EditCmd> GetUndoCmd();
   std::optional<EditCmd> PeekUndoCmd();
 };
+
+} //namespace _Editor

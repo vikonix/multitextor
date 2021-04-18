@@ -27,6 +27,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/App.h"
 #include "EditorWnd.h"
 
+namespace _Editor
+{
+
 extern Logo g_logo;
 extern sline_list g_statusLine;
 extern menu_list g_accessMenu;
@@ -117,3 +120,5 @@ public:
     bool    SelectRecentFileProc(input_t cmd);
     bool    SelectRecentSessionProc(input_t cmd);
 };
+
+} //namespace _Editor

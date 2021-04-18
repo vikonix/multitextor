@@ -30,6 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
 
+namespace _Editor
+{
+
 std::unordered_map<char16_t, std::pair<char16_t, bool>> LexParser::s_lexPairs
 {
     {'[', {']', false}},
@@ -1221,3 +1224,5 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
 
     return true;
 }
+
+} //namespace _Editor

@@ -29,6 +29,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _Utils
+{
+
 template <typename Tbuff>
 BuffPool<Tbuff> BuffPool<Tbuff>::s_pool;
 
@@ -704,3 +707,5 @@ template class BuffPool<std::string>;
 template class SBuff<std::string, std::string_view>;
 template class StrBuff<std::string, std::string_view>;
 template class MemStrBuff<std::string, std::string_view>;
+
+} //namespace _Utils

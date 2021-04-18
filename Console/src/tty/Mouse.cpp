@@ -49,6 +49,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _Console
+{
+
 static uint32_t s_fMouseOpen = 0;
 
 
@@ -298,6 +301,7 @@ input_t _ReadMouse()
     return 0;
 }
 
+} //namespace _Console
 
 /////////////////////////////////////////////////////////////////////////////
 #ifdef HAVE_MAIN

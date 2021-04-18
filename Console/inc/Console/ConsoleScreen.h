@@ -36,6 +36,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <optional>
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _Console
+{
+
 enum class cursor_t
 {
     CURSOR_OFF          = -1,
@@ -248,3 +251,4 @@ public:
     virtual bool Flush() = 0;
 };
 
+} //namespace _Console

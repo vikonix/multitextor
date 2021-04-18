@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/StdDialogs.h"
 #include "Dialogs/EditorDialogs.h"
 
+namespace _Editor
+{
 
 bool EditorWnd::DlgGoto([[maybe_unused]]input_t cmd)
 {
@@ -190,3 +192,5 @@ bool EditorWnd::TrackPopupMenu([[maybe_unused]]input_t cmd)
     menu.Activate();
     return true;
 }
+
+} //namespace _Editor

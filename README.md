@@ -31,4 +31,4 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  - iconv
  
 ## In progress:
- - Editor alpha version.
+ - Editor MVP alpha version.

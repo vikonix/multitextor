@@ -29,6 +29,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <map>
 
+using namespace _WndManager;
+
+namespace _Editor
+{
 
 enum class WindowsDlgMode
 {
@@ -126,3 +130,5 @@ public:
     bool OnActivate();
     bool OnClose(int id);
 };
+
+} //namespace _Editor

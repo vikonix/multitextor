@@ -34,6 +34,9 @@ using namespace el;
 using namespace el::base;
 using namespace el::base::utils;
 
+namespace _Utils
+{
+
 void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogSize, const bool logScreen)
 {
     Configurations cfg;
@@ -66,3 +69,5 @@ std::string CastEscString(const std::string& string)
 
     return ss.str();
 }
+
+} //namespace _Utils

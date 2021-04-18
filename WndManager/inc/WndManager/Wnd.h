@@ -35,7 +35,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <string>
 #include <filesystem>
 
+using namespace _Console;
+
 //////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 using border_t = uint32_t;
 enum enum_border_t
 {
@@ -177,3 +182,5 @@ protected:
     pos_t GetCSizeX() const;
     pos_t GetCSizeY() const;
 };
+
+} // namespace _WndManager

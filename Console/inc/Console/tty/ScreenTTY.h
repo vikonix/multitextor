@@ -34,6 +34,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #define COLOR_CHANGE(color) (((color) & TEXT_BRIGHT) | (((color) & TEXT_RED) >> 2) | ((color) & TEXT_GREEN) | (((color) & TEXT_BLUE) << 2))
 
+namespace _Console
+{
+
 enum acs_char : int
 {
     ACS_CHLINE          = 'q',
@@ -113,6 +116,7 @@ private:
     bool _WriteWChar(char16_t c);
 };
 
+} //namespace _Console
 
 #endif //WIN32
 

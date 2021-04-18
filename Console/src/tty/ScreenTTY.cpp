@@ -39,6 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <filesystem>
 
+using namespace _Utils;
+
+namespace _Console
+{
 
 bool ScreenTTY::Init()
 {
@@ -49,27 +53,26 @@ bool ScreenTTY::Init()
     m_stdout = fileno (stdout);
 
     //load termcap
-    int i;
-    for(i = 0; g_screenCap[i].id; ++i)
+    for(const auto& cap: g_screenCap)
     {
-        ScreenCapType cap = g_screenCap[i].cap;
-        if(m_cap[cap].str.empty())
+        ScreenCapType type = cap.cap;
+        if(m_cap[type].str.empty())
         {
             char buff[100];
             char* pbuff = buff;
 
-            char* str = tgetstr(const_cast<char*>(g_screenCap[i].id), &pbuff);
+            char* str = tgetstr(const_cast<char*>(cap.id), &pbuff);
             if(nullptr != str)
             {
                 //load this cap
-                m_cap[cap].str = str;
-                m_cap[cap].id = g_screenCap[i].id;
+                m_cap[type].str = str;
+                m_cap[type].id = cap.id;
             }
-            else if(*g_screenCap[i].sDefCap)
+            else if(*cap.sDefCap)
             {
                 //default cap
-                m_cap[cap].str = g_screenCap[i].sDefCap;
-                m_cap[cap].id = "--";
+                m_cap[type].str = cap.sDefCap;
+                m_cap[type].id = "--";
             }
         }
     }
@@ -85,7 +88,7 @@ bool ScreenTTY::Init()
     LOG(DEBUG) << "term x=" << m_sizex << " y=" << m_sizey
         << " xterm=" << m_fXTERMconsole << " 256=" << m_256colors;
 
-    for(i = 0; i < CAP_NUMBER; ++i)
+    for(int i = 0; i < CAP_NUMBER; ++i)
         if(!m_cap[i].str.empty())
             LOG(DEBUG) << " Cap[" << i << "][" << m_cap[i].id << "]" << CastEscString(m_cap[i].str);
 
@@ -678,5 +681,7 @@ bool ScreenTTY::WriteBlock(
     rc = Flush();
     return rc;
 }
+
+} //namespace _Console
 
 #endif //WIN32

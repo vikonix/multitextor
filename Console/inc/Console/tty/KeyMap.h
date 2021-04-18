@@ -28,12 +28,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Console/KeyCodes.h"
 #include "Console/Types.h"
 
+namespace _Console
+{
+
 struct KeyMap 
 {
-    input_t     code;
-    const char* sequence;
+    input_t     code{};
+    const char* sequence{};
 };
 
-extern KeyMap g_keyMap[];
-extern KeyMap g_keyMap1[];
-extern KeyMap g_keyMap2[];
+extern std::list<KeyMap> g_keyMap;
+extern std::list<KeyMap> g_keyMap1;
+extern std::list<KeyMap> g_keyMap2;
+
+} //namespace _Console

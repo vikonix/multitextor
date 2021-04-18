@@ -36,7 +36,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_set>
 #include <unordered_map>
 
-                            //symbol_t types
+using namespace _Utils;
+using namespace _Console;
+using namespace _WndManager;
+
+namespace _Editor
+{
+
+//symbol_t types
 enum class lex_t
 {
     END             = static_cast<int>(symbol_t::eol),      //0  
@@ -160,3 +167,5 @@ public:
 
     //std::optional<size_t> CheckFunc(size_t line, const std::u16string& str);
 };
+
+} //namespace _Editor

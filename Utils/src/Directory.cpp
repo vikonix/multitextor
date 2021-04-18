@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #include <libproc.h>
 #endif
 
+namespace _Utils
+{
+
 std::string  Directory::m_projectName;
 path_t Directory::m_runPath = [] {
     path_t path;
@@ -347,3 +350,4 @@ bool DirectoryList::IsFound()
         return false;
 }
 
+} //namespace _Utils

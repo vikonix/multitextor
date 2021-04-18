@@ -38,10 +38,14 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <iomanip>
 
+using namespace _Utils;
 
 #define K_CHAR 0xfffe
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _Console
+{
+
 class KeyMapper
 {
     size_t m_maxSeqSize {0};
@@ -156,5 +160,7 @@ private:
     void            ProcessInput(bool fMouse = false);
     void            ProcessSignals();
 };
+
+} //namespace _Console
 
 #endif //!WIN32

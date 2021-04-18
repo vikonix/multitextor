@@ -32,6 +32,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _Console
+{
+
 bool ScreenWin32::Init()
 {
     if (INVALID_HANDLE_VALUE != m_hStdout)
@@ -458,5 +461,7 @@ bool ScreenWin32::WriteBlock(
 
     return rc;
 }
+
+} //namespace _Console
 
 #endif //WIN32

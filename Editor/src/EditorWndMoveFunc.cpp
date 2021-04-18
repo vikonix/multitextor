@@ -38,6 +38,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #define ONLY_SCREEN_SCROLL
 #endif
 
+namespace _Editor
+{
 
 bool EditorWnd::MovePos(input_t cmd)
 {
@@ -911,3 +913,5 @@ bool EditorWnd::Repeat(input_t cmd)
     else
         return Replace(cmd);
 }
+
+} //namespace _Editor

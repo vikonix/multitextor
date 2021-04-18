@@ -39,6 +39,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define SHADE_BOTTOM 0x08
 #define SHADE_ALL    0x0f
 
+using namespace _Console;
+
+namespace _WndManager
+{
 
 class Shade final
 {
@@ -63,3 +67,4 @@ public:
     bool Discard() {m_mode = 0; return true;}
 };
 
+} // namespace _WndManager

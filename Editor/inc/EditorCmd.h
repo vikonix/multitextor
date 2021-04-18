@@ -31,6 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <unordered_map>
 
+using namespace _Console;
+
+namespace _Editor
+{
 
 enum AppCmd : input_t
 {
@@ -163,3 +167,5 @@ enum EditorCmd : input_t
 extern CmdMap g_defaultEditKeyMap;
 extern CmdMap g_defaultAppKeyMap;
 extern std::unordered_map<input_t, std::string> g_CmdNames;
+
+} //namespace _Editor

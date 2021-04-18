@@ -31,6 +31,11 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <list>
 #include <vector>
 
+using namespace std::chrono_literals;
+
+namespace _Console
+{
+
 using color_t = uint16_t;
 using pos_t = int16_t;
 using cell_t = uint32_t;
@@ -38,8 +43,6 @@ using cp_t = uint32_t;
 
 using input_t = uint32_t;
 using CmdMap = std::list<std::vector<input_t>>;
-
-using namespace std::chrono_literals;
 
 enum class scroll_t
 {
@@ -57,3 +60,4 @@ constexpr char S_LF { 0xa };
 constexpr char S_CR { 0xd };
 constexpr char S_EOF{ 0x1a };
 
+} //namespace _Console

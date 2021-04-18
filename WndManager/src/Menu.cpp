@@ -33,6 +33,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <cwctype>
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 input_t Menu::Close(input_t code)
 {
     if(m_menu.empty())
@@ -852,3 +855,5 @@ input_t PopupMenu::Activate(bool capture)
 
     return 0;
 }
+
+} //namespace _WndManager 

@@ -28,6 +28,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/DlgControls.h"
 #include "WndManager/App.h"
 
+namespace _Editor
+{
 
 /////////////////////////////////////////////////////////////////////////////
 #define ID_GL_NUMBER (ID_USER + 1)
@@ -80,3 +82,5 @@ bool GotoDialog::OnClose(int id)
 
     return true;
 }
+
+} //namespace _Editor

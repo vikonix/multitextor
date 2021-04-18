@@ -31,6 +31,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 
 //////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 bool Application::Init()
 {
     LOG(DEBUG) << " A::Init";
@@ -564,3 +567,4 @@ bool Application::PlayMacro()
     return m_wndManager.m_console.PlayMacro();
 }
 
+} //namespace _WndManager 

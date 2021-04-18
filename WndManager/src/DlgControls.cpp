@@ -32,8 +32,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include <cwctype>
 
+using namespace _Utils;
 
 /////////////////////////////////////////////////////////////////////////////
+namespace _WndManager
+{
+
 bool Control::SetName(const std::string& name)
 {
     //LOG(DEBUG) << __FUNC__ << " '" << name << "'";
@@ -1452,3 +1456,5 @@ input_t CtrlColor::EventProc(input_t code)
 
     return code;
 }
+
+} //namespace _WndManager 

@@ -26,6 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
 
+namespace _Editor
+{
 
 /////////////////////////////////////////////////////////////////////////////
 Logo g_logo 
@@ -261,3 +263,4 @@ std::vector<menu_list> g_mainMenu
     g_menuRecentSessions //10
 };
 
+} //namespace _Editor
