@@ -126,10 +126,10 @@ class InputTTY final: public ConsoleInput
     int             m_stdin {-1};
     bool            m_fTerm{false};
     bool            m_fTiocLinux{false}; //linux only
-    input_t         m_prevMode{K_UNUSED};   //linux only
+    input_t         m_prevMode{K_UNUSED}; //linux only
 
-    pos_t           m_prevX { MAX_COORD };
-    pos_t           m_prevY { MAX_COORD };
+    pos_t           m_prevX {MAX_COORD};
+    pos_t           m_prevY {MAX_COORD};
     input_t         m_prevKey {0};
     bool            m_prevUp {false};
     std::chrono::steady_clock::time_point m_prevTime {};

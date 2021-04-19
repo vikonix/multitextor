@@ -57,18 +57,18 @@ static uint32_t s_fMouseOpen = 0;
 
 /////////////////////////////////////////////////////////////////////////////
 #ifdef USE_GPM
-static void* hLib = NULL;
+static void* hLib{};
 
 typedef int (*p_gpm_open)(Gpm_Connect *, int);
 typedef int (*p_gpm_close)();
 typedef int (*p_gpm_getevent)(Gpm_Event *);
 
-static p_gpm_open       gpm_open             = NULL;
-static p_gpm_close      gpm_close            = NULL;
-static p_gpm_getevent   gpm_getevent         = NULL;
+static p_gpm_open       gpm_open{};
+static p_gpm_close      gpm_close{};
+static p_gpm_getevent   gpm_getevent{};
 
-static int*             p_gpm_fd             = NULL;
-static int*             p_gpm_visiblepointer = NULL;
+static int*             p_gpm_fd{};
+static int*             p_gpm_visiblepointer{};
 #endif //USE_GPM
 
 
@@ -167,9 +167,9 @@ bool CloseGpm()
     LOG(DEBUG) << "CloseGpm";
 
     dlclose(hLib);
-    hLib      = NULL;
-    gpm_open  = NULL;
-    gpm_close = NULL;
+    hLib      = nullptr;
+    gpm_open  = nullptr;
+    gpm_close = nullptr;
     return true;
 }
 

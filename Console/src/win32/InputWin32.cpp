@@ -138,19 +138,19 @@ BOOL InputWin32::CtrlHandler(DWORD fdwCtrlType)
     case CTRL_C_EVENT:
         //LOG(INFO) << "signal Ctrl+C";
         //ignore
-        s_fCtrlC = 1;
+        s_fCtrlC = true;
         return TRUE;
 
     case CTRL_BREAK_EVENT:
         LOG(INFO) << "signal Ctrl+Break";
-        s_fExit = 1;
+        s_fExit = true;
         Sleep(2000);
         return TRUE;
 
     // CTRL+CLOSE: confirm that the user wants to exit.
     case CTRL_CLOSE_EVENT:
         LOG(INFO) << "signal Close";
-        s_fExit = 1;
+        s_fExit = true;
         Sleep(2000);
         return TRUE;
 
@@ -158,7 +158,7 @@ BOOL InputWin32::CtrlHandler(DWORD fdwCtrlType)
     case CTRL_LOGOFF_EVENT:
     case CTRL_SHUTDOWN_EVENT:
     default:
-        s_fExit = 1;
+        s_fExit = true;
         LOG(INFO) << "signal Other " << fdwCtrlType;
         Sleep(2000);
         return FALSE;
@@ -215,7 +215,7 @@ void InputWin32::ProcessInput()
 
     if (s_fCtrlC)
     {
-        s_fCtrlC = 0;
+        s_fCtrlC = false;
         PutInput('C' | K_CTRL);
     }
 

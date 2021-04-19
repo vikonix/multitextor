@@ -68,7 +68,7 @@ public:
     GotoDialog(size_t maxLine, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
     virtual bool OnClose(int id) override final;
 
-    size_t GetLine() { return std::stoull(m_line); }
+    size_t GetLine() { return static_cast<size_t>(std::stoull(m_line)); }
 };
 
 struct FindReplaceVars

@@ -29,7 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "Console/ConsoleScreen.h"
 
-#include "windows.h"
+#include <windows.h>
 
 namespace _Console
 {

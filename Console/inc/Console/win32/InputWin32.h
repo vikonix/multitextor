@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef WIN32
 
 #include "Console/ConsoleInput.h"
+
 #include <windows.h>
 
 #include <atomic>

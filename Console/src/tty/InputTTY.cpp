@@ -484,7 +484,7 @@ void InputTTY::ProcessInput(bool fMouse)
 #ifdef OLD_MOUSE
     if(iLen >= 6 && buff[0] == 0x1b && buff[1] == 0x5b && buff[2] == 0x4d)//"\x1b[M"
     {
-        //mouse input
+        //old mouse input
         pos_t x = buff[4] - 0x21;
         pos_t y = buff[5] - 0x21;
 

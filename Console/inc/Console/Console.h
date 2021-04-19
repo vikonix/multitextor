@@ -59,7 +59,7 @@ public:
         };
 #endif        
         return m_input.Init() 
-        && m_screen.Init();
+            && m_screen.Init();
     }
     
     void Deinit()

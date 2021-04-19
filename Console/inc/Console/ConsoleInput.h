@@ -127,7 +127,7 @@ class ConsoleInput : public InputBuffer
 friend class Console;
 
 protected:
-ResizeFunction m_ResizeCallback {nullptr};
+    ResizeFunction m_ResizeCallback {nullptr};
 
 public:
     static std::atomic_bool s_fExit;

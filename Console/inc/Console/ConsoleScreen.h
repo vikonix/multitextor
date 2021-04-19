@@ -195,7 +195,7 @@ protected:
     pos_t       m_posx {};
     pos_t       m_posy {};
     
-    char16_t  m_ACS[ACS_MAX] 
+    char16_t    m_ACS[ACS_MAX] 
     {
         0x20,   //0
         0x2500, //ACS_HLINE
