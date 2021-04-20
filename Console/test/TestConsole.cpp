@@ -63,6 +63,7 @@ void ConsoleTest()
     console.ClrScr();
     console.SetCursor(cursor_t::CURSOR_NORMAL);
     console.GotoXY(0, 0);
+    console.WriteStr(u"Press space for steps... ");
     waitKey();
 
     console.SetTextAttr(TEXT_BLUE);

@@ -79,28 +79,9 @@ bool ScreenWin32::Init()
     return true;
 }
 
-
-void ScreenWin32::Deinit()
-{
-    if(INVALID_HANDLE_VALUE == m_hStdout)
-        return;
-
-    if(m_savex <= MAX_COORD && m_savey <= MAX_COORD)
-    {
-        m_scrSizeX = m_savex;
-        m_scrSizeY = m_savey;
-
-        Resize();
-    }
-
-    CloseHandle(m_hStdout);
-    m_hStdout = INVALID_HANDLE_VALUE;
-}
-
-
 bool ScreenWin32::Resize()
 {
-    LOG(DEBUG) << "Resize x=" << m_scrSizeX << " y=" << m_scrSizeY;
+    LOG(DEBUG) << __FUNC__ << " x=" << m_scrSizeX << " y=" << m_scrSizeY;
     if (m_scrSizeX == 0 || m_scrSizeY == 0)
         return true;
 
@@ -143,7 +124,6 @@ bool ScreenWin32::Resize()
     return rc;
 }
 
-
 bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
 {
     m_scrSizeX = m_sizex = sizex;
@@ -151,6 +131,22 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
     return true;
 }
 
+void ScreenWin32::Deinit()
+{
+    if (INVALID_HANDLE_VALUE == m_hStdout)
+        return;
+
+    if (m_savex <= MAX_COORD && m_savey <= MAX_COORD)
+    {
+        m_scrSizeX = m_savex;
+        m_scrSizeY = m_savey;
+
+        Resize();
+    }
+
+    CloseHandle(m_hStdout);
+    m_hStdout = INVALID_HANDLE_VALUE;
+}
 
 bool ScreenWin32::WriteConsoleTitle(const std::string& title)
 {
@@ -160,13 +156,11 @@ bool ScreenWin32::WriteConsoleTitle(const std::string& title)
     return rc;
 }
 
-
 bool ScreenWin32::Beep()
 {
     bool rc = ::Beep(1200, 100);
     return rc;
 }
-
 
 bool ScreenWin32::WriteChar(char16_t wc)
 {
@@ -180,7 +174,6 @@ bool ScreenWin32::WriteChar(char16_t wc)
 
     return rc;
 }
-
 
 bool ScreenWin32::WriteStr(const std::u16string& str)
 {
@@ -201,7 +194,6 @@ bool ScreenWin32::WriteStr(const std::u16string& str)
     return rc;
 }
 
-
 bool ScreenWin32::GotoXY(pos_t x, pos_t y)
 {
     //LOG(DEBUG) << "GotoXY x=" << x << " y=" << y; 
@@ -213,7 +205,6 @@ bool ScreenWin32::GotoXY(pos_t x, pos_t y)
     bool rc = SetConsoleCursorPosition(m_hStdout, CurPos);
     return rc;
 }
-
 
 bool ScreenWin32::ClrScr()
 {
@@ -233,7 +224,6 @@ bool ScreenWin32::ClrScr()
 
     return rc;
 }
-
 
 bool ScreenWin32::SetCursor(cursor_t cursor)
 {
@@ -264,7 +254,6 @@ bool ScreenWin32::SetCursor(cursor_t cursor)
     return SetConsoleCursorInfo(m_hStdout, &cInfo);
 }
 
-
 bool ScreenWin32::SetTextAttr(color_t color)
 {
     if (INVALID_HANDLE_VALUE == m_hStdout)
@@ -277,7 +266,6 @@ bool ScreenWin32::SetTextAttr(color_t color)
     m_color = color;
     return SetConsoleTextAttribute(m_hStdout, color);
 }
-
 
 bool ScreenWin32::Left()
 {
@@ -293,7 +281,6 @@ bool ScreenWin32::Left()
     return rc;
 }
 
-
 bool ScreenWin32::Right()
 {
     if (INVALID_HANDLE_VALUE == m_hStdout)
@@ -307,7 +294,6 @@ bool ScreenWin32::Right()
 
     return rc;
 }
-
 
 bool ScreenWin32::Up()
 {
@@ -323,7 +309,6 @@ bool ScreenWin32::Up()
     return rc;
 }
 
-
 bool ScreenWin32::Down()
 {
     if (INVALID_HANDLE_VALUE == m_hStdout)
@@ -337,7 +322,6 @@ bool ScreenWin32::Down()
 
     return rc;
 }
-
 
 bool ScreenWin32::ScrollBlock(pos_t left, pos_t top, pos_t right, pos_t bottom,
     pos_t n, scroll_t mode, uint32_t* invalidate)
@@ -392,7 +376,6 @@ bool ScreenWin32::ScrollBlock(pos_t left, pos_t top, pos_t right, pos_t bottom,
   return rc;
 }
 
-
 bool ScreenWin32::WriteLastChar(char16_t prevC, char16_t lastC)
 {
     if (INVALID_HANDLE_VALUE == m_hStdout)
@@ -408,7 +391,6 @@ bool ScreenWin32::WriteLastChar(char16_t prevC, char16_t lastC)
 
     return rc;
 }
-
 
 bool ScreenWin32::WriteBlock(
     pos_t left, pos_t top, pos_t right, pos_t bottom,
