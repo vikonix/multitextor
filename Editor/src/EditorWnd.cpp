@@ -132,14 +132,14 @@ bool EditorWnd::Refresh()
 
 bool EditorWnd::UpdateAccessInfo()
 {
-    std::stringstream stream;
-    stream << "[ " << GetAccessInfo() << "]";
-    
     pos_t x = 0;
     if (m_border & BORDER_TOP)
         x += 2;
 
-    WriteWnd(x, 0, stream.str(), ColorWindowInfo);
+    std::string info{ "[  ]" };
+    info[2] = m_readOnly ? 'R' : GetAccessInfo();
+
+    WriteWnd(x, 0, info, ColorWindowInfo);
     return true;
 }
 

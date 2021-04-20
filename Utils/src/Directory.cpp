@@ -30,8 +30,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #ifdef WIN32
     #include <windows.h>
-    static const size_t c_BuffLen = 0x800;
     #include <io.h>
+
+static const size_t c_BuffLen{ 0x800 };
 #else
     #include <unistd.h>
 #endif
@@ -99,7 +100,7 @@ path_t Directory::TmpPath()
 path_t Directory::CfgPath()
 {
 #ifdef WIN32
-    return m_runPath;
+    return m_runPath;//???
 #else
     std::string path{ "/etc/" + m_projectName };
     if (std::filesystem::is_directory(path))
@@ -121,14 +122,14 @@ path_t Directory::SysCfgPath()
 #endif
 }
 
-path_t Directory::UserName()
+std::string Directory::UserName()
 {
 #ifdef WIN32
     TCHAR buff[c_BuffLen];
     DWORD len = c_BuffLen;
     [[maybe_unused]]bool rc = GetUserName(buff, &len);
     _assert(rc);
-    return buff;
+    return utf8::utf16to8(reinterpret_cast<char16_t*>(buff));
 #else
     const char* user = getenv("USER");
     if (!user || 0 == *user)
@@ -152,6 +153,37 @@ std::string Directory::CutPath(const path_t& path, size_t len)
     size_t offset = wstr.size() - (len - shortPath.u16string().size());
     shortPath += wstr.substr(offset, std::string::npos);
     return shortPath.u8string();
+}
+
+std::string Directory::GetFileInfo(const std::filesystem::file_time_type& ftime, const uintmax_t& size, size_t size_width)
+{
+    std::time_t cftime = to_time_t(ftime);
+    std::tm tm = *std::localtime(&cftime);
+
+    std::stringstream sinfo;
+    sinfo << std::put_time(&tm, "%d %b %Y %H:%M:%S");
+
+    if (size > 10 * 1024 * 1024) //10M
+    {
+        sinfo << std::setw(size_width - 1) << size / (1024 * 1024) << " MBytes";
+    }
+    else if (size > 100 * 1024) //100K
+    {
+        sinfo << std::setw(size_width - 1) << size / 1024 << " KBytes";
+    }
+    else
+    {
+        sinfo << std::setw(size_width) << size << " Bytes";
+    }
+
+    return sinfo.str();
+}
+
+std::string Directory::GetFileInfo(const path_t& path)
+{
+    auto ftime = std::filesystem::last_write_time(path);
+    auto size = std::filesystem::file_size(path);
+    return GetFileInfo(ftime, size);
 }
 
 fileaccess_t Directory::GetAccessMode(const path_t& path)

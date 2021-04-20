@@ -205,6 +205,11 @@ public:
 
     bool    IsMarked() { return IsSelectComplete(); }
     bool    IsChanged() { return m_editor->IsChanged(); }
+    bool    IsRO() { return m_readOnly; }
+    bool    SetRO(bool ro) { return m_readOnly = ro; }
+    bool    IsLog() { return m_log; }
+    bool    SetLog(bool log) { return m_log = log; }
+
     bool    EditWndCopy(EditorWnd* from);
     bool    EditWndMove(EditorWnd* from);
     bool    GetWord(std::u16string& buff);
@@ -213,13 +218,7 @@ public:
 /*
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
 
-  int       IsRO()                   {return m_fReadOnly;}
-  int       SetRO(int ro)            {return m_fReadOnly = ro;}
-  int       IsLog()                  {return m_fLog;}
-  int       SetLog(int log)          {return m_fLog = log;}
-
   int       IsUntitled()             {return m_fUntitled;}
-  int       IsMarked()               {return m_nSelectState;}
   long long GetSize()                {return m_pTBuff->GetSize();}
 
   int       SaveCfg(SSave* pSave);

@@ -57,8 +57,10 @@ public:
     static path_t   TmpPath();
     static path_t   CfgPath();
     static path_t   SysCfgPath();
-    static path_t   UserName();
+    static std::string UserName();
     static std::string CutPath(const path_t& path, size_t len);
+    static std::string GetFileInfo(const std::filesystem::file_time_type& ftime, const uintmax_t& size, size_t size_width = 8);
+    static std::string GetFileInfo(const path_t& path);
     static fileaccess_t GetAccessMode(const path_t& path);
 
     template<typename T>

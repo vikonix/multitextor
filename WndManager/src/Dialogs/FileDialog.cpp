@@ -65,7 +65,7 @@ std::list<control> fileDialog
 
     {CTRL_CHECK,                        "&Read only",   ID_OF_RO,       &FileDialog::s_vars.ro,    54, 15,  0,  0, "Open file as read only"},
     {CTRL_CHECK,                        "&Log file",    ID_OF_LOG,      &FileDialog::s_vars.log,   54, 16,  0,  0, "Open file that can grow"},
-    {CTRL_STATIC,                       "",             ID_OF_INFO,     {},                        20, 18, 34},
+    {CTRL_STATIC,                       "",             ID_OF_INFO,     {},                        20, 18, 33},
     {CTRL_LINE,                         "",             0,              {},                        54, 17, 13}
 };
 
@@ -202,30 +202,8 @@ input_t FileDialog::DialogProc(input_t code)
             if (item >= list.size())
                 return code;
             auto& info = list[item];
-            auto ftime = info.last_write_time();
-            std::time_t cftime = to_time_t(ftime);
-            std::tm tm = *std::localtime(&cftime);
 
-            std::stringstream sinfo;
-            sinfo << std::put_time(&tm, "%d %b %Y %H:%M:%S");
-
-            auto size = info.file_size();
-            if (size > 10 * 1024 * 1024)
-            {
-                auto s = size / (1024 * 1024);
-                sinfo << " " << std::setw(10) << s << "M";
-            }
-            else if (size > 100 * 1024)
-            {
-                auto s = size / 1024;
-                sinfo << " " << std::setw(10) << s << "K";
-            }
-            else
-            {
-                sinfo << " " << std::setw(11) << size;
-            }
-
-            GetItem(ID_OF_INFO)->SetName(sinfo.str());
+            GetItem(ID_OF_INFO)->SetName(Directory::GetFileInfo(info.last_write_time(), info.file_size(), 11));
 
             if (m_mode != FileDlgMode::SaveAs)
             {

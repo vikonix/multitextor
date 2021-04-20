@@ -574,8 +574,6 @@ bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
     if (n > m_totalStrCount)
         return false;
 
-    size_t _n = n;
-
     //LOG(DEBUG) << "AddStr n=" << n << " '" << str << "'";
 
     auto buff = GetBuff(n);
@@ -585,6 +583,8 @@ bool MemStrBuff<Tbuff, Tview>::AddStr(size_t n, const Tview str)
         return false;
     }
         
+    size_t _n = n;
+
     bool rc = (**buff)->AddStr(n, str);
     if (!rc)
     {
@@ -642,6 +642,7 @@ bool MemStrBuff<Tbuff, Tview>::ChangeStr(size_t n, const Tview str)
     auto buff = GetBuff(n);
     if (!buff)
         return false;
+
     size_t _n = n;
 
     bool rc = (**buff)->ChangeStr(n, str);

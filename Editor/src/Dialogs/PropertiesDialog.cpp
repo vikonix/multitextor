@@ -97,30 +97,7 @@ bool PropertiesDialog::OnActivate()
         GetItem(ID_DP_NAME)->SetName(path.filename().u8string());
     }
 
-    auto ftime = std::filesystem::last_write_time(path);
-    std::time_t cftime = to_time_t(ftime);
-    std::tm tm = *std::localtime(&cftime);
-
-    std::stringstream sinfo;
-    sinfo << std::put_time(&tm, "%d %b %Y %H:%M:%S");
-
-    auto size = std::filesystem::file_size(path);
-    if (size > 10 * 1024 * 1024)
-    {
-        auto s = size / (1024 * 1024);
-        sinfo << " " << std::setw(10) << s << "M";
-    }
-    else if (size > 100 * 1024)
-    {
-        auto s = size / 1024;
-        sinfo << " " << std::setw(10) << s << "K";
-    }
-    else
-    {
-        sinfo << " " << std::setw(11) << size;
-    }
-
-    GetItem(ID_DP_INFO)->SetName(sinfo.str());
+    GetItem(ID_DP_INFO)->SetName(Directory::GetFileInfo(path));
 
     auto ctrl = GetItem(ID_DP_TYPE);
     auto listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);

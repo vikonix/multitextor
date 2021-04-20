@@ -91,8 +91,12 @@ bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
 
             auto editor = std::make_shared<EditorWnd>();
             editor->Show(true, -1);
-            if(editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
+            if (editor->SetFileName(path, false, dlg.s_vars.typeName, dlg.s_vars.cpName))
+            {
+                editor->SetRO(dlg.s_vars.ro);
+                editor->SetLog(dlg.s_vars.log);
                 m_editors[editor.get()] = editor;
+            }
         }
         catch (const std::exception& ex)
         {

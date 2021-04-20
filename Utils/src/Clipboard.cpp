@@ -31,12 +31,12 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #ifdef WIN32
     #include <windows.h>
 
-    const std::u16string c_eol = u"\r\n";
+const std::u16string c_eol{ u"\r\n" };
 #else
     #include <filesystem>
 
     namespace fs = std::filesystem;
-    static const std::string s_clipFile = "/tmp/m.clp";
+    static const std::string s_clipFile{ "/tmp/m.clp" };
 #endif
 
 namespace _Utils
@@ -171,7 +171,7 @@ bool IsClipboardReady()
 #else
 
     std::error_code ec;
-    if (fs::is_regular_file(s_clipFile, ec))
+    if (fs::is_regular_file(s_clipFile, ec) && fs::file_size(s_clipFile, ec) > 0)
         return true;
     else
         return false;
