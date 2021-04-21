@@ -35,6 +35,28 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace _Console
 {
 
+//vintage color palette
+COLORREF ScreenWin32::s_colorPalette[16]
+{
+    //0x00bbggrr
+    0x000000,
+    0x800000,
+    0x008000,
+    0x808000,
+    0x000080,
+    0x800080,
+    0x008080,
+    0xc0c0c0,
+    0x808080,
+    0xff0000,
+    0x00ff00,
+    0xffff00,
+    0x0000ff,
+    0xff00ff,
+    0x00ffff,
+    0xffffff
+};
+
 bool ScreenWin32::Init()
 {
     if (INVALID_HANDLE_VALUE != m_hStdout)
@@ -50,17 +72,28 @@ bool ScreenWin32::Init()
         return false;
     }
 
-    CONSOLE_SCREEN_BUFFER_INFO sbInfo;
-    bool rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
+    m_saveInfoEx.cbSize = sizeof(m_saveInfoEx);
+    BOOL rc = GetConsoleScreenBufferInfoEx(m_hStdout, &m_saveInfoEx);
+    if (!rc)
+    {
+        LOG(ERROR) << "ERROR GetConsoleScreenBufferInfoEx err=" << GetLastError();
+        m_saveInfoEx.cbSize = 0;
+    }
+    else
+    {
+        CONSOLE_SCREEN_BUFFER_INFOEX info{ m_saveInfoEx };
+        std::memcpy(info.ColorTable, s_colorPalette, sizeof(m_saveInfoEx.ColorTable));
+        rc = SetConsoleScreenBufferInfoEx(m_hStdout, &info);
+        if (!rc)
+            LOG(ERROR) << "ERROR SetConsoleScreenBufferInfoEx err=" << GetLastError();
+    }
+
+    rc = GetConsoleScreenBufferInfo(m_hStdout, &m_saveInfo);
     if (!rc)
         LOG(ERROR) << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
 
-    m_savex = sbInfo.dwSize.X;
-    m_savey = sbInfo.dwSize.Y;
-
-    CONSOLE_CURSOR_INFO cInfo;
-    GetConsoleCursorInfo(m_hStdout, &cInfo);
-    LOG(INFO) << "cursor size=" << cInfo.dwSize << "%";
+    GetConsoleCursorInfo(m_hStdout, &m_saveCursor);
+    LOG(INFO) << "cursor size=" << m_saveCursor.dwSize << "%";
 
     return SetSize(MAX_COORD, MAX_COORD);
 }
@@ -73,7 +106,7 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
     LOG(DEBUG) << __FUNC__ << " x=" << sizex << " y=" << sizey;
 
     CONSOLE_SCREEN_BUFFER_INFO sbInfo;
-    bool rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
+    BOOL rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
     if(!rc)
         LOG(ERROR) << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
 
@@ -125,7 +158,16 @@ void ScreenWin32::Deinit()
         return;
 
     ClrScr();
-    SetSize(m_savex, m_savey);
+
+    [[maybe_unused]] BOOL rc;
+    if (m_saveInfoEx.cbSize != 0)
+    {
+        rc = SetConsoleScreenBufferInfoEx(m_hStdout, &m_saveInfoEx);
+    }
+    else
+    {
+        rc = SetConsoleScreenBufferSize(m_hStdout, m_saveInfo.dwSize);
+    }
 
     CloseHandle(m_hStdout);
     m_hStdout = INVALID_HANDLE_VALUE;

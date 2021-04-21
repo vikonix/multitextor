@@ -34,14 +34,37 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace _Console
 {
 
+enum class color_index
+{
+    black,
+    darkBlue,
+    darkGreen,
+    darkCyan,
+    darkRed,
+    darkMagenta,
+    darkYellow,
+    gray,
+    darkGray,
+    blue,
+    green,
+    cyan,
+    red,
+    magenta,
+    yellow,
+    white,
+};
+
 class ScreenWin32 final : public ConsoleScreen
 {
     HANDLE  m_hStdout { INVALID_HANDLE_VALUE };
-
-    pos_t   m_savex {0};
-    pos_t   m_savey {0};
+    CONSOLE_SCREEN_BUFFER_INFOEX    m_saveInfoEx{};
+    CONSOLE_SCREEN_BUFFER_INFO      m_saveInfo{};
+    CONSOLE_CURSOR_INFO             m_saveCursor{};
 
 public:
+    static COLORREF s_colorPalette[16];//0x00bbggrr
+
+
     ScreenWin32() = default;
     virtual ~ScreenWin32() override { Deinit(); }
 
