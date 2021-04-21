@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "utils/logger.h"
 #include "EditorApp.h"
+#include "Version.h"
 
 using namespace _Editor;
 
@@ -41,14 +42,11 @@ int main() try
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log");
     LOG(INFO);
-    LOG(INFO) << "Multitextor";
+    LOG(INFO) << EDITOR_NAME;
 
     app.Init();
-    WndManager::getInstance().SetScreenSize();
-
     app.SetLogo(g_logo);
-    app.WriteAppName("Multitextor");
-
+    app.WriteAppName(EDITOR_NAME);
     app.SetMenu(g_mainMenu);
     app.SetAccessMenu(g_accessMenu);
     app.SetCmdParser(g_defaultAppKeyMap);

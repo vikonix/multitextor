@@ -79,7 +79,6 @@ public:
 
     virtual bool Init() override;
     virtual void Deinit() override;
-    virtual bool Resize() override {return true;}
     virtual bool SetSize(pos_t sizex, pos_t sizey) override;
 
     virtual bool WriteConsoleTitle(const std::string& title) override;

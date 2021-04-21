@@ -68,8 +68,7 @@ public:
     bool SetScreenSize([[maybe_unused]]pos_t sizex, [[maybe_unused]] pos_t sizey)
     { 
 #ifdef WIN32        
-        m_screen.SetSize(sizex, sizey); 
-        return m_screen.Resize();
+        return m_screen.SetSize(sizex, sizey); 
 #else
         return true;
 #endif

@@ -37,8 +37,6 @@ namespace _Console
 class ScreenWin32 final : public ConsoleScreen
 {
     HANDLE  m_hStdout { INVALID_HANDLE_VALUE };
-    pos_t   m_scrSizeX {0};
-    pos_t   m_scrSizeY {0};
 
     pos_t   m_savex {0};
     pos_t   m_savey {0};
@@ -49,7 +47,6 @@ public:
 
     virtual bool Init() override;
     virtual void Deinit() override;
-    virtual bool Resize() override;
     virtual bool SetSize(pos_t sizex, pos_t sizey) override;
     
     virtual bool WriteConsoleTitle(const std::string& title) override;

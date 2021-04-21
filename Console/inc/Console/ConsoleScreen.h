@@ -223,7 +223,6 @@ public:
 
     virtual bool Init() = 0;
     virtual void Deinit() = 0;
-    virtual bool Resize() = 0;
     virtual bool SetSize(pos_t sizex, pos_t sizey) = 0;
 
     virtual bool WriteConsoleTitle(const std::string& title) = 0;
