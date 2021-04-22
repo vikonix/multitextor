@@ -196,23 +196,6 @@ void InputTTY::Deinit()
     LOG(DEBUG) << "Deinited";
 }
 
-bool InputTTY::SwitchToStdConsole()
-{
-    //DeinitMouse();
-    tcsetattr(m_stdin, TCSANOW, &m_termold);
-
-    return true;
-}
-
-
-bool InputTTY::RestoreConsole()
-{
-    //InitMouse();
-    tcsetattr(m_stdin, TCSANOW, &m_termnew);
-
-    return true;
-}
-
 
 //////////////////////////////////////////////////////////////////////////////
 void InputTTY::Abort(int signal)

@@ -53,15 +53,14 @@ bool InputWin32::Init()
         return false;
     }
 
-    DWORD dwModeIn;
-    if (!GetConsoleMode(m_hStdin,  &dwModeIn))
+    if (!GetConsoleMode(m_hStdin,  &m_saveMode))
     {
         LOG(ERROR) << "GetConsoleMode error" << GetLastError();
         Deinit();
         return false;
     }
 
-    dwModeIn = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
+    DWORD dwModeIn = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
     if (!SetConsoleMode(m_hStdin, dwModeIn))
     {
         LOG(ERROR) << "SetConsoleMode error" << GetLastError();
@@ -93,7 +92,6 @@ bool InputWin32::Init()
     return true;
 }
 
-
 void InputWin32::Deinit()
 {
     if (INVALID_HANDLE_VALUE == m_hStdin)
@@ -101,32 +99,6 @@ void InputWin32::Deinit()
 
     CloseHandle(m_hStdin);
     m_hStdin = INVALID_HANDLE_VALUE;
-}
-
-
-bool InputWin32::SwitchToStdConsole()
-{
-    return true;
-}
-
-
-bool InputWin32::RestoreConsole()
-{
-    DWORD dwModeIn;
-    if (!GetConsoleMode(m_hStdin, &dwModeIn))
-    {
-        LOG(ERROR) << "GetConsoleMode error" << GetLastError();
-        return false;
-    }
-
-    dwModeIn = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_PROCESSED_INPUT;
-    if (!SetConsoleMode(m_hStdin, dwModeIn))
-    {
-        LOG(ERROR) << "SetConsoleMode error" << GetLastError();
-        return false;
-    }
-
-    return true;
 }
 
 //////////////////////////////////////////////////////////////////////////////

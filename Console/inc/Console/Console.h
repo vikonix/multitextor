@@ -76,10 +76,6 @@ public:
 
     bool InputPending(const std::chrono::milliseconds& waitTime = 500ms)
         {return m_input.InputPending(waitTime);}
-    bool SwitchToStdConsole()
-        {return m_input.SwitchToStdConsole();}
-    bool RestoreConsole()
-        {return m_input.RestoreConsole();}
     bool PutInput(const input_t code)
         {return m_input.PutInput(code);}
     bool PutMacro(const input_t code)

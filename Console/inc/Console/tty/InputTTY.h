@@ -142,9 +142,6 @@ public:
     virtual void    Deinit() final;
     virtual bool    InputPending(const std::chrono::milliseconds& WaitTime = 500ms) override  final;
 
-    virtual bool    SwitchToStdConsole() override final;
-    virtual bool    RestoreConsole() override final;
-
 private:
     static void     Abort(int signal);
     static void     Resize(int signal);

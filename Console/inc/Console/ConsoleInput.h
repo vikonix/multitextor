@@ -136,9 +136,6 @@ public:
     virtual void Deinit() = 0;
     virtual bool InputPending(const std::chrono::milliseconds& WaitTime = 500ms) = 0;
 
-    virtual bool SwitchToStdConsole() = 0;
-    virtual bool RestoreConsole() = 0;
-
     static std::string CastKeyCode(input_t code);
 };
 

@@ -73,7 +73,7 @@ bool ScreenWin32::Init()
     }
 
     m_saveInfoEx.cbSize = sizeof(m_saveInfoEx);
-    BOOL rc = GetConsoleScreenBufferInfoEx(m_hStdout, &m_saveInfoEx);
+    bool rc = GetConsoleScreenBufferInfoEx(m_hStdout, &m_saveInfoEx);
     if (!rc)
     {
         LOG(ERROR) << "ERROR GetConsoleScreenBufferInfoEx err=" << GetLastError();
@@ -106,7 +106,7 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
     LOG(DEBUG) << __FUNC__ << " x=" << sizex << " y=" << sizey;
 
     CONSOLE_SCREEN_BUFFER_INFO sbInfo;
-    BOOL rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
+    bool rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
     if(!rc)
         LOG(ERROR) << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
 
@@ -159,7 +159,7 @@ void ScreenWin32::Deinit()
 
     ClrScr();
 
-    [[maybe_unused]] BOOL rc;
+    [[maybe_unused]] bool rc;
     if (m_saveInfoEx.cbSize != 0)
     {
         rc = SetConsoleScreenBufferInfoEx(m_hStdout, &m_saveInfoEx);
@@ -195,7 +195,7 @@ bool ScreenWin32::WriteChar(char16_t wc)
     wchar_t c = (wc < ACS_MAX) ? m_ACS[wc] : wc;
 
     DWORD written;
-    int rc = WriteConsole(m_hStdout, &c, 1, &written, NULL);
+    bool rc = WriteConsole(m_hStdout, &c, 1, &written, NULL);
 
     return rc;
 }

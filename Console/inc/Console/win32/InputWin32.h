@@ -40,6 +40,7 @@ namespace _Console
 class InputWin32 final : public ConsoleInput
 {
     HANDLE  m_hStdin { INVALID_HANDLE_VALUE };
+    DWORD   m_saveMode{};
     HWND    m_hWnd { NULL };
     cp_t    m_ioCP {0};
     
@@ -61,9 +62,6 @@ public:
     virtual bool Init() override final;
     virtual void Deinit() override  final;
     virtual bool InputPending(const std::chrono::milliseconds& WaitTime = 500ms) override  final;
-
-    virtual bool SwitchToStdConsole() override final;
-    virtual bool RestoreConsole() override final;
 
 protected:
     static BOOL InputWin32::CtrlHandler(DWORD fdwCtrlType);
