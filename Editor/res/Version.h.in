@@ -26,8 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#define EDITOR_NAME     "Multitextor"
-#define EDITOR_NAME_C   "&M&u&l&t&i&t&e&x&t&o&r"
-#define EDITOR_VERSION  "2.0.0 MVP (alpha)"
+#define EDITOR_NAME     "@PRODUCT_NAME@"
+#define EDITOR_NAME_C   "@PRODUCT_NAME_COLOR@"
+#define EDITOR_VERSION  "@PRODUCT_VERSION_FULL@"
 #define COPYRIGHT_YEAR  "2020-2021"
-#define COPYRIGTH_OWNER "vikonix"
+#define COPYRIGTH_OWNER "Vikonix"

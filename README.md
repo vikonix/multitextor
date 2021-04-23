@@ -1,8 +1,24 @@
 # Multitextor
 Cross Platform console mode library and text editor.
 
-This project is attempt of recreating my old text editor.
+This project is fully recreated version of my old text editor.
 
+## Key features:
+- Simple interface same in difference environments
+- Multi-window
+- Customizable
+- Clear working with different text code pages
+- Big files editing over 4 GBytes (with small memory using)
+- Deep Undo/Redo
+
+Not MVP (not implemented now):
+- Backup files
+- Searching in on disk files
+- Random access bookmarks
+- Editor session saving/restoring
+- Customisable syntax higlighting
+- Build-in file comparing mode
+ 
 ## Tested on:
  - Windows 7 - Microsoft Visual Studio Community 2017
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017

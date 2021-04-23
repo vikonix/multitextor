@@ -42,7 +42,7 @@ int main() try
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log");
     LOG(INFO);
-    LOG(INFO) << EDITOR_NAME;
+    LOG(INFO) << EDITOR_NAME << "-" << EDITOR_VERSION;
 
     app.Init();
     app.SetLogo(g_logo);
@@ -54,7 +54,6 @@ int main() try
     
     app.Refresh();
     app.MainProc(K_EXIT);
-
     app.Deinit();
 
     LOG(INFO) << "Exit";

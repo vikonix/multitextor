@@ -198,7 +198,7 @@ bool    EditorApp::PlayMacroProc([[maybe_unused]] input_t cmd)
 bool    EditorApp::AboutProc([[maybe_unused]] input_t cmd)
 {
     MsgBox(MBoxKey::OK, "About",
-        { EDITOR_NAME_C " Version " EDITOR_VERSION,
+        { EDITOR_NAME_C " Version: " EDITOR_VERSION,
         "Cross-platform text editor",
         "",
         "https://github.com/vikonix/multitextor",
