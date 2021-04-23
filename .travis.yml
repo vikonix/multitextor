@@ -38,5 +38,3 @@ jobs:
       dist: focal
     - os: windows
       dist: server-2016
-    - os: osx
-      osx_image: xcode12.2
