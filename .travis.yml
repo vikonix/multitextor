@@ -4,7 +4,6 @@ dist: focal
 os:
   - linux
   - windows
-  - osx
 
 compiler:
   - gcc
