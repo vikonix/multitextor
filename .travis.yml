@@ -40,4 +40,4 @@ jobs:
     - os: windows
       dist: server-2016
     - os: osx
-      osx_image: xcode11  
+      osx_image: xcode11.4
