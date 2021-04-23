@@ -4,6 +4,7 @@ dist: focal
 os:
   - linux
   - windows
+  - osx
 
 compiler:
   - gcc
@@ -27,7 +28,7 @@ script:
         "windows")
           cmake --build . --target ALL_BUILD --config Release
           ;;
-        "linux")
+        "linux"|"osx")
           make
           ;;
       esac
@@ -38,3 +39,5 @@ jobs:
       dist: focal
     - os: windows
       dist: server-2016
+    - os: osx
+      osx_image: xcode9.4  

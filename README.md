@@ -1,7 +1,7 @@
 # Multitextor
 Cross Platform console mode library and text editor.
 
-This project is fully recreated version of my old text editor.
+This project is mostly recreated version of my old text editor.
 
 ## Key features:
 - Simple interface same in difference environments
@@ -41,10 +41,10 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  
 ## Used third-party libraries:
  - easyloggingpp
- - termdb
+ - termdb (not used)
  - utfcpp
  - win-iconv
- - iconv
+ - iconv (optional)
  
 ## In progress:
  - Editor MVP alpha version.
