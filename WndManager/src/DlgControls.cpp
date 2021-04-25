@@ -247,7 +247,7 @@ bool CtrlCheck::Refresh(CtrlState state)
 
 input_t CtrlCheck::EventProc(input_t code)
 {
-    if(code == K_SPACE || code == K_ENTER)
+    if(code == K_SPACE)
     {
         m_checked = !m_checked;
         Refresh(CTRL_SELECTED);
@@ -1004,7 +1004,7 @@ input_t CtrlDropList::EventProc(input_t code)
     if(m_listOpened)
         code = m_list.EventProc(code);
 
-    if(!m_listOpened && (code == K_DOWN || code == K_ENTER || code == K_SPACE))
+    if(!m_listOpened && (code == K_DOWN || code == K_SPACE))
     {
         m_listOpened = true;
         m_dcursorx = m_list.m_dcursorx;

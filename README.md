@@ -3,10 +3,13 @@ Cross Platform console mode library and text editor.
 
 This project is mostly recreated version of my old text editor.
 
+## In progress:
+- Editor MVP alpha version.
+ 
 ## Key features:
-- Simple interface same in difference environments
+- Simple interface same in different environments
 - Multi-window
-- Customizable
+- Split view mode with 2 panels
 - Clear working with different text code pages
 - Big files editing over 4 GBytes (with small memory using)
 - Deep Undo/Redo
@@ -16,12 +19,13 @@ Not MVP (not implemented now):
 - Searching in on disk files
 - Random access bookmarks
 - Editor session saving/restoring
-- Customisable syntax higlighting
+- Customizable interface and key commands
+- Customizable syntax highlighting
 - Build-in file comparing mode
  
 ## Tested on:
- - Windows 7 - Microsoft Visual Studio Community 2017
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
+ - Windows 7 - Microsoft Visual Studio Community 2017
  - Linux Ubuntu 20.04 - gcc version 9.3.0
  - Armbian Focal OrangePI 4
 
@@ -47,5 +51,3 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  - win-iconv
  - iconv (optional)
  
-## In progress:
- - Editor MVP alpha version.

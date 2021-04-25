@@ -64,7 +64,7 @@ std::list<control> fileDialog
     {CTRL_DROPLIST,                     "",             ID_OF_CP,       &FileDialog::s_vars.cp,    54, 13, 13,  6, "Select file code page"},
 
     {CTRL_CHECK,                        "&Read only",   ID_OF_RO,       &FileDialog::s_vars.ro,    54, 15,  0,  0, "Open file as read only"},
-    {CTRL_CHECK,                        "&Log file",    ID_OF_LOG,      &FileDialog::s_vars.log,   54, 16,  0,  0, "Open file that can grow"},
+    {CTRL_DISABLED|CTRL_CHECK,                        "&Log file",    ID_OF_LOG,      &FileDialog::s_vars.log,   54, 16,  0,  0, "Open file that can grow"},
     {CTRL_STATIC,                       "",             ID_OF_INFO,     {},                        20, 18, 33},
     {CTRL_LINE,                         "",             0,              {},                        54, 17, 13}
 };

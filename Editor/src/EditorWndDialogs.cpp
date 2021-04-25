@@ -143,17 +143,16 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
 {
+    PropertiesDialog::s_vars.ro       = m_readOnly;
+    PropertiesDialog::s_vars.log      = m_log;
+    PropertiesDialog::s_vars.cpName   = m_editor->GetCP();
+    PropertiesDialog::s_vars.eol      = static_cast<size_t>(m_editor->GetEol());
+    PropertiesDialog::s_vars.tabSize  = m_editor->GetTab();
+    PropertiesDialog::s_vars.saveTab  = m_editor->GetSaveTab();
+    PropertiesDialog::s_vars.showTab  = m_editor->GetShowTab();
+    PropertiesDialog::s_vars.typeName = m_editor->GetParseStyle();
+
     PropertiesDialog dlg;
-
-    dlg.s_vars.ro       = m_readOnly;
-    dlg.s_vars.log      = m_log;
-    dlg.s_vars.cpName   = m_editor->GetCP();
-    dlg.s_vars.eol      = static_cast<size_t>(m_editor->GetEol());
-    dlg.s_vars.tabSize  = m_editor->GetTab();
-    dlg.s_vars.saveTab  = m_editor->GetSaveTab();
-    dlg.s_vars.showTab  = m_editor->GetShowTab();
-    dlg.s_vars.typeName = m_editor->GetParseStyle();
-
     auto ret = dlg.Activate();
     if (ret == ID_OK)
     {
