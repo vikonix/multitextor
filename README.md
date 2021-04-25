@@ -23,6 +23,7 @@ Not MVP (not implemented now):
  - Windows 7 - Microsoft Visual Studio Community 2017
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Linux Ubuntu 20.04 - gcc version 9.3.0
+ - Armbian Focal OrangePI 4
 
 Need compiler with C++ 0x17 full support.
 

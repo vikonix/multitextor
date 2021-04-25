@@ -713,9 +713,9 @@ input_t EditorWnd::ParseCommand(input_t cmd)
                     if (m_selectState == select_state::begin)
                     {
                         if (0 != (cmd & K_CTRL))
-                            m_selectType = select_t::line;
-                        else if (0 != (cmd & K_SHIFT))
                             m_selectType = select_t::column;
+                        else if (0 != (cmd & K_SHIFT))
+                            m_selectType = select_t::line;
                     }
                 }
             }

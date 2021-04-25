@@ -508,23 +508,40 @@ void InputTTY::ProcessInput(bool fMouse)
         {
             --x;
             --y;
-            //LOG(DEBUG) << "Mouse input k=" << k << " m=" << m << " x=" << x << " y=" << y;
+            //LOG(DEBUG) << "Mouse input k=0x" << std::hex << k << std::dec << " m=" << m << " x=" << x << " y=" << y;
             
-            input_t key;
-            switch(k)
+            input_t key{K_ERROR};
+            input_t iMType{};
+            
+            if(m == 'm')
+                key = K_MOUSEKUP;
+            else
             {
-            case 0:  key = m == 'M' ? K_MOUSEKL : K_MOUSEKUP; break;
-            case 1:  key = m == 'M' ? K_MOUSEKM : K_MOUSEKUP; break;
-            case 2:  key = m == 'M' ? K_MOUSEKR : K_MOUSEKUP; break;
-            case 64: key = K_MOUSEWUP | K_MOUSEW; break;
-            case 65: key = K_MOUSEWDN | K_MOUSEW; break;
-            case 32: key = K_MOUSEKL; break;
-            case 33: key = K_MOUSEKM; break;
-            case 34: key = K_MOUSEKR; break;
-            default: key = K_ERROR; break;
+                if(k & 0x40)
+                {
+                    //wheel
+                    if(k == 0x40)
+                        key = K_MOUSEWUP | K_MOUSEW;
+                    if(k == 0x41 )
+                        key = K_MOUSEWDN | K_MOUSEW;
+                }
+                else
+                {
+                    switch(k & 0x3)
+                    {
+                    case 0:  key = K_MOUSEKL; break;
+                    case 1:  key = K_MOUSEKM; break;
+                    case 2:
+                    case 3:  key = K_MOUSEKR; break;
+                    }
+                    if(k & 0x10)
+                        iKeyMode |= K_CTRL;
+                    if(k & 0x8)
+                        iKeyMode |= K_ALT;
+                    if(k & 0x4)
+                        iKeyMode |= K_SHIFT;
+                }
             }
-
-            input_t iMType = 0;
 
             if((k & K_MOUSEW) == 0)
                 iMType = ProcessMouse(x, y, key);

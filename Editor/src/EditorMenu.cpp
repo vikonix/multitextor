@@ -74,10 +74,7 @@ menu_list g_replaceMenu
     {MENU_ITEM, "&Prev"},
     {MENU_ITEM, "&Next"},
     {MENU_ITEM, "&All"},
-    //{MENU_ITEM, "& "},
-    //{MENU_ITEM, "& "},
-    //{MENU_ITEM, "& "},
-    //{MENU_ITEM, "& "},
+
     {MENU_ITEM, "& "},
     {MENU_ITEM, "&Quit Rep"},
     {MENU_ITEM, "lace"}
@@ -91,11 +88,11 @@ static menu_list menuFile
     {MENU_ITEM,         "&Reload",                      K_ED(E_CTRL_RELOAD),        "Reload current file"},
     {MENU_ITEM,         "&Close",                       K_ED(E_CTRL_CLOSE),         "Close current file"},
     {MENU_SEPARATOR},
-    {MENU_ITEM,         "Sa&ve",                        K_ED(E_CTRL_SAVE),          "Save current file"},
+    {MENU_ITEM,         "&Save",                        K_ED(E_CTRL_SAVE),          "Save current file"},
     {MENU_ITEM,         "Save &As...",                  K_ED(E_CTRL_SAVEAS),        "Save file as"},
-    {MENU_ITEM,         "&Save All",                    K_APP_SAVE_ALL,             "Save all changed files"},
+    {MENU_ITEM,         "Save A&ll",                    K_APP_SAVE_ALL,             "Save all changed files"},
     {MENU_SEPARATOR},
-    {MENU_ITEM,         "Proper&ties...",               K_ED(E_CTRL_PROPERTIES),    "Get file properties"},
+    {MENU_ITEM,         "&Properties...",               K_ED(E_CTRL_PROPERTIES),    "Get file properties"},
     {MENU_SEPARATOR},
 //    {MENU_ITEM,         "Ne&w Session...",              K_APP_NEW_SESSION,          "Create new session"},
 //    {MENU_ITEM,         "O&pen Session...",             K_APP_OPEN_SESSION,         "Open existing session"},
@@ -149,7 +146,7 @@ static menu_list menuSearch
     {MENU_ITEM,         "Find Again &Down",             K_ED(E_CTRL_FINDDN),        "Repeat last find down"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "Current Word U&p",             K_ED(E_CTRL_FINDUPW),       "Get word under the cursor and find up"},
-    {MENU_ITEM,         "Current Word D&own",           K_ED(E_CTRL_FINDDNW),       "Get word under the cursor and find down"},
+    {MENU_ITEM,         "Current Word Dow&n",           K_ED(E_CTRL_FINDDNW),       "Get word under the cursor and find down"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "&Goto Line...",                K_ED(E_DLG_GOTO),           "Go to line number"},
 //    {MENU_SEPARATOR},
@@ -230,10 +227,10 @@ menu_list menuMain
 {
     {MENU_ITEM,         "&File",     K_MENU + 1},
     {MENU_ITEM,         "&Edit",     K_MENU + 2},
-    {MENU_ITEM,         "Bloc&k",    K_MENU + 3},
+    {MENU_ITEM,         "&Block",    K_MENU + 3},
     {MENU_ITEM,         "&Search",   K_MENU + 4},
     {MENU_ITEM,         "&Tools",    K_MENU + 5},
-    {MENU_ITEM,         "Windo&ws",  K_MENU + 7},
+    {MENU_ITEM,         "&Windows",  K_MENU + 7},
     {MENU_ITEM,         "&Help",     K_MENU + 8}
 };
 
@@ -243,7 +240,7 @@ menu_list g_popupMenu
     {MENU_ITEM,       "&Window List...",    K_APP_WND_LIST,         "Open windows list"},
     {MENU_ITEM,       "&Properties...",     K_ED(E_CTRL_PROPERTIES),"Get file properties"},
     {MENU_SEPARATOR},
-    {MENU_ITEM,       "Cu&t",               K_ED(E_EDIT_CB_CUT),    "Cut selected text to clipboard"},
+    {MENU_ITEM,       "C&ut",               K_ED(E_EDIT_CB_CUT),    "Cut selected text to clipboard"},
     {MENU_ITEM,       "&Copy",              K_ED(E_EDIT_CB_COPY),   "Copy selected text to clipboard"},
     {MENU_ITEM,       "P&aste",             K_ED(E_EDIT_CB_PASTE),  "Paste text from clipboard"}
 };
