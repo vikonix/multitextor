@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/Dialog.h"
 
 #include <map>
+#include <set>
 
 using namespace _WndManager;
 
@@ -73,8 +74,8 @@ public:
 
 struct FindReplaceVars
 {
-    std::list<std::string>  findList;
-    std::list<std::string>  replaceList;
+    std::set<std::string>  findList;
+    std::set<std::string>  replaceList;
 
     std::string     findStr;
     std::string     replaceStr;
@@ -83,9 +84,10 @@ struct FindReplaceVars
 
     bool            checkCase{};
     bool            directionUp{};
-    bool            replaceMode{};
     bool            inSelected{};
     bool            findWord{};
+
+    bool            replaceMode{};
     bool            noPrompt{};
 };
 

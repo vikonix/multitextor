@@ -225,8 +225,7 @@ CmdMap g_defaultEditKeyMap
 
     {'E' | K_CTRL},             {K_ED(E_CTRL_PROPERTIES)},
 
-    {'J' | K_CTRL},             {K_ED(E_CTRL_FUNC_LIST)},
-//???    {'M' | K_CTRL},             {K_ED(E_CTRL_CHANGE_CP)},
+    {'J' | K_CTRL},             {K_ED(E_CTRL_FUNC_LIST)}
 };
 
 std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap 
@@ -299,7 +298,6 @@ std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select
     {E_MOVE_LEX_MATCH,      {&EditorWnd::MoveLexMatch,           EditorWnd::select_state::begin}},
     {E_CTRL_FUNC_LIST,      {&EditorWnd::CtrlFuncList,           EditorWnd::select_state::end}},
     {E_CTRL_PROPERTIES,     {&EditorWnd::CtrlProperties,         EditorWnd::select_state::end}},
-    {E_CTRL_CHANGE_CP,      {&EditorWnd::CtrlChangeCP,           EditorWnd::select_state::no}},
     {E_POPUP_MENU,          {&EditorWnd::TrackPopupMenu,         EditorWnd::select_state::end}}
 };
 
@@ -465,7 +463,6 @@ std::unordered_map<input_t, std::string> g_CmdNames
     { K_ED(E_MOVE_LEX_MATCH),       "EDIT_MOVE_BRACKET_MATCH"},
     { K_ED(E_CTRL_FUNC_LIST),       "EDIT_DLG_FUNC_LIST"},
     { K_ED(E_CTRL_PROPERTIES),      "EDIT_DLG_PROPERTIES"},
-    { K_ED(E_CTRL_CHANGE_CP),       "EDIT_CTRL_CHANGE_CP"},
     { K_ED(E_POPUP_MENU),           "EDIT_POPUP_MENU"},
 
     //Editor additional

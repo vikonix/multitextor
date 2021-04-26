@@ -134,7 +134,7 @@ size_t WindowListDialog::GetWndList(bool skip)
         if (m_mode == WindowsDlgMode::List || m_mode == WindowsDlgMode::CompareWith || edWnd->IsMarked())
         {
             auto path = wnd->GetFilePath();
-            auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX());
+            auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX() - 2);
             if (active.empty())
                 active = shortPath;
             m_wndList[shortPath] = edWnd;

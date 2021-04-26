@@ -88,32 +88,31 @@ bool FindDialog::OnActivate()
     auto editor = dynamic_cast<EditorWnd*>(wnd);
     
     std::u16string curWord;
-    if (editor->GetWord(curWord))
+    bool cur = editor->GetWord(curWord);
+    auto word = utf8::utf16to8(curWord);
+
+    auto seach = GetItem(ID_FF_SEARCH);
+    auto ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
+    if (ctrlSearch)
     {
-        auto word = utf8::utf16to8(curWord);
-        auto seach = GetItem(ID_FF_SEARCH);
-        auto ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
+        if(cur)
+            ctrlSearch->AppendStr(word);
+        for(auto& str : s_vars.findList)
+            if(str != word)
+                ctrlSearch->AppendStr(str);
+    }
+
+    if (m_replace)
+    {
+        seach = GetItem(ID_FF_REPLACE);
+        ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
         if (ctrlSearch)
         {
-            for(auto& str : s_vars.findList)
-                ctrlSearch->AppendStr(str);
-            auto firstWord = ctrlSearch->GetStr(0);
-            if (firstWord != word)
-                ctrlSearch->AddStr(0, word);
-        }
-
-        if (m_replace)
-        {
-            seach = GetItem(ID_FF_REPLACE);
-            ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
-            if (ctrlSearch)
-            {
-                for (auto& str : s_vars.replaceList)
+            if (cur)
+                ctrlSearch->AppendStr(word);
+            for (auto& str : s_vars.replaceList)
+                if (str != word)
                     ctrlSearch->AppendStr(str);
-                auto firstWord = ctrlSearch->GetStr(0);
-                if (firstWord != word)
-                    ctrlSearch->AddStr(0, word);
-            }
         }
     }
 
@@ -170,8 +169,13 @@ bool FindDialog::OnClose(int id)
 
             size_t n = ctrlSearch->GetStrCount();
             s_vars.findList.clear();
-            for (size_t i = 0; i < n && i < 16; ++i)
-                s_vars.findList.emplace_back(ctrlSearch->GetStr(i));
+            for (size_t i = 0; i < n && i < 16; ++i) try
+            {
+                s_vars.findList.emplace(ctrlSearch->GetStr(i));
+            }
+            catch (...)
+            {
+            }
         }
         
         if (m_replace)
@@ -192,8 +196,13 @@ bool FindDialog::OnClose(int id)
 
                 size_t n = ctrlSearch->GetStrCount();
                 s_vars.replaceList.clear();
-                for (size_t i = 0; i < n && i < 16; ++i)
-                    s_vars.replaceList.emplace_back(ctrlSearch->GetStr(i));
+                for (size_t i = 0; i < n && i < 16; ++i) try
+                {
+                    s_vars.replaceList.emplace(ctrlSearch->GetStr(i));
+                }
+                catch (...)
+                {
+                }
             }
         }
     }

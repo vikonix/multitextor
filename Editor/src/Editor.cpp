@@ -442,6 +442,47 @@ std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
     return outstr;
 }
 
+std::u16string Editor::GetStrForFind(size_t line, bool checkCase)
+{
+    if (line >= m_buffer.GetStrCount())
+            return {};
+
+    auto str{ m_buffer.GetStr(line) };
+    std::u16string wstr;
+    [[maybe_unused]] bool rc = m_converter->Convert(str, wstr);
+    std::u16string outstr;
+    outstr.resize(wstr.size(), ' ');
+
+    //go from begin of string for right tabulation calculating 
+    size_t pos{ 0 };
+    for (auto c : wstr)
+    {
+        if (c > ' ')
+        {
+            if(checkCase)
+                outstr[pos] = c;
+            else
+                outstr[pos] = std::towupper(c);
+        }
+        if (c == S_TAB)
+        {
+            size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
+            outstr.resize(outstr.size() + tabpos, ' ');
+
+            pos = tabpos;
+        }
+        else if (c == S_CR || c == S_LF || c == S_EOF)//cr/lf/eof
+            break;
+        else
+            ++pos;
+    }
+
+    m_buffer.ReleaseBuff();
+
+    return outstr;
+}
+
+
 bool Editor::ConvertStr(const std::u16string& str, std::string& buff) const
 {
     size_t len = UStrLen(str);

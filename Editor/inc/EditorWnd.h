@@ -299,7 +299,6 @@ public:
     bool MoveLexMatch(input_t cmd);
     bool CtrlFuncList(input_t cmd);
     bool CtrlProperties(input_t cmd);
-    bool CtrlChangeCP(input_t cmd);
     bool TrackPopupMenu(input_t cmd);
 };
 

@@ -41,7 +41,7 @@ namespace _Editor
 
 bool EditorWnd::SetFileName(const std::filesystem::path& file, bool untitled, const std::string& parseMode, const std::string& cp)
 {
-    LOG(DEBUG) << "    SetFileName '" << file.u8string() << "'";
+    //LOG(DEBUG) << "    SetFileName '" << file.u8string() << "'";
 
     m_untitled = untitled;
     auto editor = std::make_shared<Editor>(file, parseMode, cp);
@@ -748,7 +748,7 @@ input_t EditorWnd::ParseCommand(input_t cmd)
 
         if (m_selectMouse)
         {
-            LOG(DEBUG) << "Mouse select for " << ecmd;
+            //LOG(DEBUG) << "Mouse select for " << ecmd;
             if (ecmd == E_SELECT_MODE)
             {
                 m_selectMouse = false;
@@ -795,7 +795,7 @@ bool EditorWnd::HideFound()
     bool rc = true;
     if (m_lexX >= 0 && m_lexY >= 0)
     {
-        LOG(DEBUG) << "    HideLex x=" << m_lexX << " y=" << m_lexY;
+        //LOG(DEBUG) << "    HideLex x=" << m_lexX << " y=" << m_lexY;
         if ( static_cast<size_t>(m_lexY) >= m_firstLine && static_cast<size_t>(m_lexY) < m_firstLine + m_clientSizeY
           && static_cast<size_t>(m_lexX) >= m_xOffset   && static_cast<size_t>(m_lexX) < m_xOffset + m_clientSizeX)
         {
@@ -810,7 +810,7 @@ bool EditorWnd::HideFound()
 
     if (m_foundSize)
     {
-        LOG(DEBUG) << "    HideFound x=" << m_foundX << " y=" << m_foundY << " size=" << m_foundSize;
+        //LOG(DEBUG) << "    HideFound x=" << m_foundX << " y=" << m_foundY << " size=" << m_foundSize;
         size_t size = m_foundSize;
         m_foundSize = 0;
 
@@ -883,7 +883,7 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
     if (m_selectState != select_state::complete)
         return true;
 
-    LOG(DEBUG) << "    ChangeSelected type=" << static_cast<int>(type);
+    //LOG(DEBUG) << "    ChangeSelected type=" << static_cast<int>(type);
     CorrectSelection();
 
     switch (type)
@@ -960,7 +960,7 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
             m_beginY = m_endY = 0;
             m_selectType = select_t::stream;
             m_selectState = select_state::no;
-            LOG(DEBUG) << "End mark";
+            //LOG(DEBUG) << "End mark";
         }
         else
         {
@@ -997,7 +997,7 @@ bool EditorWnd::ChangeSelected(select_change type, size_t line, size_t pos, size
                 m_selectType = select_t::stream;
                 m_selectState = select_state::no;
                 InvalidateRect();
-                LOG(DEBUG) << "End mark";
+                //LOG(DEBUG) << "End mark";
             }
             else
             {
@@ -1337,7 +1337,7 @@ bool EditorWnd::DelSelected()
 
         if (type == select_line::end)
         {
-            LOG(DEBUG) << "     Del first line dy=" << m_beginY;
+            //LOG(DEBUG) << "     Del first line dy=" << m_beginY;
             dy = 1;
             rc = m_editor->DelEnd(save, m_beginY, bx);
             auto str = m_editor->GetStr(m_beginY + n, m_endX + 1);
@@ -1345,13 +1345,13 @@ bool EditorWnd::DelSelected()
         }
         else if (type != select_line::substr)
         {
-            LOG(DEBUG) << "     Del line dy=" << m_beginY + dy;
+            //LOG(DEBUG) << "     Del line dy=" << m_beginY + dy;
             //del full line
             rc = m_editor->DelLine(save, m_beginY + dy);
         }
         else
         {
-            LOG(DEBUG) << "     Del substr dx=" << bx << " dy=" << srcY;
+            //LOG(DEBUG) << "     Del substr dx=" << bx << " dy=" << srcY;
             //change line
             rc = m_editor->DelSubstr(save, srcY, bx, size);
         }
@@ -1606,23 +1606,17 @@ bool EditorWnd::FindUp(bool silence)
         }
     }
 
+    m_editor->FlushCurStr();
+
     size_t begin{ line };
     size_t progress{};
     bool userBreak{};
     while (line >= end)
     {
-        auto str = m_editor->GetStr(line);
-        if (offset > str.size())
+        auto str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase);
+        if (0 != offset && offset > str.size())
         {
             offset = str.size();
-        }
-
-        for (auto it = str.begin(); it < str.end(); ++it)
-        {
-            if (*it == S_TAB)
-                *it = ' ';
-            else if (!FindDialog::s_vars.checkCase)
-                *it = std::towupper(*it);
         }
 
         auto itBegin = offset ? std::next(str.rbegin(), str.size() - offset) : str.rbegin();
@@ -1722,25 +1716,19 @@ bool EditorWnd::FindDown(bool silence)
     else
         ++offset;
 
+    m_editor->FlushCurStr();
+
     size_t begin{ line };
     size_t progress{};
     bool userBreak{};
     while (line < end)
     {
-        auto str = m_editor->GetStr(line);
-        if (offset > str.size())
+        auto str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase);
+        if (0 != offset && offset > str.size())
         {
             offset = 0;
             ++line;
             continue;
-        }
-
-        for (auto it = str.begin(); it < str.end(); ++it)
-        {
-            if (*it == S_TAB)
-                *it = ' ';
-            else if (!FindDialog::s_vars.checkCase)
-                *it = std::towupper(*it);
         }
 
         auto itBegin = offset ? std::next(str.begin(), offset) : str.begin();
@@ -1904,7 +1892,7 @@ bool EditorWnd::EditWndMove(EditorWnd* from)
 
 Wnd* EditorWnd::CloneWnd()
 {
-    LOG(DEBUG) << "CloneWnd";
+    //LOG(DEBUG) << "CloneWnd";
 
     m_clonedWnd = std::make_shared<EditorWnd>();
     EditorWnd* wnd = m_clonedWnd.get();

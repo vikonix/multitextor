@@ -42,7 +42,7 @@ bool EditorWnd::EditC(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditC " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditC " << std::hex << cmd << std::dec;
     EditBlockDel(cmd);
 
     char16_t c = K_GET_CODE(cmd);
@@ -74,7 +74,7 @@ bool EditorWnd::EditDelC(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditDelC " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditDelC " << std::hex << cmd << std::dec;
     if (m_selectState == select_state::complete)
     {
         EditBlockDel(cmd);
@@ -126,7 +126,7 @@ bool EditorWnd::EditBS(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditBS " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditBS " << std::hex << cmd << std::dec;
 
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
@@ -183,7 +183,7 @@ bool EditorWnd::EditEnter(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditEnter " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditEnter " << std::hex << cmd << std::dec;
 
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
@@ -221,7 +221,7 @@ bool EditorWnd::EditTab(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditTab " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditTab " << std::hex << cmd << std::dec;
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
 
@@ -252,7 +252,7 @@ bool EditorWnd::EditDelStr(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditDelStr " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditDelStr " << std::hex << cmd << std::dec;
 
     size_t y = m_firstLine + m_cursory;
 
@@ -268,7 +268,7 @@ bool EditorWnd::EditDelBegin(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditDelBegin " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditDelBegin " << std::hex << cmd << std::dec;
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
 
@@ -292,7 +292,7 @@ bool EditorWnd::EditDelEnd(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditDelEnd " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditDelEnd " << std::hex << cmd << std::dec;
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
 
@@ -371,7 +371,7 @@ bool EditorWnd::EditUndo(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditUndo " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditUndo " << std::hex << cmd << std::dec;
 
     auto editCmd = m_editor->PeekUndo();
     if (!editCmd)
@@ -446,7 +446,7 @@ bool EditorWnd::EditRedo(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    EditRedo " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    EditRedo " << std::hex << cmd << std::dec;
 
     auto redoCmd = m_editor->PeekRedo();
     if (!redoCmd)
@@ -686,7 +686,7 @@ bool EditorWnd::EditCutToClipboard(input_t cmd)
     if (m_selectState != select_state::complete)
         return true;
 
-    LOG(DEBUG) << "    EditCopyToClipboard " << std::hex << cmd << std::dec;
+    LOG(DEBUG) << "    EditCutToClipboard " << std::hex << cmd << std::dec;
 
     select_t mode;
     std::vector<std::u16string> strArray;
@@ -747,7 +747,7 @@ bool EditorWnd::Replace(input_t cmd)
     if (m_readOnly)
         return true;
 
-    LOG(DEBUG) << "    Replace " << std::hex << cmd << std::dec;
+    //LOG(DEBUG) << "    Replace " << std::hex << cmd << std::dec;
 
     EditCmd edit{ cmd_t::CMD_BEGIN };
     EditCmd undo{ cmd_t::CMD_BEGIN };

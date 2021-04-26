@@ -176,10 +176,11 @@ public:
     uint64_t                GetSize() const {return m_buffer.GetSize(); }
     time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
-    //editor API with undo
     std::u16string          GetStr(size_t line, size_t offset = 0, size_t size = MAX_STRLEN + 1);
+    std::u16string          GetStrForFind(size_t line, bool checkCase);
     bool                    SetCurStr(size_t line);
 
+    //editor API with undo
     bool                    CorrectTab(bool save, size_t line, std::u16string& str);
     bool                    SaveTab(bool save, size_t line);
     bool                    RestoreTab(bool save, size_t line, const std::u16string& str);

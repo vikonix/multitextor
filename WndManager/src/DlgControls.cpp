@@ -705,7 +705,7 @@ bool CtrlList::Refresh(CtrlState state)
         auto line = GetStr(static_cast<size_t>(m_firstLine) + y);
 
         std::u16string wstr = utf8::utf8to16(std::string(line));
-        if (wstr.size() < static_cast<size_t>(m_sizex) - 2)
+        if (wstr.size() <= static_cast<size_t>(m_sizex) - 2)
         {
             wstr.resize(static_cast<size_t>(m_sizex) - 2, ' ');
         }

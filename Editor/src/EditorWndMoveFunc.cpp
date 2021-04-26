@@ -846,7 +846,7 @@ bool EditorWnd::SelectAll(input_t cmd)
 
 bool EditorWnd::MoveLexMatch([[maybe_unused]]input_t cmd)
 {
-    LOG(DEBUG) << "    MoveLexMatch";
+    //LOG(DEBUG) << "    MoveLexMatch";
 
     size_t x = m_xOffset + m_cursorx;
     size_t y = m_firstLine + m_cursory;
@@ -890,7 +890,14 @@ bool EditorWnd::FindUpWord([[maybe_unused]] input_t cmd)
         return false;
     }
 
-    FindDialog::s_vars.findList.push_back(utf8::utf16to8(FindDialog::s_vars.findStrW));
+    try
+    {
+        FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW));
+    }
+    catch (...)
+    {
+    }
+
     return FindUp();
 }
 
@@ -902,7 +909,14 @@ bool EditorWnd::FindDownWord([[maybe_unused]] input_t cmd)
         return false;
     }
 
-    FindDialog::s_vars.findList.push_back(utf8::utf16to8(FindDialog::s_vars.findStrW));
+    try
+    {
+        FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW));
+    }
+    catch (...)
+    {
+    }
+
     return FindDown();
 }
 
