@@ -49,5 +49,5 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  - termdb (not used)
  - utfcpp
  - win-iconv
- - iconv (optional)
+ - iconv (optional in Windows)
  
