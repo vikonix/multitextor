@@ -24,6 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "utils/Utils.h"
 #include "utfcpp/utf8.h"
 #include "Dialogs/EditorDialogs.h"
 #include "WndManager/DlgControls.h"
@@ -165,17 +166,14 @@ bool FindDialog::OnClose(int id)
                 Refresh();
                 return false;
             }
+            if(str.size() > 2)
+                _TRY(s_vars.findList.emplace(str))
             s_vars.findStrW = utf8::utf8to16(str);
 
             size_t n = ctrlSearch->GetStrCount();
             s_vars.findList.clear();
-            for (size_t i = 0; i < n && i < 16; ++i) try
-            {
-                s_vars.findList.emplace(ctrlSearch->GetStr(i));
-            }
-            catch (...)
-            {
-            }
+            for (size_t i = 0; i < n && i < 16; ++i) 
+                _TRY(s_vars.findList.emplace(ctrlSearch->GetStr(i)))
         }
         
         if (m_replace)
@@ -192,17 +190,14 @@ bool FindDialog::OnClose(int id)
                     Refresh();
                     return false;
                 }
+                if (str.size() > 2)
+                    _TRY(s_vars.replaceList.emplace(str))
                 s_vars.replaceStrW = utf8::utf8to16(str);
 
                 size_t n = ctrlSearch->GetStrCount();
                 s_vars.replaceList.clear();
-                for (size_t i = 0; i < n && i < 16; ++i) try
-                {
-                    s_vars.replaceList.emplace(ctrlSearch->GetStr(i));
-                }
-                catch (...)
-                {
-                }
+                for (size_t i = 0; i < n && i < 16; ++i) 
+                    _TRY(s_vars.replaceList.emplace(ctrlSearch->GetStr(i)))
             }
         }
     }

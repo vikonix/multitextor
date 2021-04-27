@@ -24,6 +24,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "utils/Utils.h"
 #include "utfcpp/utf8.h"
 #include "utils/SymbolType.h"
 #include "EditorWnd.h"
@@ -890,13 +891,8 @@ bool EditorWnd::FindUpWord([[maybe_unused]] input_t cmd)
         return false;
     }
 
-    try
-    {
-        FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW));
-    }
-    catch (...)
-    {
-    }
+    if(FindDialog::s_vars.findStrW.size() > 2)
+        _TRY(FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW)))
 
     return FindUp();
 }
@@ -909,13 +905,8 @@ bool EditorWnd::FindDownWord([[maybe_unused]] input_t cmd)
         return false;
     }
 
-    try
-    {
-        FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW));
-    }
-    catch (...)
-    {
-    }
+    if (FindDialog::s_vars.findStrW.size() > 2)
+        _TRY(FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW)))
 
     return FindDown();
 }

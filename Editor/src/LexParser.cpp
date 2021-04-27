@@ -51,7 +51,7 @@ std::list<LexConfig> LexParser::s_lexConfig
         //plain text
         "Text",     //name
         "",         //file mask
-        "`'\"",     //delimiters
+        ",.:;=<>",  //delimiters
         "",         //name symbols
         {},         //special
         {},         //line
