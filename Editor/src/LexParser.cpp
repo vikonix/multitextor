@@ -325,7 +325,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
             {
                 if (str[end] == '$' && end < str.size() - 2)
                 {
-                    //LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin));
+                    //LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin, end - begin + 1));
                     //bash var test
                     if (str[end + 1] == '(')
                         skipComment = ')';
@@ -336,12 +336,12 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
 
             lex_t comment{};
             size_t e;
-            if (ScanSpecial(str.substr(begin), e))
+            if (ScanSpecial(str.substr(begin, end - begin + 1), e))
             {
                 end = begin + e;
                 offset = end;
             }
-            else if ((comment = ScanCommentFromBegin(str.substr(begin), e)) != lex_t::END)
+            else if ((comment = ScanCommentFromBegin(str.substr(begin, end - begin + 1), e)) != lex_t::END)
             {
                 //LOG(DEBUG) << "    Comment from begin";
                 if (type != lex_t::SYMBOL || e == end - begin)
@@ -474,7 +474,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                     if (type == lex_t::SYMBOL)
                     {
                         char fill = '0' + static_cast<char>(type);
-                        if (IsNumeric(str.substr(begin)))
+                        if (IsNumeric(str.substr(begin, end - begin + 1)))
                             fill = 'N';
                         else if (IsKeyWord(str.substr(begin, end - begin + 1)))
                             fill = 'K';
@@ -691,8 +691,13 @@ lex_t LexParser::ScanCommentFromBegin(std::u16string_view lexem, size_t& end)
         //check for line comment
         for (auto& comment : m_lineComment)
         {
-            if (lexem.find(comment) == 0)
+            if (auto pos = lexem.find(comment); pos != std::string::npos)
             {
+                if (pos != 0)
+                {
+                    end = pos;
+                    return lex_t::END;
+                }
                 end = comment.size() - 1;
                 return lex_t::COMMENT_LINE;
             }
@@ -702,8 +707,13 @@ lex_t LexParser::ScanCommentFromBegin(std::u16string_view lexem, size_t& end)
         //check for open comment
         for (auto& comment : m_openComment)
         {
-            if (lexem.find(comment) == 0)
+            if (auto pos = lexem.find(comment); pos != std::string::npos)
             {
+                if (pos != 0)
+                {
+                    end = pos;
+                    return lex_t::END;
+                }
                 end = comment.size() - 1;
                 return lex_t::COMMENT_OPEN;
             }
@@ -712,9 +722,9 @@ lex_t LexParser::ScanCommentFromBegin(std::u16string_view lexem, size_t& end)
     //check for close comment
     for (auto& comment : m_closeComment)
     {
-        if (lexem.find(comment) == 0)
+        if (auto pos = lexem.find(comment); pos != std::string::npos)
         {
-            end = comment.size() - 1;
+            end = pos + comment.size() - 1;
             return lex_t::COMMENT_CLOSE;
         }
     }

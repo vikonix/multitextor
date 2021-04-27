@@ -1030,18 +1030,14 @@ bool EditorWnd::CorrectSelection()
     if (m_beginY > m_endY)
     {
         rev = true;
-        size_t y = m_beginY;
-        m_beginY = m_endY;
-        m_endY = y;
+        std::swap(m_beginY, m_endY);
     }
 
     if (m_selectType == select_t::stream)
     {
         if (rev || (m_beginY == m_endY && m_beginX > m_endX))
         {
-            size_t x = m_beginX;
-            m_beginX = m_endX;
-            m_endX = x;
+            std::swap(m_beginX, m_endX);
         }
     }
     else if (m_selectType == select_t::line)
@@ -1054,9 +1050,7 @@ bool EditorWnd::CorrectSelection()
         //column
         if (m_beginX > m_endX)
         {
-            size_t x = m_beginX;
-            m_beginX = m_endX;
-            m_endX = x;
+            std::swap(m_beginX, m_endX);
         }
     }
 
@@ -1960,6 +1954,28 @@ bool EditorWnd::ReplaceSubstr(size_t line, size_t pos, size_t len, const std::u1
         ChangeSelected(select_change::insert_ch, line, pos, newSize - len);
 
     return rc;
+}
+
+bool EditorWnd::TryDeleteSelectedBlock()
+{
+    if (m_selectState != select_state::complete)
+    {
+        return false;
+    }
+
+    CorrectSelection();
+    size_t x = m_xOffset + m_cursorx;
+    size_t y = m_firstLine + m_cursory;
+    if ((y < m_beginY || y > m_endY)
+        || (m_selectType == select_t::stream && ((y == m_beginY && x < m_beginX) || (y == m_endY && x > m_endX)))
+        || (m_selectType == select_t::column && (x < m_beginX || x > m_endX)))
+    {
+        //cursor out of selected block
+        SelectUnselect(0);
+        return false;
+    }
+
+    return EditBlockDel(0);
 }
 
 } //namespace _Editor

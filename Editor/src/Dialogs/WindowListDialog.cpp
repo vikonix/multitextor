@@ -116,7 +116,8 @@ size_t WindowListDialog::GetWndList(bool skip)
     auto listPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
     listPtr->Clear();
 
-    std::string active;
+    std::filesystem::path active;
+    std::map<std::filesystem::path, EditorWnd*> wndList;
     size_t count{};
     Wnd* wnd;
     while ((wnd = WndManager::getInstance().GetWnd(count, 0)) != nullptr)
@@ -134,10 +135,9 @@ size_t WindowListDialog::GetWndList(bool skip)
         if (m_mode == WindowsDlgMode::List || m_mode == WindowsDlgMode::CompareWith || edWnd->IsMarked())
         {
             auto path = wnd->GetFilePath();
-            auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX() - 2);
             if (active.empty())
-                active = shortPath;
-            m_wndList[shortPath] = edWnd;
+                active = path;
+            wndList[path] = edWnd;
         }
     }
 
@@ -150,17 +150,18 @@ size_t WindowListDialog::GetWndList(bool skip)
             || (wnd->GetWndType() == wnd_t::editor && edWnd->IsMarked()))
         {
             auto path = wnd->GetFilePath();
-            auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX());
             if(m_activeView == 1)
-                active = shortPath;
-            m_wndList[shortPath] = edWnd;
+                active = path;
+            wndList[path] = edWnd;
         }
     }
 
     size_t n{};
-    for (auto& [path, w] : m_wndList)
+    for (auto& [path, w] : wndList)
     {
-        listPtr->AppendStr(path);
+        auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX() - 2);
+        m_wndList[shortPath] = w;
+        listPtr->AppendStr(shortPath);
         if (path == active)
             listPtr->SetSelect(n);
         ++n;
@@ -187,7 +188,7 @@ input_t WindowListDialog::DialogProc(input_t code)
         if (wndIt == m_wndList.end())
         {
             _assert(0);
-            return 0;
+            return false;
         }
         auto& [p, wnd] = *wndIt;
 

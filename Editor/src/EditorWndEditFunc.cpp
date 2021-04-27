@@ -43,7 +43,7 @@ bool EditorWnd::EditC(input_t cmd)
         return true;
 
     //LOG(DEBUG) << "    EditC " << std::hex << cmd << std::dec;
-    EditBlockDel(cmd);
+    TryDeleteSelectedBlock();
 
     char16_t c = K_GET_CODE(cmd);
     if (c < ' ')
@@ -75,9 +75,8 @@ bool EditorWnd::EditDelC(input_t cmd)
         return true;
 
     //LOG(DEBUG) << "    EditDelC " << std::hex << cmd << std::dec;
-    if (m_selectState == select_state::complete)
+    if (TryDeleteSelectedBlock())
     {
-        EditBlockDel(cmd);
         return true;
     }
 
@@ -705,7 +704,7 @@ bool EditorWnd::EditPasteFromClipboard(input_t cmd)
         return true;
 
     LOG(DEBUG) << "    EditPasteFromClipboard " << std::hex << cmd << std::dec;
-    EditBlockDel(cmd);
+    TryDeleteSelectedBlock();
 
     std::vector<std::u16string> strArray;
     bool rc = PasteFromClipboard(strArray)

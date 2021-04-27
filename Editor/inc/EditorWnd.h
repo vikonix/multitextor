@@ -165,6 +165,7 @@ class EditorWnd : public FrameWnd
     bool    IsWord(const std::u16string& str, size_t offset, size_t len);
     bool    CheckFileChanging();
     bool    ReplaceSubstr(size_t line, size_t pos, size_t len, const std::u16string& substr);
+    bool    TryDeleteSelectedBlock();
 
 public:
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
