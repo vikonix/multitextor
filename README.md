@@ -50,4 +50,6 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  - utfcpp
  - win-iconv
  - iconv (optional in Windows)
+ - cxxopts
+ - nlohmann/json
  

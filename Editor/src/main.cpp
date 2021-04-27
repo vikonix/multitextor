@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "utils/logger.h"
+#include "cxxopts/cxxopts.hpp"
 #include "EditorApp.h"
 #include "Version.h"
 
