@@ -107,6 +107,7 @@ bool LexParser::SetParseStyle(const std::string& style)
     m_lineComment.clear();
     m_openComment.clear();
     m_closeComment.clear();
+    m_keyWords.clear();
 
     for (auto& cfg : s_lexConfig)
     {

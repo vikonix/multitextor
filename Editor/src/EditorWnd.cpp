@@ -683,7 +683,7 @@ input_t EditorWnd::ParseCommand(input_t cmd)
             m_selectMouse = false;
             InputRelease();
             MovePos(cmd);
-            SelectEnd(cmd);
+            SelectEnd(0);
 
             if (m_popupMenu)
             {
@@ -1489,10 +1489,9 @@ bool EditorWnd::GetWord(std::u16string& str)
     str.clear();
     if (m_selectState == select_state::complete && m_selectType != select_t::line)
     {
-        if (y == m_beginY && y == m_endY && m_beginX != m_endX)
+        CorrectSelection();
+        if (y == m_beginY && y == m_endY && m_endX - m_beginX >= 1)
         {
-            CorrectSelection();
-
             for (size_t i = m_beginX; i <= m_endX; ++i)
             {
                 auto c = curStr[i];
@@ -1505,6 +1504,9 @@ bool EditorWnd::GetWord(std::u16string& str)
 
     size_t b, e;
     if (!FindWord(curStr, b, e))
+        return false;
+
+    if (e - b < 1)
         return false;
 
     for (size_t i = b; i <= e; ++i)

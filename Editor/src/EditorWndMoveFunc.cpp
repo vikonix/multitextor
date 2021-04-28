@@ -616,7 +616,7 @@ bool EditorWnd::SelectBegin(input_t cmd)
         m_beginX = m_endX = m_xOffset + m_cursorx;
         m_beginY = m_endY = m_firstLine + m_cursory;
 
-        if (K_GET_CODE(cmd) == 1)
+        if (cmd == K_ED(E_SELECT_BEGIN) + 1)
         {
             //select key arrow with key shift
             //LOG(DEBUG) << "    ShiftSelect";
@@ -724,7 +724,7 @@ bool EditorWnd::SelectEnd(input_t cmd)
     InputRelease();
     EditorApp::StatusMark();
 
-    if (!m_selectKeyShift && K_GET_CODE(cmd) == 1)
+    if (!m_selectKeyShift && cmd == K_ED(E_SELECT_END) + 1)
         //not key shift select
         return true;
 
