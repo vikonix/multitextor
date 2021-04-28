@@ -97,13 +97,8 @@ bool EditorApp::StatusMark(mark_status mark)
 std::string EditorApp::GetKeyName(input_t code) const
 {
     std::vector<input_t> codeKeys;
-    for (auto it = g_defaultAppKeyMap.cbegin(); it != g_defaultAppKeyMap.cend(); ++it)
+    for (const auto& [keys, cmd] : g_defaultAppKeyMap)
     {
-        const auto& keys = *it;
-        ++it;
-        const auto& cmd = *it;
-
-
         if (cmd.size() == 1 && code == cmd[0])
         {
             codeKeys = keys;
@@ -111,16 +106,11 @@ std::string EditorApp::GetKeyName(input_t code) const
         }
     }
     if(codeKeys.empty())
-        for (auto it = g_defaultEditKeyMap.cbegin(); it != g_defaultEditKeyMap.cend(); ++it)
+        for (const auto& [keys, cmd] : g_defaultEditKeyMap)
         {
-            const auto& key = *it;
-            ++it;
-            const auto& cmd = *it;
-
-
             if (cmd.size() == 1 && code == cmd[0])
             {
-                codeKeys = key;
+                codeKeys = keys;
                 break;
             }
         }
@@ -128,7 +118,7 @@ std::string EditorApp::GetKeyName(input_t code) const
         return {};
 
     std::string keyNames;
-    for (auto key : codeKeys)
+    for (const auto key : codeKeys)
     {
         if (!keyNames.empty())
             keyNames += " ";

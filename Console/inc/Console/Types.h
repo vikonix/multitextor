@@ -42,7 +42,10 @@ using cell_t = uint32_t;
 using cp_t = uint32_t;
 
 using input_t = uint32_t;
-using CmdMap = std::list<std::vector<input_t>>;
+
+//first array is key array
+//second array is cmd array
+using CmdMap = std::list<std::pair<std::vector<input_t>, std::vector<input_t>>>;
 
 enum class scroll_t
 {
@@ -52,7 +55,7 @@ enum class scroll_t
     SCROLL_RIGHT = 4
 };
 
-#define MAX_COORD       0x1ff //maximal X Y coordinate
+constexpr pos_t MAX_COORD{ 0x1ff }; //maximal X Y coordinate
 
 //special symbols
 constexpr char S_TAB{ 0x9 };

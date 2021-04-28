@@ -37,11 +37,10 @@ bool CmdParser::SetCmdMap(const CmdMap& cmdMap)
     m_cmdMap.clear();
     m_savedKeys.clear();
 
-    for (auto it = cmdMap.cbegin(); it != cmdMap.cend(); ++it)
+    for (auto& [keys, cmd] : cmdMap)
     {
-        m_keyMap.push_back(*it);
-        ++it;
-        m_cmdMap.push_back(*it);
+        m_keyMap.push_back(keys);
+        m_cmdMap.push_back(cmd);
     }
     
     return true;
@@ -77,7 +76,7 @@ scancmd_t CmdParser::ScanKey(input_t key)
     auto savedptr = m_savedKeys.data();
     
     auto cmdit = m_cmdMap.cbegin();
-    for (auto keylist : m_keyMap)
+    for (const auto& keylist : m_keyMap)
     {
         ++cmdit;
         if (keylist.size() < m_savedKeys.size())
