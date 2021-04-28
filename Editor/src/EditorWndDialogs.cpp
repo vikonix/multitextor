@@ -165,9 +165,9 @@ bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
         m_editor->SetEol(static_cast<eol_t>(dlg.s_vars.eol));
         m_editor->SetTab(dlg.s_vars.tabSize);
         m_editor->SetSaveTab(dlg.s_vars.saveTab);
-        m_editor->SetShowTab(dlg.s_vars.showTab);
 
         m_editor->SetParseStyle(dlg.s_vars.typeName);//???
+        m_editor->SetShowTab(dlg.s_vars.showTab);
     }
 
     return true;
