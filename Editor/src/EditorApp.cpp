@@ -270,6 +270,39 @@ input_t EditorApp::AppProc(input_t code)
     return code; 
 } 
 
+bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& parseMode, const std::string& cp, bool ro, bool log) try
+{
+    auto fullPath = std::filesystem::canonical(path);
+
+    if (auto wnd = GetEditorWnd(fullPath))
+        return WndManager::getInstance().SetTopWnd(wnd);
+
+    auto editor = std::make_shared<EditorWnd>();
+    editor->Show(true, -1);
+    if (editor->SetFileName(fullPath, false, parseMode, cp))
+    {
+        editor->SetRO(ro);
+        editor->SetLog(log);
+        m_editors[editor.get()] = editor;
+    }
+
+    return true;
+}
+catch (const std::exception& ex)
+{
+    _assert(0);
+    LOG(ERROR) << "Error file loading: " << ex.what();
+    EditorApp::SetErrorLine("Error file loading");
+    return false;
+}
+catch (...)
+{
+    _assert(0);
+    LOG(ERROR) << "Error file loading: unknown exeption";
+    EditorApp::SetErrorLine("Error file loading");
+    return false;
+}
+
 bool EditorApp::LoadCfg()
 {
     //configuration loading

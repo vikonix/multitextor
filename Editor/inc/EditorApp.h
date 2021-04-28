@@ -87,6 +87,7 @@ public:
     static bool StatusMark(mark_status mark = mark_status::no);
 
     Wnd* GetEditorWnd(std::filesystem::path path);
+    bool OpenFile(const std::filesystem::path& path, const std::string& parseMode, const std::string& cp, bool ro = false, bool log = false);
 
     //editor app commands
     bool    AboutProc(input_t cmd);

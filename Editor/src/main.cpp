@@ -39,11 +39,23 @@ using namespace _Editor;
 EditorApp app;
 Application& Application::s_app{app};
 
-int main() try
+int main(int argc, char** argv) try
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log");
     LOG(INFO);
-    LOG(INFO) << EDITOR_NAME << "-" << EDITOR_VERSION;
+    LOG(INFO) << EDITOR_NAME "-" EDITOR_VERSION;
+
+    cxxopts::Options options(EDITOR_NAME, EDITOR_NAME "-" EDITOR_VERSION ". Console mode text editor.");
+    options.add_options()
+        ("h,help", "Print usage")
+        ;
+
+    auto result = options.parse(argc, argv);
+    if (result.count("help"))
+    {
+        std::cout << options.help() << std::endl;
+        return 0;
+    }
 
     app.Init();
     app.SetLogo(g_logo);
@@ -52,8 +64,13 @@ int main() try
     app.SetAccessMenu(g_accessMenu);
     app.SetCmdParser(g_defaultAppKeyMap);
     app.SetClock(clock_pos::bottom);
-    
     app.Refresh();
+
+    auto& files = result.unmatched();
+    for (auto& f : files)
+    {
+        app.OpenFile(f, "Text", "UTF-8");
+    }
     app.MainProc(K_EXIT);
     app.Deinit();
 
