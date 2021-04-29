@@ -1,20 +1,19 @@
-# Multitextor
-Some editor screenshots.
+##Some editor screenshots.
 
-Start screen:
- ![Screenshot](StartScreen.png)
+Start screen.
+  ![Screenshot](StartScreen.png)
 
-Menu:
- ![Screenshot](Menu.png)
+Menu.
+  ![Screenshot](Menu.png)
 
-Open file dialog:
- ![Screenshot](OpenFileDialog.png)
+Open file dialog.
+  ![Screenshot](OpenFileDialog.png)
 
-File properties dialog:
- ![Screenshot](FilePropertyDialog.png)
+File properties dialog.
+  ![Screenshot](FilePropertyDialog.png)
 
-Two panels view mode:
- ![Screenshot](TwoPanelsView.png)
+Two panels view mode.
+  ![Screenshot](TwoPanelsView.png)
 
-Windows list dialog:
- ![Screenshot](WindowsListDialog.png)
+Windows list dialog.
+  ![Screenshot](WindowsListDialog.png)
