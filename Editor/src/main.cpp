@@ -48,7 +48,7 @@ int main(int argc, char** argv) try
     cxxopts::Options options(EDITOR_NAME, EDITOR_NAME "-" EDITOR_VERSION ". Console mode text editor.");
     options.add_options()
         ("h,help", "Print usage")
-        ("k,keys", "Print key combinations")
+        ("k,keys", "Print key map combinations")
         ;
 
     auto result = options.parse(argc, argv);
@@ -59,6 +59,7 @@ int main(int argc, char** argv) try
     }
     else if (result.count("keys"))
     {
+        std::cout << "Editor keyboard combination map to editor commands." << std::endl;
         for (const auto& map : { g_defaultAppKeyMap, g_defaultEditKeyMap })
             for (const auto& [keys, cmd] : map)
             {
