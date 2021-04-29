@@ -122,50 +122,61 @@ std::string EditorApp::GetKeyName(input_t code) const
     {
         if (!keyNames.empty())
             keyNames += " ";
-        auto keyType = key & K_TYPEMASK;
-        auto keyCmd = key & 0xffff0000;
-        auto keyCode = K_GET_CODE(key);
-
-        if (key & K_SHIFT)
-            keyNames += "Shift+";
-        if (key & K_CTRL)
-            keyNames += "Ctrl+";
-        if (key & K_ALT)
-            keyNames += "Alt+";
-
-        bool found{};
-        if (0 != keyType)
-        {
-            auto it = g_CmdNames.find(keyType);
-            if (it != g_CmdNames.end())
-            {
-                keyNames += it->second;
-                found = true;
-            }
-        }
-        if(!found && 0 != keyType && 0 != keyCmd)
-        {
-            auto it = g_CmdNames.find(keyCmd);
-            if (it != g_CmdNames.end())
-            {
-                keyNames += it->second;
-                found = true;
-            }
-        }
-        if (!found && 0 != keyCode)
-        {
-            auto it = g_CmdNames.find(keyCode);
-            if (it != g_CmdNames.end())
-            {
-                keyNames += it->second;
-                found = true;
-            }
-        }
-        if(!found && keyCode > ' ')
-            keyNames += static_cast<char>(keyCode);
+        keyNames += GetName(key);
     }
 
     return keyNames;
+}
+
+std::string EditorApp::GetName(input_t code) const
+{
+    std::string name;
+
+    auto keyType = code & K_TYPEMASK;
+    auto keyCmd = code & 0xffff0000;
+    auto keyCode = K_GET_CODE(code);
+
+    if (code & K_SHIFT)
+        name += "Shift+";
+    if (code & K_CTRL)
+        name += "Ctrl+";
+    if (code & K_ALT)
+        name += "Alt+";
+
+    bool found{};
+    if (auto it = g_CmdNames.find(code); it != g_CmdNames.end())
+    {
+        name = it->second;
+        found = true;
+    }
+    if (!found && 0 != keyType)
+    {
+        if (auto it = g_CmdNames.find(keyType); it != g_CmdNames.end())
+        {
+            name += it->second;
+            found = true;
+        }
+    }
+    if (!found && 0 != keyType && 0 != keyCmd)
+    {
+        if (auto it = g_CmdNames.find(keyCmd); it != g_CmdNames.end())
+        {
+            name += it->second;
+            found = true;
+        }
+    }
+    if (!found && 0 != keyCode)
+    {
+        if (auto it = g_CmdNames.find(keyCode); it != g_CmdNames.end())
+        {
+            name += it->second;
+            found = true;
+        }
+    }
+    if (!found && keyCode > ' ')
+        name += static_cast<char>(keyCode);
+
+    return name;
 }
 
 bool EditorApp::CloseWindow(Wnd* wnd)

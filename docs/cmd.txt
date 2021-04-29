@@ -1,0 +1,135 @@
+Editor keyboard combination map to editor commands.
+
+Keys: F2                 cmd: APP_SAVE_ALL
+Keys: Alt+S              cmd: APP_SAVE_ALL
+Keys: F3                 cmd: APP_DLG_OPEN
+Keys: Shift+F5           cmd: APP_DLG_WND_COPY
+Keys: Shift+F6           cmd: APP_DLG_WND_MOVE
+Keys: Ctrl+W             cmd: APP_DLG_WND_LIST
+Keys: F9                 cmd: APP_MENU
+Keys: Esc  F1            cmd: APP_MENU
+Keys: F10                cmd: APP_EXIT
+Keys: Alt+X              cmd: APP_EXIT
+Keys: Esc  x             cmd: APP_EXIT
+Keys: Esc  X             cmd: APP_EXIT
+Keys: Esc  0             cmd: Insert
+Keys: Alt+/              cmd: APP_VIEW_SPLIT_MERGE
+Keys: Alt++              cmd: APP_VIEW_SPLIT_VH
+Keys: Alt+=              cmd: APP_VIEW_SPLIT_VH
+Keys: Alt+-              cmd: APP_VIEW_SIZE
+Keys: Esc  /             cmd: APP_VIEW_SPLIT_MERGE
+Keys: Esc  =             cmd: APP_VIEW_SPLIT_VH
+Keys: Esc  +             cmd: APP_VIEW_SPLIT_VH
+Keys: Esc  -             cmd: APP_VIEW_SIZE
+Keys: Alt+PageUp         cmd: APP_VIEW_CHANGE
+Keys: Alt+PageDn         cmd: APP_VIEW_CHANGE
+Keys: Esc  PageUp        cmd: APP_VIEW_CHANGE
+Keys: Esc  PageDn        cmd: APP_VIEW_CHANGE
+Keys: Esc  9             cmd: APP_VIEW_CHANGE
+Keys: Esc  3             cmd: APP_VIEW_CHANGE
+Keys: Ctrl+K             cmd: APP_RECORD_MACRO
+Keys: Alt+K              cmd: APP_PLAY_MACRO
+Keys: F12                cmd: APP_REFRESH
+Keys: KeyLeft            cmd: EDIT_MOVE_LEFT
+Keys: KeyRight           cmd: EDIT_MOVE_RIGHT
+Keys: KeyUp              cmd: EDIT_MOVE_UP
+Keys: KeyDown            cmd: EDIT_MOVE_DOWN
+Keys: MouseScrollUp      cmd: EDIT_MOVE_SCROLL3_UP
+Keys: MouseScrollDown    cmd: EDIT_MOVE_SCROLL3_DOWN
+Keys: PageUp             cmd: EDIT_MOVE_PAGE_UP
+Keys: PageDn             cmd: EDIT_MOVE_PAGE_DOWN
+Keys: Home               cmd: EDIT_MOVE_STR_BEGIN
+Keys: End                cmd: EDIT_MOVE_STR_END
+Keys: Ctrl+Home          cmd: EDIT_MOVE_FILE_BEGIN
+Keys: Ctrl+End           cmd: EDIT_MOVE_FILE_END
+Keys: Alt+Home           cmd: EDIT_MOVE_FILE_BEGIN
+Keys: Alt+End            cmd: EDIT_MOVE_FILE_END
+Keys: Esc  Home          cmd: EDIT_MOVE_FILE_BEGIN
+Keys: Esc  End           cmd: EDIT_MOVE_FILE_END
+Keys: Esc  7             cmd: EDIT_MOVE_FILE_BEGIN
+Keys: Esc  1             cmd: EDIT_MOVE_FILE_END
+Keys: Ctrl+KeyLeft       cmd: EDIT_MOVE_WORD_LEFT
+Keys: Ctrl+KeyRight      cmd: EDIT_MOVE_WORD_RIGHT
+Keys: Alt+,              cmd: EDIT_MOVE_WORD_LEFT
+Keys: Alt+.              cmd: EDIT_MOVE_WORD_RIGHT
+Keys: Alt+<              cmd: EDIT_MOVE_WORD_LEFT
+Keys: Alt+>              cmd: EDIT_MOVE_WORD_RIGHT
+Keys: Esc  ,             cmd: EDIT_MOVE_WORD_LEFT
+Keys: Esc  .             cmd: EDIT_MOVE_WORD_RIGHT
+Keys: Ctrl+]             cmd: EDIT_MOVE_BRACKET_MATCH
+Keys: Ctrl+[             cmd: EDIT_MOVE_BRACKET_MATCH
+Keys: Ctrl+T             cmd: EDIT_MOVE_CENTER
+Keys: Alt+KeyUp          cmd: EDIT_MOVE_SCROLL_UP
+Keys: Alt+KeyDown        cmd: EDIT_MOVE_SCROLL_DOWN
+Keys: Alt+KeyLeft        cmd: EDIT_MOVE_SCROLL_LEFT
+Keys: Alt+KeyRight       cmd: EDIT_MOVE_SCROLL_RIGHT
+Keys: Delete             cmd: EDIT_DEL_CHAR
+Keys: Esc  BackSpace     cmd: EDIT_DEL_CHAR
+Keys: Ctrl+Y             cmd: EDIT_DEL_STR
+Keys: Enter              cmd: EDIT_ENTER
+Keys: Tab                cmd: EDIT_TAB
+Keys: BackSpace          cmd: EDIT_BS
+Keys: MouseLeft2         cmd: EDIT_SELECT_WORD
+Keys: MouseLeft3         cmd: EDIT_SELECT_LINE
+Keys: Ctrl+Space         cmd: EDIT_SELECT_WORD
+Keys: Esc  KeyLeft       cmd: EDIT_SELECT_STREAM_BEGIN + EDIT_MOVE_LEFT
+Keys: Esc  KeyRight      cmd: EDIT_SELECT_STREAM_BEGIN + EDIT_MOVE_RIGHT
+Keys: Esc  KeyUp         cmd: EDIT_SELECT_STREAM_BEGIN + EDIT_MOVE_UP
+Keys: Esc  KeyDown       cmd: EDIT_SELECT_STREAM_BEGIN + EDIT_MOVE_DOWN
+Keys: Shift+KeyLeft      cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_LEFT
+Keys: Shift+KeyRight     cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_RIGHT
+Keys: Shift+KeyUp        cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_UP
+Keys: Shift+KeyDown      cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_DOWN
+Keys: Shift+Home         cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_STR_BEGIN
+Keys: Shift+End          cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_STR_END
+Keys: Shift+PageUp       cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_PAGE_UP
+Keys: Shift+PageDn       cmd: EDIT_SELECT_SHIFT_BEGIN + EDIT_MOVE_PAGE_DOWN
+Keys: F4                 cmd: EDIT_SELECT_LINES_BEGIN
+Keys: Shift+F4           cmd: EDIT_SELECT_COLUMN_BEGIN
+Keys: F8                 cmd: EDIT_SELECT_UNSELECT
+Keys: F4                 cmd: EDIT_SELECT_END
+Keys: Esc  Esc           cmd: EDIT_SELECT_END
+Keys: ShiftRelease       cmd: EDIT_SELECT_SHIFT_END
+Keys: Ctrl+A             cmd: EDIT_SELECT_ALL
+Keys: F5                 cmd: EDIT_BLOCK_COPY
+Keys: F6                 cmd: EDIT_BLOCK_MOVE
+Keys: Alt+Y              cmd: EDIT_BLOCK_DEL
+Keys: Ctrl+X             cmd: EDIT_CB_CUT
+Keys: Ctrl+C             cmd: EDIT_CB_COPY
+Keys: Ctrl+V             cmd: EDIT_CB_PASTE
+Keys: Shift+Delete       cmd: EDIT_CB_CUT
+Keys: Ctrl+Insert        cmd: EDIT_CB_COPY
+Keys: Shift+Insert       cmd: EDIT_CB_PASTE
+Keys: Alt+I              cmd: EDIT_BLOCK_INDENT
+Keys: Alt+U              cmd: EDIT_BLOCK_UNDENT
+Keys: Esc  i             cmd: EDIT_BLOCK_INDENT
+Keys: Esc  I             cmd: EDIT_BLOCK_INDENT
+Keys: Esc  u             cmd: EDIT_BLOCK_UNDENT
+Keys: Esc  U             cmd: EDIT_BLOCK_UNDENT
+Keys: Ctrl+Z             cmd: EDIT_UNDO
+Keys: Alt+BackSpace      cmd: EDIT_UNDO
+Keys: Alt+Z              cmd: EDIT_REDO
+Keys: Esc  z             cmd: EDIT_REDO
+Keys: Esc  Z             cmd: EDIT_REDO
+Keys: Ctrl+G             cmd: EDIT_DLG_GOTO
+Keys: Ctrl+F             cmd: EDIT_DLG_FIND
+Keys: F7                 cmd: EDIT_DLG_FIND
+Keys: Ctrl+R             cmd: EDIT_DLG_REPLACE
+Keys: Ctrl+H             cmd: EDIT_DLG_REPLACE
+Keys: Ctrl+F7            cmd: EDIT_CTRL_FIND
+Keys: Shift+F7           cmd: EDIT_CTRL_REPEAT
+Keys: Ctrl+P             cmd: EDIT_CTRL_FINDUP
+Keys: Ctrl+N             cmd: EDIT_CTRL_FINDDN
+Keys: Alt+P              cmd: EDIT_CTRL_FINDUPWORD
+Keys: Alt+N              cmd: EDIT_CTRL_FINDDNWORD
+Keys: Ctrl+S             cmd: EDIT_CTRL_SAVE
+Keys: Esc  F2            cmd: EDIT_CTRL_SAVE
+Keys: Shift+F2           cmd: EDIT_CTRL_SAVEAS
+Keys: Shift+F3           cmd: EDIT_CTRL_RELOAD
+Keys: Esc  F3            cmd: EDIT_CTRL_RELOAD
+Keys: Shift+F10          cmd: EDIT_CTRL_CLOSE
+Keys: Esc  F10           cmd: EDIT_CTRL_CLOSE
+Keys: Alt+M              cmd: EDIT_POPUP_MENU
+Keys: Esc  m             cmd: EDIT_POPUP_MENU
+Keys: Esc  M             cmd: EDIT_POPUP_MENU
+Keys: Ctrl+E             cmd: EDIT_DLG_PROPERTIES

@@ -59,12 +59,18 @@ int main(int argc, char** argv) try
     }
     else if (result.count("keys"))
     {
-        for(const auto& [keys, cmd] : g_defaultAppKeyMap)
-        {
-        }
-        for (const auto& [keys, cmd] : g_defaultEditKeyMap)
-        {
-        }
+        for (const auto& map : { g_defaultAppKeyMap, g_defaultEditKeyMap })
+            for (const auto& [keys, cmd] : map)
+            {
+                std::string keystr;
+                std::string cmdstr;
+
+                for (auto k : keys)
+                    keystr += (keystr.size() ? "  " : "") + app.GetName(k);
+                for (auto c : cmd)
+                    cmdstr += (cmdstr.size() ? " + " : "") + app.GetName(c);
+                std::cout << "Keys: " << std::left << std::setw(16) << keystr << "\t cmd: " << cmdstr << std::endl;
+            }
 
         return 0;
     }

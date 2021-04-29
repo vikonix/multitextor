@@ -172,6 +172,7 @@ CmdMap g_defaultEditKeyMap
     {{K_F4},                    {K_ED(E_SELECT_END)}},
     {{K_ESC, K_ESC},            {K_ED(E_SELECT_END)}},
     {{K_RELEASE | K_SHIFT},     {K_ED(E_SELECT_END) + 1}},
+    {{'A' | K_CTRL},            {K_ED(E_SELECT_ALL)}},
 
     {{K_F5},                    {K_ED(E_EDIT_BLOCK_COPY)}},
     {{K_F6},                    {K_ED(E_EDIT_BLOCK_MOVE)}},
@@ -332,10 +333,10 @@ std::unordered_map<input_t, std::string> g_CmdNames
     {K_PAGEUP,                      "PageUp"},
     {K_PAGEDN,                      "PageDn"},
 
-    {K_UP,                          "Up"},
-    {K_DOWN,                        "Down"},
-    {K_LEFT,                        "Left"},
-    {K_RIGHT,                       "Right"},
+    {K_UP,                          "KeyUp"},
+    {K_DOWN,                        "KeyDown"},
+    {K_LEFT,                        "KeyLeft"},
+    {K_RIGHT,                       "KeyRight"},
 
     {K_MOUSEWUP | K_MOUSEW,         "MouseScrollUp"},
     {K_MOUSEWDN | K_MOUSEW,         "MouseScrollDown"},
@@ -368,7 +369,7 @@ std::unordered_map<input_t, std::string> g_CmdNames
 
     {K_APP_VIEW_SPLIT,              "APP_VIEW_SPLIT_MERGE"},
     {K_APP_VIEW_MODE,               "APP_VIEW_SPLIT_VH"},
-    {K_APP_VIEW_SET,                "APP_VIEW_SELECT"},
+    {K_APP_VIEW_SET,                "APP_VIEW_CHANGE"},
     {K_APP_VIEW_SIZE,               "APP_VIEW_SIZE"},
 
     {K_APP_DIFF,                    "APP_DLG_DIFF"},
