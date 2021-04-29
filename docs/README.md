@@ -1,9 +1,9 @@
 ## Some editor screenshots.
 
-Start screen.     .
+Start screen screenshot.
   ![Screenshot](StartScreen.png)
 
-Menu.             .
+Menu screenshot.
   ![Screenshot](Menu.png)
 
 Open file dialog.
