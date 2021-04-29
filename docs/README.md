@@ -1,9 +1,9 @@
 ## Some editor screenshots.
 
-Start screen.
+Start screen.     .
   ![Screenshot](StartScreen.png)
 
-Menu.
+Menu.             .
   ![Screenshot](Menu.png)
 
 Open file dialog.
@@ -18,7 +18,10 @@ Two panels view mode.
 Windows list dialog.
   ![Screenshot](WindowsListDialog.png)
 
+
 ## Editor keyboard combination map to editor commands.
+
+Currently implemented.
 
 |Keys               |Commands|
 |----               |--------|
