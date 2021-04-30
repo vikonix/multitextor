@@ -1,22 +1,22 @@
 ## Some editor screenshots.
 
 Start screen screenshot.
-  ![Screenshot](StartScreen.png)
+  ![Screenshot](StartScreen1.png)
 
 Menu screenshot.
-  ![Screenshot](Menu.png)
+  ![Screenshot](Menu1.png)
 
 Open file dialog.
-  ![Screenshot](OpenFileDialog.png)
+  ![Screenshot](OpenFileDialog1.png)
 
 File properties dialog.
-  ![Screenshot](FilePropertyDialog.png)
+  ![Screenshot](FilePropertyDialog1.png)
 
 Two panels view mode.
-  ![Screenshot](TwoPanelsView.png)
+  ![Screenshot](TwoPanelsView1.png)
 
 Windows list dialog.
-  ![Screenshot](WindowsListDialog.png)
+  ![Screenshot](WindowsListDialog1.png)
 
 
 ## Editor keyboard combination map to editor commands.
