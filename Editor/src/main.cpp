@@ -96,7 +96,14 @@ int main(int argc, char** argv) try
     LOG(INFO) << "Exit";
     return 0;
 }
+catch (const std::exception& ex)
+{
+    LOG(ERROR) << "Exeption: " << ex.what();
+    std::cerr << "Exeption: " << ex.what();
+    return -1;
+}
 catch (...)
 {
-    LOG(ERROR) << "Unhandle exeption";
+    LOG(ERROR) << "Unhandle exeption.";
+    return -1;
 }

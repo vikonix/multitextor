@@ -130,8 +130,12 @@ std::string EditorApp::GetKeyName(input_t code) const
 
 std::string EditorApp::GetName(input_t code) const
 {
-    std::string name;
+    if (auto it = g_CmdNames.find(code); it != g_CmdNames.end())
+    {
+        return it->second;
+    }
 
+    std::string name;
     auto keyType = code & K_TYPEMASK;
     auto keyCmd = code & 0xffff0000;
     auto keyCode = K_GET_CODE(code);
@@ -144,12 +148,7 @@ std::string EditorApp::GetName(input_t code) const
         name += "Alt+";
 
     bool found{};
-    if (auto it = g_CmdNames.find(code); it != g_CmdNames.end())
-    {
-        name = it->second;
-        found = true;
-    }
-    if (!found && 0 != keyType)
+    if (0 != keyType)
     {
         if (auto it = g_CmdNames.find(keyType); it != g_CmdNames.end())
         {
