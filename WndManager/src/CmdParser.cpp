@@ -116,9 +116,8 @@ scancmd_t CmdParser::ScanKey(input_t key)
 
 std::vector<input_t> CmdParser::GetCommand()
 {
-    auto ret = m_savedKeys;
-    m_savedKeys.clear();
-    return ret;
+    //return and clear saved keys
+    return std::move(m_savedKeys);
 }
 
 } //namespace _WndManager 
