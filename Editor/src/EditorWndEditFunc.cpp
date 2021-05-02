@@ -384,11 +384,7 @@ bool EditorWnd::EditUndo(input_t cmd)
 
     if (editCmd->line != m_firstLine + m_cursory)
     {
-        if (editCmd->pos >= 0)//???
-            _GotoXY(editCmd->pos, editCmd->line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, editCmd->line);
-        
+        _GotoXY(editCmd->pos, editCmd->line);
         return true;
     }
 
@@ -403,10 +399,7 @@ bool EditorWnd::EditUndo(input_t cmd)
             InvalidateRect();
         }
 
-        if (editCmd->pos >= 0)//???
-            _GotoXY(editCmd->pos, editCmd->line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, editCmd->line);
+        _GotoXY(editCmd->pos, editCmd->line);
 
         if (editCmd->command == cmd_t::CMD_SET_POS)
             ;//nothing to do
@@ -456,10 +449,7 @@ bool EditorWnd::EditRedo(input_t cmd)
 
     if (redoCmd->line != m_firstLine + m_cursory)
     {
-        if (redoCmd->pos >= 0)//???
-            _GotoXY(redoCmd->pos, redoCmd->line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, redoCmd->line);
+        _GotoXY(redoCmd->pos, redoCmd->line);
         return true;
     }
 
@@ -474,10 +464,7 @@ bool EditorWnd::EditRedo(input_t cmd)
             InvalidateRect();
         }
 
-        if (redoCmd->pos >= 0)//???
-            _GotoXY(redoCmd->pos, redoCmd->line);
-        else
-            _GotoXY(m_xOffset + m_cursorx, redoCmd->line);
+        _GotoXY(redoCmd->pos, redoCmd->line);
 
         if (redoCmd->command == cmd_t::CMD_SET_POS)
             ;//nothing to do
