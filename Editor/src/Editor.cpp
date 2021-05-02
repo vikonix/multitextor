@@ -1352,7 +1352,7 @@ bool Editor::ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::str
                 outstr += ' ';
             else if (c == S_TAB)
             {
-                if (m_saveTab)//??? || !rc)
+                if (m_saveTab)
                     outstr += S_TAB;
                 else
                 {

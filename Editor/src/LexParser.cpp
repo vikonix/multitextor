@@ -214,21 +214,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
             color.push_back(ColorWindowLKeyW);
             break;
         case 'R'://rem
-            if (wstr[i] == '{' && i < len - 2 && wstr[i + 1] == '$')//???
-            {
-                //pascal preprocessor
-                color.push_back(ColorWindowLDelim);
-                color.push_back(ColorWindowLDelim);
-                ++i;
-                for (++i; i < len && wstr[i] != '}'; ++i)
-                    color.push_back(ColorWindowLRem);
-                if (wstr[i] == '}')
-                    color.push_back(ColorWindowLDelim);
-                else
-                    color.push_back(ColorWindowLRem);
-            }
-            else
-                color.push_back(ColorWindowLRem);
+            color.push_back(ColorWindowLRem);
             break;
         case 'N'://number
         case '2'://str
