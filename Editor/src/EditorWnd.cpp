@@ -1215,42 +1215,42 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
             {
                 //only 1 string
                 bx1 = posX;
-                ex1 = posX + str.size() - 1;
+                ex1 = posX + str.size();
             }
             else if (i == 0)
             {
                 //first line
                 bx1 = posX;
-                ex1 = m_editor->GetMaxStrLen() - 1;
+                ex1 = m_editor->GetMaxStrLen();
                 copyLine = 1;
             }
             else if (i == n - 1)
             {
                 //last line
                 bx1 = 0;
-                ex1 = str.size() - 1;
+                ex1 = str.size();
             }
             else
             {
                 bx1 = 0;
-                ex1 = m_editor->GetMaxStrLen() - 1;
+                ex1 = m_editor->GetMaxStrLen();
                 copyLine = 2;
             }
         }
         else if (selType == select_t::line)
         {
             bx1 = 0;
-            ex1 = m_editor->GetMaxStrLen() - 1;
+            ex1 = m_editor->GetMaxStrLen();
             copyLine = 2;
         }
         else
         {
             bx1 = posX;
-            ex1 = posX + str.size() - 1;
+            ex1 = posX + str.size();
         }
 
-        if (static_cast<int>(ex1) < 0)//???
-            ex1 = 0;
+        if (ex1 > 0)
+            --ex1;
 
         size_t dstY = posY + i;
 
