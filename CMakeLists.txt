@@ -1,15 +1,19 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.15)
 
 set(PROJECT_NAME Multitextor)
+
+if(MSVC)
+    add_link_options("/INCREMENTAL:NO")
+    # Set MSVC runtime to MultiThreaded (/MT)
+    cmake_policy(SET CMP0091 NEW)
+endif()
+
 project(${PROJECT_NAME} VERSION 2.0.0)
 
 #option(USE_VLD "VLD" ON)
 #option(USE_ICONV "LIBICONV" ON)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/_build/bin/")
-if(MSVC)
-    add_link_options("/INCREMENTAL:NO")
-endif()
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Utils)

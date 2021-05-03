@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.9)
+cmake_minimum_required(VERSION 3.15)
 
 set(PROJECT_NAME TestConsole)
 project(${PROJECT_NAME})
@@ -34,6 +34,8 @@ set_target_properties(${PROJECT_NAME}
 if(MSVC)
     # warning level 4
     target_compile_options(${PROJECT_NAME} PRIVATE /W4)
+    set_property(TARGET ${PROJECT_NAME} PROPERTY
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")    
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
