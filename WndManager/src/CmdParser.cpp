@@ -114,7 +114,7 @@ scancmd_t CmdParser::ScanKey(input_t key)
         return scancmd_t::collected;
 }
 
-std::vector<input_t> CmdParser::GetCommand()
+std::vector<input_t>&& CmdParser::GetCommand()
 {
     //return and clear saved keys
     return std::move(m_savedKeys);

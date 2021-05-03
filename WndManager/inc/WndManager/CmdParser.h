@@ -56,7 +56,7 @@ public:
 
     bool        SetCmdMap(const CmdMap& cmdMap);
     scancmd_t   ScanKey(input_t key);
-    std::vector<input_t>    GetCommand();
+    std::vector<input_t>&&  GetCommand();
 };
 
 } // namespace _WndManager
