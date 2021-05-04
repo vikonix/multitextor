@@ -191,9 +191,14 @@ bool EditorWnd::TrackPopupMenu([[maybe_unused]]input_t cmd)
 
     pos_t x{ m_cursorx };
     pos_t y{ m_cursory + 1 };
-    if (x > m_clientSizeX - menuX)
+    if (m_clientSizeX <= menuX)
+        x = 0;
+    else if (x > m_clientSizeX - menuX)
         x = m_clientSizeX - menuX;
-    if (y > m_clientSizeY - menuY)
+    
+    if (m_clientSizeY <= menuY)
+        y = 0;
+    else if (y > m_clientSizeY - menuY)
         y = m_clientSizeY - menuY;
 
     ClientToScreen(x, y);
