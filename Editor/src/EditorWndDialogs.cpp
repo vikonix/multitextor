@@ -186,8 +186,8 @@ bool EditorWnd::TrackPopupMenu([[maybe_unused]]input_t cmd)
     auto maxEntry = std::max_element(g_popupMenu.begin(), g_popupMenu.end(), [](const menu& menu1, const menu& menu2) {
         return menu1.name.size() < menu2.name.size(); });
 
-    size_t menuX = maxEntry->name.size();
-    size_t menuY = g_popupMenu.size() + 2;
+    pos_t menuX = static_cast<pos_t>(maxEntry->name.size());
+    pos_t menuY = static_cast<pos_t>(g_popupMenu.size() + 2);
 
     pos_t x{ m_cursorx };
     pos_t y{ m_cursory + 1 };
