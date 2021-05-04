@@ -8,6 +8,7 @@ This project is mostly recreated version of my old text editor.
  
 ## Key features:
 - Simple interface same in different environments
+- Mouse using
 - Multi-window
 - Split view mode with 2 panels
 - Clear working with different text code pages
@@ -23,6 +24,9 @@ Not MVP (not implemented now):
 - Customizable syntax highlighting
 - Build-in file comparing mode
  
+Editor screenshot.
+  ![Screenshot](docs/multitextor.png)
+
 ## Tested on:
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Windows 7 - Microsoft Visual Studio Community 2017
@@ -42,5 +46,5 @@ Minimal requirement: gcc 8.0 or MSVS 2017
 ## Need to install packages in Linux:
  - sudo apt-get install -y libncurses5-dev
  - sudo apt-get install -y libgpm-dev
- - sudo apt-get install -y gpm
+ - sudo apt-get install -y gpm (only for mouse supporting in console)
  
