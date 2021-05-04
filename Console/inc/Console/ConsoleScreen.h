@@ -149,6 +149,18 @@ public:
         m_buffer[x + y * m_sizex] = c;
         return true;
     }
+    bool SetColor(size_t x, size_t y, color_t c)
+    {
+        //LOG(DEBUG) << "set color x=" << x << " y=" << y << " c=" << std::hex << c << std::dec;
+        if (x >= m_sizex || y >= m_sizey)
+        {
+            LOG(ERROR) << __FUNC__ << " x=" << x << " y=" << y;
+            _assert(!"pos");
+            return false;
+        }
+        m_buffer[x + y * m_sizex] = MAKE_CELL(0, c, m_buffer[x + y * m_sizex]);
+        return true;
+    }
     bool ScrollBlock(size_t left, size_t top, size_t right, size_t bottom, size_t n, scroll_t mode)
     {
         if (left >= m_sizex || right >= m_sizex || top >= m_sizey || bottom >= m_sizey)

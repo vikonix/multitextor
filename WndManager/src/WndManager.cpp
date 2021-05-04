@@ -360,8 +360,7 @@ bool WndManager::WriteColor(pos_t x, pos_t y, const std::vector<color_t>& color)
 
     for (pos_t i = 0; i < len; ++i)
     {
-        cell_t cl = MAKE_CELL(0, color[i], m_screenBuff.GetCell(x + i, y));
-        m_screenBuff.SetCell(x + i, y, cl);
+        m_screenBuff.SetColor(x + i, y, color[i]);
     }
 
     bool rc = CallConsole(WriteBlock(x, y, x + len - 1, y, m_screenBuff, x, y));
@@ -471,8 +470,7 @@ bool WndManager::ColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey, colo
     {
         for (pos_t x = 0; x < sizex; ++x)
         {
-            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y));
-            m_screenBuff.SetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y, cl);
+            m_screenBuff.SetColor(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y, color);
         }
     }
 
@@ -490,8 +488,7 @@ bool WndManager::InvColorRect(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
         for (pos_t x = 0; x < sizex; ++x)
         {
             color_t color = COLOR_INVERSE(GET_CCOLOR(m_screenBuff.GetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y)));
-            cell_t cl = MAKE_CELL(0, color, m_screenBuff.GetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y));
-            m_screenBuff.SetCell(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y, cl);
+            m_screenBuff.SetColor(static_cast<size_t>(left) + x, static_cast<size_t>(top) + y, color);
         }
     }
 
