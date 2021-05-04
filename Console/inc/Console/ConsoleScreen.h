@@ -146,6 +146,10 @@ public:
             _assert(!"pos");
             return false;
         }
+        if (y > 0 && y < m_sizey - 3 && (m_buffer[x + y * m_sizex] & 0xffff) != (c & 0xffff))
+        {
+            size_t a = 0;
+        }
         m_buffer[x + y * m_sizex] = c;
         return true;
     }

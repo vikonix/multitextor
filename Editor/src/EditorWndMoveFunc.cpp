@@ -602,7 +602,7 @@ bool EditorWnd::MoveCenter([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::SelectBegin(input_t cmd)
 {
-    //LOG(DEBUG) << "    SelectBegin code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
+    LOG(DEBUG) << "    SelectBegin code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
     if ((m_selectState & select_state::end) != 0)
         SelectUnselect(cmd);
 

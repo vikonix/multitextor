@@ -189,8 +189,8 @@ bool EditorWnd::TrackPopupMenu([[maybe_unused]]input_t cmd)
     pos_t menuX = static_cast<pos_t>(maxEntry->name.size());
     pos_t menuY = static_cast<pos_t>(g_popupMenu.size() + 2);
 
-    pos_t x{ m_cursorx };
-    pos_t y{ m_cursory + 1 };
+    pos_t x = m_cursorx ;
+    pos_t y = m_cursory + 1;
     if (m_clientSizeX <= menuX)
         x = 0;
     else if (x > m_clientSizeX - menuX)
