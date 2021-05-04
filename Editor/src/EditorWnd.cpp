@@ -107,8 +107,8 @@ bool EditorWnd::Refresh()
 
     m_clientSizeX = GetCSizeX();
     m_clientSizeY = GetCSizeY();
-    LOG(DEBUG) << "    EditorWnd::Refresh " << this;
-    LOG(DEBUG) << "sx=" << m_clientSizeX << " sy=" << m_clientSizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
+    //LOG(DEBUG) << "    EditorWnd::Refresh " << this;
+    //LOG(DEBUG) << "sx=" << m_clientSizeX << " sy=" << m_clientSizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
 
     if (m_clientSizeX <= m_cursorx || m_clientSizeY <= m_cursory)
         _GotoXY(m_xOffset + m_cursorx, m_firstLine + m_cursory);
@@ -456,8 +456,8 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
 
 bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, select_t selectType)
 {
-    LOG(DEBUG) << "    Mark bx=" << bx << " by=" << by << " ex=" << ex << " ey=" << ey 
-        << " color=" << std::hex << color << std::dec << " select=" << static_cast<int>(selectType);
+    //LOG(DEBUG) << "    Mark bx=" << bx << " by=" << by << " ex=" << ex << " ey=" << ey 
+    //    << " color=" << std::hex << color << std::dec << " select=" << static_cast<int>(selectType);
 
     //check begin and end of selection
     size_t x1, x2;
@@ -531,7 +531,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             y2 = m_firstLine + m_clientSizeY - 1;
     }
 
-    LOG(DEBUG) << "    Mark1 bx=" << x1 << " by=" << y1 << " ex=" << x2 << " ey=" << y2;
+    //LOG(DEBUG) << "    Mark1 bx=" << x1 << " by=" << y1 << " ex=" << x2 << " ey=" << y2;
 
     for (size_t y = y1; y <= y2; ++y)
     {
@@ -593,10 +593,7 @@ bool EditorWnd::Mark(size_t bx, size_t by, size_t ex, size_t ey, color_t color, 
             ex = m_xOffset + m_clientSizeX - 1;
 
         if (color)
-        {
-            //LOG(DEBUG) << "ColorRect bx=" << bx << " ex=" << ex << " y=" << y;
             ColorRect(static_cast<pos_t>(bx - m_xOffset), static_cast<pos_t>(y - m_firstLine), static_cast<pos_t>(ex - bx + 1), 1, color);
-        }
         else
         {
             auto str = m_editor->GetStr(y);
