@@ -29,6 +29,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager.h"
 #include "Menu.h"
 
+#include <optional>
+
 
 //////////////////////////////////////////////////////////////////////////////
 namespace _WndManager
