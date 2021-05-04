@@ -31,6 +31,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/StdDialogs.h"
 #include "Dialogs/EditorDialogs.h"
 
+#include <algorithm>
+
 namespace _Editor
 {
 
@@ -181,7 +183,21 @@ bool EditorWnd::CtrlFuncList(input_t cmd)
 
 bool EditorWnd::TrackPopupMenu([[maybe_unused]]input_t cmd)
 {
-    PopupMenu menu(g_popupMenu, m_cursorx, m_cursory + 3);
+    auto maxEntry = std::max_element(g_popupMenu.begin(), g_popupMenu.end(), [](const menu& menu1, const menu& menu2) {
+        return menu1.name.size() < menu2.name.size(); });
+
+    size_t menuX = maxEntry->name.size();
+    size_t menuY = g_popupMenu.size() + 2;
+
+    pos_t x{ m_cursorx };
+    pos_t y{ m_cursory + 1 };
+    if (x > m_clientSizeX - menuX)
+        x = m_clientSizeX - menuX;
+    if (y > m_clientSizeY - menuY)
+        y = m_clientSizeY - menuY;
+
+    ClientToScreen(x, y);
+    PopupMenu menu(g_popupMenu, x, y);
     menu.Activate();
     return true;
 }
