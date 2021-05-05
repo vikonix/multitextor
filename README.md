@@ -51,11 +51,11 @@ Minimal requirement: gcc 8.0 or MSVS 2017
 ## How to build
  - Install CMake 3.15 or higher
  - Install g++ or clang or MSVC
- - Run CMake: **cmake -B _build -S .
-    or **cmakegen.bat
+ - Run CMake: **cmake -B _build -S .**
+    or **cmakegen.bat**
  - Build editor
-    in Linux run: **build.sh
-    in Windows try to run: **msbuild /p:Configuration=Release BigProject.sln 
+    in Linux run: **build.sh**
+    in Windows try to run: **msbuild /p:Configuration=Release BigProject.sln**
     or open solution _build/Multitextor.sln with MSVC
  - Get editor in Linux _build/bin/multitextor or in Windows _build/bir/Debug|Release/multitextor.exe
     
