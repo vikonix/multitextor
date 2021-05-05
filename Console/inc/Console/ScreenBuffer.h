@@ -135,26 +135,29 @@ public:
         }
 
         size_t y;
+        cell_t* buff = m_buffer.data();
         switch (mode)
         {
         case scroll_t::SCROLL_UP:
+            if (bottom < n)
+                bottom = n;
             for (y = top; y <= bottom - n; ++y)
-                std::memcpy(m_buffer.data() + left + y * m_sizex, m_buffer.data() + left + (y + n) * m_sizex, (right - left + n) * sizeof(cell_t));
+                std::memcpy(buff + left + y * m_sizex, buff + left + (y + n) * m_sizex, (right - left + 1) * sizeof(cell_t));
             break;
 
         case scroll_t::SCROLL_DOWN:
-            for (y = bottom; y >= top + n; --y)
-                std::memcpy(m_buffer.data() + left + y * m_sizex, m_buffer.data() + left + (y - n) * m_sizex, (right - left + n) * sizeof(cell_t));
+            for (y = bottom; y >= top + n && y <= bottom; --y)
+                std::memcpy(buff + left + y * m_sizex, buff + left + (y - n) * m_sizex, (right - left + 1) * sizeof(cell_t));
             break;
 
         case scroll_t::SCROLL_LEFT:
             for (y = top; y <= bottom; ++y)
-                std::memmove(m_buffer.data() + left + y * m_sizex, m_buffer.data() + left + n + y * m_sizex, (right - left + 1 - n) * sizeof(cell_t));
+                std::memmove(buff + left + y * m_sizex, buff + left + n + y * m_sizex, (right - left + 1 - n) * sizeof(cell_t));
             break;
 
         case scroll_t::SCROLL_RIGHT:
             for (y = top; y <= bottom; ++y)
-                std::memmove(m_buffer.data() + left + n + y * m_sizex, m_buffer.data() + left + y * m_sizex, (right - left + 1 - n) * sizeof(cell_t));
+                std::memmove(buff + left + n + y * m_sizex, buff + left + y * m_sizex, (right - left + 1 - n) * sizeof(cell_t));
             break;
         }
 

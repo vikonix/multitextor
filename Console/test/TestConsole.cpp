@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "utils/logger.h"
 #include "Console/Console.h"
+#include "Console/ScreenBuffer.h"
 
 #include <iostream>
 

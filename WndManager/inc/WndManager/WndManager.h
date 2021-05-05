@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "Console/Console.h"
+#include "Console/ScreenBuffer.h"
 #include "Wnd.h"
 
 #include <array>
@@ -70,6 +71,9 @@ class WndManager final
     friend class Application;
 
 protected:
+    ScreenBuffer        m_screenBuff; //current buffer color/symbol/changing
+
+protected:
     Console             m_console;
 #define CallConsole(p) ((m_disablePaint) ? true : m_console. p)
 
@@ -77,8 +81,6 @@ protected:
     //view 1/2 - splited view
     std::array<View, 3> m_view {};
     std::deque<Wnd*>    m_wndList;  //windows list sorted in Z order with them activity
-
-    ScreenBuffer        m_screenBuff; //current buffer color/symbol/changing
     Logo                m_logo;
 
     color_t             m_color         {};

@@ -663,6 +663,7 @@ input_t EditorWnd::EventProc(input_t code)
         return K_CLOSE;
     }
 
+    //WndManager::getInstance().ShowBuff();//!!! for debug only
     return 0;
 }
 

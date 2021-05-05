@@ -25,7 +25,7 @@ Not MVP (not implemented now):
 - Build-in file comparing mode
  
 Editor screenshot.
-  ![Screenshot](docs/multitextor.png)
+  ![Screenshot](docs/multitextor1.png)
 
 ## Tested on:
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017

@@ -27,7 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "utils/logger.h"
-#include "ScreenBuffer.h"
 #include "Types.h"
 #include "Color.h"
 
@@ -74,6 +73,8 @@ enum acs_t
 };
 
 //////////////////////////////////////////////////////////////////////////////
+class ScreenBuffer;
+
 class ConsoleScreen
 {
 protected:
