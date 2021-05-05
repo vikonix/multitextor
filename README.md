@@ -56,12 +56,9 @@ Minimal requirement: gcc 8.0 or MSVS 2017
     or ***cmakegen.bat***
     
  - Build editor
- 
-    in Linux run: ***build.sh***
-    
-    in Windows try to run: ***msbuild /p:Configuration=Release BigProject.sln*** 
-    
-    or open solution ***_build/Multitextor.sln*** with MSVC
+    - in Linux run: ***build.sh***
+    - in Windows try to run: ***msbuild /p:Configuration=Release BigProject.sln*** 
+    - or open solution ***_build/Multitextor.sln*** with MSVC
     
  - Get editor in Linux ***_build/bin/multitextor*** or in Windows ***_build/bir/Debug|Release/multitextor.exe***
     
