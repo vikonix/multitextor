@@ -1909,7 +1909,7 @@ bool EditorWnd::CheckFileChanging()
 {
     if (!m_untitled && m_checkTime <= std::chrono::system_clock::now())
     {
-        LOG(DEBUG) << "CheckFileChanging";
+        //LOG(DEBUG) << "CheckFileChanging";
         m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval);
 
         auto state = m_editor->CheckFile();

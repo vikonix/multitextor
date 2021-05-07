@@ -704,7 +704,7 @@ bool EditorWnd::EditPasteFromClipboard(input_t cmd)
 
 bool EditorWnd::Reload([[maybe_unused]]input_t cmd)
 {
-    LOG(DEBUG) << "    Reload";
+    //LOG(DEBUG) << "    Reload";
 
     m_selectState = select_state::no;
     m_selectType = select_t::stream;

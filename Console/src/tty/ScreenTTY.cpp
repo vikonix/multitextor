@@ -482,7 +482,7 @@ bool ScreenTTY::WriteLastChar(char16_t prevC, char16_t lastC)
 bool ScreenTTY::ScrollBlock(pos_t left, pos_t top, pos_t right, pos_t bottom,
     pos_t n, scroll_t mode, uint32_t* invalidate)
 {
-    LOG(DEBUG) << "scroll m=" << static_cast<int>(mode) << " l=" << left << " t=" << top << " r=" << right << " b=" << bottom << " n=" << n;
+    //LOG(DEBUG) << "scroll m=" << static_cast<int>(mode) << " l=" << left << " t=" << top << " r=" << right << " b=" << bottom << " n=" << n;
 
     bool rc = false;
     std::string cap = m_cap[S_SetScroll].str;

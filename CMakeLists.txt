@@ -12,14 +12,18 @@ project(${PROJECT_NAME} VERSION 2.0.0)
 
 #option(USE_VLD "VLD" ON)
 #option(USE_ICONV "LIBICONV" ON)
+#option(BUILD_TEST "BUILD_TEST" OFF)
 
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY "${CMAKE_SOURCE_DIR}/_build/bin/")
 
 add_subdirectory(ThirdParty)
 add_subdirectory(Utils)
-add_subdirectory(Utils/test)
 add_subdirectory(Console)
-add_subdirectory(Console/test)
 add_subdirectory(WndManager)
-add_subdirectory(WndManager/test)
 add_subdirectory(Editor)
+
+if(BUILD_TEST)
+    add_subdirectory(Utils/test)
+    add_subdirectory(Console/test)
+    add_subdirectory(WndManager/test)
+endif()
