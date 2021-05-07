@@ -162,6 +162,6 @@ protected:
 };
 
 /////////////////////////////////////////////////////////////////////////////
-input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::string>& message);
+input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::string>& message, const std::vector<std::string>& keys = {});
 
 } // namespace _WndManager

@@ -59,16 +59,21 @@ scancmd_t CmdParser::ScanKey(input_t key)
         key &= ~K_SHIFT;
     else if (key == K_TIME)
     {
-        if (!m_savedKeys.empty() && time(NULL) - m_time > 1)
-        {
-            //long time between key pressing
-            //return all collected codes
-            Application::getInstance().StatusWaitKey();
-            return scancmd_t::collected;
-        }
+        if (m_savedKeys.empty())
+            return scancmd_t::not_found;
         else
         {
-            return scancmd_t::wait_next;
+            if (time(NULL) - m_time > 1)
+            {
+                //long time between key pressing
+                //return all collected codes
+                Application::getInstance().StatusWaitKey();
+                return scancmd_t::collected;
+            }
+            else
+            {
+                return scancmd_t::wait_next;
+            }
         }
     }
     

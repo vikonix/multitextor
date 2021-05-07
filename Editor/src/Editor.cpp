@@ -89,7 +89,7 @@ bool Editor::LoadBuff(uint64_t offset, size_t size, std::shared_ptr<std::string>
     return true;
 }
 
-bool Editor::Load()
+bool Editor::Load(bool log)
 {
     try
     {
@@ -103,12 +103,14 @@ bool Editor::Load()
 
     Clear();
 
-    auto fileSize{ std::filesystem::file_size(m_file) };
-    decltype(fileSize) fileOffset{};
-    if (0 == fileSize)
+    m_fileTime = std::filesystem::last_write_time(m_file);
+    m_fileSize = std::filesystem::file_size(m_file);
+
+    decltype(m_fileSize) fileOffset{};
+    if (0 == m_fileSize)
         return true;
 
-    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << std::hex << fileSize << std::dec;
+    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << std::hex << m_fileSize << std::dec;
     time_t start{ time(NULL) };
 
     std::ifstream file{m_file, std::ios::binary};
@@ -121,7 +123,7 @@ bool Editor::Load()
 
     time_t t1{ time(nullptr) };
     size_t percent{};
-    auto step{ fileSize / 100 };//1%
+    auto step{ m_fileSize / 100 };//1%
 
     const size_t buffsize{ 0x200000 };//2MB
     auto buff{ std::make_unique<std::array<char, buffsize>>() };
@@ -151,7 +153,7 @@ bool Editor::Load()
     };
 
     
-    if (fileSize > MAX_PARSED_SIZE)
+    if (m_fileSize > MAX_PARSED_SIZE)
         m_lexParser.EnableParsing(false);
 
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
@@ -187,7 +189,7 @@ bool Editor::Load()
 
                 size_t rest;
                 //LOG(DEBUG) << std::hex << "file offset=" << fileOffset << " read=" << read << " strOffset=" << strOffset << " tocopy=" << tocopy << std:: dec;
-                [[maybe_unused]]bool rc = FillStrOffset(strBuff, strOffset + tocopy, fileSize == fileOffset + strOffset + tocopy, rest);
+                [[maybe_unused]]bool rc = FillStrOffset(strBuff, strOffset + tocopy, m_fileSize <= fileOffset + strOffset + tocopy, rest);
                 //LOG(DEBUG) << std::hex << "rest=" << rest << std::dec;
 
                 _assert(rc);
@@ -208,7 +210,7 @@ bool Editor::Load()
             read -= tocopy;
         }
     }
-    _assert(fileSize == fileOffset);
+    _assert(!log || m_fileSize == fileOffset);
     
     EditorApp::ShowProgressBar();
     EditorApp::SetHelpLine("Ready", stat_color::grayed);
@@ -1306,6 +1308,9 @@ bool Editor::Save()
         std::filesystem::resize_file(filePath, buffOffset);
     }
 
+    m_fileTime = std::filesystem::last_write_time(m_file);
+    m_fileSize = std::filesystem::file_size(m_file);
+
     rc = ClearModifyFlag();
     EditorApp::ShowProgressBar();
     EditorApp::SetHelpLine("Ready", stat_color::grayed);
@@ -1465,6 +1470,37 @@ bool Editor::SetParseStyle(const std::string& style)
         }
     }
     
+    return true;
+}
+
+file_state Editor::CheckFile()
+{
+    if (!std::filesystem::exists(m_file))
+        return file_state::removed;
+    
+    auto size = std::filesystem::file_size(m_file);
+    if (size != m_fileSize)
+    {
+        if(size == 0)
+            return file_state::removed;
+        else
+            return file_state::changed;
+    }
+    return file_state::not_changed;
+}
+
+bool Editor::IsFileInMemory()
+{
+    for (auto& buff : m_buffer.m_buffList)
+    {
+        auto ptr = buff->GetBuff();
+        if (!ptr)
+            return false;
+        ptr.reset();
+        buff->ReleaseBuff();
+        if (buff->m_lostData)
+            return false;
+    }
     return true;
 }
 

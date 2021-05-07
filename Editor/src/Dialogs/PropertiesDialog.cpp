@@ -63,7 +63,7 @@ std::list<control> propertiesDialog
     {CTRL_STATIC,                       "Code &page:",          0,                  {},                                 1,  7, 14},
     {CTRL_DROPLIST,                     "",                     ID_DP_CP,           &PropertiesDialog::s_vars.cp,      15,  7, 17,  7, "Select encoding page"},
     {CTRL_CHECK,                        "&Read only",           ID_DP_RO,           &PropertiesDialog::s_vars.ro,       1,  9, 30,  1, "Protect file from changing"},
-    {CTRL_DISABLED | CTRL_CHECK,                        "&Log file",            ID_DP_LOG,          &PropertiesDialog::s_vars.log,      1, 10, 30,  1, "File will be reload without confirmation if it changed"},
+    {CTRL_CHECK,                        "&Log file",            ID_DP_LOG,          &PropertiesDialog::s_vars.log,      1, 10, 30,  1, "File will be reload without confirmation if it changed"},
     {CTRL_STATIC,                       "&End of line:",        0,                  {},                                 35,  6, 13},
     {CTRL_DROPLIST,                     "",                     ID_DP_EOL,          &PropertiesDialog::s_vars.eol,      49,  6, 18,  6, "Select the end of line type"},
     {CTRL_STATIC,                       "&Tab size:",           0,                  {},                                 35,  8, 13},

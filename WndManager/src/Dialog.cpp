@@ -686,7 +686,7 @@ bool Dialog::CtrlRadioSelect(size_t pos)
 }
 
 /////////////////////////////////////////////////////////////////////////////
-input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::string>& message)
+input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::string>& message, const std::vector<std::string>& keys)
 {
     size_t len{};
     for (auto& str : message)
@@ -706,12 +706,20 @@ input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::stri
     box.push_back({ CTRL_LINE, "", 0, nullptr, 1, ++line, static_cast<pos_t>(len) });
     ++line;
 
-    box.push_back({ CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "OK", ID_OK, nullptr, 1, line });
+    std::vector<std::string> defKeys{"OK", "Cancel", "Ignore"};
+    if (keys.size() >= 1 && !keys[0].empty())
+        defKeys[0] = keys[0];
+    if (keys.size() >= 2 && !keys[1].empty())
+        defKeys[1] = keys[1];
+    if (keys.size() >= 3 && !keys[2].empty())
+        defKeys[2] = keys[2];
+
+    box.push_back({ CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, defKeys[0], ID_OK, nullptr, 1, line });
     if(type != MBoxKey::OK)
     {
-        box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, "Cancel", ID_CANCEL, nullptr, 1, line });
+        box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, defKeys[1], ID_CANCEL, nullptr, 1, line });
         if(type != MBoxKey::OK_CANCEL)
-            box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, "Ignore", ID_IGNORE, nullptr, 1, line });
+            box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, defKeys[2], ID_IGNORE, nullptr, 1, line });
     }
 
     Dialog Dlg(box);

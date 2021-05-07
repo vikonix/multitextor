@@ -1778,84 +1778,6 @@ bool EditorWnd::FindDown(bool silence)
     return false;
 }
 
-bool EditorWnd::CheckFileChanging()
-{
-/* //???
-    if (!m_Timer)
-    {
-        m_Timer = 5 * 2;//2 sec
-        int rc = m_pTBuff->CheckAccess();
-        if (rc)
-        {
-            int mode = m_pTBuff->GetAccessInfo();
-            long long size = m_pTBuff->GetSize();
-
-            TPRINT(("File was changed mode=%c size=%lld\n", mode, size));
-            if (mode == 'N' || !size)
-            {
-                //файл удален
-                if (!m_fDeleted)
-                {
-                    //еще одно ожидание
-                    //многие программы сначала удал€ют файл
-                    //а потом восстанавливают
-                    TPRINT(("Check deleted\n"));
-                    m_fDeleted = 1;
-                }
-                else
-                {
-                    m_fDeleted = 0;
-                    //нужно проверить изменен ли файл
-                    //если изменен, весь ли он в пам€ти
-                    FLoadDialog Dlg(GetObjPath(), 1);
-                    int code1 = Dlg.Activate();
-                    if (code1 == ID_OK)
-                    {
-                        //TPRINT(("...Save1\n"));
-                        Save(1);
-                    }
-                }
-            }
-            else
-            {
-                m_fDeleted = 0;
-                if (!m_fLog)
-                {
-                    FLoadDialog Dlg(GetObjPath());
-                    int code1 = Dlg.Activate();
-                    if (code1 == ID_OK)
-                    {
-                        //TPRINT(("...Reload1\n"));
-                        Reload(0);
-                    }
-                }
-                else
-                {
-                    //???
-                    //TPRINT(("...Reload2\n"));
-                    Reload(0);
-                }
-            }
-        }
-        else if (m_fDeleted)
-        {
-            m_fDeleted = 0;
-            //нужно проверить изменен ли файл
-            //если изменен, весь ли он в пам€ти
-            FLoadDialog Dlg(GetObjPath(), 1);
-            int code1 = Dlg.Activate();
-            if (code1 == ID_OK)
-            {
-                //TPRINT(("...Save2\n"));
-                Save(1);
-            }
-        }
-    }
-    --m_Timer;
-*/
-    return true;
-}
-
 bool EditorWnd::EditWndCopy(EditorWnd* from)
 {
     if (m_readOnly)
@@ -1981,6 +1903,77 @@ bool EditorWnd::TryDeleteSelectedBlock()
     }
 
     return EditBlockDel(0);
+}
+
+bool EditorWnd::CheckFileChanging()
+{
+    if (!m_untitled && m_checkTime <= std::chrono::system_clock::now())
+    {
+        LOG(DEBUG) << "CheckFileChanging";
+        m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval);
+
+        auto state = m_editor->CheckFile();
+
+        if (state == file_state::removed)
+        {
+            //file was deleted
+            if (!m_deleted)
+            {
+                //lets try to wait one more 
+                //as some programms can recreate file while updated it
+                m_deleted = true;
+                LOG(DEBUG) << "Check deleted";
+                return true;
+            }
+            else
+            {
+                //realy deleted
+                LOG(DEBUG) << "Deleted";
+                //check is all file in memory
+                if (!m_editor->IsFileInMemory())
+                {
+                    return true;
+                }
+                //ask for rewrite
+                auto ret = MsgBox(MBoxKey::OK_CANCEL, "Restore",
+                    { "File has been deleted outside of editor.",
+                    "Do you want to restore it ?" },
+                    { "Restore", "No" }
+                );
+                if (ret == ID_OK)
+                {
+                    //recreate file
+                    std::ofstream ofs(m_editor->GetFilePath());
+                    ofs.close();
+                    //force save
+                    Save(1);
+                }
+            }
+        }
+        else if (state == file_state::changed)
+        {
+            m_deleted = false;
+            LOG(DEBUG) << "Changed";
+            if (m_log)
+                Reload(0);
+            else
+            {
+                //ask for reload
+                auto ret = MsgBox(MBoxKey::OK_CANCEL, "Reload",
+                    { "File has been modified outside of editor.",
+                    "Do you want to reload it ?", },
+                    { "Reload", "No" }
+                );
+                if (ret == ID_OK)
+                    Reload(0);
+                m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval);
+            }
+        }
+        else
+            m_deleted = false;
+    }
+
+    return true;
 }
 
 } //namespace _Editor

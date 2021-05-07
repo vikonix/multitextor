@@ -42,6 +42,8 @@ class Diff;
 
 class EditorWnd : public FrameWnd
 {
+    inline static const std::chrono::seconds CheckInterval{5};
+
     enum select_state : int
     {
         no          = 0,
@@ -95,6 +97,8 @@ class EditorWnd : public FrameWnd
     bool            m_untitled{true};
     bool            m_readOnly{};
     bool            m_log{};
+    std::chrono::time_point<std::chrono::system_clock> m_checkTime{ 
+        std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval)};
 
     //file position
     size_t          m_xOffset{};

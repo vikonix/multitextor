@@ -209,7 +209,8 @@ bool EditorApp::CloseAllWindows()
 
         auto ret = MsgBox(MBoxKey::OK_CANCEL, "Close: " + wnd->GetObjectName(),
             { "File was changed.",
-            "Do you want to save it?" }
+            "Do you want to save it?" },
+            { "Save", "No" }
         );
         if (ret == ID_OK)
             wnd->Save(0);
@@ -242,7 +243,7 @@ input_t EditorApp::AppProc(input_t code)
     else if (code == K_EXIT)
     {
         auto ret = MsgBox(MBoxKey::OK_CANCEL, "Exit",
-            {"Do you want to exit program ?"}
+            { "Do you want to exit program ?" }
         );
         if (ret != ID_OK)
             return 0;

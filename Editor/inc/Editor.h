@@ -61,6 +61,13 @@ enum class eol_t
     mac_eol
 };
 
+enum class file_state
+{
+    not_changed,
+    changed,
+    removed
+};
+
 #ifdef WIN32
     #define DEF_EOL eol_t::win_eol
 #else
@@ -76,7 +83,8 @@ private:
     std::shared_ptr<iconvpp::CpConverter>       m_converter;
 
     std::filesystem::path                       m_file;
-    std::filesystem::file_time_type             m_lastWriteTime;
+    std::filesystem::file_time_type             m_fileTime{};
+    uintmax_t                                   m_fileSize{};
     MemStrBuff<std::string, std::string_view>   m_buffer;
 
     std::unordered_set<FrameWnd*>               m_wndList;
@@ -150,12 +158,13 @@ public:
     bool                    InvalidateWnd(size_t line, invalidate_t type, pos_t pos = 0, pos_t size = 0) const;
     bool                    RefreshAllWnd(FrameWnd* wnd) const;
 
-    bool                    Load();
+    bool                    Load(bool log = false);
     bool                    Save();
     bool                    SetName(const std::filesystem::path& file, bool copy);
     bool                    ClearModifyFlag();
-    bool                    CheckFileAccess();
     char                    GetAccessInfo();
+    file_state              CheckFile();
+    bool                    IsFileInMemory();
 
     size_t                  GetMaxStrLen() const    {return m_maxStrlen;}
     void                    SetMaxStrLen(size_t len){m_maxStrlen = std::min(static_cast<size_t>(MAX_STRLEN), len);}

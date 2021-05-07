@@ -896,9 +896,11 @@ bool EditorWnd::Replace(input_t cmd)
     return true;
 }
 
-bool EditorWnd::Save([[maybe_unused]] input_t cmd)
+bool EditorWnd::Save(input_t cmd)
 {
-    if (!m_editor->IsChanged())
+    input_t force{ K_GET_CODE(cmd) };
+
+    if (force == 0 && !m_editor->IsChanged())
         return true;
 
     LOG(DEBUG) << "    Save " << std::hex << cmd << std::dec;
@@ -914,8 +916,8 @@ bool EditorWnd::Save([[maybe_unused]] input_t cmd)
     {
         LOG(ERROR) << "save as: exception " << ex.what();
         MsgBox(MBoxKey::OK, "Save",
-            {"File write error",
-            "Check file access and try again"}
+            { "File write error",
+            "Check file access and try again" }
         );
         return false;
     }
