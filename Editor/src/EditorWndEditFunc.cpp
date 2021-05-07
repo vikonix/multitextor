@@ -69,7 +69,7 @@ bool EditorWnd::EditC(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditDelC(input_t cmd)
+bool EditorWnd::EditDelC([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -120,7 +120,7 @@ bool EditorWnd::EditDelC(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditBS(input_t cmd)
+bool EditorWnd::EditBS([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -177,7 +177,7 @@ bool EditorWnd::EditBS(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditEnter(input_t cmd)
+bool EditorWnd::EditEnter([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -215,7 +215,7 @@ bool EditorWnd::EditEnter(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditTab(input_t cmd)
+bool EditorWnd::EditTab([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -246,7 +246,7 @@ bool EditorWnd::EditTab(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditDelStr(input_t cmd)
+bool EditorWnd::EditDelStr([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -262,7 +262,7 @@ bool EditorWnd::EditDelStr(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditDelBegin(input_t cmd)
+bool EditorWnd::EditDelBegin([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -286,7 +286,7 @@ bool EditorWnd::EditDelBegin(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditDelEnd(input_t cmd)
+bool EditorWnd::EditDelEnd([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -365,7 +365,7 @@ bool EditorWnd::EditBlockDel(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditUndo(input_t cmd)
+bool EditorWnd::EditUndo([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -433,7 +433,7 @@ bool EditorWnd::EditUndo(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditRedo(input_t cmd)
+bool EditorWnd::EditRedo([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
@@ -728,7 +728,7 @@ bool EditorWnd::CtrlRefresh([[maybe_unused]] input_t cmd)
     return Refresh();
 }
 
-bool EditorWnd::Replace(input_t cmd)
+bool EditorWnd::Replace([[maybe_unused]] input_t cmd)
 {
     if (m_readOnly)
         return true;
