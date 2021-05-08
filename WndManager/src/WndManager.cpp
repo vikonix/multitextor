@@ -760,7 +760,7 @@ input_t WndManager::ProcInput(input_t code)
     if (code == K_REFRESH)
     {
         //refresh
-        LOG(DEBUG) << "WndManager Refresh";
+        //LOG(DEBUG) << "WndManager Refresh";
         Refresh();
         out = 0;
     }
@@ -808,7 +808,7 @@ input_t WndManager::ProcInput(input_t code)
                         }
                         else
                         {
-                            LOG(DEBUG) << "Split line";
+                            //LOG(DEBUG) << "Split line";
                             if ((code & K_TYPEMASK) == K_MOUSEKL)
                                 TrackView({});
                         }

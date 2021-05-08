@@ -1913,14 +1913,13 @@ bool EditorWnd::CheckFileChanging()
         m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval);
 
         auto state = m_editor->CheckFile();
-
         if (state == file_state::removed)
         {
             //file was deleted
             if (!m_deleted)
             {
                 //lets try to wait one more 
-                //as some programms can recreate file while updated it
+                //as some programms can to recreate file while updated it
                 m_deleted = true;
                 LOG(DEBUG) << "Check deleted";
                 return true;
