@@ -60,6 +60,6 @@ Minimal requirement: gcc 8.0 or MSVS 2017
     - in Windows try to run: ***msbuild /p:Configuration=Release Multitextor.sln*** 
     - or open solution ***_build/Multitextor.sln*** with MSVC
     
- - Get editor in Linux ***_build/bin/multitextor*** or in Windows ***_build/bir/Debug|Release/multitextor.exe***
+ - Get editor in Linux ***_build/bin/multitextor*** or in Windows ***_build/bin/Debug|Release/multitextor.exe***
     
  
