@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 #include "WndManager/Dialog.h"
+#include "utils/Directory.h"
 
 #include <map>
 #include <set>
@@ -35,6 +36,51 @@ using namespace _WndManager;
 namespace _Editor
 {
 
+/////////////////////////////////////////////////////////////////////////////
+enum class FileDlgMode
+{
+    Open,
+    SaveAs,
+    NewSess,
+    OpenSess
+};
+
+#define MAX_MASK_LIST 16
+struct FileDialogVars
+{
+    std::list<std::string> typeList{ "Text", "C++" };
+    std::list<std::string> cpList{ "UTF-8", "CP437", "CP866", "CP1251" };
+    std::list<std::string> maskList;
+
+    std::string path{ "." };
+    std::string file{ "*.*" };
+    std::string typeName;
+    std::string cpName;
+
+    size_t type{};
+    size_t cp{};
+    bool ro{};
+    bool log{};
+};
+
+class FileDialog : public Dialog
+{
+    FileDlgMode             m_mode;
+    _Utils::DirectoryList   m_dirList;
+
+    bool ScanDir(const std::string& mask);
+
+public:
+    static FileDialogVars s_vars;
+
+    FileDialog(FileDlgMode mode = FileDlgMode::Open, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+
+    virtual input_t DialogProc(input_t code) override;
+    virtual bool OnActivate() override;
+    virtual bool OnClose(int id) override;
+};
+    
+/////////////////////////////////////////////////////////////////////////////
 enum class WindowsDlgMode
 {
     List,
@@ -59,6 +105,7 @@ public:
     virtual bool OnClose(int id) override;
 };
 
+/////////////////////////////////////////////////////////////////////////////
 class GotoDialog : public Dialog
 {
     size_t m_maxLine;
@@ -72,6 +119,7 @@ public:
     size_t GetLine() { return static_cast<size_t>(std::stoull(m_line)); }
 };
 
+/////////////////////////////////////////////////////////////////////////////
 struct FindReplaceVars
 {
     std::set<std::string>  findList;
@@ -104,6 +152,7 @@ public:
     bool OnClose(int id);
 };
 
+/////////////////////////////////////////////////////////////////////////////
 struct PropertiesVars
 {
     std::list<std::string> typeList{ "Text", "C++" };

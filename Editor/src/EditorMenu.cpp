@@ -192,7 +192,7 @@ static menu_list menuHelp
 //    {MENU_ITEM,         "&View Help",                   K_APP_HELP,               "Help documentation"},
 //    {MENU_ITEM,         "Keyboard &Map",                K_APP_HELP_KEYMAP,        "Keyboard command description"},
 //    {MENU_SEPARATOR},
-    {MENU_ITEM,         "&About",                       K_APP_ABOUT,              "About Application"}
+    {MENU_ITEM,         "&About",                       K_APP_ABOUT,                "About Application"}
 };
 
 menu_list g_menuRecentFiles 

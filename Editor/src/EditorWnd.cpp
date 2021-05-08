@@ -1960,7 +1960,7 @@ bool EditorWnd::CheckFileChanging()
                 //ask for reload
                 auto ret = MsgBox(MBoxKey::OK_CANCEL, "Reload",
                     { "File has been modified outside of editor.",
-                    "Do you want to reload it ?", },
+                    "Do you want to reload it ?" },
                     { "Reload", "No" }
                 );
                 if (ret == ID_OK)

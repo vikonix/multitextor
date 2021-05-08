@@ -24,12 +24,14 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
+#include "Dialogs/EditorDialogs.h"
 #include "utfcpp/utf8.h"
-#include "WndManager/StdDialogs.h"
 #include "WndManager/DlgControls.h"
 #include "WndManager/WndManager.h"
 
-namespace _WndManager 
+using namespace _Utils;
+
+namespace _Editor 
 {
 
 /////////////////////////////////////////////////////////////////////////////
@@ -314,4 +316,4 @@ bool FileDialog::OnClose(int id)
     return true;
 }
 
-} //namespace _WndManager 
+} //namespace _Editor

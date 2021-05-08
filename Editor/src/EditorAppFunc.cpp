@@ -25,7 +25,6 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
-#include "WndManager/StdDialogs.h"
 #include "Dialogs/EditorDialogs.h"
 #include "utfcpp/utf8.h"
 #include "Version.h"

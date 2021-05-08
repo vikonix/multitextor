@@ -68,7 +68,7 @@ std::list<control> propertiesDialog
     {CTRL_DROPLIST,                     "",                     ID_DP_EOL,          &PropertiesDialog::s_vars.eol,      49,  6, 18,  6, "Select the end of line type"},
     {CTRL_STATIC,                       "&Tab size:",           0,                  {},                                 35,  8, 13},
     {CTRL_EDIT,                         "",                     ID_DP_TAB,          {},                                 64,  8,  3,  7, "Input tabulation size (1-10)"},
-    {CTRL_RADIO,                        "Convert tabs to &space",ID_DP_TAB_CONVERT, &PropertiesDialog::s_vars.saveTab,  35,  9, 30,  1, "Convert all tabulations to space"},
+    {CTRL_RADIO,                        "&Convert tabs to space",ID_DP_TAB_CONVERT, &PropertiesDialog::s_vars.saveTab,  35,  9, 30,  1, "Convert all tabulations to space"},
     {CTRL_RADIO,                        "&Use tabs as space",   ID_DP_TAB_SAVE,     &PropertiesDialog::s_vars.saveTab,  35, 10, 30,  1, "Save tabulations"},
     {CTRL_CHECK,                        "S&how tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,  35, 11, 30,  1, "Highlight tabulations"},
 
