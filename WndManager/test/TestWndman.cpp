@@ -32,10 +32,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/Directory.h"
 #include "WndManager/App.h"
 #include "WndManager/DlgControls.h"
-#include "WndManager/StdDialogs.h"
 
 #include <iostream>
 
+using namespace _Utils;
 using namespace _WndManager;
 
 /////////////////////////////////////////////////////////////////////////////
@@ -116,9 +116,7 @@ public:
         }
         else if (code == K_F3)
         {
-            //code = MsgBox("Title", "Str111", "Str2222222", MBOX_OK_CANCEL_IGNORE);
-            FileDialog dlg{ FileDlgMode::Open };
-            dlg.Activate();
+            code = MsgBox(MBoxKey::OK_CANCEL_IGNORE, "Title", { "Str111", "Str2222222" });
             code = 0;
         }
 
@@ -143,28 +141,6 @@ public:
 MyApp app;
 Application& Application::s_app{app};
 
-void CheckDirectoryFunc()
-{
-    LOG(DEBUG) << "run path=" << Directory::RunPath();
-    LOG(DEBUG) << "cur path=" << Directory::CurPath();
-    LOG(DEBUG) << "tmp path=" << Directory::TmpPath();
-    LOG(DEBUG) << "cfg path=" << Directory::CfgPath();
-    LOG(DEBUG) << "sys cfg path=" << Directory::SysCfgPath();
-    LOG(DEBUG) << "user=" << Directory::UserName();
-
-    _assert( Directory::Match<std::string>("geeks", "g*ks")); // Yes 
-    _assert( Directory::Match<std::string>("geeksforgeeks", "ge?ks*")); // Yes 
-    _assert(!Directory::Match<std::string>("gee", "g*k"));  // No because 'k' is not in second 
-    _assert(!Directory::Match<std::string>("pqrst", "*pqrs")); // No because 't' is not in first 
-    _assert( Directory::Match<std::string>("abcdhghgbcd", "abc*bcd")); // Yes 
-    _assert(!Directory::Match<std::string>("abcd", "abc*c?d")); // No because second must have 2 instances of 'c' 
-    _assert( Directory::Match<std::string>("abcd", "*c*d")); // Yes 
-    _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
-    _assert( Directory::Match<std::string>("acd", "*?c*d")); // Yes 
-    _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
-    _assert( Directory::Match<std::u16string>(u"abcd", u"*?c*d")); // Yes 
-}
-
 int main()
 {
     ConfigureLogger("m-%datetime{%Y%M%d}.log", 0x200000, false);
@@ -188,7 +164,6 @@ int main()
 
     app.Deinit();
 
-    CheckDirectoryFunc();
     LOG(INFO) << "End";
     return 0;
 }

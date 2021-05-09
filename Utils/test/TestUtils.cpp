@@ -119,10 +119,12 @@ int main()
     ConfigureLogger("m-%datetime{%Y%M%d}.log", 0x200000, false);
     LOG(INFO);
     LOG(INFO) << "Utils test";
+    std::cout << "Utils test starts...";
 
     BuffTest();
     CheckDirectoryFunc();
 
+    std::cout << "Utils test finished";
     LOG(INFO) << "End";
 
     return 0;
