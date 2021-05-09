@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/Directory.h"
 #include "WndManager/DlgControls.h"
 #include "WndManager/App.h"
+#include "utils/CpConverter.h"
 
 using namespace _Utils;
 
@@ -110,7 +111,7 @@ bool PropertiesDialog::OnActivate()
 
     ctrl = GetItem(ID_DP_CP);
     listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);
-    for (const auto& str : s_vars.cpList)
+    for (const auto& str : iconvpp::CpConverter::GetCpList())
     {
         listPtr->AppendStr(str);
         if (str == s_vars.cpName)

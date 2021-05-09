@@ -26,11 +26,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #pragma once
 
-#include "utils/logger.h"
-
 #include <iconv.h>
-#include <errno.h>
 #include <string>
+#include <list>
 
 namespace iconvpp
 {
@@ -49,108 +47,13 @@ class CpConverter
     void operator= (const CpConverter&) = delete;
 
 public:
-    CpConverter(const std::string& cp)
-        : m_cp{cp}
-    {
-        m_iconvFrom = iconv_open(s_u16.c_str(), m_cp.c_str());
-        if (m_iconvFrom == s_invalidIconv)
-        {
-            _assert(0);
-            if (errno == EINVAL)
-                throw std::runtime_error{ "conversion not supported from " + m_cp };
-            else
-                throw std::runtime_error{ "error init conversion from " + m_cp + " errno=" + std::to_string(errno) };
-        }
-        
-        m_iconvTo = iconv_open(m_cp.c_str(), s_u16.c_str());
-        if (m_iconvTo == s_invalidIconv)
-        {
-            _assert(0);
-            if (errno == EINVAL)
-                throw std::runtime_error{ "conversion not supported to " + m_cp };
-            else
-                throw std::runtime_error{ "error init conversion to " + m_cp + " errno=" + std::to_string(errno) };
-        }
-    }
-    
-    ~CpConverter() 
-    {
-        if (m_iconvFrom != s_invalidIconv)
-            iconv_close(m_iconvFrom);
-        if (m_iconvTo != s_invalidIconv)
-            iconv_close(m_iconvTo);
-    }
+    CpConverter(const std::string& cp);
+    ~CpConverter();
 
-    bool Convert(std::string_view str, std::u16string& out)
-    {
-        out.clear();
-        if (m_iconvFrom == s_invalidIconv)
-            return false;
+    bool Convert(std::string_view str, std::u16string& out);
+    bool Convert(char16_t ch, std::string& out);
 
-        auto srcPtr = str.data();
-        size_t srcSize = str.size();
-
-        out.resize(srcSize * 2);//2x reserve
-        auto outPtr = out.data();
-        size_t outSize = out.size();
-        size_t reserv = outSize;
-
-        char* dstPtr = reinterpret_cast<char*>(outPtr);
-        size_t dstSize = outSize * 2;
-
-        bool rc{ true };
-        while (srcSize)
-        {
-            size_t converted = iconv(m_iconvFrom, &srcPtr, &srcSize, &dstPtr, &dstSize);
-            if (converted == static_cast<size_t>(-1))
-            {
-                rc = false;
-                if (errno == EINVAL)
-                {
-                    break;
-                }
-                else
-                {
-                    //skip symbol
-                    ++srcPtr;
-                    --srcSize;
-                    *dstPtr++ = '?';
-                    *dstPtr++ = 0;
-                    dstSize -= 2;
-                }
-            }
-        }
-
-        //resize out str
-        out.resize(reserv - dstSize / 2);
-        return rc;
-    }
-
-    bool Convert(char16_t ch, std::string& out)
-    {
-        if (m_iconvFrom == s_invalidIconv)
-            return false;
-
-        const char* srcPtr = reinterpret_cast<const char*>(&ch);
-        size_t srcSize = sizeof(ch);
-
-        out.resize(srcSize * 3); //6x reserve 
-        auto dstPtr = out.data();
-        size_t dstSize = out.size();
-        size_t reserv = dstSize;
-
-        size_t converted = iconv(m_iconvTo, &srcPtr, &srcSize, &dstPtr, &dstSize);
-        if (converted == static_cast<size_t>(-1))
-        {
-            _assert(0);
-            out = ' ';
-            return false;
-        }
-
-        //resize out str
-        out.resize(reserv - dstSize);
-        return true;
-    }
+    static std::list<std::string> GetCpList();
 };
 
 } //namespace iconvpp

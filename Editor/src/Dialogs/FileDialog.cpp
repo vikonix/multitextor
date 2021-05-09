@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "WndManager/DlgControls.h"
 #include "WndManager/WndManager.h"
+#include "utils/CpConverter.h"
 
 using namespace _Utils;
 
@@ -123,7 +124,7 @@ bool FileDialog::OnActivate()
         auto ctrlCp = std::dynamic_pointer_cast<CtrlDropList>(cp);
         if (ctrlCp)
         {
-            for (const std::string& str : s_vars.cpList)
+            for (const std::string& str : iconvpp::CpConverter::GetCpList())
                 ctrlCp->AppendStr(str);
             ctrlCp->SetSelect(s_vars.cp);
         }
