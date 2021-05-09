@@ -141,8 +141,9 @@ std::list<std::string> CpConverter::GetCpList()
 {
     return {
         "UTF-8", 
-        "CP437", "CP866", 
-        "CP1251"
+        "CP1250", "CP1251", "CP1252", "CP1253", "CP1254", "CP1257",
+        "CP437", "CP775", "CP850", "CP852", "CP857", "CP858", "CP860", "CP863", "CP866",
+        "KOI8-R"
     };
 }
 

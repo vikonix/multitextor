@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/DlgControls.h"
 #include "WndManager/WndManager.h"
 #include "utils/CpConverter.h"
+#include "LexParser.h"
 
 using namespace _Utils;
 
@@ -133,7 +134,7 @@ bool FileDialog::OnActivate()
         auto ctrlType = std::dynamic_pointer_cast<CtrlDropList>(type);
         if (ctrlType)
         {
-            for (const std::string& str : s_vars.typeList)
+            for (const std::string& str : LexParser::GetFileTypeList())
                 ctrlType->AppendStr(str);
             ctrlType->SetSelect(s_vars.type);
         }

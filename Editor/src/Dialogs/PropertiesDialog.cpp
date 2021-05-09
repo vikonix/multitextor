@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/DlgControls.h"
 #include "WndManager/App.h"
 #include "utils/CpConverter.h"
+#include "LexParser.h"
 
 using namespace _Utils;
 
@@ -102,7 +103,7 @@ bool PropertiesDialog::OnActivate()
 
     auto ctrl = GetItem(ID_DP_TYPE);
     auto listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);
-    for (const auto& str : s_vars.typeList)
+    for (const auto& str : LexParser::GetFileTypeList())
     {
         listPtr->AppendStr(str);
         if (str == s_vars.typeName)

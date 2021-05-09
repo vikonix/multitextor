@@ -33,6 +33,63 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace _Editor
 {
 
+std::unordered_map<std::string, LexConfig> LexParser::s_lexConfig
+{
+    {
+        "Text",
+        {
+            //plain text
+            "Text",     //name
+            "",         //file mask
+            ",.:;=<>",  //delimiters
+            "",         //name symbols
+            {},         //special
+            {},         //line
+            {},         //open
+            {},         //close
+            0,          //toggled
+            0,          //recursive
+            0,          //not case
+            0,          //Save Tab
+            8,          //tab size
+            {}          //key words
+        }
+    },
+    {
+        "C++",
+        {
+            //C/C++
+            "C++",    //name
+            "*.c;*.cc;*.cpp;*.h;*.hpp",//file mask
+            "[]{}();",  //delimiters
+            "$",        //name symbols
+            {},         //special
+            {"//"},     //line
+            {"/*"},     //open
+            {"*/"},     //close
+            0,          //toggled
+            0,          //recursive
+            0,          //not case
+            0,          //Save Tab
+            4,          //tab size
+            //key words
+            {
+                "alignas", "alignof", "and", "and_eq", "asm", "auto", "bitand", "bitor", "bool", "break", "case", "catch",
+                "char", "char8_t", "char16_t", "char32_t", "class", "compl", "const", "constexpr", "const_cast", "continue",
+                "decltype", "default", "delete", "do", "double", "dynamic_cast", "else", "enum", "explisit", "export", "extern",
+                "false", "float", "for", "final", "finally", "friend", "goto", "if", "inline", "int", "long", "longlong", "mutable", "namespace", "new",
+                "noexept", "not", "not_eq", "nullptr", "operator", "or", "or_eq", "override", "private", "protected", "public",
+                "register", "reinterpret_cast", "restrict", "return", "short", "signed", "sizeof", "static", "static_assert",
+                "static_cast", "struct", "switch", "template", "this", "throw", "true", "try", "typedef", "typeid", "typename",
+                "union", "unsigned", "use", "using", "virtual", "void", "volatile", "wchar_t", "while", "xor", "xoe_or",
+                "far", "near", "huge",
+                //preprocessor
+                "elif", "endif", "ifdef", "ifndef", "define", "defined", "undef", "include", "line", "error", "pragma", "once", "NULL"
+            }
+        }
+    }
+};
+
 std::unordered_map<char16_t, std::pair<char16_t, bool>> LexParser::s_lexPairs
 {
     {'[', {']', false}},
@@ -45,58 +102,22 @@ std::unordered_map<char16_t, std::pair<char16_t, bool>> LexParser::s_lexPairs
     {'>', {'<', true}},
 };
 
-std::list<LexConfig> LexParser::s_lexConfig
-{
-    {
-        //plain text
-        "Text",     //name
-        "",         //file mask
-        ",.:;=<>",  //delimiters
-        "",         //name symbols
-        {},         //special
-        {},         //line
-        {},         //open
-        {},         //close
-        0,          //toggled
-        0,          //recursive
-        0,          //not case
-        0,          //Save Tab
-        8,          //tab size
-        {}          //key words
-    },
-    {
-        //C/C++
-        "C++",    //name
-        "*.c;*.cc;*.cpp;*.h;*.hpp",//file mask
-        "[]{}();",  //delimiters
-        "$",        //name symbols
-        {},         //special
-        {"//"},     //line
-        {"/*"},     //open
-        {"*/"},     //close
-        0,          //toggled
-        0,          //recursive
-        0,          //not case
-        0,          //Save Tab
-        4,          //tab size
-        //key words
-        {
-            "alignas", "alignof", "and", "and_eq", "asm", "auto", "bitand", "bitor", "bool", "break", "case", "catch",
-            "char", "char8_t", "char16_t", "char32_t", "class", "compl", "const", "constexpr", "const_cast", "continue",
-            "decltype", "default", "delete", "do", "double", "dynamic_cast", "else", "enum", "explisit", "export", "extern",
-            "false", "float", "for", "final", "finally", "friend", "goto", "if", "inline", "int", "long", "longlong", "mutable", "namespace", "new",
-            "noexept", "not", "not_eq", "nullptr", "operator", "or", "or_eq", "override", "private", "protected", "public",
-            "register", "reinterpret_cast", "restrict", "return", "short", "signed", "sizeof", "static", "static_assert",
-            "static_cast", "struct", "switch", "template", "this", "throw", "true", "try", "typedef", "typeid", "typename",
-            "union", "unsigned", "use", "using", "virtual", "void", "volatile", "wchar_t", "while", "xor", "xoe_or",
-            "far", "near", "huge",
-            //preprocessor
-            "elif", "endif", "ifdef", "ifndef", "define", "defined", "undef", "include", "line", "error", "pragma", "once", "NULL"
-        }
-    }
-};
-
 //////////////////////////////////////////////////////////////////////////////
+bool LexParser::SetLexConfig(const std::list<LexConfig>& config)
+{
+    for (auto& cfg : config)
+        s_lexConfig.insert_or_assign(cfg.langName, cfg);
+    return true;
+}
+
+std::list<std::string> LexParser::GetFileTypeList()
+{
+    std::list<std::string> typeList;
+    for (auto& [type, cfg] : s_lexConfig)
+        typeList.emplace_back(type);
+    return typeList;
+}
+
 bool LexParser::SetParseStyle(const std::string& style)
 {
     m_scan = false;
@@ -109,7 +130,7 @@ bool LexParser::SetParseStyle(const std::string& style)
     m_closeComment.clear();
     m_keyWords.clear();
 
-    for (auto& cfg : s_lexConfig)
+    for (auto& [type, cfg] : s_lexConfig)
     {
         if (cfg.langName == style)
         {

@@ -48,7 +48,6 @@ enum class FileDlgMode
 #define MAX_MASK_LIST 16
 struct FileDialogVars
 {
-    std::list<std::string> typeList{ "Text", "C++" };
     std::list<std::string> maskList;
 
     std::string path{ "." };
@@ -154,7 +153,6 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 struct PropertiesVars
 {
-    std::list<std::string> typeList{ "Text", "C++" };
     std::list<std::string> eolList{ "Unix (LF)", "Windows (CR+LF)", "Mac (CR)" };
     size_t type{};
     size_t cp{};
