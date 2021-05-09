@@ -1,5 +1,5 @@
 # Multitextor
-Cross Platform console mode library and text editor.
+![Screenshot](docs/m.png) Cross Platform console mode library and text editor.
 
 This project is mostly recreated version of my old text editor.
 
