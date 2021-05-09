@@ -17,7 +17,7 @@ set(PRODUCT_NAME "Multitextor")
 set(PRODUCT_NAME_COLOR "&M&u&l&t&i&t&e&x&t&o&r")
 set(PRODUCT_VERSION 2.0.0)
 set(PRODUCT_VERSION_RC 2,0,0)
-set(PRODUCT_VERSION_FULL "${PRODUCT_VERSION} MVP (alpha)")
+set(PRODUCT_VERSION_FULL "${PRODUCT_VERSION} MVP (beta)")
 configure_file("res/editor.rc.in" "editor.rc" @ONLY)
 configure_file("res/Version.h.in" "Version.h" @ONLY)
 

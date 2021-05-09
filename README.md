@@ -1,10 +1,10 @@
 # Multitextor
-![Screenshot](docs/m.png) Cross Platform console mode library and text editor.
+![Screenshot](docs/m.png) Cross Platform console mode text editor.
 
 This project is mostly recreated version of my old text editor.
 
 ## In progress:
-- Editor MVP alpha version.
+- Editor 2.0.0 MVP (beta) version.
  
 ## Key features:
 - Simple interface same in different environments
