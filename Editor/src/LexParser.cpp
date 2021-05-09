@@ -47,10 +47,10 @@ std::unordered_map<std::string, LexConfig> LexParser::s_lexConfig
             {},         //line
             {},         //open
             {},         //close
-            0,          //toggled
-            0,          //recursive
-            0,          //not case
-            0,          //Save Tab
+            false,      //toggled
+            false,      //recursive
+            false,      //not case
+            false,      //Save Tab
             8,          //tab size
             {}          //key words
         }
@@ -67,10 +67,10 @@ std::unordered_map<std::string, LexConfig> LexParser::s_lexConfig
             {"//"},     //line
             {"/*"},     //open
             {"*/"},     //close
-            0,          //toggled
-            0,          //recursive
-            0,          //not case
-            0,          //Save Tab
+            false,      //toggled
+            false,      //recursive
+            false,      //not case
+            false,      //Save Tab
             4,          //tab size
             //key words
             {
@@ -86,6 +86,26 @@ std::unordered_map<std::string, LexConfig> LexParser::s_lexConfig
                 //preprocessor
                 "elif", "endif", "ifdef", "ifndef", "define", "defined", "undef", "include", "line", "error", "pragma", "once", "NULL"
             }
+        }
+    },
+    {
+        "JSON",
+        {
+            //plain text
+            "JSON",     //name
+            "*.json",   //file mask
+            ":,{}[]",   //delimiters
+            "",         //name symbols
+            {},         //special
+            {"//"},     //line
+            {"/*"},     //open
+            {"*/"},     //close
+            false,      //toggled
+            false,      //recursive
+            false,      //not case
+            false,      //Save Tab
+            4,          //tab size
+            {}          //key words
         }
     }
 };

@@ -153,7 +153,9 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 struct PropertiesVars
 {
+    //eol_t same order
     std::list<std::string> eolList{ "Unix (LF)", "Windows (CR+LF)", "Mac (CR)" };
+
     size_t type{};
     size_t cp{};
 
