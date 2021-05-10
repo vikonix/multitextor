@@ -212,13 +212,16 @@ input_t FileDialog::DialogProc(input_t code)
             if (m_mode != FileDlgMode::SaveAs)
             {
                 GetItem(ID_OF_NAME)->SetName(info.path().filename().u8string());
-                /*???
-                if (m_nMode != DIALOG_OPENSESS && m_nMode != DIALOG_CMD)// && m_nMode != DIALOG_KEY)
+                if (m_mode != FileDlgMode::OpenSess)
                 {
-                    CtrlSList* pCtrl = (CtrlSList*)GetItem(ID_OF_TYPE);
-                    pCtrl->SetSelect(g_LexCfg.CheckFile(pInfo->sName));
+                    auto type = GetItem(ID_OF_TYPE);
+                    auto ctrlType = std::dynamic_pointer_cast<CtrlDropList>(type);
+                    if (ctrlType)
+                    {
+                        size_t pos = LexParser::CheckFileName(info.path().filename().u8string());
+                        ctrlType->SetSelect(pos);
+                    }
                 }
-                */
             }
         }
         else if (GetSelectedId() == ID_OF_DIRLIST)
@@ -294,7 +297,7 @@ input_t FileDialog::DialogProc(input_t code)
         {
             if (GetSelectedId() == ID_OF_DIRLIST)
             {
-                LOG(DEBUG) << "Dirlist BS";
+                //LOG(DEBUG) << "Dirlist BS";
                 ScanDir("..");
                 code = 0;
             }
@@ -311,6 +314,7 @@ bool FileDialog::OnClose(int id)
         auto path = m_dirList.GetPath();
         auto name = GetItem(ID_OF_NAME)->GetName();
         LOG(DEBUG) << "path=" << path.u8string() << " file=" << name;
+
         s_vars.path = path.u8string();
         s_vars.cpName = GetItem(ID_OF_CP)->GetName();
         s_vars.typeName = GetItem(ID_OF_TYPE)->GetName();

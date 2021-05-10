@@ -145,6 +145,7 @@ public:
 
     static bool SetLexConfig(const std::list<LexConfig>& config);
     static std::list<std::string> GetFileTypeList();
+    static size_t CheckFileName(const std::string& name);
 
     bool    EnableParsing(bool scan)    { return m_scan = scan; }
     bool    SetParseStyle(const std::string& style = "");

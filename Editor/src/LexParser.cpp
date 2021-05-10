@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Editor.h"
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
+#include "utils/Directory.h"
 
 namespace _Editor
 {
@@ -138,6 +139,33 @@ std::list<std::string> LexParser::GetFileTypeList()
     return typeList;
 }
 
+size_t LexParser::CheckFileName(const std::string& name)
+{
+    size_t lexType{};
+    size_t textType{};
+
+    for (auto& [type, cfg] : s_lexConfig)
+    {
+        if (!cfg.fileExt.empty())
+        {
+            std::stringstream ss(cfg.fileExt);
+            std::string mask;
+
+            while (std::getline(ss, mask, ';')) 
+            {
+                if(Directory::Match<std::string>(name, mask))
+                    return lexType;
+            }
+        }
+        if (cfg.langName == "Text")
+            textType = lexType;
+        ++lexType;
+    }
+
+    return textType;
+}
+
+//////////////////////////////////////////////////////////////////////////////
 bool LexParser::SetParseStyle(const std::string& style)
 {
     m_scan = false;
