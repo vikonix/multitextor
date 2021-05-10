@@ -141,12 +141,12 @@ std::list<std::string> LexParser::GetFileTypeList()
 
 size_t LexParser::CheckFileName(const std::string& name)
 {
-    size_t lexType{};
-    size_t textType{};
+    size_t textType{};  //default type
+    size_t lexType{};   //file type
 
     for (auto& [type, cfg] : s_lexConfig)
     {
-        if (!cfg.fileExt.empty())
+        if (!name.empty() && !cfg.fileExt.empty())
         {
             std::stringstream ss(cfg.fileExt);
             std::string mask;
