@@ -419,7 +419,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
     }
     else
     {
-/*???
+/* //???
         if (m_diff->IsDiff(m_nDiffBuff, m_nFirstLine + y))//???
             SetTextAttr(ColorWindowDiff);
         else
@@ -787,7 +787,7 @@ input_t EditorWnd::ParseCommand(input_t cmd)
     else
     {
         if(cmd != K_FOCUSLOST && cmd != K_FOCUSSET)
-            LOG(DEBUG) << "    ??? editor code=" << std::hex << cmd << std::dec;
+            LOG(ERROR) << "    ??? editor code=" << std::hex << cmd << std::dec;
     }
 
     return 0;

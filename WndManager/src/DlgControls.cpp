@@ -809,7 +809,7 @@ input_t CtrlList::EventProc(input_t code)
     {
         if((code & K_MODMASK) == 0 && K_GET_CODE(code) > K_SPACE)
         {
-/* ???       
+/* //???       
             int f = -1;
             char buff[2] = {wchar2char(g_textCP, wchar(code & K_CODEMASK)), 0};
             f = m_pList->FindSorted(buff, g_textCP, 0);
@@ -1128,7 +1128,7 @@ CtrlEditDropList::CtrlEditDropList(Dialog& dialog, const control& control, size_
     else
         m_list.m_posy -= m_sizey - 1;
 
-/* ???  
+/* //???  
   if(pControl->pName && *((long*)pControl->pName) == STR_SIGN)
   {
     //TPRINT(("SaveStr buff\n"));
