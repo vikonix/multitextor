@@ -3,11 +3,17 @@
 
 This project is mostly recreated version of my old text editor.
 
+[![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)][license]
+[![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)][travis]
+
+[license]: https://github.com/vikonix/multitextor/blob/main/LICENSE
+[travis]: https://travis-ci.org/vikonix/multitextor
+
 ## In progress:
 - Editor 2.0.0 MVP (beta) version.
  
 ## Key features:
-- Simple interface same in different environments
+- Simple interface same in different environments (with menu and dialog)
 - Mouse using
 - Multi-window
 - Split view mode with 2 panels
@@ -36,12 +42,6 @@ Editor screenshot.
 Need compiler with C++ 0x17 full support.
 
 Minimal requirement: gcc 8.0 or MSVS 2017
-
-[![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)][travis]
-[![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)][license]
-
-[travis]: https://travis-ci.org/vikonix/multitextor
-[license]: https://github.com/vikonix/multitextor/blob/main/LICENSE
 
 ## Need to install packages in Linux:
  - sudo apt-get install -y libncurses5-dev
