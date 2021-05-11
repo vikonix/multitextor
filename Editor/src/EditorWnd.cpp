@@ -1931,6 +1931,7 @@ bool EditorWnd::CheckFileChanging()
                 //check is all file in memory
                 if (!m_editor->IsFileInMemory())
                 {
+                    _assert(0);
                     return true;
                 }
                 //ask for rewrite
@@ -1951,10 +1952,18 @@ bool EditorWnd::CheckFileChanging()
         }
         else if (state == file_state::changed)
         {
-            m_deleted = false;
             LOG(DEBUG) << "Changed";
             if (m_log)
+            {
+                size_t line{ m_firstLine + m_cursory };
+                bool last{ line >= m_editor->GetStrCount()};
                 Reload(0);
+                if (last)
+                {
+                   MoveFileEnd(0);
+                   MoveDown(0);
+                }
+            }
             else
             {
                 //ask for reload
@@ -1968,8 +1977,8 @@ bool EditorWnd::CheckFileChanging()
                 m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval);
             }
         }
-        else
-            m_deleted = false;
+
+        m_deleted = false;
     }
 
     return true;
