@@ -1565,14 +1565,24 @@ bool EditorWnd::FindUp(bool silence)
         EditorApp::SetHelpLine("Search. Press any key for cancel");
 
     time_t t{ time(NULL) };
+
     std::u16string find{ FindDialog::s_vars.findStrW };
+    size_t size = find.size();
     if (!FindDialog::s_vars.checkCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
         );
     }
-    size_t size = find.size();
+
+    //find only latin symbols
+    bool fast{ true };
+    for (auto c : find)
+        if (c >= 0x80)
+        {
+            fast = false;
+            break;
+        }
 
     //search diaps
     size_t line{ m_firstLine + m_cursory };
@@ -1612,17 +1622,22 @@ bool EditorWnd::FindUp(bool silence)
     bool userBreak{};
     while (line >= end)
     {
-        auto str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase);
+        auto str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, fast && offset == 0);
         if (0 != offset && offset > str.size())
         {
             offset = str.size();
         }
 
         auto itBegin = offset ? std::next(str.rbegin(), str.size() - offset) : str.rbegin();
-        offset = 0;
-        if (auto itFound = std::search(itBegin, str.rend(), std::boyer_moore_horspool_searcher(find.rbegin(), find.rend())); 
-            itFound != str.rend())
+        auto itFound = std::search(itBegin, str.rend(), std::boyer_moore_horspool_searcher(find.rbegin(), find.rend())); 
+        if (itFound != str.rend())
         {
+            if (fast && offset == 0)
+            {
+                str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
+                itFound = std::search(str.rbegin(), str.rend(), std::boyer_moore_horspool_searcher(find.rbegin(), find.rend()));
+            }
+
             offset = std::distance(itFound, str.rend()) - size;
             if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
             {
@@ -1643,6 +1658,8 @@ bool EditorWnd::FindUp(bool silence)
                 return true;
             }
         }
+        else
+            offset = 0;
 
         if (line)
             --line;
@@ -1681,14 +1698,24 @@ bool EditorWnd::FindDown(bool silence)
         EditorApp::SetHelpLine("Search. Press any key for cancel");
 
     time_t t{ time(NULL) };
+
     std::u16string find{ FindDialog::s_vars.findStrW };
+    size_t size = find.size();
     if (!FindDialog::s_vars.checkCase)
     {
         std::transform(find.begin(), find.end(), find.begin(),
             [](char16_t c) { return std::towupper(c); }
         );
     }
-    size_t size = find.size();
+    
+    //find only latin symbols
+    bool fast{true};
+    for(auto c : find)
+        if (c >= 0x80)
+        {
+            fast = false;
+            break;
+        }
 
     //search diaps
     size_t line{ m_firstLine + m_cursory };
@@ -1722,7 +1749,7 @@ bool EditorWnd::FindDown(bool silence)
     bool userBreak{};
     while (line < end)
     {
-        auto str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase);
+        auto str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, fast && offset == 0);
         if (0 != offset && offset > str.size())
         {
             offset = 0;
@@ -1731,10 +1758,15 @@ bool EditorWnd::FindDown(bool silence)
         }
 
         auto itBegin = offset ? std::next(str.begin(), offset) : str.begin();
-        offset = 0;
-        if (auto itFound = std::search(itBegin, str.end(), std::boyer_moore_horspool_searcher(find.begin(), find.end()));
-            itFound != str.end())
+        auto itFound = std::search(itBegin, str.end(), std::boyer_moore_horspool_searcher(find.begin(), find.end()));
+        if(itFound != str.end())
         {
+            if (fast && offset == 0)
+            {
+                str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
+                itFound = std::search(str.begin(), str.end(), std::boyer_moore_horspool_searcher(find.begin(), find.end()));
+            }
+
             offset = std::distance(str.begin(), itFound);
             if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
             {
@@ -1755,6 +1787,8 @@ bool EditorWnd::FindDown(bool silence)
                 return true;
             }
         }
+        else
+            offset = 0;
 
         ++line;
 
@@ -1910,7 +1944,7 @@ bool EditorWnd::CheckFileChanging()
     if (!m_untitled && m_checkTime <= std::chrono::system_clock::now())
     {
         //LOG(DEBUG) << "CheckFileChanging";
-        m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval);
+        m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(m_log ? 1 : FileCheckInterval);
 
         auto state = m_editor->CheckFile();
         if (state == file_state::removed)
@@ -1955,13 +1989,28 @@ bool EditorWnd::CheckFileChanging()
             LOG(DEBUG) << "Changed";
             if (m_log)
             {
+                size_t prevLines = m_editor->GetStrCount();
                 size_t line{ m_firstLine + m_cursory };
-                bool last{ line >= m_editor->GetStrCount()};
-                Reload(0);
+                bool last{ line >= prevLines};
+                Reload(1);
+                size_t newLines = m_editor->GetStrCount();
+                
                 if (last)
                 {
-                   MoveFileEnd(0);
-                   MoveDown(0);
+                    if (newLines < prevLines || newLines - prevLines >= std::numeric_limits<uint16_t>::max() 
+                        || line > prevLines)
+                        MoveFileEnd(1);
+                    else
+                        MoveDown(static_cast<uint16_t>(newLines - prevLines));
+                }
+                InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
+                Repaint();
+                auto linked = m_editor->GetLinkedWnd(this);
+                for (auto& wnd : linked)
+                {
+                    auto editorWnd = reinterpret_cast<EditorWnd*>(wnd);
+                    editorWnd->InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
+                    editorWnd->Repaint();
                 }
             }
             else
@@ -1974,7 +2023,7 @@ bool EditorWnd::CheckFileChanging()
                 );
                 if (ret == ID_OK)
                     Reload(0);
-                m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(CheckInterval);
+                m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(FileCheckInterval);
             }
         }
 

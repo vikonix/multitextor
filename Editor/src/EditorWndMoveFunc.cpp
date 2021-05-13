@@ -373,23 +373,27 @@ bool EditorWnd::MoveFileBegin([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool EditorWnd::MoveFileEnd([[maybe_unused]]input_t cmd)
+bool EditorWnd::MoveFileEnd(input_t cmd)
 {
+    size_t saveX = K_GET_CODE(cmd);
     size_t numLine = m_editor->GetStrCount();
 
-    size_t x = 0;
     size_t line = 0;
-    m_cursorx = 0;
     if (numLine >= static_cast<size_t>(m_clientSizeY))
     {
-        line = numLine - m_clientSizeY + 1;
         m_cursory = m_clientSizeY - 1;
+        line = numLine - m_clientSizeY + 1;
     }
     else
     {
-        m_cursory = (numLine) ? static_cast<pos_t>(numLine) : 0;
+        m_cursory = static_cast<pos_t>(numLine);
     }
 
+    size_t x = 0;
+    if (saveX)
+        x = m_xOffset;
+    else
+        m_cursorx = 0;
     if (m_xOffset != x || m_firstLine != line)
     {
         m_xOffset = x;

@@ -110,7 +110,7 @@ bool Editor::Load(bool log)
     if (0 == m_fileSize)
         return true;
 
-    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << std::hex << m_fileSize << std::dec;
+    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << m_fileSize;
     time_t start{ time(NULL) };
 
     std::ifstream file{m_file, std::ios::binary};
@@ -444,41 +444,61 @@ std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
     return outstr;
 }
 
-std::u16string Editor::GetStrForFind(size_t line, bool checkCase)
+std::u16string Editor::GetStrForFind(size_t line, bool checkCase, bool fast)
 {
     if (line >= m_buffer.GetStrCount())
             return {};
 
     auto str{ m_buffer.GetStr(line) };
-    std::u16string wstr;
-    [[maybe_unused]] bool rc = m_converter->Convert(str, wstr);
     std::u16string outstr;
-    outstr.resize(wstr.size(), ' ');
-
-    //go from begin of string for right tabulation calculating 
-    size_t pos{ 0 };
-    for (auto c : wstr)
+    if (fast)
     {
-        if (c > ' ')
+        //fast without CP conversion and tab calculating
+        outstr.resize(str.size(), ' ');
+        size_t pos{ 0 };
+        for (unsigned char c : str)
         {
-            if(checkCase)
-                outstr[pos] = c;
+            if (c >= 0x80)
+                outstr[pos++] = 0x1f;//any filler 
+            else if (c > ' ')
+                outstr[pos++] = checkCase ? c : static_cast<char16_t>(std::toupper(c));
+            else if (c == S_TAB)
+            {
+                ++pos;
+            }
+            else if (c == S_CR || c == S_LF || c == S_EOF)//cr/lf/eof
+                break;
             else
-                outstr[pos] = std::towupper(c);
+                ++pos;
         }
-        if (c == S_TAB)
-        {
-            size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
-            outstr.resize(outstr.size() + tabpos, ' ');
-
-            pos = tabpos;
-        }
-        else if (c == S_CR || c == S_LF || c == S_EOF)//cr/lf/eof
-            break;
-        else
-            ++pos;
     }
+    else
+    {
+        std::u16string wstr;
+        [[maybe_unused]] bool rc = m_converter->Convert(str, wstr);
+        outstr.resize(wstr.size(), ' ');
 
+        //go from begin of string for right tabulation calculating 
+        size_t pos{ 0 };
+        for (auto c : wstr)
+        {
+            if (c > ' ')
+            {
+                outstr[pos++] = checkCase ? c: std::towupper(c);
+            }
+            else if (c == S_TAB)
+            {
+                size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
+                outstr.resize(outstr.size() + tabpos, ' ');
+
+                pos = tabpos;
+            }
+            else if (c == S_CR || c == S_LF || c == S_EOF)//cr/lf/eof
+                break;
+            else
+                ++pos;
+        }
+    }
     m_buffer.ReleaseBuff();
 
     return outstr;
@@ -1479,9 +1499,10 @@ file_state Editor::CheckFile()
         return file_state::removed;
     
     auto size = std::filesystem::file_size(m_file);
-    if (size != m_fileSize)
+    auto time = std::filesystem::last_write_time(m_file);
+    if (size != m_fileSize || time != m_fileTime)
     {
-        if(size == 0)
+        if(m_fileSize > 0 && size == 0)
             return file_state::removed;
         else
             return file_state::changed;

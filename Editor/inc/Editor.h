@@ -186,7 +186,7 @@ public:
     time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
     std::u16string          GetStr(size_t line, size_t offset = 0, size_t size = MAX_STRLEN + 1);
-    std::u16string          GetStrForFind(size_t line, bool checkCase);
+    std::u16string          GetStrForFind(size_t line, bool checkCase, bool fast);
     bool                    SetCurStr(size_t line);
 
     //editor API with undo
