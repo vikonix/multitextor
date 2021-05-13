@@ -776,13 +776,25 @@ input_t WndManager::ProcInput(input_t code)
             if ((code & K_MOUSE) == K_MOUSE)
             {
                 //mouse event
-                if ((code & K_TYPEMASK) == K_MOUSEKUP
-                    || (code & K_MOUSEW) == K_MOUSEW)
+                if ((code & K_TYPEMASK) == K_MOUSEKUP)
                 {
                     if (!m_activeView)
                         out = m_wndList[0]->EventProc(code);
                     else
                         out = m_view[2].wnd->EventProc(code);
+                }
+                else if ((code & K_MOUSEW) == K_MOUSEW)
+                {
+                    pos_t x = K_GET_X(code);
+                    pos_t y = K_GET_Y(code);
+                    if (m_wndList[0]->CheckWndPos(x, y))
+                    {
+                        out = m_wndList[0]->EventProc(code);
+                    }
+                    else if (m_view[2].wnd && m_view[2].wnd->CheckWndPos(x, y))
+                    {
+                        out = m_view[2].wnd->EventProc(code);
+                    }
                 }
                 else
                 {

@@ -809,13 +809,16 @@ input_t CtrlList::EventProc(input_t code)
     {
         if((code & K_MODMASK) == 0 && K_GET_CODE(code) > K_SPACE)
         {
-/* //???       
-            int f = -1;
-            char buff[2] = {wchar2char(g_textCP, wchar(code & K_CODEMASK)), 0};
-            f = m_pList->FindSorted(buff, g_textCP, 0);
-            if(f != -1)
-                n = f;
-*/
+            auto ch = std::towupper(K_GET_CODE(code));
+            auto it = std::find_if(m_list.begin(), m_list.end(), [ch](const std::string& str) { 
+                auto wstr = utf8::utf8to16(str);
+                return ch == std::towupper(wstr[0]); 
+            });
+
+            if (it != m_list.end())
+            {
+                n = static_cast<int>(std::distance(m_list.begin(), it));
+            }
         }
         else
             return code;
