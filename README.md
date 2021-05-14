@@ -4,9 +4,9 @@
 This project is mostly recreated version of my old text editor.
 
 [![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)][license]
-[![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)][travis]
-
 [license]: https://github.com/vikonix/multitextor/blob/main/LICENSE
+
+Linux/Windows (Travis CI): [![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)][travis]
 [travis]: https://travis-ci.org/vikonix/multitextor
 
 ## In progress:
