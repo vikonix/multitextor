@@ -19,14 +19,15 @@ Linux/Windows build (Travis CI): [![Build Status](https://travis-ci.org/vikonix/
 - Multi-window
 - Split view mode with 2 panels
 - Clear working with different text code pages
+- Different select modes
 - Big files editing over 4 GBytes (with small memory using)
 - Deep Undo/Redo
 
-Not MVP (not implemented now):
-- Backup files
+Not implemented now (not MVP):
 - Searching in on disk files
-- Random access bookmarks
+- Backup files
 - Editor session saving/restoring
+- Random access bookmarks
 - Customizable interface and key commands
 - Customizable syntax highlighting
 - Build-in file comparing mode
@@ -40,7 +41,7 @@ Editor screenshot.
  - Linux Ubuntu 20.04 - gcc version 9.3.0
  - Armbian Focal OrangePI 4
 
-Need compiler with C++ 0x17 full support.
+For building it needs a compiler with C++ 0x17 full support.
 
 Minimal requirement: gcc 8.0 or MSVS 2017
 
