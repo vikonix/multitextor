@@ -152,7 +152,6 @@ bool Editor::Load(bool log)
         return static_cast<size_t>(read);
     };
 
-    
     if (m_fileSize > MAX_PARSED_SIZE)
         m_lexParser.EnableParsing(false);
 
@@ -454,14 +453,23 @@ std::u16string Editor::GetStrForFind(size_t line, bool checkCase, bool fast)
     if (fast)
     {
         //fast without CP conversion and tab calculating
+        auto toupper = [](unsigned char c) -> char16_t {
+            if (c >= 'a' && c <= 'z')
+                return c - 0x20;
+            else
+                return c;
+        };
+
         outstr.resize(str.size(), ' ');
+        auto buff = outstr.data();
+
         size_t pos{ 0 };
         for (unsigned char c : str)
         {
             if (c >= 0x80)
-                outstr[pos++] = 0x1f;//any filler 
+                buff[pos++] = 0x1f;//any filler 
             else if (c > ' ')
-                outstr[pos++] = checkCase ? c : static_cast<char16_t>(std::toupper(c));
+                buff[pos++] = checkCase ? c : toupper(c);
             else if (c == S_TAB)
             {
                 ++pos;
@@ -477,6 +485,7 @@ std::u16string Editor::GetStrForFind(size_t line, bool checkCase, bool fast)
         std::u16string wstr;
         [[maybe_unused]] bool rc = m_converter->Convert(str, wstr);
         outstr.resize(wstr.size(), ' ');
+        auto buff = outstr.data();
 
         //go from begin of string for right tabulation calculating 
         size_t pos{ 0 };
@@ -484,12 +493,13 @@ std::u16string Editor::GetStrForFind(size_t line, bool checkCase, bool fast)
         {
             if (c > ' ')
             {
-                outstr[pos++] = checkCase ? c: std::towupper(c);
+                buff[pos++] = checkCase ? c: std::towupper(c);
             }
             else if (c == S_TAB)
             {
                 size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
                 outstr.resize(outstr.size() + tabpos, ' ');
+                buff = outstr.data();
 
                 pos = tabpos;
             }
