@@ -106,7 +106,7 @@ bool Editor::Load(bool log)
     m_fileTime = std::filesystem::last_write_time(m_file);
     m_fileSize = std::filesystem::file_size(m_file);
 
-    decltype(m_fileSize) fileOffset{};
+    uintmax_t fileOffset{};
     if (0 == m_fileSize)
         return true;
 
@@ -118,6 +118,8 @@ bool Editor::Load(bool log)
         return false;
 
     m_buffer.SetLoadBuffFunc(std::bind(&Editor::LoadBuff, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
+    if (m_fileSize > MAX_PARSED_SIZE)
+        m_lexParser.EnableParsing(false);
 
     EditorApp::SetHelpLine("Wait for file loading");
 
@@ -125,8 +127,7 @@ bool Editor::Load(bool log)
     size_t percent{};
     auto step{ m_fileSize / 100 };//1%
 
-    const size_t buffsize{ 0x200000 };//2MB
-    auto buff{ std::make_unique<std::array<char, buffsize>>() };
+    auto buff{ std::make_shared<std::array<char, buffsize>>() };
     size_t buffOffset{0};
 
     auto readFile = [&]() -> size_t {
@@ -152,62 +153,16 @@ bool Editor::Load(bool log)
         return static_cast<size_t>(read);
     };
 
-    if (m_fileSize > MAX_PARSED_SIZE)
-        m_lexParser.EnableParsing(false);
-
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
     size_t strOffset{};
     size_t read;
     while (0 != (read = readFile()))
     {
-        while (read)
-        {
-            if (!strBuff)
-            {
-                strBuff = m_buffer.GetNewBuff();
-                strOffset = 0;
-            }
-            auto strBuffData{ strBuff->GetBuff() };
-            if (!strBuffData)
-            {
-                //no memory
-                _assert(0);
-                return false;
-            }
-            size_t tocopy{ std::min(static_cast<size_t>(BUFF_SIZE) - strOffset, read) };
-            strBuffData->resize(strOffset + tocopy);
-            std::memcpy(strBuffData->data() + strOffset, buff->data() + buffOffset, tocopy);
-            strBuff->ReleaseBuff();
-
-            if (strOffset + tocopy < BUFF_SIZE / 2 && !file.eof())
-                strOffset += tocopy;
-            else
-            {
-                //now fill string offset table
-                strBuff->m_fileOffset = fileOffset;
-
-                size_t rest;
-                //LOG(DEBUG) << std::hex << "file offset=" << fileOffset << " read=" << read << " strOffset=" << strOffset << " tocopy=" << tocopy << std:: dec;
-                [[maybe_unused]]bool rc = FillStrOffset(strBuff, strOffset + tocopy, m_fileSize <= fileOffset + strOffset + tocopy, rest);
-                //LOG(DEBUG) << std::hex << "rest=" << rest << std::dec;
-
-                _assert(rc);
-                if(tocopy > rest)
-                    tocopy -= rest;
-                else
-                {
-                    _assert(0);
-                }
-
-                fileOffset += tocopy + strOffset;
-                m_buffer.m_totalStrCount += strBuff->GetStrCount();
-                strBuff = nullptr;
-                strOffset = 0;
-            }
-
-            buffOffset += tocopy;
-            read -= tocopy;
-        }
+        bool rc = ApplyBuffer(buff, read, buffOffset,
+            strBuff, strOffset,
+            fileOffset, file.eof());
+        if (!rc)
+            return false;
     }
     _assert(!log || m_fileSize == fileOffset);
     
@@ -216,6 +171,100 @@ bool Editor::Load(bool log)
 
     LOG(DEBUG) << "load time=" << time(NULL) - start;
     LOG(DEBUG) << "num str=" << m_buffer.m_totalStrCount;
+
+    return true;
+}
+
+bool Editor::LoadTail()
+{
+    std::ifstream file{ m_file, std::ios::binary };
+    if (!file)
+    {
+        _assert(0);
+        return false;
+    }
+
+    m_fileTime = std::filesystem::last_write_time(m_file);
+    m_fileSize = std::filesystem::file_size(m_file);
+
+    auto buff{ std::make_shared<std::array<char, buffsize>>() };
+    size_t buffOffset{ 0 };
+
+    std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff = m_buffer.m_buffList.back();
+    strBuff->m_lostData = false;
+    m_buffer.m_totalStrCount -= strBuff->GetStrCount();
+    strBuff->m_strOffsetList.clear();
+    size_t strOffset{};
+
+    uintmax_t fileOffset{strBuff->m_fileOffset};
+    size_t toRead{ std::min(buffsize, static_cast<size_t>(m_fileSize - fileOffset)) };
+    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " offset=" << fileOffset << " read=" << toRead;
+
+    file.seekg(fileOffset);
+    file.read(buff->data(), std::min(buffsize, toRead));
+    _assert(file.good());
+    auto read = file.gcount();
+    m_fileSize = fileOffset + read;
+    
+    bool rc = ApplyBuffer(buff, read, buffOffset,
+        strBuff, strOffset,
+        fileOffset, true);
+
+    return rc;
+}
+
+bool Editor::ApplyBuffer(const std::shared_ptr<std::array<char, buffsize>>& buff, size_t read, size_t& buffOffset,
+    std::shared_ptr<StrBuff<std::string, std::string_view>>& strBuff, size_t& strOffset,
+    uintmax_t& fileOffset, bool eof)
+{
+    while (read)
+    {
+        if (!strBuff)
+        {
+            strBuff = m_buffer.GetNewBuff();
+            strOffset = 0;
+        }
+        auto strBuffData{ strBuff->GetBuff() };
+        if (!strBuffData)
+        {
+            //no memory
+            _assert(0);
+            return false;
+        }
+        size_t tocopy{ std::min(static_cast<size_t>(BUFF_SIZE) - strOffset, read) };
+        strBuffData->resize(strOffset + tocopy);
+        std::memcpy(strBuffData->data() + strOffset, buff->data() + buffOffset, tocopy);
+        strBuff->ReleaseBuff();
+
+        if (strOffset + tocopy < BUFF_SIZE / 2 && !eof)
+            strOffset += tocopy;
+        else
+        {
+            //now fill string offset table
+            strBuff->m_fileOffset = fileOffset;
+
+            size_t rest;
+            //LOG(DEBUG) << std::hex << "file offset=" << fileOffset << " read=" << read << " strOffset=" << strOffset << " tocopy=" << tocopy << std:: dec;
+            [[maybe_unused]] bool rc = FillStrOffset(strBuff, strOffset + tocopy, m_fileSize <= fileOffset + strOffset + tocopy, rest);
+            //LOG(DEBUG) << std::hex << "rest=" << rest << std::dec;
+
+            _assert(rc);
+            if (tocopy > rest)
+                tocopy -= rest;
+            else
+            {
+                _assert(0);
+            }
+
+            fileOffset += tocopy + strOffset;
+            m_buffer.m_totalStrCount += strBuff->GetStrCount();
+            strBuff = nullptr;
+            strOffset = 0;
+        }
+
+        buffOffset += tocopy;
+        read -= tocopy;
+    }
 
     return true;
 }
@@ -261,7 +310,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
                 ++cr;
 
             m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), {buff + begin, i - begin}, m_cp);
-            strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
+            strBuff->m_strOffsetList.push_back(static_cast<uint32_t>(i + 1));
             begin = i + 1;
             len = 0;
             cut = 0;
@@ -271,7 +320,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             ++lf;
 
             m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
-            strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
+            strBuff->m_strOffsetList.push_back(static_cast<uint32_t>(i + 1));
             begin = i + 1;
             len = 0;
             cut = 0;
@@ -309,7 +358,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             }
 
             m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
-            strBuff->m_strOffsetList.push_back((uint32_t)i + 1);
+            strBuff->m_strOffsetList.push_back(static_cast<uint32_t>(i + 1));
             begin = i + 1;
             len = 0;
             cut = 0;
@@ -320,7 +369,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
     {
         //parse last string in file
         m_lexParser.ScanStr(m_buffer.m_totalStrCount + strBuff->GetStrCount(), { buff + begin, i - begin }, m_cp);
-        strBuff->m_strOffsetList.push_back((uint32_t)i);
+        strBuff->m_strOffsetList.push_back(static_cast<uint32_t>(i));
     }
 
     if (0 == strBuff->m_fileOffset)

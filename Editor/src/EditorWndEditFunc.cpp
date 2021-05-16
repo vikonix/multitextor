@@ -702,9 +702,8 @@ bool EditorWnd::EditPasteFromClipboard(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::Reload(input_t cmd)
+bool EditorWnd::Reload([[maybe_unused]]input_t cmd)
 {
-    size_t notRefresh = K_GET_CODE(cmd);
     //LOG(DEBUG) << "    Reload";
 
     m_selectState = select_state::no;
@@ -713,8 +712,7 @@ bool EditorWnd::Reload(input_t cmd)
     m_beginY = m_endY = 0;
 
     bool rc = m_editor->Load();
-    if(!notRefresh)
-        rc = Refresh();
+    rc = Refresh();
     return rc;
 }
 

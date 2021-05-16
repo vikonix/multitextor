@@ -98,7 +98,7 @@ bool WndManager::CalcView()
     }
     else if (m_splitType == split_t::split_v)
     {
-        //vertical
+        //vertical 
         m_view[1].left  = 0;
         m_view[1].top   = m_topLines;
         m_view[1].sizex = m_splitX;
@@ -839,10 +839,13 @@ input_t WndManager::ProcInput(input_t code)
                 }
                 else if (m_wndList[0]->IsUsedTimer())
                 {
+                    if (m_activeView == 1 && m_view[2].wnd && m_view[2].wnd->IsUsedTimer())
+                        m_view[2].wnd->EventProc(code);
+
                     for(auto& wnd : m_wndList)
                         wnd->EventProc(code);
 
-                    if (m_view[2].wnd)
+                    if (m_activeView != 1 && m_view[2].wnd && m_view[2].wnd->IsUsedTimer())
                         m_view[2].wnd->EventProc(code);
                 }
             }

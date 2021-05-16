@@ -90,10 +90,10 @@ class EditorWnd : public FrameWnd
     EditorPtr       m_editor;
     std::shared_ptr<EditorWnd>  m_clonedWnd;
 
+    bool            m_clone{};
     bool            m_close{};    //close window at EventProc return
     bool            m_deleted{};  //file was deleted by external program
     bool            m_saved{};    //file was saved
-    bool            m_clone{};
     bool            m_untitled{true};
     bool            m_readOnly{};
     bool            m_log{};

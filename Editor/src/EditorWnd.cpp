@@ -1858,6 +1858,13 @@ Wnd* EditorWnd::CloneWnd()
     }
 
     wnd->SetEditor(m_editor);
+    wnd->m_deleted = m_deleted;
+    wnd->m_saved = m_saved;
+    wnd->m_untitled = m_untitled;
+    wnd->m_readOnly = m_readOnly;
+    wnd->m_log = m_log;
+    wnd->m_checkTime = m_checkTime;
+
     wnd->m_clone = true;
     wnd->m_visible = true;
     wnd->_GotoXY(m_xOffset + m_cursorx, m_firstLine + m_cursory);
@@ -1939,8 +1946,9 @@ bool EditorWnd::TryDeleteSelectedBlock()
     return EditBlockDel(0);
 }
 
-bool EditorWnd::CheckFileChanging()
+bool EditorWnd::CheckFileChanging() try
 {
+    bool rc{true};
     if (!m_untitled && m_checkTime <= std::chrono::system_clock::now())
     {
         //LOG(DEBUG) << "CheckFileChanging";
@@ -1980,35 +1988,36 @@ bool EditorWnd::CheckFileChanging()
                     std::ofstream ofs(m_editor->GetFilePath());
                     ofs.close();
                     //force save
-                    Save(1);
+                    rc = Save(1);
                 }
             }
         }
         else if (state == file_state::changed)
         {
-            LOG(DEBUG) << "Changed";
+            //LOG(DEBUG) << "Changed";
             if (m_log)
             {
                 size_t prevLines = m_editor->GetStrCount();
-                size_t line{ m_firstLine + m_cursory };
-                bool last{ line >= prevLines};
-                Reload(1);
+                rc = m_editor->LoadTail();
                 size_t newLines = m_editor->GetStrCount();
                 
-                if (last)
-                {
-                    if (newLines < prevLines || newLines - prevLines >= std::numeric_limits<uint16_t>::max() 
-                        || line > prevLines)
-                        MoveFileEnd(1);
-                    else
-                        MoveDown(static_cast<uint16_t>(newLines - prevLines));
-                }
-                InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
-                Repaint();
-                auto linked = m_editor->GetLinkedWnd(this);
+                auto linked = m_editor->GetLinkedWnd();
                 for (auto& wnd : linked)
                 {
                     auto editorWnd = reinterpret_cast<EditorWnd*>(wnd);
+                    size_t line{ editorWnd->m_firstLine + editorWnd->m_cursory };
+                    bool last{ line >= prevLines };
+                    if (last)
+                    {
+                        auto step = newLines - prevLines;
+                        if (newLines < prevLines || line > prevLines
+                            || step >= std::numeric_limits<uint16_t>::max())
+                            editorWnd->MoveFileEnd(1);
+                        else if (editorWnd->m_cursory < editorWnd->m_clientSizeY - static_cast<uint16_t>(step))
+                            editorWnd->m_cursory += static_cast<uint16_t>(step);
+                        else
+                            editorWnd->MoveDown(static_cast<uint16_t>(step));
+                    }
                     editorWnd->InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
                     editorWnd->Repaint();
                 }
@@ -2022,7 +2031,7 @@ bool EditorWnd::CheckFileChanging()
                     { "Reload", "No" }
                 );
                 if (ret == ID_OK)
-                    Reload(0);
+                    rc = Reload(0);
                 m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(FileCheckInterval);
             }
         }
@@ -2030,7 +2039,12 @@ bool EditorWnd::CheckFileChanging()
         m_deleted = false;
     }
 
-    return true;
+    return rc;
+}
+catch (const std::exception& ex)
+{
+    LOG(ERROR) << __FUNC__ << "exception:" << ex.what();
+    return false;
 }
 
 } //namespace _Editor

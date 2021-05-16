@@ -106,6 +106,11 @@ private:
     size_t          m_curStr{STR_NOTDEFINED};
     bool            m_curChanged{};
 
+    inline static const size_t buffsize{ 0x200000 };//2MB
+
+    bool    ApplyBuffer(const std::shared_ptr<std::array<char, buffsize>>& buff, size_t read, size_t& buffOffset,
+        std::shared_ptr<StrBuff<std::string, std::string_view>>& strBuff, size_t& strOffset,
+        uintmax_t& fileOffset, bool eof);
     bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);
     bool    ImproveBuff(std::list<std::shared_ptr<StrBuff<std::string, std::string_view>>>::iterator strBuff);
 
@@ -159,6 +164,7 @@ public:
     bool                    RefreshAllWnd(FrameWnd* wnd) const;
 
     bool                    Load(bool log = false);
+    bool                    LoadTail();
     bool                    Save();
     bool                    SetName(const std::filesystem::path& file, bool copy);
     bool                    ClearModifyFlag();
