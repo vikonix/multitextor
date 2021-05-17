@@ -44,8 +44,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
   #define MAXBLOCKS_NUM   0x100
 #else
   #define BUFF_SIZE     0x10000 //64k max
-  #define STEP_BLOCKS      0x40
-  #define MAXBLOCKS_NUM   0x400
+  #define STEP_BLOCKS     0x100
+  #define MAXBLOCKS_NUM  0x1000
 #endif
 
 #define MAX_STRLEN (BUFF_SIZE / 2)

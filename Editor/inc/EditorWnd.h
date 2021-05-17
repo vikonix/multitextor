@@ -42,7 +42,8 @@ class Diff;
 
 class EditorWnd : public FrameWnd
 {
-    inline static const size_t FileCheckInterval{10};
+    inline static const size_t FileCheckInterval{ 10 };
+    inline static const size_t LogFileCheckInterval{ 1 };
 
     enum select_state : int
     {

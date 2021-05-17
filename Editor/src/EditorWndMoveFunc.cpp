@@ -164,6 +164,7 @@ bool EditorWnd::MoveUp(input_t cmd)
 
     if (!step)
     {
+        //move cursor
         if (m_cursory)
             --m_cursory;
         else if (line)
@@ -171,6 +172,7 @@ bool EditorWnd::MoveUp(input_t cmd)
     }
     else
     {
+        //scroll screen
         if (line > static_cast<size_t>(step))
             line -= step;
         else if (line)
@@ -210,6 +212,7 @@ bool EditorWnd::MoveDown(input_t cmd)
 
     if (!step)
     {
+        //move cursor
         if (m_cursory < m_clientSizeY - 1)
             ++m_cursory;
         else
@@ -217,6 +220,7 @@ bool EditorWnd::MoveDown(input_t cmd)
     }
     else
     {
+        //scroll screen
         line += step;
     }
 

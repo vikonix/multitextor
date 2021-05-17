@@ -1538,7 +1538,7 @@ bool EditorWnd::UpdateProgress(size_t step)
         WndManager::getInstance().Flush();
 
         m_progress = step;
-        return CheckInput();
+        return CheckInput(1ms);
     }
 
     return false;
@@ -1952,7 +1952,7 @@ bool EditorWnd::CheckFileChanging() try
     if (!m_untitled && m_checkTime <= std::chrono::system_clock::now())
     {
         //LOG(DEBUG) << "CheckFileChanging";
-        m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(m_log ? 1 : FileCheckInterval);
+        m_checkTime = std::chrono::system_clock::now() + std::chrono::seconds(m_log ? LogFileCheckInterval : FileCheckInterval);
 
         auto state = m_editor->CheckFile();
         if (state == file_state::removed)
