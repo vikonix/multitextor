@@ -144,6 +144,7 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
 {
+    PropertiesDialog::s_vars.untitled = m_untitled;
     PropertiesDialog::s_vars.ro       = m_readOnly;
     PropertiesDialog::s_vars.log      = m_log;
     PropertiesDialog::s_vars.cpName   = m_editor->GetCP();

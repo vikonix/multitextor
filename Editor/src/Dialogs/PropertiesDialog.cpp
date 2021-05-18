@@ -99,7 +99,10 @@ bool PropertiesDialog::OnActivate()
         GetItem(ID_DP_NAME)->SetName(path.filename().u8string());
     }
 
-    GetItem(ID_DP_INFO)->SetName(Directory::GetFileInfo(path));
+    if(!s_vars.untitled)
+        GetItem(ID_DP_INFO)->SetName(Directory::GetFileInfo(path));
+    else
+        GetItem(ID_DP_LOG)->SetMode(CTRL_DISABLED);
 
     auto ctrl = GetItem(ID_DP_TYPE);
     auto listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);

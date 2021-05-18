@@ -167,6 +167,7 @@ struct PropertiesVars
     bool showTab{};
     bool ro{};
     bool log{};
+    bool untitled{};
 };
 
 class PropertiesDialog : public Dialog

@@ -181,9 +181,17 @@ std::string Directory::GetFileInfo(const std::filesystem::file_time_type& ftime,
 
 std::string Directory::GetFileInfo(const path_t& path)
 {
-    auto ftime = std::filesystem::last_write_time(path);
-    auto size = std::filesystem::file_size(path);
-    return GetFileInfo(ftime, size);
+    try 
+    {
+        auto ftime = std::filesystem::last_write_time(path);
+        auto size = std::filesystem::file_size(path);
+        return GetFileInfo(ftime, size);
+    }
+    catch (const std::exception& ex)
+    {
+        LOG(ERROR) << "exception " << ex.what();
+        return {};
+    }
 }
 
 fileaccess_t Directory::GetAccessMode(const path_t& path)
