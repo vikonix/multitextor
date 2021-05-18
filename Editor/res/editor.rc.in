@@ -74,7 +74,7 @@ BEGIN
             VALUE "LegalCopyright", "Copyright (C) 2020-2021 Vikonix"
             VALUE "OriginalFilename", "@PRODUCT_NAME@.exe"
             VALUE "ProductName", "@PRODUCT_NAME@"
-            VALUE "ProductVersion", "@PRODUCT_VERSION@.0"
+            VALUE "ProductVersion", "@PRODUCT_NAME@ @PRODUCT_VERSION_FULL@"
         END
     END
     BLOCK "VarFileInfo"
