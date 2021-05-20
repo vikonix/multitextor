@@ -178,7 +178,7 @@ public:
     virtual ~EditorWnd() = default;
 
     bool        SetFileName(const std::filesystem::path& file, bool untitled = false, 
-        const std::string& parseMode = "", const std::string& cp = "");
+        const std::string& parseMode = "Text", const std::string& cp = "UTF-8");
     bool        SetEditor(EditorPtr editor);
     EditorPtr   GetEditor() { return m_editor; }
     bool        SelectClear();
