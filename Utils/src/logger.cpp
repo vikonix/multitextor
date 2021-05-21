@@ -41,7 +41,7 @@ void ConfigureLogger(const std::string& logFileName, const std::uint64_t maxLogS
 {
     Configurations cfg;
     //cfg.setGlobally(ConfigurationType::Format, "[%datetime{%Y-%M-%d %H:%m:%s.%g}] [%thread] [%levshort]- %msg");
-    cfg.setGlobally(ConfigurationType::Format, "[%datetime{%H:%m:%s.%g}][%thread][%levshort]- %msg");
+    cfg.setGlobally(ConfigurationType::Format, "[%datetime{%H:%m:%s.%g}][%thread][%levshort] %msg");
     cfg.setGlobally(ConfigurationType::Filename, logFileName);
     cfg.setGlobally(ConfigurationType::MaxLogFileSize, std::to_string(maxLogSize));
     cfg.setGlobally(ConfigurationType::ToStandardOutput, logScreen ? "true" : "false");
