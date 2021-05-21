@@ -61,7 +61,7 @@ if(MSVC)
     # warning level 4
     target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Zc:__cplusplus)
     set_property(TARGET ${PROJECT_NAME} PROPERTY
-        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")    
+        MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     if(USE_VLD)
         target_compile_definitions(${PROJECT_NAME} PUBLIC USE_VLD)
         target_include_directories(${PROJECT_NAME} PUBLIC
@@ -72,9 +72,10 @@ if(MSVC)
             #"../../../ThirdParty/lib/vld"
             "C:/Program Files (x86)/Visual Leak Detector/lib/Win64/vld.lib"
         )
-    endif()    
+    endif()
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
+    #target_link_options(${PROJECT_NAME} PRIVATE -static)
 endif()
 
