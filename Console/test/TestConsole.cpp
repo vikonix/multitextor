@@ -46,7 +46,6 @@ void ConsoleTest()
     Console console;
 
     console.Init();
-    console.SetScreenSize(MAX_COORD, MAX_COORD);
 
     auto waitKey = [&console]() {
         console.Flush();
@@ -60,11 +59,15 @@ void ConsoleTest()
         }
     };
 
+    //console.SetScreenSize(MAX_COORD, MAX_COORD);
     console.WriteConsoleTitle("Console Screen Ш");
+    console.SetTextAttr(FON_RED|FON_GREEN|FON_BLUE);
     console.ClrScr();
     console.SetCursor(cursor_t::CURSOR_NORMAL);
     console.GotoXY(0, 0);
     console.WriteStr(u"Press space for steps... ");
+    console.WriteLastChar('[', ']');
+    console.GotoXY(0, 0);
     waitKey();
 
     console.SetTextAttr(TEXT_BLUE);
@@ -78,8 +81,6 @@ void ConsoleTest()
 
     console.SetTextAttr(COLOR_INVERSE(TEXT_GREEN));
     console.WriteStr(u"Text\x428_\x253c.");
-    
-    console.WriteLastChar('[', ']');
     waitKey();
 
     console.SetTextAttr(TEXT_BLUE | FON_RED);
