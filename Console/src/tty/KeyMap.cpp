@@ -69,12 +69,15 @@ std::list<KeyMap> g_keyMap
   {K_F9,           "\x1b[20~"},
   {K_F10,          "\x1b[21~"},
 
+  {K_PAGEUP | K_ALT, "\x1b[5;3~"},
+  {K_PAGEDN | K_ALT, "\x1b[6;3~"},
+
   {K_F1 | K_SHIFT, "\x1bO2P"},
   {K_F2 | K_SHIFT, "\x1bO2Q"},
   {K_F3 | K_SHIFT, "\x1bO2R"},
   {K_F4 | K_SHIFT, "\x1bO2S"},
 
-  //linux XTerm console      
+  //linux XTerm console
   {K_F1 | K_SHIFT, "\x1b[1;2P"},
   {K_F2 | K_SHIFT, "\x1b[1;2Q"},
   {K_F3 | K_SHIFT, "\x1b[1;2R"},

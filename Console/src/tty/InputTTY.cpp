@@ -65,7 +65,7 @@ bool InputTTY::LoadKeyCode()
     //for solveing XTERM key mapping error
     for(const auto& map : g_keyMap)
         m_KeyMap.AddKey(map.sequence, map.code);
-    
+
 #ifdef __linux__
     if(!strcmp(getenv("TERM"), "linux"))
     {
@@ -102,7 +102,7 @@ std::string InputTTY::GetConsoleCP()
   LOG(DEBUG) << "LC_CTYPE=" << lc_type;
   if(lc_type.empty())
       return lc_type;
-  
+
   auto pos = lc_type.find(".");
   if(pos == std::string::npos)
       return lc_type;
@@ -162,7 +162,7 @@ bool InputTTY::Init()
     rc = tcsetattr(m_stdin, TCSANOW, &m_termnew);
     if(-1 == rc)
         return false;
-        
+
     m_fTerm = true;
 
     rc = LoadKeyCode();
@@ -181,7 +181,7 @@ void InputTTY::Deinit()
 {
     if(m_stdin < 0)
         return;
-    
+
     if(m_fTerm)
     {
         tcsetattr(m_stdin, TCSANOW, &m_termold);
@@ -192,7 +192,7 @@ void InputTTY::Deinit()
     m_stdin = -1;
 
     DeinitMouse();
-    
+
     LOG(DEBUG) << "Deinited";
 }
 
@@ -327,8 +327,8 @@ size_t InputTTY::ReadConsole(std::string& str, size_t n)
     int s = select(m_stdin + 1, &Read_FD_Set, NULL, NULL, &wait);
     if(s > 0)
     {
-        std::string buff(MaxInputLen, 0);        
-    
+        std::string buff(MaxInputLen, 0);
+
         int rc = read(m_stdin, buff.data(), n);
         if(rc > 0)
         {
@@ -336,7 +336,7 @@ size_t InputTTY::ReadConsole(std::string& str, size_t n)
             return static_cast<size_t>(rc);
         }
     }
-    
+
     return 0;
 }
 
@@ -345,14 +345,14 @@ input_t InputTTY::ProcessMouse(pos_t x, pos_t y, input_t k)
 {
     input_t iMType = 0;
     bool prevUp = m_prevUp;
-    
+
     //LOG(DEBUG) << __FUNC__ << " prevup=" << prevUp;
     if(k == K_MOUSEKUP)
         m_prevUp = true;
     else
     {
         m_prevUp = false;
-        
+
         const std::chrono::milliseconds waitTicks {500ms};
         auto t = std::chrono::steady_clock::now();
         auto dtms = std::chrono::duration_cast<std::chrono::milliseconds>(t - m_prevTime);
@@ -390,7 +390,7 @@ input_t InputTTY::ProcessMouse(pos_t x, pos_t y, input_t k)
 void InputTTY::ProcessInput(bool fMouse)
 {
     std::string buff;
-  
+
     size_t iLen = 0;
     input_t iKey = K_ERROR;
     input_t iKeyMode = 0;
@@ -454,7 +454,7 @@ void InputTTY::ProcessInput(bool fMouse)
             rc = ReadConsole(buff, MaxInputLen);
             if(rc > 0)
                 iLen += rc;
-            
+
             //LOG(DEBUG) << "utf8=" << KeyMapper::CastString(buff);
             std::u16string wstr = utf8::utf8to16(buff);
             for(auto& wc : wstr)
@@ -509,10 +509,10 @@ void InputTTY::ProcessInput(bool fMouse)
             --x;
             --y;
             //LOG(DEBUG) << "Mouse input k=0x" << std::hex << k << std::dec << " m=" << m << " x=" << x << " y=" << y;
-            
+
             input_t key{K_ERROR};
             input_t iMType{};
-            
+
             if(m == 'm')
                 key = K_MOUSEKUP;
             else
@@ -551,7 +551,7 @@ void InputTTY::ProcessInput(bool fMouse)
             //LOG(DEBUG) << "Mouse input iKey=" << std::hex << iKey << std::dec;
         }
     }
-#endif //!OLD_MOUSE    
+#endif //!OLD_MOUSE
     else
 #endif //USE_MOUSE
 
@@ -572,8 +572,48 @@ void InputTTY::ProcessInput(bool fMouse)
             iKey = m_KeyMap.GetCode(buff);
 
         int t = 10;
-        while(iKey == 0 && iLen >= 2 && buff[0] == 0x1b && buff[1] != 0x1b && t--)
+        while((iKey == 0 || iKey == K_ERROR) && iLen >= 2 && buff[0] == 0x1b && buff[1] != 0x1b && t--)
         {
+            if (iLen == 6 && buff.substr(0, 4) == "\x1b[1;")
+            {
+                auto k = buff[4];
+                if (k >= '2' && k <= '8')
+                {
+                    k -= '1';
+                    if (k & 0x1)
+                        iKeyMode |= K_SHIFT;
+                    if (k & 0x2)
+                        iKeyMode |= K_ALT;
+                    if (k & 0x4)
+                        iKeyMode |= K_CTRL;
+                }
+                switch (buff[5])
+                {
+                case 'A':
+                    iKey = K_UP;
+                    break;
+                case 'B':
+                    iKey = K_DOWN;
+                    break;
+                case 'C':
+                    iKey = K_RIGHT;
+                    break;
+                case 'D':
+                    iKey = K_LEFT;
+                    break;
+                case 'H':
+                    iKey = K_HOME;
+                    break;
+                case 'F':
+                    iKey = K_END;
+                    break;
+                }
+                if (iKey)
+                    break;
+            }
+
+            break;
+/* //???            
             //try to read any more
             LOG(DEBUG) << "read more";
             rc = ReadConsole(buff, MaxInputLen);
@@ -582,6 +622,7 @@ void InputTTY::ProcessInput(bool fMouse)
                 iLen += rc;
                 iKey = m_KeyMap.GetCode(buff);
             }
+*/
         }
 
         if(iKey == K_ERROR)
