@@ -565,7 +565,8 @@ bool EditorWnd::EditBlockIndent(input_t cmd)
         if (size > m_editor->GetMaxStrLen())
             size = m_editor->GetMaxStrLen();
 
-        rc = m_editor->Indent(save, y, bx, size, count);
+        if (size > count)
+            rc = m_editor->Indent(save, y, bx, size, count);
     }
 
     edit.command = cmd_t::CMD_END;
@@ -642,7 +643,8 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
         if (size > m_editor->GetMaxStrLen())
             size = m_editor->GetMaxStrLen();
 
-        rc = m_editor->Undent(save, y, bx, size, count);
+        if (size > count)
+            rc = m_editor->Undent(save, y, bx, size, count);
     }
 
     edit.command = cmd_t::CMD_END;
