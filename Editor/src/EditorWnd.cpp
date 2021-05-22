@@ -1290,6 +1290,7 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
     undo.command = cmd_t::CMD_END;
     m_editor->AddUndoCommand(edit, undo);
 
+#if 0
     //new selection
     m_beginX = posX;
     m_beginY = posY;
@@ -1297,9 +1298,11 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
     m_endY = posY + n - 1;
     m_selectType = selType;
     m_selectState = select_state::complete;
+#else
+    m_selectState = select_state::no;
+#endif
 
     InvalidateRect();
-
     return rc;
 }
 

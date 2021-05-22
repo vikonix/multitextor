@@ -517,6 +517,11 @@ void InputWin32::ProcessResizeEvent(WINDOW_BUFFER_SIZE_RECORD* pWindowBufferSize
         //special case for screen size calculating
         return;
     
+    if (x > MAX_COORD)
+        x = MAX_COORD;
+    if (y > MAX_COORD)
+        y = MAX_COORD;
+
     input_t iKey = K_MAKE_COORD_CODE(K_RESIZE, x, y);
     PutInput(iKey);
 }
