@@ -332,7 +332,7 @@ size_t InputTTY::ReadConsole(std::string& str, size_t n)
         int rc = read(m_stdin, buff.data(), n);
         if(rc > 0)
         {
-            str.insert(str.size(), buff, 0, rc);
+            str.append(std::string_view(buff).substr(0, rc));
             return static_cast<size_t>(rc);
         }
     }
@@ -571,49 +571,54 @@ void InputTTY::ProcessInput(bool fMouse)
         else
             iKey = m_KeyMap.GetCode(buff);
 
-        int t = 10;
-        while((iKey == 0 || iKey == K_ERROR) && iLen >= 2 && buff[0] == 0x1b && buff[1] != 0x1b && t--)
+        auto CheckKeys = [&buff, &iLen, &iKey, &iKeyMode]()
         {
-            if (iLen == 6 && buff.substr(0, 4) == "\x1b[1;")
+            if(iKey != 0 && iKey != K_ERROR)
+                return;
+
+            if (iLen != 6 || std::string_view(buff).substr(0, 4) != "\x1b[1;")
+                return;
+
+            auto k = buff[4];
+            if (k >= '2' && k <= '8')
             {
-                auto k = buff[4];
-                if (k >= '2' && k <= '8')
-                {
-                    k -= '1';
-                    if (k & 0x1)
-                        iKeyMode |= K_SHIFT;
-                    if (k & 0x2)
-                        iKeyMode |= K_ALT;
-                    if (k & 0x4)
-                        iKeyMode |= K_CTRL;
-                }
-                switch (buff[5])
-                {
-                case 'A':
-                    iKey = K_UP;
-                    break;
-                case 'B':
-                    iKey = K_DOWN;
-                    break;
-                case 'C':
-                    iKey = K_RIGHT;
-                    break;
-                case 'D':
-                    iKey = K_LEFT;
-                    break;
-                case 'H':
-                    iKey = K_HOME;
-                    break;
-                case 'F':
-                    iKey = K_END;
-                    break;
-                }
-                if (iKey)
-                    break;
+                k -= '1';
+                if (k & 0x1)
+                    iKeyMode |= K_SHIFT;
+                if (k & 0x2)
+                    iKeyMode |= K_ALT;
+                if (k & 0x4)
+                    iKeyMode |= K_CTRL;
             }
 
-            break;
-/* //???            
+            switch (buff[5])
+            {
+            case 'A':
+                iKey = K_UP;
+                break;
+            case 'B':
+                iKey = K_DOWN;
+                break;
+            case 'C':
+                iKey = K_RIGHT;
+                break;
+            case 'D':
+                iKey = K_LEFT;
+                break;
+            case 'H':
+                iKey = K_HOME;
+                break;
+            case 'F':
+                iKey = K_END;
+                break;
+            }
+        };
+
+        CheckKeys();
+
+        int t = 10;
+        while(iKey == 0 && iLen >= 2 && buff[0] == 0x1b && buff[1] != 0x1b && t--)
+        {
             //try to read any more
             LOG(DEBUG) << "read more";
             rc = ReadConsole(buff, MaxInputLen);
@@ -621,8 +626,8 @@ void InputTTY::ProcessInput(bool fMouse)
             {
                 iLen += rc;
                 iKey = m_KeyMap.GetCode(buff);
+                CheckKeys();
             }
-*/
         }
 
         if(iKey == K_ERROR)
