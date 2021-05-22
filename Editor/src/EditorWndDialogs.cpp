@@ -162,6 +162,7 @@ bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
 
         m_readOnly = dlg.s_vars.ro;
         m_log = dlg.s_vars.log;
+        m_checkTime = std::chrono::system_clock::now();
 
         m_editor->SetCP(dlg.s_vars.cpName);
         m_editor->SetEol(static_cast<eol_t>(dlg.s_vars.eol));
