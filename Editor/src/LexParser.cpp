@@ -379,7 +379,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
             //for delimiters check first symbol as comment and if it matches then check some beginning symbols
             if (type == lex_t::OPERATOR)
             {
-                if (str[end] == '$' && end < str.size() - 2)
+                if (str[end] == '$' && str.size() > 2 && end < str.size() - 2)
                 {
                     //LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin, end - begin + 1));
                     //bash var test

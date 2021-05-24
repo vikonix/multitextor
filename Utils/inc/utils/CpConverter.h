@@ -54,6 +54,8 @@ public:
     bool Convert(char16_t ch, std::string& out);
 
     static std::list<std::string> GetCpList();
+
+    static std::u16string FixPrintWidth(const std::u16string& str, size_t& width);
 };
 
 } //namespace iconvpp

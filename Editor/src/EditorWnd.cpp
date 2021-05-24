@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "utfcpp/utf8.h"
 #include "utils/SymbolType.h"
+#include "utils/CpConverter.h"
 #include "EditorWnd.h"
 #include "WndManager/WndManager.h"
 #include "EditorApp.h"
@@ -397,7 +398,7 @@ bool EditorWnd::IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey) co
         return false;
 }
 
-bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t offset, size_t len)
+bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& wstr, size_t offset, size_t len)
 {
     size_t line = y + m_firstLine;
     auto MarkFound = [this, line]() {
@@ -406,6 +407,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t off
             Mark(m_foundX, m_foundY, m_foundX + m_foundSize - 1, m_foundY, ColorWindowFound);
     };
 
+    auto str = iconvpp::CpConverter::FixPrintWidth(wstr, len);
     bool rc{};
     if (!m_diff)
     {

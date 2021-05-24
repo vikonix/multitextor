@@ -1,4 +1,4 @@
-/*
+﻿/*
 FreeBSD License
 
 Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "utils/CpConverter.h"
 #include "utils/logger.h"
+#include "widecharwidth/widechar_width.h"
 
 #include <errno.h>
 
@@ -143,6 +144,40 @@ std::list<std::string> CpConverter::GetCpList()
         "CP437", "CP775", "CP850", "CP852", "CP857", "CP858", "CP860", "CP863", "CP866",
         "KOI8-R"
     };
+}
+
+std::u16string CpConverter::FixPrintWidth(const std::u16string& str, size_t& width)
+{
+    std::u16string fixed( width, ' ');
+
+    size_t pos{};
+    for (auto c : str)
+    {
+        auto w = widechar_wcwidth(c);
+        if(w == 1 || w == widechar_ambiguous)
+            fixed[pos++] = c;
+        else if (w == 2 || w == widechar_widened_in_9)
+        {
+//            //cann't work with width character //???
+//            if (pos < width - 1)
+//            {
+//                fixed[pos++] = c;
+//                fixed[pos++] = 0;// x200B;// 0xFEFF;  //ZERO WIDTH NO - BREAK SPACE
+//                --width;//???
+//            }
+//            else
+                fixed[pos++] = 0x00BF; //¿ INVERTED QUESTION MARK
+        }
+        else
+        {
+            fixed[pos++] = 0x00BF; //¿ INVERTED QUESTION MARK
+        }
+
+        if (pos == width)
+            break;
+    }
+
+    return fixed;
 }
 
 } //namespace iconvpp
