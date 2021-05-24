@@ -7,4 +7,5 @@
  - iconv (optional in Windows)
  - cxxopts
  - nlohmann/json
+ - widecharwidth
  

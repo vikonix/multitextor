@@ -1,5 +1,5 @@
 # Multitextor
-![Screenshot](docs/m.png) Cross Platform console mode text editor.
+![Screenshot](docs/m.png) Cross platform console mode text editor.
 
 This project is mostly recreated version of my old text editor.
 
@@ -15,7 +15,7 @@ Linux/Windows build (Travis CI): [![Build Status](https://travis-ci.org/vikonix/
  
 ## Key features:
 - Simple interface same in different environments (with menu and dialog)
-- Mouse using
+- Mouse and keyboard cursor movement and selection
 - Multi-window
 - Split view mode with 2 panels
 - Clear working with different text code pages
