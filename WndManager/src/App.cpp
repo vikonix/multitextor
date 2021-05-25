@@ -305,20 +305,23 @@ bool  Application::PrintStatusLine()
         sstr << "|";
     }
 
-    rc = m_wndManager.GotoXY(m_wndManager.m_sizex - static_cast<pos_t>(sstr.str().size()) - 5, y); //reserv 5 positions for clock
-    li = m_sLine.cbegin();
-    for (auto c : sstr.str())
+    if (m_wndManager.m_sizex >= static_cast<pos_t>(sstr.str().size()) + 5)
     {
-        if (c == '|')
+        rc = m_wndManager.GotoXY(m_wndManager.m_sizex - static_cast<pos_t>(sstr.str().size()) - 5, y); //reserv 5 positions for clock
+        li = m_sLine.cbegin();
+        for (auto c : sstr.str())
         {
-            ++li;
-            rc = m_wndManager.SetTextAttr(ColorStatusLineG);
-            rc = m_wndManager.WriteChar(c);
-            if (li == m_sLine.cend() || li->color == stat_color::normal)
-                rc = m_wndManager.SetTextAttr(ColorStatusLine);
+            if (c == '|')
+            {
+                ++li;
+                rc = m_wndManager.SetTextAttr(ColorStatusLineG);
+                rc = m_wndManager.WriteChar(c);
+                if (li == m_sLine.cend() || li->color == stat_color::normal)
+                    rc = m_wndManager.SetTextAttr(ColorStatusLine);
+            }
+            else
+                rc = m_wndManager.WriteChar(c);
         }
-        else
-            rc = m_wndManager.WriteChar(c);
     }
 
     m_wndManager.BeginPaint();

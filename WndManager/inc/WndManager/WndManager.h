@@ -74,6 +74,9 @@ protected:
     ScreenBuffer        m_screenBuff; //current buffer color/symbol/changing
 
 protected:
+    inline static const pos_t c_minSplitX{ 16 };
+    inline static const pos_t c_minSplitY{ 3 };
+
     Console             m_console;
 #define CallConsole(p) ((m_disablePaint) ? true : m_console. p)
 

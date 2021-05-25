@@ -178,9 +178,10 @@ bool EditorWnd::UpdatePosInfo()
     size_t len = std::max(str.size(), m_infoStrSize);
     len = std::min({len, static_cast<size_t>(32), static_cast<size_t>(m_clientSizeX / 2 + 3)});
 
-    m_infoStrSize = str.size() - 14;
+    m_infoStrSize = str.size() - 14;//clearing prefix
 
-    WriteWnd(m_clientSizeX - static_cast<pos_t>(len), 0, str.substr(str.size() - len), *m_pColorWindowTitle);
+    if(m_clientSizeX > static_cast<pos_t>(len))
+        WriteWnd(m_clientSizeX - static_cast<pos_t>(len), 0, str.substr(str.size() - len), *m_pColorWindowTitle);
     return true;
 }
 
@@ -400,6 +401,9 @@ bool EditorWnd::IsNormalSelection(size_t bx, size_t by, size_t ex, size_t ey) co
 
 bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& wstr, size_t offset, size_t len)
 {
+    if (len == 0)
+        return true;
+
     size_t line = y + m_firstLine;
     auto MarkFound = [this, line]() {
         if (m_foundSize && line == m_foundY)

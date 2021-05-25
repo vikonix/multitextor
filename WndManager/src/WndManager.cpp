@@ -86,6 +86,14 @@ bool WndManager::CalcView()
     if (m_splitType == split_t::split_h)
     {
         //horizontal
+        if (m_splitY > m_sizey - m_topLines - m_bottomLines - c_minSplitY - 1)
+            m_splitY = m_sizey - m_topLines - m_bottomLines - c_minSplitY - 1;
+        if (m_splitY <= 0)
+        {
+            ChangeViewMode();
+            return true;
+        }
+
         m_view[1].left  = 0;
         m_view[1].top   = m_topLines;
         m_view[1].sizex = m_sizex;
@@ -99,6 +107,14 @@ bool WndManager::CalcView()
     else if (m_splitType == split_t::split_v)
     {
         //vertical 
+        if (m_splitX > m_sizex - c_minSplitX)
+            m_splitX = m_sizex - c_minSplitX;
+        if (m_splitX <= 0)
+        {
+            ChangeViewMode();
+            return true;
+        }
+
         m_view[1].left  = 0;
         m_view[1].top   = m_topLines;
         m_view[1].sizex = m_splitX;
@@ -146,11 +162,12 @@ bool WndManager::Refresh()
 
         SetTextAttr(m_logo.logoColor);
 
-        for(const auto& str : m_logo.logoStr)
-        {
-            GotoXY(x, y++);
-            WriteStr(str);
-        }
+        if(x > 0 && y > 0)
+            for(const auto& str : m_logo.logoStr)
+            {
+                GotoXY(x, y++);
+                WriteStr(str);
+            }
     }
 
     rc = Application::getInstance().Repaint();
@@ -273,7 +290,7 @@ bool WndManager::ShowBuff(pos_t left, pos_t top, pos_t sizex, pos_t sizey)
 
     bool rc = false;
     if (left < 0 || top < 0 || left + sizex > m_sizex || top + sizey > m_sizey)
-        LOG(ERROR) << "  M::ShowBuff l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
+        LOG(ERROR) << __FUNC__ << "  M::ShowBuff l=" << left << " t=" << top << " sx=" << sizex << " sy=" << sizey;
     else
         rc = WriteBlock(left, top, left + sizex - 1, top + sizey - 1, m_screenBuff);
     return rc;
@@ -371,6 +388,12 @@ bool WndManager::Resize(pos_t sizex, pos_t sizey)
 {
     LOG(INFO) << "  M::Resize x=" << sizex << " y=" << sizey;
     _assert(sizex > 0 && sizey > 0);
+
+    if (sizex < c_minSplitX || sizey < c_minSplitY)
+    {
+        LOG(ERROR) << "Too small screen size";
+        throw std::runtime_error("Too small screen size");
+    }
 
     m_sizex = sizex;
     m_sizey = sizey;
@@ -925,15 +948,15 @@ bool WndManager::SetView(pos_t x, pos_t y, split_t type)
     if (!x || !y)
         return true;
 
-    if (y < 3)
-        y = 3;
-    if (y > m_sizey - m_topLines - m_bottomLines - 4)
-        y = m_sizey - m_topLines - m_bottomLines - 4;
+    if (y < c_minSplitY)
+        y = c_minSplitY;
+    if (y > m_sizey - m_topLines - m_bottomLines - c_minSplitY - 1)
+        y = m_sizey - m_topLines - m_bottomLines - c_minSplitY - 1;
 
-    if (x < 15)
-        x = 15;
-    if (x > m_sizex - 16)
-        x = m_sizex - 16;
+    if (x < c_minSplitX - 1)
+        x = c_minSplitX - 1;
+    if (x > m_sizex - c_minSplitX)
+        x = m_sizex - c_minSplitX;
 
     if (type != split_t::split_v && type != split_t::split_h)
         type = split_t::no_split;
