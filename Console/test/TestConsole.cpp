@@ -43,6 +43,10 @@ void ConsoleTest()
     LOG(INFO);
     LOG(INFO) << "Console test";
 
+    std::cout << "Input 'y Enter' for continue: ";
+    std::string str;
+    std::cin >> str;
+
     Console console;
 
     console.Init();

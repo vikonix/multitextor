@@ -49,13 +49,13 @@ bool InputWin32::Init()
         OPEN_EXISTING, 0, NULL);
     if (INVALID_HANDLE_VALUE == m_hStdin)
     {
-        LOG(ERROR) << "CreateFile(CONIN$...) error" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "CreateFile(CONIN$...) error" << GetLastError();
         return false;
     }
 
     if (!GetConsoleMode(m_hStdin,  &m_saveMode))
     {
-        LOG(ERROR) << "GetConsoleMode error" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "GetConsoleMode error" << GetLastError();
         Deinit();
         return false;
     }
@@ -63,7 +63,7 @@ bool InputWin32::Init()
     DWORD dwModeIn = ENABLE_WINDOW_INPUT | ENABLE_MOUSE_INPUT | ENABLE_EXTENDED_FLAGS;
     if (!SetConsoleMode(m_hStdin, dwModeIn))
     {
-        LOG(ERROR) << "SetConsoleMode error" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "SetConsoleMode error" << GetLastError();
         Deinit();
         return false;
     }
@@ -72,7 +72,7 @@ bool InputWin32::Init()
         (PHANDLER_ROUTINE) CtrlHandler, // handler function
         TRUE))                          // add to list
     {
-        LOG(ERROR) << "SetConsoleCtrlHandler error" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "SetConsoleCtrlHandler error" << GetLastError();
         Deinit();
         return false;
     }
@@ -517,7 +517,7 @@ void InputWin32::ProcessResizeEvent(WINDOW_BUFFER_SIZE_RECORD* pWindowBufferSize
         //special case for screen size calculating
         return;
     
-    if (x > MAX_COORD)
+    if (x > MAX_COORD) //???
         x = MAX_COORD;
     if (y > MAX_COORD)
         y = MAX_COORD;

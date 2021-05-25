@@ -69,7 +69,7 @@ bool ScreenWin32::Init()
 
     if (INVALID_HANDLE_VALUE == m_hStdout)
     {
-        LOG(ERROR) << "ERROR get Handle err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR get Handle err=" << GetLastError();
         return false;
     }
 
@@ -77,7 +77,7 @@ bool ScreenWin32::Init()
     bool rc = GetConsoleScreenBufferInfoEx(m_hStdout, &m_saveInfoEx);
     if (!rc)
     {
-        LOG(ERROR) << "ERROR GetConsoleScreenBufferInfoEx err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR GetConsoleScreenBufferInfoEx err=" << GetLastError();
         m_saveInfoEx.cbSize = 0;
     }
     else
@@ -86,12 +86,12 @@ bool ScreenWin32::Init()
         std::memcpy(info.ColorTable, s_colorPalette, sizeof(m_saveInfoEx.ColorTable));
         rc = SetConsoleScreenBufferInfoEx(m_hStdout, &info);
         if (!rc)
-            LOG(ERROR) << "ERROR SetConsoleScreenBufferInfoEx err=" << GetLastError();
+            LOG(ERROR) << __FUNC__ << "ERROR SetConsoleScreenBufferInfoEx err=" << GetLastError();
     }
 
     rc = GetConsoleScreenBufferInfo(m_hStdout, &m_saveInfo);
     if (!rc)
-        LOG(ERROR) << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
 
     GetConsoleCursorInfo(m_hStdout, &m_saveCursor);
     LOG(DEBUG) << __FUNC__ << " x=" << m_saveInfo.dwSize.X << " y=" << m_saveInfo.dwSize.Y;
@@ -111,7 +111,7 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
     CONSOLE_SCREEN_BUFFER_INFO sbInfo;
     bool rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
     if(!rc)
-        LOG(ERROR) << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
 
     LOG(INFO) << "Cur size=" << sbInfo.dwSize.X << "/" << sbInfo.dwSize.Y
         << " pos=" << sbInfo.srWindow.Left << "/" << sbInfo.srWindow.Top << "/" << sbInfo.srWindow.Right << "/" << sbInfo.srWindow.Bottom
@@ -121,11 +121,11 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
     COORD sizeM { MAX_COORD, MAX_COORD };
     rc = SetConsoleScreenBufferSize(m_hStdout, sizeM);
     if(!rc)
-        LOG(ERROR) << "ERROR SetConsoleScreenBufferSizeM err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR SetConsoleScreenBufferSizeM err=" << GetLastError();
 
     rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
     if(!rc)
-        LOG(ERROR) << "ERROR GetConsoleScreenBufferInfoM err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR GetConsoleScreenBufferInfoM err=" << GetLastError();
 
     LOG(DEBUG) << "max=" << sbInfo.dwMaximumWindowSize.X << "/" << sbInfo.dwMaximumWindowSize.Y;
 #endif
@@ -139,16 +139,16 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
     SMALL_RECT rect {0, 0, sizex - 1, sizey - 1};
     rc = SetConsoleWindowInfo(m_hStdout, TRUE, &rect);
     if(!rc)
-        LOG(ERROR) << "ERROR SetConsoleWindowInfoM1 err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR SetConsoleWindowInfoM1 err=" << GetLastError();
 
     COORD size { sizex, sizey };
     rc = SetConsoleScreenBufferSize(m_hStdout, size);
     if(!rc)
-        LOG(ERROR) << "ERROR SetConsoleScreenBufferSizeM1 err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR SetConsoleScreenBufferSizeM1 err=" << GetLastError();
 
     rc = GetConsoleScreenBufferInfo(m_hStdout, &sbInfo);
     if (!rc)
-        LOG(ERROR) << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "ERROR GetConsoleScreenBufferInfo err=" << GetLastError();
 
     m_sizex = sbInfo.dwSize.X;
     m_sizey = sbInfo.dwSize.Y;
@@ -162,6 +162,7 @@ void ScreenWin32::Deinit()
     if (INVALID_HANDLE_VALUE == m_hStdout)
         return;
 
+    SetConsoleTextAttribute(m_hStdout, m_saveInfo.wAttributes);
     ClrScr();
 
     [[maybe_unused]] bool rc;
@@ -173,6 +174,7 @@ void ScreenWin32::Deinit()
     {
         rc = SetConsoleScreenBufferSize(m_hStdout, m_saveInfo.dwSize);
     }
+    LOG(DEBUG) << __FUNC__ << "Restore x=" << m_saveInfo.dwSize.X << " y=" << m_saveInfo.dwSize.Y;
 
     CloseHandle(m_hStdout);
     m_hStdout = INVALID_HANDLE_VALUE;
@@ -469,7 +471,7 @@ bool ScreenWin32::WriteBlock(
         &srWriteRegion              // rectangle to write
     );
     if (!rc)
-        LOG(ERROR) << "WriteBlock err=" << GetLastError();
+        LOG(ERROR) << __FUNC__ << "WriteBlock err=" << GetLastError();
 
     return rc;
 }

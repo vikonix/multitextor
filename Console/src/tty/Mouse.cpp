@@ -143,7 +143,7 @@ bool LoadGpm()
 
     if(!hLib)
     {
-        LOG(ERROR) << "LoadGpm ERROR " << dlerror();
+        LOG(ERROR) << __FUNC__ << "LoadGpm ERROR " << dlerror();
         return false;
     }
 
