@@ -521,7 +521,7 @@ bool MemStrBuff<Tbuff, Tview>::SplitBuff(typename std::list<std::shared_ptr<StrB
         oldBuff->ReleaseBuff();
         newBuff->ReleaseBuff();
 
-        LOG(ERROR) << "ERROR GetBuff";
+        LOG(ERROR) << __FUNC__ << "ERROR GetBuff";
         return false;
     }
 

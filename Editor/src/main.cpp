@@ -98,12 +98,12 @@ int main(int argc, char** argv) try
 }
 catch (const std::exception& ex)
 {
-    LOG(ERROR) << "Exeption: " << ex.what();
+    LOG(ERROR) << __FUNC__ << "Exeption: " << ex.what();
     std::cerr << "Exeption: " << ex.what();
     return -1;
 }
 catch (...)
 {
-    LOG(ERROR) << "Unhandle exeption.";
+    LOG(ERROR) << __FUNC__ << "Unhandle exeption.";
     return -1;
 }

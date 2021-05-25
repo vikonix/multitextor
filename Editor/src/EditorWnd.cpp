@@ -765,7 +765,7 @@ input_t EditorWnd::ParseCommand(input_t cmd)
         auto it = s_funcMap.find(ecmd);
         if(it == s_funcMap.end())
         {
-            LOG(ERROR) << "    ??? editor cmd=" << std::hex << cmd << std::dec;
+            LOG(ERROR) << __FUNC__ << "    ??? editor cmd=" << std::hex << cmd << std::dec;
         }
         else
         {
@@ -789,7 +789,7 @@ input_t EditorWnd::ParseCommand(input_t cmd)
     else
     {
         if(cmd != K_FOCUSLOST && cmd != K_FOCUSSET)
-            LOG(ERROR) << "    ??? editor code=" << std::hex << cmd << std::dec;
+            LOG(ERROR) << __FUNC__ << "    ??? editor code=" << std::hex << cmd << std::dec;
     }
 
     return 0;

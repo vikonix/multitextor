@@ -1234,7 +1234,7 @@ bool Editor::Command(const EditCmd& cmd)
         break;
 
     default:
-        LOG(ERROR) << "Unknown command " << static_cast<int>(cmd.command);
+        LOG(ERROR) << __FUNC__ << "Unknown command " << static_cast<int>(cmd.command);
         break;
     }
 

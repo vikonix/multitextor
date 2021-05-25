@@ -189,7 +189,7 @@ std::string Directory::GetFileInfo(const path_t& path)
     }
     catch (const std::exception& ex)
     {
-        LOG(ERROR) << "exception " << ex.what();
+        LOG(ERROR) << __FUNC__ << "exception " << ex.what();
         return {};
     }
 }

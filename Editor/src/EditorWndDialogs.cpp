@@ -120,7 +120,7 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
             }
             catch (const std::exception& ex)
             {
-                LOG(ERROR) << "save as: exception " << ex.what();
+                LOG(ERROR) << __FUNC__ << "save as: exception " << ex.what();
                 MsgBox(MBoxKey::OK, "Save As",
                     { "File write error",
                     "Check file access and try again" }
@@ -133,7 +133,7 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
         }
         catch (...)
         {
-            LOG(ERROR) << "Error in file Saving As";
+            LOG(ERROR) << __FUNC__ << "Error in file Saving As";
             EditorApp::SetErrorLine("Error in file Saving As");
             return false;
         }

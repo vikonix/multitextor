@@ -292,14 +292,14 @@ bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& p
 catch (const std::exception& ex)
 {
     _assert(0);
-    LOG(ERROR) << "Error file loading: " << ex.what();
+    LOG(ERROR) << __FUNC__ << "Error file loading: " << ex.what();
     EditorApp::SetErrorLine("Error file loading");
     return false;
 }
 catch (...)
 {
     _assert(0);
-    LOG(ERROR) << "Error file loading: unknown exeption";
+    LOG(ERROR) << __FUNC__ << "Error file loading: unknown exeption";
     EditorApp::SetErrorLine("Error file loading");
     return false;
 }

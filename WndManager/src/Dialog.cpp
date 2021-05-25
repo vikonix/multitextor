@@ -52,7 +52,7 @@ Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
         || WndManager::getInstance().m_sizex < controls.front().sizex 
         || WndManager::getInstance().m_sizey < controls.front().sizey)
     {
-        LOG(ERROR) << "ERROR Dialog small screen size !!!";
+        LOG(ERROR) << __FUNC__ << "ERROR Dialog small screen size !!!";
         m_left  = 0;
         m_top   = 0;
         m_sizex = 0;
@@ -105,7 +105,7 @@ Dialog::Dialog(const std::list<control>& controls, pos_t x, pos_t y)
             break;
 
         default:
-            LOG(ERROR) << "Bad dialog control " << std::hex << control.type << std::dec;
+            LOG(ERROR) << __FUNC__ << "Bad dialog control " << std::hex << control.type << std::dec;
             _assert(0);
             break;
         }
@@ -720,6 +720,13 @@ input_t MsgBox(MBoxKey type, const std::string& title, const std::list<std::stri
         box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, defKeys[1], ID_CANCEL, nullptr, 1, line });
         if(type != MBoxKey::OK_CANCEL)
             box.push_back({ CTRL_BUTTON | CTRL_ALIGN_RIGHT, defKeys[2], ID_IGNORE, nullptr, 1, line });
+    }
+
+    if (WndManager::getInstance().m_sizex < box.front().sizex
+     || WndManager::getInstance().m_sizey < box.front().sizey)
+    {
+        LOG(ERROR) << __FUNC__ << "ERROR Too small screen size !!!";
+        return ID_OK;
     }
 
     Dialog Dlg(box);

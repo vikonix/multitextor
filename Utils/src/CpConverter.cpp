@@ -156,18 +156,20 @@ std::u16string CpConverter::FixPrintWidth(const std::u16string& str, size_t& wid
         auto w = widechar_wcwidth(c);
         if(w == 1 || w == widechar_ambiguous)
             fixed[pos++] = c;
+#if 0
         else if (w == 2 || w == widechar_widened_in_9)
         {
-//            //cann't work with width character //???
-//            if (pos < width - 1)
-//            {
-//                fixed[pos++] = c;
-//                fixed[pos++] = 0;// x200B;// 0xFEFF;  //ZERO WIDTH NO - BREAK SPACE
-//                --width;//???
-//            }
-//            else
+            //cann't work with width character //???
+            if (pos < width - 1)
+            {
+                fixed[pos++] = c;
+                fixed[pos++] = 0;// x200B;// 0xFEFF;  //ZERO WIDTH NO - BREAK SPACE
+                --width;//???
+            }
+            else
                 fixed[pos++] = 0x00BF; //¿ INVERTED QUESTION MARK
         }
+#endif
         else
         {
             fixed[pos++] = 0x00BF; //¿ INVERTED QUESTION MARK
