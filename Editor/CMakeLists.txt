@@ -79,3 +79,8 @@ else()
     #target_link_options(${PROJECT_NAME} PRIVATE -static)
 endif()
 
+if(UNIX)
+    set(CMAKE_SKIP_INSTALL_ALL_DEPENDENCY true)
+    set(CMAKE_INSTALL_PREFIX /usr/local/bin)
+    install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT binaries)
+endif()
