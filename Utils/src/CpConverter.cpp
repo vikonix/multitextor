@@ -146,12 +146,12 @@ std::list<std::string> CpConverter::GetCpList()
     };
 }
 
-std::u16string CpConverter::FixPrintWidth(const std::u16string& str, size_t& width)
+std::u16string CpConverter::FixPrintWidth(const std::u16string& str, size_t offset, size_t width)
 {
     std::u16string fixed( width, ' ');
 
     size_t pos{};
-    for (auto c : str)
+    for (auto c : std::u16string_view(str).substr(offset, width))
     {
         auto w = widechar_wcwidth(c);
         if(w == 1 || w == widechar_ambiguous)

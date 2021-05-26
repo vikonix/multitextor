@@ -55,7 +55,7 @@ public:
 
     static std::list<std::string> GetCpList();
 
-    static std::u16string FixPrintWidth(const std::u16string& str, size_t& width);
+    static std::u16string FixPrintWidth(const std::u16string& str, size_t offset, size_t width);
 };
 
 } //namespace iconvpp

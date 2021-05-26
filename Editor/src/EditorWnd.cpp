@@ -411,17 +411,17 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& wstr, size_t of
             Mark(m_foundX, m_foundY, m_foundX + m_foundSize - 1, m_foundY, ColorWindowFound);
     };
 
-    auto str = iconvpp::CpConverter::FixPrintWidth(wstr, len);
+    auto str = iconvpp::CpConverter::FixPrintWidth(wstr, offset, len);
     bool rc{};
     if (!m_diff)
     {
         std::vector<color_t> colorBuff;
-        rc = m_editor->GetColor(m_firstLine + y, str, colorBuff, offset + len);
+        rc = m_editor->GetColor(m_firstLine + y, wstr, colorBuff, offset + len);
 
         if (rc)
-            rc = WriteColorStr(x, y, str.substr(offset, len), std::vector<color_t>(colorBuff.cbegin() + offset, colorBuff.cend()));
+            rc = WriteColorStr(x, y, str, std::vector<color_t>(colorBuff.cbegin() + offset, colorBuff.cend()));
         else
-            rc = WriteWStr(x, y, str.substr(offset, len));
+            rc = WriteWStr(x, y, str);
     }
     else
     {
