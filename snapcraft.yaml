@@ -23,10 +23,8 @@ parts:
   gcc-9:
     plugin: nil
     override-pull: |
-      add-apt-repository -yu ppa:ubuntu-toolchain-r/test
       apt install -y gcc-9 g++-9
       update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 900 --slave /usr/bin/g++ g++ /usr/bin/g++-9
-      update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-7 700 --slave /usr/bin/g++ g++ /usr/bin/g++-7
 
   multitextor:
     source: https://github.com/vikonix/multitextor.git
