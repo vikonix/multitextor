@@ -23,6 +23,9 @@ parts:
   gcc-9:
     plugin: nil
     override-pull: |
+      apt install software-properties-common
+      add-apt-repository -yu ppa:ubuntu-toolchain-r/test
+      apt update
       apt install -y gcc-9 g++-9
       update-alternatives --install /usr/bin/gcc gcc /usr/bin/gcc-9 900 --slave /usr/bin/g++ g++ /usr/bin/g++-9
 
