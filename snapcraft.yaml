@@ -1,0 +1,36 @@
+name: multitextor
+version: "2.0.0-MVP-beta"
+summary: Cross platform console mode text editor
+description: |
+  Multitextor is simple cross platform console mode text editor.
+  It has very simple interface same in different environments (with menu and dialog).
+  Editor supports mouse and keyboard cursor movement.
+  It has multi-window editing, split view mode with 2 panels.
+  Can clear works with different text code pages. Has different selecting modes.
+  Can work with files over 4 GBytes (with small memory using).
+  Has deep Undo/Redo buffer.
+license: BSD-2-Clause
+
+base: core18
+confinement: devmode
+grade: devel
+
+apps:
+  multitextor:
+    command: multitextor
+
+parts:
+  multitextor:
+    source: https://github.com/vikonix/multitextor.git
+    source-branch: main
+    source-depth: 1
+    plugin: cmake
+    configflags:
+      - -DCMAKE_BUILD_TYPE=Release
+    build-packages:
+      - g++
+      - libncurses5-dev
+      - libgpm-dev
+    stage-packages:
+      - libstdc++6
+      - libtinfo6
