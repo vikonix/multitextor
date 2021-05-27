@@ -23,7 +23,7 @@ parts:
   gcc-9:
     plugin: nil
     override-pull: |
-      apt install software-properties-common
+      apt install -y software-properties-common
       add-apt-repository -yu ppa:ubuntu-toolchain-r/test
       apt update
       apt install -y gcc-9 g++-9
