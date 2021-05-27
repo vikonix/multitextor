@@ -3,12 +3,11 @@
 
 This project is mostly recreated version of my old text editor.
 
-[![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)][license]
+[![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)](https://github.com/vikonix/multitextor/blob/main/LICENSE)
 
-Linux/Windows build (Travis CI): [![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)][travis]
+Linux/Windows build (Travis CI): [![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)](https://travis-ci.org/vikonix/multitextor)
 
-[license]: https://github.com/vikonix/multitextor/blob/main/LICENSE
-[travis]: https://travis-ci.org/vikonix/multitextor
+[![multitextor](https://snapcraft.io/multitextor/badge.svg)](https://snapcraft.io/multitextor)
 
 ## In progress:
 - Editor 2.0.0 MVP (beta) version.
