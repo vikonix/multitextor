@@ -98,7 +98,7 @@ bool ScreenWin32::Init()
     LOG(INFO) << "cursor size=" << m_saveCursor.dwSize << "%";
 
 //    return SetSize(MAX_COORD, MAX_COORD);
-    return SetSize(m_saveInfo.dwSize.X, m_saveInfo.dwSize.Y);
+    return SetSize(m_saveInfo.dwMaximumWindowSize.X, m_saveInfo.dwMaximumWindowSize.Y);
 }
 
 bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
@@ -162,7 +162,7 @@ void ScreenWin32::Deinit()
     if (INVALID_HANDLE_VALUE == m_hStdout)
         return;
 
-    SetConsoleTextAttribute(m_hStdout, m_saveInfo.wAttributes);
+    //SetConsoleTextAttribute(m_hStdout, m_saveInfo.wAttributes);
     ClrScr();
 
     [[maybe_unused]] bool rc;

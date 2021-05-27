@@ -388,6 +388,8 @@ bool WndManager::Resize(pos_t sizex, pos_t sizey)
 {
     LOG(INFO) << "  M::Resize x=" << sizex << " y=" << sizey;
     _assert(sizex > 0 && sizey > 0);
+    if (m_sizex == sizex && m_sizey == sizey)
+        return true;
 
     if (sizex < c_minSplitX || sizey < c_minSplitY)
     {

@@ -48,6 +48,7 @@ bool EditorApp::Init()
 
 void EditorApp::Deinit()
 {
+    CloseAllWindows();
     Application::Deinit();
 }
 

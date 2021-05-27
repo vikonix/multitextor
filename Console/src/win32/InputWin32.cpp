@@ -505,18 +505,26 @@ void InputWin32::ProcessMouseEvent(MOUSE_EVENT_RECORD* pMouseEvent)
 //////////////////////////////////////////////////////////////////////////////
 void InputWin32::ProcessResizeEvent(WINDOW_BUFFER_SIZE_RECORD* pWindowBufferSizeEvent)
 {
-/*    
-    LOG(DEBUG) 
-        << "ResizeEvent x=" << pWindowBufferSizeEvent->dwSize.X
-        << " y=" <<pWindowBufferSizeEvent->dwSize.Y
-    ;
-//*/
+    LOG(DEBUG) << "ResizeEvent x=" << pWindowBufferSizeEvent->dwSize.X << " y=" << pWindowBufferSizeEvent->dwSize.Y;
+
     pos_t x = pWindowBufferSizeEvent->dwSize.X;
     pos_t y = pWindowBufferSizeEvent->dwSize.Y;
     if (x == MAX_COORD && y == MAX_COORD)
         //special case for screen size calculating
         return;
     
+    auto handle = GetStdHandle(STD_OUTPUT_HANDLE);
+    CONSOLE_SCREEN_BUFFER_INFO sbInfo;
+    bool rc = GetConsoleScreenBufferInfo(handle, &sbInfo);
+    if (rc)
+    {
+        if (x != sbInfo.dwSize.X && y != sbInfo.dwSize.Y)
+        {
+            LOG(WARNING) << "Scr size=" << sbInfo.dwSize.X << "/" << sbInfo.dwSize.Y;
+            return;
+        }
+    }
+
     if (x > MAX_COORD) //???
         x = MAX_COORD;
     if (y > MAX_COORD)
