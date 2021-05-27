@@ -36,7 +36,7 @@ parts:
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
     build-packages:
-      - g++-9
+      - g++
       - libncurses5-dev
       - libgpm-dev
     stage-packages:
