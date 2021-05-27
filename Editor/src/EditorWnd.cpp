@@ -1330,11 +1330,11 @@ bool EditorWnd::DelSelected()
     bool save{true};
     bool rc{true};
 
-    size_t bx, ex;
-    size_t dy = 0;
 
     for (size_t i = 0; i <= n; ++i)
     {
+        size_t dy{};
+        size_t bx, ex;
         select_line type;
         GetSelectedPos(m_beginY + i, bx, ex, type);
 
