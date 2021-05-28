@@ -100,10 +100,13 @@ catch (const std::exception& ex)
 {
     LOG(ERROR) << __FUNC__ << " Exeption: " << ex.what();
     std::cerr << "Exeption: " << ex.what();
+    app.Deinit();
     return -1;
 }
 catch (...)
 {
     LOG(ERROR) << __FUNC__ << " Unhandle exeption.";
+    std::cerr << "Unhandle exeption";
+    app.Deinit();
     return -1;
 }
