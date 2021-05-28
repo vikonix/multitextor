@@ -98,16 +98,17 @@ bool InputTTY::LoadKeyCode()
 //////////////////////////////////////////////////////////////////////////////
 std::string InputTTY::GetConsoleCP()
 {
-  std::string lc_type = setlocale(LC_CTYPE, "");
-  LOG(DEBUG) << "LC_CTYPE=" << lc_type;
-  if(lc_type.empty())
-      return lc_type;
+    auto locale = setlocale(LC_CTYPE, "");
+    std::string lc_type = locale != nullptr ? locale : "";
+    LOG(DEBUG) << "LC_CTYPE=" << lc_type;
+    if(lc_type.empty())
+        return lc_type;
 
-  auto pos = lc_type.find(".");
-  if(pos == std::string::npos)
-      return lc_type;
-  else
-      return lc_type.substr(pos + 1);
+    auto pos = lc_type.find(".");
+    if(pos == std::string::npos)
+        return lc_type;
+    else
+        return lc_type.substr(pos + 1);
 }
 
 
