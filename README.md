@@ -65,7 +65,8 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  - Get editor in Linux ***_build/bin/multitextor*** or in Windows ***_build/bin/Debug|Release/multitextor.exe***
     
 ## Linux get packet from snap
-Install
-***snap install --edge --devmode multitextor***
-Update 
-***snap refresh --edge --devmode multitextor***
+ - Install:
+    ***snap install --edge --devmode multitextor***
+
+ - Update: 
+    ***snap refresh --edge --devmode multitextor***
