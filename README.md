@@ -7,7 +7,7 @@ This project is mostly recreated version of my old text editor.
 
 Linux/Windows build (Travis CI): [![Build Status](https://travis-ci.org/vikonix/multitextor.svg?branch=main)](https://travis-ci.org/vikonix/multitextor)
 
-[![multitextor](https://snapcraft.io/multitextor/badge.svg)](https://snapcraft.io/multitextor)
+Snap packet: [![multitextor](https://snapcraft.io/multitextor/badge.svg)](https://snapcraft.io/multitextor)
 
 ## In progress:
 - Editor 2.0.0 MVP (beta) version.
@@ -37,6 +37,7 @@ Editor screenshot.
 ## Tested on:
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Windows 7 - Microsoft Visual Studio Community 2017
+ - Linux Ubuntu 18.04 - gcc version 9.3.0
  - Linux Ubuntu 20.04 - gcc version 9.3.0
  - Armbian Focal OrangePI 4
 
@@ -51,7 +52,7 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  
 ## How to build
  - Install CMake 3.15 or higher
- - Install g++ or clang or MSVC
+ - Install g++-9 or clang or MSVC
  - Run CMake: ***cmake -B _build -S .***
  
     or ***cmakegen.bat***
@@ -63,4 +64,8 @@ Minimal requirement: gcc 8.0 or MSVS 2017
     
  - Get editor in Linux ***_build/bin/multitextor*** or in Windows ***_build/bin/Debug|Release/multitextor.exe***
     
- 
+## Linux get packet from snap
+Install
+***snap install --edge --devmode multitextor***
+Update 
+***snap refresh --edge --devmode multitextor***
