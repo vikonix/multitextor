@@ -42,10 +42,14 @@ void ConsoleTest()
     std::cout << "Console test" << std::endl;
     LOG(INFO);
     LOG(INFO) << "Console test";
-
+/*
     std::cout << "Input 'y Enter' for continue: ";
     std::string str;
-    std::cin >> str;
+    do
+    {
+        std::cin >> str;
+    } while (str != "y");
+//*/
 
     Console console;
 
