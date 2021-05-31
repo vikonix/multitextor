@@ -113,9 +113,9 @@ std::string InputTTY::GetConsoleCP()
 
 
 //////////////////////////////////////////////////////////////////////////////
-bool InputTTY::Init()
+bool InputTTY::Init() 
 {
-    int rc = 0;
+    int rc = 0; 
 
     if(m_stdin > 0)
         return false;
@@ -124,8 +124,15 @@ bool InputTTY::Init()
 
     m_stdin = open("/dev/tty", O_RDWR);
     if(m_stdin <= 0)
-        return false;
-
+    {
+        LOG(WARNING) << "'/dev/tty' not found";
+        m_stdin = fileno(stdin);
+        if(m_stdin < 0)
+        {
+            LOG(ERROR) << "file 'stdin' not exists";
+            throw std::runtime_error {"file 'stdin' not exists"};
+        }
+    }
     //LOG(DEBUG) << "stdin no=" << fileno(stdin) << " stdin tty=" << ttyname(fileno(stdin));
     LOG(DEBUG) << "stdin file=" << m_stdin << " open tty=" << ttyname(m_stdin);
 
