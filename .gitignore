@@ -1,3 +1,8 @@
 .build
 _build
+build
 temp
+parts
+prime
+stage
+*.snap
