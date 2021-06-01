@@ -49,3 +49,5 @@ parts:
     stage-packages:
       - libstdc++6
       - libtinfo5
+    prime:
+      - -usr/share
