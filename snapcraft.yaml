@@ -9,6 +9,7 @@ description: |
   Can clear works with different text code pages. Has different selecting modes.
   Can work with files over 4 GBytes (with small memory using).
   Has deep Undo/Redo buffer.
+icon: docs/m.png
 license: BSD-2-Clause
 
 base: core18
