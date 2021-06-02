@@ -16,7 +16,10 @@ before_build:
 build:
     project: build/Multitextor.sln
     verbosity: normal
+    
+after_build:
+    - cmd: 7z a Multitextor.zip '%APPVEYOR_BUILD_FOLDER%/_build/bin/$(configuration)/*.*'    
 
 artifacts:
-    - path: '_build/bin/$(configuration)/multitextor.exe'
+    - path: Multitextor.zip
       name: Multitextor
