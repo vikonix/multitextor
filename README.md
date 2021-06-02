@@ -11,10 +11,10 @@ Snap packet: [![multitextor](https://snapcraft.io/multitextor/badge.svg)](https:
 
 Windows build zip (Appveyor): [![Build status](https://ci.appveyor.com/api/projects/status/m98q8sh347k0cdu6/branch/main?svg=true)](https://ci.appveyor.com/project/vikonix/multitextor/branch/main/artifacts)
 
-## In progress:
+### In progress:
 - Editor 2.0.0 MVP (beta) version.
  
-## Key features:
+### Key features:
 - Simple interface same in different environments (with menu and dialog)
 - Mouse and keyboard cursor movement and selection
 - Multi-window
@@ -36,7 +36,7 @@ Not implemented now (not MVP):
 Editor screenshot.
   ![Screenshot](docs/multitextor1.png)
 
-## Tested on:
+### Tested on:
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Windows 7 - Microsoft Visual Studio Community 2017
  - Linux Ubuntu 18.04 - gcc version 9.3.0
@@ -47,12 +47,12 @@ For building it needs a compiler with C++ 0x17 full support.
 
 Minimal requirement: gcc 8.0 or MSVS 2017
 
-## Need to install packages in Linux:
+### Need to install packages in Linux:
  - sudo apt-get install -y libncurses5-dev
  - sudo apt-get install -y libgpm-dev
  - sudo apt-get install -y gpm (only for mouse supporting in console)
  
-## How to build
+### How to build
  - Install CMake 3.15 or higher
  - Install g++-9 or clang or MSVC
  - Run CMake: ***cmake -B _build -S .***
@@ -66,7 +66,7 @@ Minimal requirement: gcc 8.0 or MSVS 2017
     
  - Get editor in Linux ***_build/bin/multitextor*** or in Windows ***_build/bin/Debug|Release/multitextor.exe***
     
-## Linux get packet from snap
+### Linux get packet from snap
  - Install:
     ***snap install --edge --devmode multitextor***
 
