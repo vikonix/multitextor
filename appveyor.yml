@@ -11,14 +11,14 @@ configuration:
     - Release
 
 before_build:
-    - cmd: cmake -H. -B./build
+    - cmd: cmake -H. -B./_build
 
 build:
-    project: build/Multitextor.sln
+    project: _build/Multitextor.sln
     verbosity: normal
     
 after_build:
-    - cmd: 7z a Multitextor.zip "%APPVEYOR_BUILD_FOLDER%/_build/bin/$(configuration)/*.*"
+    - cmd: 7z a Multitextor.zip "%APPVEYOR_BUILD_FOLDER%/_build/bin/Release/*.*"
 
 artifacts:
     - path: Multitextor.zip
