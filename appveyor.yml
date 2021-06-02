@@ -18,5 +18,5 @@ build:
     verbosity: normal
 
 artifacts:
-    - path: 'multitextor.exe'
+    - path: 'bin\$(configuration)\multitextor.exe'
       name: Multitextor
