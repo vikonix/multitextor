@@ -14,4 +14,5 @@ before_build:
     - cmd: cmake -H. -B./build
 
 build:
+    project: Multitextor.sln
     verbosity: normal
