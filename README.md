@@ -9,6 +9,8 @@ Linux/Windows build (Travis CI): [![Build Status](https://travis-ci.org/vikonix/
 
 Snap packet: [![multitextor](https://snapcraft.io/multitextor/badge.svg)](https://snapcraft.io/multitextor)
 
+Windows build zip (Appveyor): [![Build status](https://ci.appveyor.com/api/projects/status/m98q8sh347k0cdu6/branch/main?svg=true)](https://ci.appveyor.com/project/vikonix/multitextor/branch/main)
+
 ## In progress:
 - Editor 2.0.0 MVP (beta) version.
  
