@@ -18,7 +18,7 @@ build:
     verbosity: normal
     
 after_build:
-    - cmd: 7z a Multitextor.zip '%APPVEYOR_BUILD_FOLDER%/_build/bin/$(configuration)/*.*'    
+    - cmd: 7z a Multitextor.zip "%APPVEYOR_BUILD_FOLDER%/_build/bin/$(configuration)/*.*"
 
 artifacts:
     - path: Multitextor.zip
