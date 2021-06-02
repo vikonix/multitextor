@@ -72,3 +72,6 @@ Minimal requirement: gcc 8.0 or MSVS 2017
 
  - Update: 
     ***snap refresh --edge --devmode multitextor***
+    
+### Windows get zip archive
+ - Get from Appveyor artifacts
