@@ -63,7 +63,7 @@ Minimal requirement: gcc 8.0 or MSVS 2017
  - Get editor in Linux ***_build/bin/multitextor*** or in Windows ***_build/bin/Debug|Release/multitextor.exe***
     
 ### Linux: get binaries packet from snap
-[![snap packet](https://snapcraft.io/multitextor/badge.svg)](https://snapcraft.io/multitextor)
+Snap packet: [![snap packet](https://snapcraft.io/multitextor/badge.svg)](https://snapcraft.io/multitextor)
 
  - Install:
     ***snap install --edge --devmode multitextor***
@@ -72,4 +72,4 @@ Minimal requirement: gcc 8.0 or MSVS 2017
     ***snap refresh --edge --devmode multitextor***
     
 ### Windows: get zip archive from AppVeyor artifacts
-[![zip archive](https://ci.appveyor.com/api/projects/status/m98q8sh347k0cdu6/branch/main?svg=true)](https://ci.appveyor.com/project/vikonix/multitextor/branch/main/artifacts)
+Zip archive: [![zip archive](https://ci.appveyor.com/api/projects/status/m98q8sh347k0cdu6/branch/main?svg=true)](https://ci.appveyor.com/project/vikonix/multitextor/branch/main/artifacts)
