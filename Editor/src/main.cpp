@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #include "utils/logger.h"
+#include "utils/Directory.h"
 #include "cxxopts/cxxopts.hpp"
 #include "EditorApp.h"
 #include "Version.h"
@@ -41,7 +42,15 @@ Application& Application::s_app{app};
 
 int main(int argc, char** argv) try
 {
-    ConfigureLogger("m-%datetime{%Y%M%d}.log");
+#ifdef WIN32    
+    std::string dir = "m";
+#else
+    std::string dir = "m-" + _Utils::Directory::UserName();
+#endif
+    auto path = _Utils::Directory::TmpPath() / dir;
+    auto log = path / "m-%datetime{%Y%M%d}.log";
+
+    ConfigureLogger(log.u8string());
     LOG(INFO);
     LOG(INFO) << EDITOR_NAME "-" EDITOR_VERSION;
 
