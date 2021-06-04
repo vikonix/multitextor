@@ -42,12 +42,7 @@ Application& Application::s_app{app};
 
 int main(int argc, char** argv) try
 {
-#ifdef WIN32    
-    std::string dir = "m";
-#else
-    std::string dir = "m-" + _Utils::Directory::UserName();
-#endif
-    auto path = _Utils::Directory::TmpPath() / dir;
+    auto path = _Utils::Directory::TmpPath("m");
     auto log = path / "m-%datetime{%Y%M%d}.log";
 
     ConfigureLogger(log.u8string());

@@ -54,7 +54,7 @@ public:
     static bool         SetCurDir(const std::string& path);
     static path_t       RunPath() { return m_runPath; }
     static path_t       CurPath();
-    static path_t       TmpPath();
+    static path_t       TmpPath(const std::string& appPrefix = "");
     static path_t       CfgPath();
     static path_t       SysCfgPath();
     static std::string  UserName();

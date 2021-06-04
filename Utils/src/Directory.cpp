@@ -91,10 +91,15 @@ path_t Directory::CurPath()
     return path;
 }
 
-path_t Directory::TmpPath()
+path_t Directory::TmpPath(const std::string& appPrefix)
 {
+#ifdef WIN32    
+    std::string dir = appPrefix;
+#else
+    std::string dir = appPrefix + "-" + UserName();
+#endif
     auto path = std::filesystem::temp_directory_path();
-    return path;
+    return path / dir;
 }
 
 path_t Directory::CfgPath()
