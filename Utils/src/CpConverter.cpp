@@ -25,6 +25,7 @@ ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "utils/CpConverter.h"
+#include "utils/IntervalMap.h"
 #include "utils/logger.h"
 #include "widecharwidth/widechar_width.h"
 
@@ -146,14 +147,49 @@ std::list<std::string> CpConverter::GetCpList()
     };
 }
 
+class WcWidth : public _Utils::IntervalMap<uint32_t, int>
+{
+public:
+    WcWidth() : IntervalMap(1)
+    { 
+        AddDiaps(widechar_widened_table, widechar_widened_in_9);
+        AddDiaps(widechar_unassigned_table, widechar_unassigned);
+        AddDiaps(widechar_ambiguous_table, widechar_ambiguous);
+        AddDiaps(widechar_doublewide_table, 2);
+        AddDiaps(widechar_combining_table, widechar_combining);
+        AddDiaps(widechar_nonchar_table, widechar_non_character);
+        AddDiaps(widechar_nonprint_table, widechar_nonprint);
+        AddDiaps(widechar_private_table, widechar_private_use);
+
+#ifdef _DEBUG
+        //check this class
+        for (uint32_t i = 0; i < 0x110000; ++i)
+        {
+            auto v1 = operator[](i);
+            auto v2 = widechar_wcwidth(i);
+            _assert(v1 == v2);
+        }
+#endif
+    }
+    
+    template<typename Collection>
+    void AddDiaps(const Collection& diaps, int value)
+    {
+        for (auto& [kBegin, kEnd] : diaps)
+            AddInterval(kBegin, kEnd, value);
+    }
+};
+
 std::u16string CpConverter::FixPrintWidth(const std::u16string& str, size_t offset, size_t width)
 {
+    static WcWidth s_wcChar;
+
     std::u16string fixed( width, ' ');
 
     size_t pos{};
     for (auto c : std::u16string_view(str).substr(offset, width))
     {
-        auto w = widechar_wcwidth(c);
+        auto w = s_wcChar[c];
         if(w == 1 || w == widechar_ambiguous)
             fixed[pos++] = c;
 #if 0
