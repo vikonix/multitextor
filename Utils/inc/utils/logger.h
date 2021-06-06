@@ -43,6 +43,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #define _assert(v) if(!(v)){LOG(ERROR) << __FUNC__ << ":" << __LINE__ << " _assert(" << #v << ")";}
 #endif
 
+#define _TRY(v) try{v;}catch(const std::exception& ex){LOG(ERROR) << __FUNC__ << ":" << __LINE__  << "-" << ex.what();} 
+
 namespace _Utils
 {
 

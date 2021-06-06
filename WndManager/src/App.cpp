@@ -536,12 +536,6 @@ bool Application::SetCmdParser(const CmdMap& cmdMap)
     return m_cmdParser.SetCmdMap(cmdMap);
 }
 
-
-std::string Application::GetKeyName([[maybe_unused]]input_t code) const
-{
-    return {};
-}
-
 bool Application::CloseWindow([[maybe_unused]] Wnd* wnd)
 {
     return true;

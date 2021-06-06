@@ -27,16 +27,17 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/App.h"
 #include "EditorWnd.h"
 
+
 namespace _Editor
 {
 
-extern Logo g_logo;
-extern sline_list g_statusLine;
-extern menu_list g_accessMenu;
-extern menu_list g_replaceMenu;
-extern menu_list g_menuRecentFiles;
-extern menu_list g_menuRecentSessions;
-extern menu_list g_popupMenu;
+extern Logo         g_logo;
+extern sline_list   g_statusLine;
+extern menu_list    g_accessMenu;
+extern menu_list    g_replaceMenu;
+extern menu_list    g_menuRecentFiles;
+extern menu_list    g_menuRecentSessions;
+extern menu_list    g_popupMenu;
 extern std::vector<menu_list> g_mainMenu;
 
 class EditorApp : public Application
@@ -58,9 +59,11 @@ public:
     virtual bool    Init() override final;
     virtual void    Deinit() override final;
     virtual bool    CloseWindow(Wnd* wnd) override final;
-    virtual std::string GetKeyName(input_t code) const override final;
     virtual void    StatusWaitKey(bool wait) override final;
     virtual void    StatusRecordMacro(bool run) override final;
+    virtual std::string GetKeyName(input_t code) const override final;
+    virtual std::string GetCodeName(input_t code) const override final;
+    virtual input_t GetCode(const std::string& code) const override final;
 
     static bool SetHelpLine(std::optional<const std::string> help = std::nullopt, stat_color color = stat_color::normal)
     {
@@ -88,7 +91,6 @@ public:
 
     Wnd* GetEditorWnd(std::filesystem::path path);
     bool OpenFile(const std::filesystem::path& path, const std::string& parseMode, const std::string& cp, bool ro = false, bool log = false);
-    std::string GetName(input_t code) const;
 
     //editor app commands
     bool    AboutProc(input_t cmd);

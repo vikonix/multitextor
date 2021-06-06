@@ -99,10 +99,12 @@ public:
 
     virtual bool    Init();
     virtual void    Deinit();
-    virtual std::string GetKeyName(input_t code) const;
     virtual bool    CloseWindow(Wnd* wnd);
     virtual void    StatusWaitKey([[maybe_unused]] bool wait = false) {}
     virtual void    StatusRecordMacro([[maybe_unused]] bool run) {}
+    virtual std::string GetKeyName([[maybe_unused]]input_t code) const { return {}; };
+    virtual std::string GetCodeName([[maybe_unused]] input_t code) const { return {}; };
+    virtual input_t GetCode([[maybe_unused]] const std::string& code) const { return 0; }
 
     input_t MainProc(input_t exit_code = K_EXIT);//input treatment loop
     input_t CheckMouse(input_t code);

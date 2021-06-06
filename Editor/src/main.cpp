@@ -33,6 +33,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "cxxopts/cxxopts.hpp"
 #include "EditorApp.h"
 #include "Version.h"
+#include "Config.h"
+
 
 using namespace _Editor;
 
@@ -53,6 +55,7 @@ int main(int argc, char** argv) try
     options.add_options()
         ("h,help", "Print usage")
         ("k,keys", "Print key map combinations")
+        ("c,config", "Save default config files")
         ;
 
     auto result = options.parse(argc, argv);
@@ -71,22 +74,36 @@ int main(int argc, char** argv) try
                 std::string cmdstr;
 
                 for (auto k : keys)
-                    keystr += (keystr.size() ? "  " : "") + app.GetName(k);
+                    keystr += (keystr.size() ? "  " : "") + app.GetCodeName(k);
                 for (auto c : cmd)
-                    cmdstr += (cmdstr.size() ? " + " : "") + app.GetName(c);
+                    cmdstr += (cmdstr.size() ? " + " : "") + app.GetCodeName(c);
                 std::cout << "Keys: " << std::left << std::setw(16) << keystr << "\t cmd: " << cmdstr << std::endl;
             }
 
         return 0;
     }
+    else if (result.count("config"))
+    {
+        std::filesystem::create_directories(EditorConfig::ConfigDir);
+        g_editorConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile, true);
+        
+        KeyConfig keyConfig;
+        keyConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile);
+
+        return 0;
+    }
 
     app.Init();
-    app.SetLogo(g_logo);
     app.WriteAppName(EDITOR_NAME);
+    if(g_editorConfig.maxScreenSize)
+        WndManager::getInstance().SetScreenSize(MAX_COORD, MAX_COORD);
+    app.SetLogo(g_logo);
+    if(g_editorConfig.showAccessMenu)
+        app.SetAccessMenu(g_accessMenu);
+    if(g_editorConfig.showClock)
+        app.SetClock(clock_pos::bottom);
     app.SetMenu(g_mainMenu);
-    app.SetAccessMenu(g_accessMenu);
     app.SetCmdParser(g_defaultAppKeyMap);
-    app.SetClock(clock_pos::bottom);
     app.Refresh();
 
     auto& files = result.unmatched();

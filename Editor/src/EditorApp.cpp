@@ -26,6 +26,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
 #include "Dialogs/EditorDialogs.h"
+#include "Config.h"
+
 
 namespace _Editor
 {
@@ -123,13 +125,13 @@ std::string EditorApp::GetKeyName(input_t code) const
     {
         if (!keyNames.empty())
             keyNames += " ";
-        keyNames += GetName(key);
+        keyNames += GetCodeName(key);
     }
 
     return keyNames;
 }
 
-std::string EditorApp::GetName(input_t code) const
+std::string EditorApp::GetCodeName(input_t code) const
 {
     if (auto it = g_CmdNames.find(code); it != g_CmdNames.end())
     {
@@ -177,6 +179,39 @@ std::string EditorApp::GetName(input_t code) const
         name += static_cast<char>(keyCode);
 
     return name;
+}
+
+input_t EditorApp::GetCode(const std::string& code) const
+{
+    input_t retCode{};
+    std::stringstream stream(code);
+
+    std::string parsed;
+    while (std::getline(stream, parsed, '+'))
+    {
+        bool found{};
+        for (auto& [c, name] : g_CmdNames)
+            if (parsed == name)
+            {
+                retCode |= c;
+                found = true;
+                break;
+            }
+        if (!found)
+        {
+            if (parsed.size() == 1)
+                retCode |= parsed[0];
+            else if(parsed.empty())
+                retCode |= '+';
+            else
+            {
+                _assert(0);
+            }
+        }
+
+    }    
+    
+    return retCode;
 }
 
 bool EditorApp::CloseWindow(Wnd* wnd)
@@ -309,6 +344,20 @@ bool EditorApp::LoadCfg()
 {
     //configuration loading
     LOG(DEBUG) << __FUNC__;
+    
+    auto cfgPath = Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
+    DirectoryList cfgDir;
+    cfgDir.SetMask(cfgPath);
+    cfgDir.Scan();
+    if (cfgDir.IsFound())
+    {
+        auto& list = cfgDir.GetFileList();
+        _TRY(g_editorConfig.Load(list.front()));
+    }
+
+    KeyConfig keyConfig;
+    keyConfig.Load(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile);
+
     return true;
 }
 
@@ -316,6 +365,17 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
 { 
     //configuration saving
     LOG(DEBUG) << __FUNC__;
+
+    auto cfgPath = Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
+    DirectoryList cfgDir;
+    cfgDir.SetMask(cfgPath);
+    cfgDir.Scan();
+    if (cfgDir.IsFound())
+    {
+        auto& list = cfgDir.GetFileList();
+        _TRY(g_editorConfig.Save(list.front()));
+    }
+
     return true;
 } 
 
