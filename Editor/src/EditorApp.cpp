@@ -356,7 +356,7 @@ bool EditorApp::LoadCfg()
     }
 
     KeyConfig keyConfig;
-    keyConfig.Load(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile);
+    _TRY(keyConfig.Load(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile));
 
     return true;
 }
