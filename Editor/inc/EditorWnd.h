@@ -174,7 +174,7 @@ class EditorWnd : public FrameWnd
 
 public:
     EditorWnd(pos_t left = 0, pos_t top = 0, pos_t sizex = 0, pos_t sizey = 0, int border = BORDER_TITLE)
-        : FrameWnd(left, top, sizex, sizey, border) {m_cmdParser.SetCmdMap(g_defaultEditKeyMap);}
+        : FrameWnd(left, top, sizex, sizey, border) {m_cmdParser.SetCmdMap(g_EditKeyMap);}
     virtual ~EditorWnd() = default;
 
     bool        SetFileName(const std::filesystem::path& file, bool untitled = false, 

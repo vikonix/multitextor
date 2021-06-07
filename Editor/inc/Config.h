@@ -40,8 +40,8 @@ namespace _Editor
 class EditorConfig
 {
     inline static const std::string ConfigKey           { "EditorConfig" };
-    inline static const std::string ColorKey            { "ColorFile" };
-    inline static const std::string KeymapKey           { "KeyMapFile" };
+    inline static const std::string ColorKey            { "1_ColorFile" };
+    inline static const std::string KeymapKey           { "2_KeyMapFile" };
     inline static const std::string ShowAccessMenuKey   { "ShowAccessMenu" };
     inline static const std::string ShowClockKey        { "ShowClock" };
     inline static const std::string FileSaveTimeKey     { "FileSaveTime" };
@@ -68,14 +68,41 @@ public:
 class KeyConfig
 {
     inline static const std::string ConfigKey   { "KeyConfig" };
+    inline static const std::string AppKey      { "AppKeys" };
+    inline static const std::string EditorKey   { "EditorKeys" };
     inline static const std::string KeyKey      { "Key" };
     inline static const std::string CmdKey      { "Cmd" };
 
 public:
-    CmdMap keyMap;
-
     bool Load(const path_t& file);
     bool Save(const path_t& file);
+};
+
+struct LexConfig;
+class ParserConfig
+{
+    inline static const std::string ConfigKey           { "ParserConfig" };
+    inline static const std::string LangNameKey         { "1_LanguageName" };
+    inline static const std::string FileExtKey          { "2_FileExtentions" };
+    inline static const std::string DelimitersKey       { "3_Delimiters" };
+    inline static const std::string NameSymbolsKey      { "4_NameSymbols" };
+    inline static const std::string SpecialSymbolsKey   { "5_SpecialSymbols" };
+    inline static const std::string LineCommentsKey     { "6_LineComments" };
+    inline static const std::string OpenCommentsKey     { "7_OpenComments" };
+    inline static const std::string CloseCommentsKey    { "8_ClosedComments" };
+    inline static const std::string RecursiveCommentsKey{ "RecursiveComments" };
+    inline static const std::string ToggledCommentsKey  { "ToggledComments" };
+    inline static const std::string NotCaseKey          { "NotCase" };
+    inline static const std::string SaveTabsKey         { "SaveTabs" };
+    inline static const std::string TabSizeKey          { "TabSize" };
+    inline static const std::string KeywordsKey         { "_KeyWords" };
+
+public:
+    inline static const std::string ConfigDir{ "parser" };
+    inline static const std::string Ext{ ".lex" };
+
+    bool Load(const path_t& file);
+    bool Save(const path_t& file, const LexConfig& config);
 };
 
 extern class EditorConfig g_editorConfig;

@@ -106,6 +106,7 @@ CmdMap g_defaultAppKeyMap
     //for test
     {{K_F12},                   {K_REFRESH}}
 };
+CmdMap g_AppKeyMap = g_defaultAppKeyMap;
 
 CmdMap g_defaultEditKeyMap
 {
@@ -229,6 +230,7 @@ CmdMap g_defaultEditKeyMap
     //for testing
     {{K_F11},                   {K_ED(E_CTRL_REFRESH)}}
 };
+CmdMap g_EditKeyMap = g_defaultEditKeyMap;
 
 std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap 
 {

@@ -90,6 +90,19 @@ int main(int argc, char** argv) try
         KeyConfig keyConfig;
         keyConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile);
 
+        std::filesystem::create_directories(ParserConfig::ConfigDir);
+        for (auto& parser : LexParser::s_lexConfig)
+        {
+            std::string file{ parser.first + ParserConfig::Ext };
+            std::replace(file.begin(), file.end(), '+', 'p');
+            std::transform(file.begin(), file.end(), file.begin(),
+                [](unsigned char c) { return static_cast<char>(std::tolower(c)); }
+            );
+
+            ParserConfig config;
+            config.Save(Directory::RunPath() / ParserConfig::ConfigDir / file, parser.second);
+        }
+
         return 0;
     }
 
@@ -103,7 +116,7 @@ int main(int argc, char** argv) try
     if(g_editorConfig.showClock)
         app.SetClock(clock_pos::bottom);
     app.SetMenu(g_mainMenu);
-    app.SetCmdParser(g_defaultAppKeyMap);
+    app.SetCmdParser(g_AppKeyMap);
     app.Refresh();
 
     auto& files = result.unmatched();

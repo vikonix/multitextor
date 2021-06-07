@@ -41,9 +41,14 @@ EditorConfig g_editorConfig;
 bool EditorConfig::Load(const path_t& file)
 {
     std::ifstream ifs(file);
+    if (!ifs)
+        return true;
+
+    LOG(DEBUG) << "Load " << file.u8string();
     nlohmann::json json = nlohmann::json::parse(ifs);
     auto& jsonConfig = json[ConfigKey];
 
+    //first collect all variables
     EditorConfig config;
     config.colorFile        = jsonConfig[ColorKey];
     config.keyFile          = jsonConfig[KeymapKey];
@@ -88,24 +93,41 @@ bool EditorConfig::Save(const path_t& file, bool force)
 bool KeyConfig::Load(const path_t& file)
 {
     std::ifstream ifs(file);
+    if (!ifs)
+        return true;
+
+    LOG(DEBUG) << "Load " << file.u8string();
     nlohmann::json json = nlohmann::json::parse(ifs);
     auto& jsonConfig = json[ConfigKey];
 
     auto& app = Application::getInstance();
-    CmdMap map;
-    for (auto&& entry : jsonConfig)
+    bool editorMap{};
+    for (auto& jsonMap : { jsonConfig[AppKey], jsonConfig[EditorKey] })
     {
-        std::vector<input_t> keyArray;
-        auto& keys = entry[KeyKey];
-        for (auto& key : keys)
-            keyArray.push_back(app.GetCode(key));
+        CmdMap map;
+        for (auto&& entry : jsonMap)
+        {
+            std::vector<input_t> keyArray;
+            auto& keys = entry[KeyKey];
+            for (auto& key : keys)
+                keyArray.push_back(app.GetCode(key));
 
-        std::vector<input_t> cmdArray;
-        auto& cmds = entry[CmdKey];
-        for (auto&& cmd : cmds)
-            cmdArray.push_back(app.GetCode(cmd));
-        
-        map.push_back({keyArray, cmdArray});
+            std::vector<input_t> cmdArray;
+            auto& cmds = entry[CmdKey];
+            for (auto&& cmd : cmds)
+                cmdArray.push_back(app.GetCode(cmd));
+
+            map.push_back({ keyArray, cmdArray });
+        }
+        if (!editorMap)
+        {
+            editorMap = true;
+            g_AppKeyMap = map;
+        }
+        else
+        {
+            g_EditKeyMap = map;
+        }
     }
 
     return true;
@@ -116,7 +138,10 @@ bool KeyConfig::Save(const path_t& file)
     auto& app = Application::getInstance();
 
     nlohmann::json json;
-    for (const auto& map : { g_defaultAppKeyMap, g_defaultEditKeyMap })
+    bool editorMap{};
+    for (const auto& map : { g_AppKeyMap, g_EditKeyMap })
+    {
+        nlohmann::json jsonMap;
         for (const auto& [keys, cmds] : map)
         {
             nlohmann::json key;
@@ -126,12 +151,22 @@ bool KeyConfig::Save(const path_t& file)
                 key.push_back(app.GetCodeName(k));
             for (auto c : cmds)
                 cmd.push_back(app.GetCodeName(c));
-            
+
             nlohmann::json entry;
             entry[KeyKey] = key;
             entry[CmdKey] = cmd;
-            json.push_back(entry);
+            jsonMap.push_back(entry);
         }
+        if (!editorMap)
+        {
+            editorMap = true;
+            json[AppKey] = jsonMap;
+        }
+        else
+        {
+            json[EditorKey] = jsonMap;
+        }
+    }
 
     nlohmann::json jsonConfig;
     jsonConfig[ConfigKey] = json;
@@ -142,6 +177,73 @@ bool KeyConfig::Save(const path_t& file)
 
     return true;
 }
+
+bool ParserConfig::Load(const path_t& file)
+{
+    std::ifstream ifs(file);
+    if (!ifs)
+        return true;
+
+    LOG(DEBUG) << "Load " << file.u8string();
+    nlohmann::json jsonConfig = nlohmann::json::parse(ifs);
+    auto& json = jsonConfig[ConfigKey];
+
+    LexConfig config;
+    config.langName = json[LangNameKey];
+    config.fileExt = json[FileExtKey];
+    config.delimiters = json[DelimitersKey];
+    config.nameSymbols = json[NameSymbolsKey];
+    config.recursiveComment = json[RecursiveCommentsKey];
+    config.toggledComment = json[ToggledCommentsKey];
+    config.notCase = json[NotCaseKey];
+    config.saveTab = json[SaveTabsKey];
+    config.tabSize = json[TabSizeKey];
+    for(auto& entry : json[SpecialSymbolsKey])
+        config.special.push_back(static_cast<std::string>(entry));
+    for (auto& entry : json[LineCommentsKey])
+        config.lineComment.push_back(static_cast<std::string>(entry));
+    for (auto& entry : json[OpenCommentsKey])
+        config.openComment.push_back(static_cast<std::string>(entry));
+    for (auto& entry : json[CloseCommentsKey])
+        config.closeComment.push_back(static_cast<std::string>(entry));
+    for (auto& entry : json[KeywordsKey])
+        config.keyWords.insert(static_cast<std::string>(entry));
+
+    LexParser::SetLexConfig(config);
+
+    return true;
+}
+
+bool ParserConfig::Save(const path_t& file, const LexConfig& config)
+{
+    nlohmann::json json;
+
+    json[LangNameKey]           = config.langName;
+    json[FileExtKey]            = config.fileExt;
+    json[DelimitersKey]         = config.delimiters;
+    json[NameSymbolsKey]        = config.nameSymbols;
+    json[SpecialSymbolsKey]     = config.special;
+    json[LineCommentsKey]       = config.lineComment;
+    json[OpenCommentsKey]       = config.openComment;
+    json[CloseCommentsKey]      = config.closeComment;
+    json[RecursiveCommentsKey]  = config.recursiveComment;
+    json[ToggledCommentsKey]    = config.toggledComment;
+    json[NotCaseKey]            = config.notCase;
+    json[SaveTabsKey]           = config.saveTab;
+    json[TabSizeKey]            = config.tabSize;
+    json[KeywordsKey]           = config.keyWords;
+
+    nlohmann::json jsonConfig;
+    jsonConfig[ConfigKey] = json;
+
+    std::ofstream ofs(file);
+    ofs << jsonConfig.dump(2);
+    LOG(DEBUG) << jsonConfig.dump(2);
+
+    return true;
+}
+
+
 
 
 } //namespace _Editor

@@ -165,6 +165,8 @@ enum EditorCmd : input_t
 
 extern CmdMap g_defaultEditKeyMap;
 extern CmdMap g_defaultAppKeyMap;
+extern CmdMap g_EditKeyMap;
+extern CmdMap g_AppKeyMap;
 extern std::unordered_map<input_t, std::string> g_CmdNames;
 
 } //namespace _Editor

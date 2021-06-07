@@ -358,6 +358,17 @@ bool EditorApp::LoadCfg()
     KeyConfig keyConfig;
     _TRY(keyConfig.Load(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile));
 
+    auto parserPath = Directory::RunPath() / ParserConfig::ConfigDir / ("*" + ParserConfig::Ext);
+    DirectoryList parserDir;
+    parserDir.SetMask(parserPath);
+    parserDir.Scan();
+    auto& list = parserDir.GetFileList();
+    for(auto& file : list)
+    {
+        ParserConfig parser;
+        _TRY(parser.Load(file));
+    }
+
     return true;
 }
 

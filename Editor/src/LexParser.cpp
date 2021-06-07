@@ -106,7 +106,8 @@ std::unordered_map<std::string, LexConfig> LexParser::s_lexConfig
             false,      //not case
             false,      //Save Tab
             4,          //tab size
-            {}          //key words
+            //key words
+            {"true", "false"}
         }
     }
 };
@@ -124,10 +125,9 @@ std::unordered_map<char16_t, std::pair<char16_t, bool>> LexParser::s_lexPairs
 };
 
 //////////////////////////////////////////////////////////////////////////////
-bool LexParser::SetLexConfig(const std::list<LexConfig>& config)
+bool LexParser::SetLexConfig(const LexConfig& config)
 {
-    for (auto& cfg : config)
-        s_lexConfig.insert_or_assign(cfg.langName, cfg);
+    s_lexConfig.insert_or_assign(config.langName, config);
     return true;
 }
 
