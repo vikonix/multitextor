@@ -17,14 +17,14 @@ This project is mostly recreated version of my old text editor.
 - Different select modes
 - Big files editing over 4 GBytes (with small memory using)
 - Deep Undo/Redo
+- Customizable key commands and some interface parameters
+- Customizable syntax highlighting
+- Editor session saving/restoring
 
 Not implemented now (not MVP):
 - Searching in on disk files
 - Backup files
-- Editor session saving/restoring
 - Random access bookmarks
-- Customizable interface and key commands
-- Customizable syntax highlighting
 - Build-in file comparing mode
  
 Editor screenshot.

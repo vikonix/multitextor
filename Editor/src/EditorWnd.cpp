@@ -33,6 +33,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "EditorApp.h"
 #include "WndManager/Dialog.h"
 #include "Dialogs/EditorDialogs.h"
+#include "Config.h"
 
 #include <algorithm>
 #include <iterator>
@@ -2054,6 +2055,30 @@ catch (const std::exception& ex)
 {
     LOG(ERROR) << __FUNC__ << "exception:" << ex.what();
     return false;
+}
+
+bool EditorWnd::SaveCfg(WndConfig& config)
+{
+    config.filePath     = GetFilePath().u8string();
+    config.firstLine    = m_firstLine;
+    config.xOffset      = m_xOffset;
+    config.cursorX      = m_cursorx;
+    config.cursorY      = m_cursory;
+    config.ro           = m_readOnly;
+    config.log          = m_log;
+    config.maxStrLen    = m_editor->GetMaxStrLen();
+    config.tabSize      = m_editor->GetTab();
+    config.saveTabs     = m_editor->GetSaveTab();
+    config.eol          = static_cast<size_t>(m_editor->GetEol());
+    config.cp           = m_editor->GetCP();
+    config.parser       = m_editor->GetParseStyle();
+
+    return true;
+}
+
+bool EditorWnd::LoadCfg(const WndConfig& config)
+{
+    return true;
 }
 
 } //namespace _Editor

@@ -84,12 +84,14 @@ int main(int argc, char** argv) try
     }
     else if (result.count("config"))
     {
+        //common config dir
         std::filesystem::create_directories(EditorConfig::ConfigDir);
         g_editorConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile, true);
         
         KeyConfig keyConfig;
         keyConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile);
 
+        //parser dir
         std::filesystem::create_directories(ParserConfig::ConfigDir);
         for (auto& parser : LexParser::s_lexConfig)
         {
@@ -102,6 +104,11 @@ int main(int argc, char** argv) try
             ParserConfig config;
             config.Save(Directory::RunPath() / ParserConfig::ConfigDir / file, parser.second);
         }
+        
+        //user config dir
+        auto userPath = Directory::UserCfgPath(EDITOR_NAME);
+        if(!std::filesystem::exists(userPath))
+            std::filesystem::create_directory(userPath);
 
         return 0;
     }

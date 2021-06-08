@@ -127,6 +127,24 @@ path_t Directory::SysCfgPath()
 #endif
 }
 
+path_t Directory::UserCfgPath([[maybe_unused]]const std::string& appName)
+{
+#ifdef WIN32
+    char* env;
+    size_t len;
+    errno_t err = _dupenv_s(&env, &len, "APPDATA");
+    _assert(err == 0);
+    
+    path_t path{env};
+    free(env);
+
+    return path / appName;
+#else
+    const char* home = getenv("HOME");
+    return home;
+#endif
+}
+
 std::string Directory::UserName()
 {
 #ifdef WIN32

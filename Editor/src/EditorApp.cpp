@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
 #include "Dialogs/EditorDialogs.h"
+#include "Version.h"
 #include "Config.h"
 
 
@@ -385,6 +386,35 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
     {
         auto& list = cfgDir.GetFileList();
         _TRY(g_editorConfig.Save(list.front()));
+    }
+
+    if (!m_editors.empty())
+    {
+        SessionConfig sesConfig;
+        for (auto& [w, wnd] : m_editors)
+        {
+            WndConfig config;
+            wnd->SaveCfg(config);
+            sesConfig.SaveWndConfig(config);
+        }
+
+        auto GetFile = [](Wnd* wnd) -> std::string {
+            if (!wnd || wnd->GetWndType() != wnd_t::editor)
+                return {};
+            auto wedit = reinterpret_cast<EditorWnd*>(wnd);
+            return wedit->GetFilePath().u8string();
+        };
+
+        ViewConfig viewConfig;
+        viewConfig.sizex    = WndManager::getInstance().m_splitX;
+        viewConfig.sizey    = WndManager::getInstance().m_splitY;
+        viewConfig.type     = static_cast<size_t>(WndManager::getInstance().m_splitType);
+        viewConfig.active   = WndManager::getInstance().m_activeView;
+        viewConfig.file1    = GetFile(WndManager::getInstance().GetWnd(0, 0));
+        viewConfig.file2    = GetFile(WndManager::getInstance().GetWnd(0, 1));
+        sesConfig.SaveViewConfig(viewConfig);
+
+        sesConfig.Save(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
     }
 
     return true;

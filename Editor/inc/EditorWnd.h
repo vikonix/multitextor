@@ -39,6 +39,7 @@ namespace _Editor
 {
 
 class Diff;
+class WndConfig;
 
 class EditorWnd : public FrameWnd
 {
@@ -209,26 +210,25 @@ public:
     virtual Wnd*            CloneWnd() override;
     virtual bool            IsClone() const override { return m_clone; }
 
-    bool    IsMarked() { return IsSelectComplete(); }
-    bool    IsChanged() { return m_editor->IsChanged(); }
-    bool    IsRO() { return m_readOnly; }
-    bool    SetRO(bool ro) { return m_readOnly = ro; }
-    bool    IsLog() { return m_log; }
-    bool    SetLog(bool log) { return m_log = log; }
+    bool    IsMarked()      { return IsSelectComplete(); }
+    bool    IsChanged()     { return m_editor->IsChanged(); }
+    bool    IsRO()          { return m_readOnly; }
+    bool    SetRO(bool ro)  { return m_readOnly = ro; }
+    bool    IsLog()         { return m_log; }
+    bool    SetLog(bool log){ return m_log = log; }
 
     bool    EditWndCopy(EditorWnd* from);
     bool    EditWndMove(EditorWnd* from);
     bool    GetWord(std::u16string& buff);
     bool    GetSelectedLines(size_t& begin, size_t& end);
 
+    bool    SaveCfg(WndConfig& config);
+    bool    LoadCfg(const WndConfig& config);
+
 /*
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
-
   int       IsUntitled()             {return m_fUntitled;}
   long long GetSize()                {return m_pTBuff->GetSize();}
-
-  int       SaveCfg(SSave* pSave);
-  int       LoadCfg();
 
   int       SelectAndGoto(int nline, int size);
   int       ScrollWnd(int iCode, int size = 1);

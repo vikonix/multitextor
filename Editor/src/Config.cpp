@@ -27,7 +27,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #pragma once
 
 #include "utils/logger.h"
-#include "nlohmann/json.hpp"
 #include "Config.h"
 #include "EditorApp.h"
 
@@ -72,6 +71,7 @@ bool EditorConfig::Save(const path_t& file, bool force)
     if (!m_changed && !force)
         return true;
 
+    LOG(DEBUG) << "Save " << file.u8string();
     nlohmann::json json;
     json[ColorKey]          = colorFile;
     json[KeymapKey]         = keyFile;
@@ -243,7 +243,69 @@ bool ParserConfig::Save(const path_t& file, const LexConfig& config)
     return true;
 }
 
+bool WndConfig::Load(const nlohmann::json& json)
+{
+    return true;
+}
 
+bool WndConfig::Save(nlohmann::json& json) const
+{
+    json[FilePathKey]   = filePath;
+    json[FirstLineKey]  = firstLine;
+    json[XOffsetKey]    = xOffset;
+    json[CursorXKey]    = cursorX;
+    json[CursorYKey]    = cursorY;
+    json[ROKey]         = ro;
+    json[LogKey]        = log;
+    json[MaxStrLenKey]  = maxStrLen;
+    json[TabSizeKey]    = tabSize;
+    json[SaveTabsKey]   = saveTabs;
+    json[EolKey]        = eol;
+    json[CodePageKey]   = cp;
+    json[ParserKey]     = parser;
 
+    return true;
+}
+
+bool ViewConfig::Save(nlohmann::json& json) const
+{
+    json[SizeXKey]  = sizex;
+    json[SizeYKey]  = sizey;
+    json[TypeKey]   = type;
+    json[ActiveKey] = active;
+    json[File1Key] = file1;
+    json[File2Key] = file2;
+
+    return true;
+}
+
+bool SessionConfig::SaveWndConfig(const WndConfig& config)
+{
+    nlohmann::json json;
+    config.Save(json);
+    m_json[WndKey].push_back(json);
+    return true;
+}
+
+bool SessionConfig::SaveViewConfig(const ViewConfig& config)
+{
+    nlohmann::json json;
+    config.Save(json);
+    m_json[ViewKey] = json;
+    return true;
+}
+
+bool SessionConfig::Save(const path_t& file)
+{
+    LOG(DEBUG) << "Save " << file.u8string();
+    std::ofstream ofs(file);
+    if (!ofs)
+        return true;
+
+    ofs << m_json.dump(2);
+    LOG(DEBUG) << m_json.dump(2);
+
+    return true;
+}
 
 } //namespace _Editor
