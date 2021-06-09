@@ -714,7 +714,7 @@ bool LexParser::ScanSpecial(std::u16string_view lexem, size_t& end)
     {
         if (lexem.find(special) == 0)
         {
-            end = special.size();
+            end = special.size() - 1;
             return true;
         }
     }
