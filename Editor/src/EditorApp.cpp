@@ -347,14 +347,8 @@ bool EditorApp::LoadCfg()
     LOG(DEBUG) << __FUNC__;
     
     auto cfgPath = Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
-    DirectoryList cfgDir;
-    cfgDir.SetMask(cfgPath);
-    cfgDir.Scan();
-    if (cfgDir.IsFound())
-    {
-        auto& list = cfgDir.GetFileList();
-        _TRY(g_editorConfig.Load(list.front()));
-    }
+    if (std::filesystem::exists(cfgPath))
+        _TRY(g_editorConfig.Load(cfgPath));
 
     KeyConfig keyConfig;
     _TRY(keyConfig.Load(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile));
@@ -410,6 +404,7 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
         viewConfig.sizey    = WndManager::getInstance().m_splitY;
         viewConfig.type     = static_cast<size_t>(WndManager::getInstance().m_splitType);
         viewConfig.active   = WndManager::getInstance().m_activeView;
+
         viewConfig.file1    = GetFile(WndManager::getInstance().GetWnd(0, 0));
         viewConfig.file2    = GetFile(WndManager::getInstance().GetWnd(0, 1));
         sesConfig.SaveViewConfig(viewConfig);
@@ -418,6 +413,19 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
     }
 
     return true;
-} 
+}
+
+bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
+{
+    LOG(DEBUG) << __FUNC__;
+
+    SessionConfig sesConfig;
+    if (path)
+        sesConfig.Load(*path);
+    else
+        sesConfig.Load(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
+
+    return true;
+}
 
 } //namespace _Editor

@@ -109,6 +109,9 @@ bool EditorWnd::Refresh()
 
     m_clientSizeX = GetCSizeX();
     m_clientSizeY = GetCSizeY();
+    _assert(m_clientSizeX > 0 && m_clientSizeX < MAX_COORD);
+    _assert(m_clientSizeY > 0 && m_clientSizeY < MAX_COORD);
+
     //LOG(DEBUG) << "    EditorWnd::Refresh " << this;
     //LOG(DEBUG) << "sx=" << m_clientSizeX << " sy=" << m_clientSizeY << " cx=" << m_cursorx << " cy=" << m_cursory;
 
@@ -2060,24 +2063,32 @@ catch (const std::exception& ex)
 bool EditorWnd::SaveCfg(WndConfig& config)
 {
     config.filePath     = GetFilePath().u8string();
+    config.parser       = m_editor->GetParseStyle();
+    config.cp           = m_editor->GetCP();
+    config.ro           = m_readOnly;
+    config.log          = m_log;
+
     config.firstLine    = m_firstLine;
     config.xOffset      = m_xOffset;
     config.cursorX      = m_cursorx;
     config.cursorY      = m_cursory;
-    config.ro           = m_readOnly;
-    config.log          = m_log;
-    config.maxStrLen    = m_editor->GetMaxStrLen();
     config.tabSize      = m_editor->GetTab();
     config.saveTabs     = m_editor->GetSaveTab();
     config.eol          = static_cast<size_t>(m_editor->GetEol());
-    config.cp           = m_editor->GetCP();
-    config.parser       = m_editor->GetParseStyle();
 
     return true;
 }
 
 bool EditorWnd::LoadCfg(const WndConfig& config)
 {
+    m_firstLine = config.firstLine;
+    m_xOffset = config.xOffset;
+    m_cursorx = config.cursorX;
+    m_cursory = config.cursorY;
+    m_editor->SetTab(config.tabSize);
+    m_editor->SetSaveTab(config.saveTabs);
+    m_editor->SetEol(static_cast<eol_t>(config.eol));
+
     return true;
 }
 

@@ -85,7 +85,7 @@ bool EditorConfig::Save(const path_t& file, bool force)
 
     std::ofstream ofs(file);
     ofs << jsonConfig.dump(2);
-    LOG(DEBUG) << jsonConfig.dump(2);
+    //LOG(DEBUG) << jsonConfig.dump(2);
 
     return true;
 }
@@ -173,7 +173,7 @@ bool KeyConfig::Save(const path_t& file)
 
     std::ofstream ofs(file);
     ofs << jsonConfig.dump(2);
-    LOG(DEBUG) << jsonConfig.dump(2);
+    //LOG(DEBUG) << jsonConfig.dump(2);
 
     return true;
 }
@@ -238,13 +238,26 @@ bool ParserConfig::Save(const path_t& file, const LexConfig& config)
 
     std::ofstream ofs(file);
     ofs << jsonConfig.dump(2);
-    LOG(DEBUG) << jsonConfig.dump(2);
+    //LOG(DEBUG) << jsonConfig.dump(2);
 
     return true;
 }
 
 bool WndConfig::Load(const nlohmann::json& json)
 {
+    filePath    = json[FilePathKey];
+    firstLine   = json[FirstLineKey];
+    xOffset     = json[XOffsetKey];
+    cursorX     = json[CursorXKey];
+    cursorY     = json[CursorYKey];
+    ro          = json[ROKey];
+    log         = json[LogKey];
+    tabSize     = json[TabSizeKey];
+    saveTabs    = json[SaveTabsKey];
+    eol         = json[EolKey];
+    cp          = json[CodePageKey];
+    parser      = json[ParserKey];
+
     return true;
 }
 
@@ -257,12 +270,23 @@ bool WndConfig::Save(nlohmann::json& json) const
     json[CursorYKey]    = cursorY;
     json[ROKey]         = ro;
     json[LogKey]        = log;
-    json[MaxStrLenKey]  = maxStrLen;
     json[TabSizeKey]    = tabSize;
     json[SaveTabsKey]   = saveTabs;
     json[EolKey]        = eol;
     json[CodePageKey]   = cp;
     json[ParserKey]     = parser;
+
+    return true;
+}
+
+bool ViewConfig::Load(const nlohmann::json& json)
+{
+    sizex   = json[SizeXKey];
+    sizey   = json[SizeYKey];
+    type    = json[TypeKey];
+    active  = json[ActiveKey];
+    file1   = json[File1Key];
+    file2   = json[File2Key];
 
     return true;
 }
@@ -283,7 +307,7 @@ bool SessionConfig::SaveWndConfig(const WndConfig& config)
 {
     nlohmann::json json;
     config.Save(json);
-    m_json[WndKey].push_back(json);
+    m_json[ConfigKey][WndKey].push_back(json);
     return true;
 }
 
@@ -291,7 +315,7 @@ bool SessionConfig::SaveViewConfig(const ViewConfig& config)
 {
     nlohmann::json json;
     config.Save(json);
-    m_json[ViewKey] = json;
+    m_json[ConfigKey][ViewKey] = json;
     return true;
 }
 
@@ -303,7 +327,57 @@ bool SessionConfig::Save(const path_t& file)
         return true;
 
     ofs << m_json.dump(2);
-    LOG(DEBUG) << m_json.dump(2);
+    //LOG(DEBUG) << m_json.dump(2);
+
+    return true;
+}
+
+bool SessionConfig::Load(const path_t& file)
+{
+    std::ifstream ifs(file);
+    if (!ifs)
+        return true;
+
+    LOG(DEBUG) << "Load " << file.u8string();
+    nlohmann::json jsonConfig = nlohmann::json::parse(ifs);
+    auto& json = jsonConfig[ConfigKey];
+    auto& jsonView = json[ViewKey];
+    auto& jsonWndList = json[WndKey];
+
+    auto& app = Application::getInstance();
+    auto& editorApp = dynamic_cast<EditorApp&>(app);
+    for (auto& jsonWnd : jsonWndList)
+    {
+        WndConfig wConfig;
+        wConfig.Load(jsonWnd);
+        editorApp.OpenFile(wConfig.filePath, wConfig.parser, wConfig.cp, wConfig.ro, wConfig.log);
+        auto wnd = editorApp.GetEditorWnd(wConfig.filePath);
+        if (wnd)
+        {
+            auto eWnd = dynamic_cast<EditorWnd*>(wnd);
+            eWnd->LoadCfg(wConfig);
+        }
+    }
+
+    ViewConfig vConfig;
+    vConfig.Load(jsonView);
+    WndManager::getInstance().m_splitX      = vConfig.sizex;
+    WndManager::getInstance().m_splitY      = vConfig.sizey;
+    WndManager::getInstance().m_splitType   = static_cast<split_t>(vConfig.type);
+    WndManager::getInstance().m_activeView  = vConfig.active;
+
+    if (!vConfig.file1.empty())
+    {
+        auto wnd = editorApp.GetEditorWnd(vConfig.file1);
+        WndManager::getInstance().SetTopWnd(wnd, 0);
+    }
+    if (!vConfig.file2.empty())
+    {
+        auto wnd = editorApp.GetEditorWnd(vConfig.file2);
+        WndManager::getInstance().SetTopWnd(wnd, 1);
+    }
+
+    WndManager::getInstance().CalcView();
 
     return true;
 }

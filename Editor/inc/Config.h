@@ -115,7 +115,6 @@ class WndConfig
     inline static const std::string CursorYKey  { "CursorY" };
     inline static const std::string ROKey       { "ro" };
     inline static const std::string LogKey      { "log" };
-    inline static const std::string MaxStrLenKey{ "MaxStrLen" };
     inline static const std::string TabSizeKey  { "TabSize" };
     inline static const std::string SaveTabsKey { "SaveTabs" };
     inline static const std::string EolKey      { "Eol" };
@@ -124,18 +123,18 @@ class WndConfig
 
 public:
     std::string filePath;
+    std::string parser{};
+    std::string cp{};
+    bool        ro{};
+    bool        log{};
+
     size_t      firstLine{};
     size_t      xOffset{};
     pos_t       cursorX{};
     pos_t       cursorY{};
-    bool        ro{};
-    bool        log{};
-    size_t      maxStrLen{4000};
     size_t      tabSize{4};
     bool        saveTabs{};
     size_t      eol{};
-    std::string cp{};
-    std::string parser{};
 
     bool Load(const nlohmann::json& json);
     bool Save(nlohmann::json& json) const;
@@ -173,11 +172,13 @@ class SessionConfig
     inline static const std::string DialogsKey      { "Dialogs" };
 
     nlohmann::json m_json;
+
 public:
     inline static const std::string File{ ".m.smt" };
 
     bool SaveWndConfig(const WndConfig& config);
     bool SaveViewConfig(const ViewConfig& config);
+
     bool Load(const path_t& file);
     bool Save(const path_t& file);
 };

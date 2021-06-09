@@ -37,7 +37,6 @@ namespace _WndManager
 bool Application::Init()
 {
     LOG(DEBUG) << " A::Init";
-    LOG(DEBUG) << __FUNC__;
     
     if (m_inited)
         return true;

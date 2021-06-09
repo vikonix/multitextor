@@ -119,13 +119,15 @@ bool WndManager::CalcView()
         m_view[1].top   = m_topLines;
         m_view[1].sizex = m_splitX;
         m_view[1].sizey = m_sizey - m_topLines - m_bottomLines;
-        m_wndList[0]->m_cursorx = 0;
+        if(m_wndList[0])
+            m_wndList[0]->m_cursorx = 0;
 
         m_view[2].left  = m_splitX + SPLIT_WIDTH;
         m_view[2].top   = m_topLines;
         m_view[2].sizex = m_sizex - m_splitX - SPLIT_WIDTH;
         m_view[2].sizey = m_sizey - m_topLines - m_bottomLines;
-        m_view[2].wnd->m_cursorx = 0;
+        if(m_view[2].wnd)
+            m_view[2].wnd->m_cursorx = 0;
     }
 
     return true;

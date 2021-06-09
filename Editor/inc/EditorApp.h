@@ -55,12 +55,14 @@ public:
     virtual input_t AppProc(input_t code) override final;
     virtual bool    LoadCfg() override final;
     virtual bool    SaveCfg(input_t code = 0) override final;
+    virtual bool    LoadSession(std::optional<const std::filesystem::path> path) override final;
 
     virtual bool    Init() override final;
     virtual void    Deinit() override final;
     virtual bool    CloseWindow(Wnd* wnd) override final;
     virtual void    StatusWaitKey(bool wait) override final;
     virtual void    StatusRecordMacro(bool run) override final;
+
     virtual std::string GetKeyName(input_t code) const override final;
     virtual std::string GetCodeName(input_t code) const override final;
     virtual input_t GetCode(const std::string& code) const override final;

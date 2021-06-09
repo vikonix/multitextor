@@ -15,6 +15,7 @@ This project is mostly recreated version of my old text editor.
 - Split view mode with 2 panels
 - Clear working with different text code pages
 - Different select modes
+- Working with macros 
 - Big files editing over 4 GBytes (with small memory using)
 - Deep Undo/Redo
 - Customizable key commands and some interface parameters

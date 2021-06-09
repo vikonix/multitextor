@@ -127,10 +127,16 @@ int main(int argc, char** argv) try
     app.Refresh();
 
     auto& files = result.unmatched();
-    for (auto& f : files)
+    if (!files.empty())
     {
-        app.OpenFile(f, "Text", "UTF-8");
+        for (auto& f : files)
+        {
+            app.OpenFile(f, "Text", "UTF-8");
+        }
     }
+    else
+        app.LoadSession(std::nullopt);
+
     app.MainProc(K_EXIT);
     app.Deinit();
 
