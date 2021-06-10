@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "nlohmann/json.hpp"
 
 #include <string>
+#include <set>
 
 using namespace _Utils;
 using namespace _Console;
@@ -162,6 +163,24 @@ public:
     bool Save(nlohmann::json& json) const;
 };
 
+class DialogsConfig
+{
+    inline static const std::string ConfigKey   { "DialogsConfig" };
+    inline static const std::string FilePathKey { "FilePath" };
+    inline static const std::string MaskKey     { "MaskList" };
+    inline static const std::string FindKey     { "FindList" };
+    inline static const std::string ReplaceKey  { "ReplaceList" };
+
+public:
+    std::string             filePath;
+    std::list<std::string>  fileMaskList;
+    std::set<std::string>   findList;
+    std::set<std::string>   replaceList;
+
+    bool Load(const nlohmann::json& json);
+    bool Save(nlohmann::json& json) const;
+};
+
 class SessionConfig
 {
     inline static const std::string ConfigKey       { "SessionConfig" };
@@ -176,8 +195,9 @@ class SessionConfig
 public:
     inline static const std::string File{ ".m.smt" };
 
-    bool SaveWndConfig(const WndConfig& config);
-    bool SaveViewConfig(const ViewConfig& config);
+    bool SaveConfig(const WndConfig& config);
+    bool SaveConfig(const ViewConfig& config);
+    bool SaveConfig(const DialogsConfig& config);
 
     bool Load(const path_t& file);
     bool Save(const path_t& file);

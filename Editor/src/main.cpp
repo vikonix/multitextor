@@ -135,7 +135,7 @@ int main(int argc, char** argv) try
         }
     }
     else
-        app.LoadSession(std::nullopt);
+        _TRY(app.LoadSession(std::nullopt));
 
     app.MainProc(K_EXIT);
     app.Deinit();

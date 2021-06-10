@@ -27,6 +27,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utils/logger.h"
 #include "Config.h"
 #include "EditorApp.h"
+#include "Dialogs/EditorDialogs.h"
 
 #include <fstream>
 
@@ -291,9 +292,9 @@ bool ViewConfig::Load(const nlohmann::json& json)
 
 bool ViewConfig::Save(nlohmann::json& json) const
 {
-    json[SizeXKey]  = sizex;
-    json[SizeYKey]  = sizey;
-    json[TypeKey]   = type;
+    json[SizeXKey] = sizex;
+    json[SizeYKey] = sizey;
+    json[TypeKey] = type;
     json[ActiveKey] = active;
     json[File1Key] = file1;
     json[File2Key] = file2;
@@ -301,7 +302,30 @@ bool ViewConfig::Save(nlohmann::json& json) const
     return true;
 }
 
-bool SessionConfig::SaveWndConfig(const WndConfig& config)
+bool DialogsConfig::Load(const nlohmann::json& json)
+{
+    filePath = json[FilePathKey];
+    for(auto& var : json[MaskKey])
+        fileMaskList.push_back(var);
+    for(auto& var : json[FindKey])
+        findList.emplace(var);
+    for(auto& var : json[ReplaceKey])
+        replaceList.emplace(var);
+
+    return true;
+}
+
+bool DialogsConfig::Save(nlohmann::json& json) const
+{
+    json[FilePathKey]   = filePath;
+    json[MaskKey]       = fileMaskList;
+    json[FindKey]       = findList;
+    json[ReplaceKey]    = replaceList;
+
+    return true;
+}
+
+bool SessionConfig::SaveConfig(const WndConfig& config)
 {
     nlohmann::json json;
     config.Save(json);
@@ -309,11 +333,19 @@ bool SessionConfig::SaveWndConfig(const WndConfig& config)
     return true;
 }
 
-bool SessionConfig::SaveViewConfig(const ViewConfig& config)
+bool SessionConfig::SaveConfig(const ViewConfig& config)
 {
     nlohmann::json json;
     config.Save(json);
     m_json[ConfigKey][ViewKey] = json;
+    return true;
+}
+
+bool SessionConfig::SaveConfig(const DialogsConfig& config)
+{
+    nlohmann::json json;
+    config.Save(json);
+    m_json[ConfigKey][DialogsKey] = json;
     return true;
 }
 
@@ -338,9 +370,10 @@ bool SessionConfig::Load(const path_t& file)
 
     LOG(DEBUG) << "Load " << file.u8string();
     nlohmann::json jsonConfig = nlohmann::json::parse(ifs);
-    auto& json = jsonConfig[ConfigKey];
-    auto& jsonView = json[ViewKey];
-    auto& jsonWndList = json[WndKey];
+    auto& json          = jsonConfig[ConfigKey];
+    auto& jsonView      = json[ViewKey];
+    auto& jsonWndList   = json[WndKey];
+    auto& jsonDialogs   = json[DialogsKey];
 
     auto& app = Application::getInstance();
     auto& editorApp = dynamic_cast<EditorApp&>(app);
@@ -376,6 +409,13 @@ bool SessionConfig::Load(const path_t& file)
     }
 
     WndManager::getInstance().CalcView();
+
+    DialogsConfig dConfig;
+    dConfig.Load(jsonDialogs);
+    FileDialog::s_vars.path         = dConfig.filePath;
+    FileDialog::s_vars.maskList     = dConfig.fileMaskList;
+    FindDialog::s_vars.findList     = dConfig.findList;
+    FindDialog::s_vars.replaceList  = dConfig.replaceList;
 
     return true;
 }

@@ -315,6 +315,15 @@ bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& p
     if (auto wnd = GetEditorWnd(fullPath))
         return WndManager::getInstance().SetTopWnd(wnd);
 
+    if (!std::filesystem::is_regular_file(fullPath))
+    {
+        MsgBox(MBoxKey::OK, "Open: " + fullPath.filename().u8string(),
+            { "File not exists." },
+            { "Close" }
+        );
+        return false;
+    }
+
     auto editor = std::make_shared<EditorWnd>();
     editor->Show(true, -1);
     if (editor->SetFileName(fullPath, false, parseMode, cp))
@@ -373,14 +382,8 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
     LOG(DEBUG) << __FUNC__;
 
     auto cfgPath = Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
-    DirectoryList cfgDir;
-    cfgDir.SetMask(cfgPath);
-    cfgDir.Scan();
-    if (cfgDir.IsFound())
-    {
-        auto& list = cfgDir.GetFileList();
-        _TRY(g_editorConfig.Save(list.front()));
-    }
+    if (std::filesystem::exists(cfgPath))
+        _TRY(g_editorConfig.Save(cfgPath));
 
     if (!m_editors.empty())
     {
@@ -389,7 +392,7 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
         {
             WndConfig config;
             wnd->SaveCfg(config);
-            sesConfig.SaveWndConfig(config);
+            sesConfig.SaveConfig(config);
         }
 
         auto GetFile = [](Wnd* wnd) -> std::string {
@@ -407,7 +410,15 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
 
         viewConfig.file1    = GetFile(WndManager::getInstance().GetWnd(0, 0));
         viewConfig.file2    = GetFile(WndManager::getInstance().GetWnd(0, 1));
-        sesConfig.SaveViewConfig(viewConfig);
+        sesConfig.SaveConfig(viewConfig);
+
+        DialogsConfig dlgConfig;
+        dlgConfig.filePath      = FileDialog::s_vars.path;
+        dlgConfig.fileMaskList  = FileDialog::s_vars.maskList;
+        dlgConfig.findList      = FindDialog::s_vars.findList;
+        dlgConfig.replaceList   = FindDialog::s_vars.replaceList;
+
+        sesConfig.SaveConfig(dlgConfig);
 
         sesConfig.Save(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
     }

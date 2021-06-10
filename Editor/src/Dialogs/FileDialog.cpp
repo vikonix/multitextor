@@ -262,6 +262,8 @@ input_t FileDialog::DialogProc(input_t code)
                 auto edit = GetItem(ID_OF_NAME);
                 auto editPtr = std::dynamic_pointer_cast<CtrlEditDropList>(edit);
                 editPtr->SetName(std::string(file));
+                if (file.empty())
+                    code = 0;
             }
             else
             {
