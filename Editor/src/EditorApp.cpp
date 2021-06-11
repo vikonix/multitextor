@@ -316,13 +316,7 @@ bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& p
         return WndManager::getInstance().SetTopWnd(wnd);
 
     if (!std::filesystem::is_regular_file(fullPath))
-    {
-        MsgBox(MBoxKey::OK, "Open: " + fullPath.filename().u8string(),
-            { "File not exists." },
-            { "Close" }
-        );
-        return false;
-    }
+        throw std::runtime_error{ "Not regular file: " + fullPath.filename().u8string() };
 
     auto editor = std::make_shared<EditorWnd>();
     editor->Show(true, -1);
@@ -337,14 +331,16 @@ bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& p
 }
 catch (const std::exception& ex)
 {
-    _assert(0);
     LOG(ERROR) << __FUNC__ << "Error file loading: " << ex.what();
+    MsgBox(MBoxKey::OK, "Open: " + path.filename().u8string(),
+        { "Error open file." },
+        { "Close" }
+    );
     EditorApp::SetErrorLine("Error file loading");
     return false;
 }
 catch (...)
 {
-    _assert(0);
     LOG(ERROR) << __FUNC__ << "Error file loading: unknown exeption";
     EditorApp::SetErrorLine("Error file loading");
     return false;

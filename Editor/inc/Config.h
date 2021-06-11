@@ -50,7 +50,7 @@ class EditorConfig
     inline static const std::string MaxScreenSizeKey    { "MaxScreenSize" };
 
 public:
-    inline static const std::string ConfigDir           { "cfg" };
+    inline static const std::string ConfigDir           { "config" };
     inline static const std::string ConfigFile          { "multitextor.json" };
 
     std::string colorFile       {"default.clr"};
@@ -183,7 +183,7 @@ public:
 
 class SessionConfig
 {
-    inline static const std::string ConfigKey       { "SessionConfig" };
+    inline static const std::string ConfigKey       { "MultitextorSessionConfig" };
     inline static const std::string WndKey          { "WndList" };
     inline static const std::string ViewKey         { "View" };
     

@@ -38,10 +38,57 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 using namespace _Editor;
 
-/////////////////////////////////////////////////////////////////////////////
 EditorApp app;
 Application& Application::s_app{app};
 
+/////////////////////////////////////////////////////////////////////////////
+void PrintKeys()
+{
+    std::cout << "Editor keyboard combination map to editor commands." << std::endl;
+    for (const auto& map : { g_defaultAppKeyMap, g_defaultEditKeyMap })
+        for (const auto& [keys, cmd] : map)
+        {
+            std::string keystr;
+            std::string cmdstr;
+
+            for (auto k : keys)
+                keystr += (keystr.size() ? "  " : "") + app.GetCodeName(k);
+            for (auto c : cmd)
+                cmdstr += (cmdstr.size() ? " + " : "") + app.GetCodeName(c);
+            std::cout << "Keys: " << std::left << std::setw(16) << keystr << "\t cmd: " << cmdstr << std::endl;
+        }
+}
+
+void SaveConfig()
+{
+    //common config dir
+    std::filesystem::create_directories(EditorConfig::ConfigDir);
+    g_editorConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile, true);
+
+    KeyConfig keyConfig;
+    keyConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile);
+
+    //parser dir
+    std::filesystem::create_directories(ParserConfig::ConfigDir);
+    for (auto& parser : LexParser::s_lexConfig)
+    {
+        std::string file{ parser.first + ParserConfig::Ext };
+        std::replace(file.begin(), file.end(), '+', 'p');
+        std::transform(file.begin(), file.end(), file.begin(),
+            [](unsigned char c) { return static_cast<char>(std::tolower(c)); }
+        );
+
+        ParserConfig config;
+        config.Save(Directory::RunPath() / ParserConfig::ConfigDir / file, parser.second);
+    }
+
+    //user config dir
+    auto userPath = Directory::UserCfgPath(EDITOR_NAME);
+    if (!std::filesystem::exists(userPath))
+        std::filesystem::create_directory(userPath);
+}
+
+/////////////////////////////////////////////////////////////////////////////
 int main(int argc, char** argv) try
 {
     auto path = _Utils::Directory::TmpPath("m");
@@ -66,50 +113,12 @@ int main(int argc, char** argv) try
     }
     else if (result.count("keys"))
     {
-        std::cout << "Editor keyboard combination map to editor commands." << std::endl;
-        for (const auto& map : { g_defaultAppKeyMap, g_defaultEditKeyMap })
-            for (const auto& [keys, cmd] : map)
-            {
-                std::string keystr;
-                std::string cmdstr;
-
-                for (auto k : keys)
-                    keystr += (keystr.size() ? "  " : "") + app.GetCodeName(k);
-                for (auto c : cmd)
-                    cmdstr += (cmdstr.size() ? " + " : "") + app.GetCodeName(c);
-                std::cout << "Keys: " << std::left << std::setw(16) << keystr << "\t cmd: " << cmdstr << std::endl;
-            }
-
+        PrintKeys();
         return 0;
     }
     else if (result.count("config"))
     {
-        //common config dir
-        std::filesystem::create_directories(EditorConfig::ConfigDir);
-        g_editorConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile, true);
-        
-        KeyConfig keyConfig;
-        keyConfig.Save(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile);
-
-        //parser dir
-        std::filesystem::create_directories(ParserConfig::ConfigDir);
-        for (auto& parser : LexParser::s_lexConfig)
-        {
-            std::string file{ parser.first + ParserConfig::Ext };
-            std::replace(file.begin(), file.end(), '+', 'p');
-            std::transform(file.begin(), file.end(), file.begin(),
-                [](unsigned char c) { return static_cast<char>(std::tolower(c)); }
-            );
-
-            ParserConfig config;
-            config.Save(Directory::RunPath() / ParserConfig::ConfigDir / file, parser.second);
-        }
-        
-        //user config dir
-        auto userPath = Directory::UserCfgPath(EDITOR_NAME);
-        if(!std::filesystem::exists(userPath))
-            std::filesystem::create_directory(userPath);
-
+        SaveConfig();
         return 0;
     }
 

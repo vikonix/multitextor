@@ -100,7 +100,7 @@ class EditorWnd : public FrameWnd
     bool            m_readOnly{};
     bool            m_log{};
     std::chrono::time_point<std::chrono::system_clock> m_checkTime{ 
-        std::chrono::system_clock::now() + std::chrono::seconds(1)};
+        std::chrono::system_clock::now() + std::chrono::seconds(2)};
 
     //file position
     size_t          m_xOffset{};

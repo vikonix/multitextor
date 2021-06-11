@@ -270,7 +270,7 @@ input_t FileDialog::DialogProc(input_t code)
                 auto name = GetItem(ID_OF_NAME)->GetName();
                 auto found = ScanDir(std::string(name));
 
-                if (!found && !m_dirList.IsSingleMask())
+                if (!found || !m_dirList.IsSingleMask())
                 {
                     //if not simple mask or found many files
                     auto mask = m_dirList.GetMask();
