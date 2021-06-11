@@ -44,7 +44,7 @@ void CheckDirectoryFunc()
     LOG(DEBUG) << "run path=" << Directory::RunPath();
     LOG(DEBUG) << "cur path=" << Directory::CurPath();
     LOG(DEBUG) << "tmp path=" << Directory::TmpPath();
-    LOG(DEBUG) << "cfg path=" << Directory::CfgPath();
+    LOG(DEBUG) << "cfg path=" << Directory::CfgPath("Test");
     LOG(DEBUG) << "sys cfg path=" << Directory::SysCfgPath();
     LOG(DEBUG) << "user=" << Directory::UserName();
 

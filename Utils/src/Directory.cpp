@@ -44,7 +44,6 @@ static const size_t c_BuffLen{ 0x800 };
 namespace _Utils
 {
 
-std::string  Directory::m_projectName;
 path_t Directory::m_runPath = [] {
     path_t path;
 
@@ -102,12 +101,23 @@ path_t Directory::TmpPath(const std::string& appPrefix)
     return path / dir;
 }
 
-path_t Directory::CfgPath()
+path_t Directory::CfgPath(const std::string& projectName)
 {
 #ifdef WIN32
-    return m_runPath;//???
+    char* env;
+    size_t len;
+    errno_t err = _dupenv_s(&env, &len, "ProgramFiles");
+    _assert(err == 0);
+
+    path_t path{ (env ? env : "") + projectName };
+    free(env);
+
+    if (std::filesystem::is_directory(path))
+        return path;
+
+    return m_runPath;
 #else
-    std::string path{ "/etc/" + m_projectName };
+    std::string path{ "/etc/" + projectName };
     if (std::filesystem::is_directory(path))
         return path;
 
@@ -135,7 +145,7 @@ path_t Directory::UserCfgPath([[maybe_unused]]const std::string& appName)
     errno_t err = _dupenv_s(&env, &len, "APPDATA");
     _assert(err == 0);
     
-    path_t path{env};
+    path_t path{env ? env : ""};
     free(env);
 
     return path / appName;

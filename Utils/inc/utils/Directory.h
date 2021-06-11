@@ -49,13 +49,11 @@ class Directory
     static path_t   m_runPath;
 
 public:
-    static std::string  m_projectName;
-
     static bool         SetCurDir(const std::string& path);
     static path_t       RunPath() { return m_runPath; }
     static path_t       CurPath();
     static path_t       TmpPath(const std::string& appPrefix = "");
-    static path_t       CfgPath();
+    static path_t       CfgPath(const std::string& projectName);
     static path_t       SysCfgPath();
     static path_t       UserCfgPath(const std::string& appName);
     static std::string  UserName();
