@@ -46,16 +46,16 @@ enum class fileaccess_t
 
 class Directory
 {
-    static path_t   m_runPath;
+    static path_t   s_runPath;
 
 public:
     static bool         SetCurDir(const std::string& path);
-    static path_t       RunPath() { return m_runPath; }
+    static path_t       RunPath() { return s_runPath; }
     static path_t       CurPath();
     static path_t       TmpPath(const std::string& appPrefix = "");
     static path_t       CfgPath(const std::string& projectName);
     static path_t       SysCfgPath();
-    static path_t       UserCfgPath(const std::string& appName);
+    static path_t       UserCfgPath(const std::string& appName, bool create = false);
     static std::string  UserName();
     static std::string  CutPath(const path_t& path, size_t len);
     static std::string  GetFileInfo(const std::filesystem::file_time_type& ftime, const uintmax_t& size, size_t size_width = 8);
@@ -74,14 +74,7 @@ public:
         if (mask == mm)
             return true;
 
-        // Based at algorithm written by Jack Handy - <A href="mailto:jakkhandy@hotmail.com">jakkhandy@hotmail.com</A>
-        auto nameIt = name.cbegin();
-        auto maskIt = mask.cbegin();
-
-        decltype(nameIt) namePos;
-        decltype(maskIt) maskPos;
-
-        auto cmp_chars = [nametoupper](decltype(*nameIt) c1, decltype(*maskIt) c2) -> bool
+        auto cmp_chars = [nametoupper](auto c1, auto c2) -> bool
         {
             if (!nametoupper)
                 return c1 == c2;
@@ -94,6 +87,10 @@ public:
             }
         };
 
+        // Based at algorithm written by Jack Handy - <A href="mailto:jakkhandy@hotmail.com">jakkhandy@hotmail.com</A>
+        auto nameIt = name.cbegin();
+        auto maskIt = mask.cbegin();
+
         while (nameIt != name.cend() && maskIt != mask.cend() && *maskIt != '*')
         {
             if (!cmp_chars(*nameIt, *maskIt) && *maskIt != '?')
@@ -102,6 +99,9 @@ public:
             ++maskIt;
         }
 
+        //we have * in mask
+        decltype(nameIt) namePos;
+        decltype(maskIt) maskPos;
         while (nameIt != name.cend() && maskIt != mask.cend())
         {
             if (*maskIt == '*')
@@ -124,6 +124,7 @@ public:
                 maskIt = maskPos;
             }
         }
+
         if (nameIt != name.cend())
             return false;
 

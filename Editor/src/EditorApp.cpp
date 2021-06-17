@@ -383,41 +383,49 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
 
     if (!m_editors.empty())
     {
-        SessionConfig sesConfig;
-        for (auto& [w, wnd] : m_editors)
-        {
-            WndConfig config;
-            wnd->SaveCfg(config);
-            sesConfig.SaveConfig(config);
-        }
-
-        auto GetFile = [](Wnd* wnd) -> std::string {
-            if (!wnd || wnd->GetWndType() != wnd_t::editor)
-                return {};
-            auto wedit = reinterpret_cast<EditorWnd*>(wnd);
-            return wedit->GetFilePath().u8string();
-        };
-
-        ViewConfig viewConfig;
-        viewConfig.sizex    = WndManager::getInstance().m_splitX;
-        viewConfig.sizey    = WndManager::getInstance().m_splitY;
-        viewConfig.type     = static_cast<size_t>(WndManager::getInstance().m_splitType);
-        viewConfig.active   = WndManager::getInstance().m_activeView;
-
-        viewConfig.file1    = GetFile(WndManager::getInstance().GetWnd(0, 0));
-        viewConfig.file2    = GetFile(WndManager::getInstance().GetWnd(0, 1));
-        sesConfig.SaveConfig(viewConfig);
-
-        DialogsConfig dlgConfig;
-        dlgConfig.filePath      = FileDialog::s_vars.path;
-        dlgConfig.fileMaskList  = FileDialog::s_vars.maskList;
-        dlgConfig.findList      = FindDialog::s_vars.findList;
-        dlgConfig.replaceList   = FindDialog::s_vars.replaceList;
-
-        sesConfig.SaveConfig(dlgConfig);
-
-        sesConfig.Save(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
+        SaveSession(std::nullopt);
     }
+
+    return true;
+}
+
+bool EditorApp::SaveSession(std::optional<const std::filesystem::path> path)
+{
+    SessionConfig sesConfig;
+    for (auto& [w, wnd] : m_editors)
+    {
+        WndConfig config;
+        wnd->SaveCfg(config);
+        sesConfig.SaveConfig(config);
+    }
+
+    auto GetFile = [](Wnd* wnd) -> std::string {
+        if (!wnd || wnd->GetWndType() != wnd_t::editor)
+            return {};
+        auto wedit = reinterpret_cast<EditorWnd*>(wnd);
+        return wedit->GetFilePath().u8string();
+    };
+
+    ViewConfig viewConfig;
+    viewConfig.sizex    = WndManager::getInstance().m_splitX;
+    viewConfig.sizey    = WndManager::getInstance().m_splitY;
+    viewConfig.type     = static_cast<size_t>(WndManager::getInstance().m_splitType);
+    viewConfig.active   = WndManager::getInstance().m_activeView;
+    viewConfig.file1    = GetFile(WndManager::getInstance().GetWnd(0, 0));
+    viewConfig.file2    = GetFile(WndManager::getInstance().GetWnd(0, 1));
+    sesConfig.SaveConfig(viewConfig);
+
+    DialogsConfig dlgConfig;
+    dlgConfig.filePath      = FileDialog::s_vars.path;
+    dlgConfig.fileMaskList  = FileDialog::s_vars.maskList;
+    dlgConfig.findList      = FindDialog::s_vars.findList;
+    dlgConfig.replaceList   = FindDialog::s_vars.replaceList;
+    sesConfig.SaveConfig(dlgConfig);
+
+    if (path)
+        sesConfig.Save(*path);
+    else
+        sesConfig.Save(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
 
     return true;
 }
@@ -432,6 +440,44 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
     else
         sesConfig.Load(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
 
+    auto&& wndConfig    = sesConfig.GetConfig<std::vector<WndConfig>>();
+    auto&& vConfig      = sesConfig.GetConfig<ViewConfig>();
+    auto&& dConfig      = sesConfig.GetConfig<DialogsConfig>();
+
+    for (auto& wConfig : wndConfig)
+    {
+        OpenFile(wConfig.filePath, wConfig.parser, wConfig.cp, wConfig.ro, wConfig.log);
+        auto wnd = GetEditorWnd(wConfig.filePath);
+        if (wnd)
+        {
+            auto eWnd = dynamic_cast<EditorWnd*>(wnd);
+            eWnd->LoadCfg(wConfig);
+        }
+    }
+
+    WndManager::getInstance().m_splitX      = vConfig.sizex;
+    WndManager::getInstance().m_splitY      = vConfig.sizey;
+    WndManager::getInstance().m_splitType   = static_cast<split_t>(vConfig.type);
+    WndManager::getInstance().m_activeView  = vConfig.active;
+
+    if (!vConfig.file1.empty())
+    {
+        auto wnd = GetEditorWnd(vConfig.file1);
+        WndManager::getInstance().SetTopWnd(wnd, 0);
+    }
+    if (!vConfig.file2.empty())
+    {
+        auto wnd = GetEditorWnd(vConfig.file2);
+        WndManager::getInstance().SetTopWnd(wnd, 1);
+    }
+
+    WndManager::getInstance().CalcView();
+
+    FileDialog::s_vars.path         = dConfig.filePath;
+    FileDialog::s_vars.maskList     = dConfig.fileMaskList;
+    FindDialog::s_vars.findList     = dConfig.findList;
+    FindDialog::s_vars.replaceList  = dConfig.replaceList;
+    
     return true;
 }
 

@@ -58,6 +58,10 @@ void CheckDirectoryFunc()
     _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
     _assert( Directory::Match<std::string>("acd", "*?c*d")); // Yes 
     _assert( Directory::Match<std::string>("abcd", "*?c*d")); // Yes 
+    _assert(!Directory::Match<std::string>("abcd", "ab?z")); // No
+    _assert( Directory::Match<std::string>("abcd", "ab?***")); // Yes
+    _assert( Directory::Match<std::string>("abcd", "ab*?***")); // Yes
+
     _assert( Directory::Match<std::u16string>(u"abcd", u"*?c*d")); // Yes 
 }
 

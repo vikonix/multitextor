@@ -44,7 +44,7 @@ static const size_t c_BuffLen{ 0x800 };
 namespace _Utils
 {
 
-path_t Directory::m_runPath = [] {
+path_t Directory::s_runPath = [] {
     path_t path;
 
 #ifdef WIN32
@@ -115,13 +115,13 @@ path_t Directory::CfgPath(const std::string& projectName)
     if (std::filesystem::is_directory(path))
         return path;
 
-    return m_runPath;
+    return s_runPath;
 #else
     std::string path{ "/etc/" + projectName };
     if (std::filesystem::is_directory(path))
         return path;
 
-    return m_runPath;
+    return s_runPath;
 #endif
 }
 
@@ -137,7 +137,7 @@ path_t Directory::SysCfgPath()
 #endif
 }
 
-path_t Directory::UserCfgPath([[maybe_unused]]const std::string& appName)
+path_t Directory::UserCfgPath([[maybe_unused]]const std::string& appName, [[maybe_unused]]bool create)
 {
 #ifdef WIN32
     char* env;
@@ -148,7 +148,14 @@ path_t Directory::UserCfgPath([[maybe_unused]]const std::string& appName)
     path_t path{env ? env : ""};
     free(env);
 
-    return path / appName;
+    path /= appName;
+    if (std::filesystem::is_directory(path))
+        return path;
+    
+    if(create)
+        std::filesystem::create_directory(path);
+
+    return s_runPath;
 #else
     const char* home = getenv("HOME");
     return home;

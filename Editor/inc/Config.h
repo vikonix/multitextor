@@ -199,6 +199,9 @@ public:
     bool SaveConfig(const ViewConfig& config);
     bool SaveConfig(const DialogsConfig& config);
 
+    template <class T>
+    T GetConfig();
+
     bool Load(const path_t& file);
     bool Save(const path_t& file);
 };

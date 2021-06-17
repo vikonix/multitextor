@@ -349,6 +349,35 @@ bool SessionConfig::SaveConfig(const DialogsConfig& config)
     return true;
 }
 
+template <>
+std::vector<WndConfig> SessionConfig::GetConfig< std::vector<WndConfig>>()
+{
+    std::vector<WndConfig> config;
+    for (auto& entry : m_json[ConfigKey][WndKey])
+    {
+        WndConfig wnd;
+        wnd.Load(entry);
+        config.push_back(std::move(wnd));
+    }
+    return std::move(config);
+}
+
+template <>
+ViewConfig SessionConfig::GetConfig<ViewConfig>()
+{
+    ViewConfig config;
+    config.Load(m_json[ConfigKey][ViewKey]);
+    return std::move(config);
+}
+
+template <>
+DialogsConfig SessionConfig::GetConfig<DialogsConfig>()
+{
+    DialogsConfig config;
+    config.Load(m_json[ConfigKey][DialogsKey]);
+    return std::move(config);
+}
+
 bool SessionConfig::Save(const path_t& file)
 {
     LOG(DEBUG) << "Save " << file.u8string();
@@ -369,53 +398,7 @@ bool SessionConfig::Load(const path_t& file)
         return true;
 
     LOG(DEBUG) << "Load " << file.u8string();
-    nlohmann::json jsonConfig = nlohmann::json::parse(ifs);
-    auto& json          = jsonConfig[ConfigKey];
-    auto& jsonView      = json[ViewKey];
-    auto& jsonWndList   = json[WndKey];
-    auto& jsonDialogs   = json[DialogsKey];
-
-    auto& app = Application::getInstance();
-    auto& editorApp = dynamic_cast<EditorApp&>(app);
-    for (auto& jsonWnd : jsonWndList)
-    {
-        WndConfig wConfig;
-        wConfig.Load(jsonWnd);
-        editorApp.OpenFile(wConfig.filePath, wConfig.parser, wConfig.cp, wConfig.ro, wConfig.log);
-        auto wnd = editorApp.GetEditorWnd(wConfig.filePath);
-        if (wnd)
-        {
-            auto eWnd = dynamic_cast<EditorWnd*>(wnd);
-            eWnd->LoadCfg(wConfig);
-        }
-    }
-
-    ViewConfig vConfig;
-    vConfig.Load(jsonView);
-    WndManager::getInstance().m_splitX      = vConfig.sizex;
-    WndManager::getInstance().m_splitY      = vConfig.sizey;
-    WndManager::getInstance().m_splitType   = static_cast<split_t>(vConfig.type);
-    WndManager::getInstance().m_activeView  = vConfig.active;
-
-    if (!vConfig.file1.empty())
-    {
-        auto wnd = editorApp.GetEditorWnd(vConfig.file1);
-        WndManager::getInstance().SetTopWnd(wnd, 0);
-    }
-    if (!vConfig.file2.empty())
-    {
-        auto wnd = editorApp.GetEditorWnd(vConfig.file2);
-        WndManager::getInstance().SetTopWnd(wnd, 1);
-    }
-
-    WndManager::getInstance().CalcView();
-
-    DialogsConfig dConfig;
-    dConfig.Load(jsonDialogs);
-    FileDialog::s_vars.path         = dConfig.filePath;
-    FileDialog::s_vars.maskList     = dConfig.fileMaskList;
-    FindDialog::s_vars.findList     = dConfig.findList;
-    FindDialog::s_vars.replaceList  = dConfig.replaceList;
+    m_json = nlohmann::json::parse(ifs);
 
     return true;
 }

@@ -56,6 +56,7 @@ public:
     virtual bool    LoadCfg() override final;
     virtual bool    SaveCfg(input_t code = 0) override final;
     virtual bool    LoadSession(std::optional<const std::filesystem::path> path) override final;
+    virtual bool    SaveSession(std::optional<const std::filesystem::path> path) override final;
 
     virtual bool    Init() override final;
     virtual void    Deinit() override final;

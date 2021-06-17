@@ -56,7 +56,7 @@ public:
 
         auto [it, ret] = m_diaps.insert_or_assign(kBegin, value);
 
-        //remove the internal previous intervals
+        //remove the all internal points
         for (++it; it->first < kEnd;)
             it = m_diaps.erase(it);
     }

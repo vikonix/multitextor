@@ -96,7 +96,8 @@ public:
     virtual input_t AppProc(input_t code)                       { return code; } //input treatment in user function
     virtual bool    LoadCfg()                                   { return true; } //configuration loading
     virtual bool    SaveCfg([[maybe_unused]] input_t code = 0)  { return true; } //configuration saving
-    virtual bool    LoadSession([[maybe_unused]]std::optional<const std::filesystem::path> path) { return true; }
+    virtual bool    LoadSession([[maybe_unused]] std::optional<const std::filesystem::path> path) { return true; }
+    virtual bool    SaveSession([[maybe_unused]] std::optional<const std::filesystem::path> path) { return true; }
 
     virtual bool    Init();
     virtual void    Deinit();

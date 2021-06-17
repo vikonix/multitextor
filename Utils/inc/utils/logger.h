@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "easyloggingpp/easylogging++.h"
 
 #ifdef WIN32
-#define __FUNC__ __FUNCTION__
+#define __FUNC__ __FUNCTION__ " "
 #ifdef _DEBUG
 #define _assert(v) _ASSERT(v)
 #else
