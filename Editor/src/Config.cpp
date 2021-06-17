@@ -188,15 +188,15 @@ bool ParserConfig::Load(const path_t& file)
     auto& json = jsonConfig[ConfigKey];
 
     LexConfig config;
-    config.langName = json[LangNameKey];
-    config.fileExt = json[FileExtKey];
-    config.delimiters = json[DelimitersKey];
-    config.nameSymbols = json[NameSymbolsKey];
+    config.langName         = json[LangNameKey];
+    config.fileExt          = json[FileExtKey];
+    config.delimiters       = json[DelimitersKey];
+    config.nameSymbols      = json[NameSymbolsKey];
     config.recursiveComment = json[RecursiveCommentsKey];
-    config.toggledComment = json[ToggledCommentsKey];
-    config.notCase = json[NotCaseKey];
-    config.saveTab = json[SaveTabsKey];
-    config.tabSize = json[TabSizeKey];
+    config.toggledComment   = json[ToggledCommentsKey];
+    config.notCase          = json[NotCaseKey];
+    config.saveTab          = json[SaveTabsKey];
+    config.tabSize          = json[TabSizeKey];
     for(auto& entry : json[SpecialSymbolsKey])
         config.special.push_back(static_cast<std::string>(entry));
     for (auto& entry : json[LineCommentsKey])
@@ -292,12 +292,12 @@ bool ViewConfig::Load(const nlohmann::json& json)
 
 bool ViewConfig::Save(nlohmann::json& json) const
 {
-    json[SizeXKey] = sizex;
-    json[SizeYKey] = sizey;
-    json[TypeKey] = type;
+    json[SizeXKey]  = sizex;
+    json[SizeYKey]  = sizey;
+    json[TypeKey]   = type;
     json[ActiveKey] = active;
-    json[File1Key] = file1;
-    json[File2Key] = file2;
+    json[File1Key]  = file1;
+    json[File2Key]  = file2;
 
     return true;
 }
@@ -359,7 +359,7 @@ std::vector<WndConfig> SessionConfig::GetConfig< std::vector<WndConfig>>()
         wnd.Load(entry);
         config.push_back(std::move(wnd));
     }
-    return std::move(config);
+    return config;
 }
 
 template <>
@@ -367,7 +367,7 @@ ViewConfig SessionConfig::GetConfig<ViewConfig>()
 {
     ViewConfig config;
     config.Load(m_json[ConfigKey][ViewKey]);
-    return std::move(config);
+    return config;
 }
 
 template <>
@@ -375,7 +375,7 @@ DialogsConfig SessionConfig::GetConfig<DialogsConfig>()
 {
     DialogsConfig config;
     config.Load(m_json[ConfigKey][DialogsKey]);
-    return std::move(config);
+    return config;
 }
 
 bool SessionConfig::Save(const path_t& file)
