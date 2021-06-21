@@ -178,47 +178,53 @@ bool LexParser::SetParseStyle(const std::string& style)
     m_closeComment.clear();
     m_keyWords.clear();
 
-    for (auto& [type, cfg] : s_lexConfig)
-    {
-        if (cfg.langName == style)
+    auto FindStyle = [this](const std::string& style) {
+        for (auto& [type, cfg] : s_lexConfig)
         {
-            m_parseStyle = cfg.langName;
+            if (cfg.langName == style)
+            {
+                m_parseStyle = cfg.langName;
 
-            for (char16_t i = 0; i < lexTabSize; ++i)
-                m_lexTab[i] = static_cast<lex_t>(GetSymbolType(i));
-            for (int d : cfg.delimiters)
-                m_lexTab[d] = lex_t::DELIMITER;
-            for (int s : cfg.nameSymbols)
-                m_lexTab[s] = lex_t::SYMBOL;
+                for (char16_t i = 0; i < lexTabSize; ++i)
+                    m_lexTab[i] = static_cast<lex_t>(GetSymbolType(i));
+                for (int d : cfg.delimiters)
+                    m_lexTab[d] = lex_t::DELIMITER;
+                for (int s : cfg.nameSymbols)
+                    m_lexTab[s] = lex_t::SYMBOL;
 
-            for (auto special : cfg.special)
-                m_special.insert(utf8::utf8to16(special));
-            for (auto lineComment : cfg.lineComment)
-                m_lineComment.insert(utf8::utf8to16(lineComment));
-            for (auto openComment : cfg.openComment)
-                m_openComment.insert(utf8::utf8to16(openComment));
-            for (auto closeComment : cfg.closeComment)
-                m_closeComment.insert(utf8::utf8to16(closeComment));
+                for (auto& special : cfg.special)
+                    m_special.insert(utf8::utf8to16(special));
+                for (auto& lineComment : cfg.lineComment)
+                    m_lineComment.insert(utf8::utf8to16(lineComment));
+                for (auto& openComment : cfg.openComment)
+                    m_openComment.insert(utf8::utf8to16(openComment));
+                for (auto& closeComment : cfg.closeComment)
+                    m_closeComment.insert(utf8::utf8to16(closeComment));
 
-            for (auto kword : cfg.keyWords)
-                m_keyWords.insert(utf8::utf8to16(kword));
+                for (auto& kword : cfg.keyWords)
+                    m_keyWords.insert(utf8::utf8to16(kword));
 
-            m_recursiveComment = cfg.recursiveComment;
-            m_toggledComment = cfg.toggledComment;
-            m_notCase = cfg.notCase;
-            m_saveTab = cfg.saveTab;
-            m_tabSize = cfg.tabSize;
+                m_recursiveComment = cfg.recursiveComment;
+                m_toggledComment = cfg.toggledComment;
+                m_notCase = cfg.notCase;
+                m_saveTab = cfg.saveTab;
+                m_tabSize = cfg.tabSize;
 
-            m_showTab = false;
+                m_showTab = false;
 
-            if (!m_openComment.empty() && !m_closeComment.empty())
-                m_scan = true;
+                if (!m_openComment.empty() && !m_closeComment.empty())
+                    m_scan = true;
 
-            return true;
+                return true;
+            }
         }
-    }
-    
-    return false;
+        return false;
+    };
+
+    if (!style.empty() && FindStyle(style))
+        return true;
+
+    return FindStyle("Text");
 }
 
 //////////////////////////////////////////////////////////////////////////////
