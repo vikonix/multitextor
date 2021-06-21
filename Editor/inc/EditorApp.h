@@ -40,16 +40,25 @@ extern menu_list    g_menuRecentSessions;
 extern menu_list    g_popupMenu;
 extern std::vector<menu_list> g_mainMenu;
 
+extern const size_t c_recentFilesMenu;
+extern const size_t c_recentSessionsMenu;
+
+using file_t = std::tuple < std::string, std::string, std::string, bool, bool >;
+
 class EditorApp : public Application
 {
     using AppFunc = std::function<bool(EditorApp*, input_t)>;
     static std::unordered_map<AppCmd, AppFunc> s_funcMap;
-
+    
+    inline static const size_t c_maxRecentFiles{16};
+    std::deque<file_t> m_recentFiles;
     std::unordered_map<Wnd*, std::shared_ptr<EditorWnd>> m_editors;
+
     bool m_wait{};
     bool m_run{};
 
     bool CloseAllWindows();
+    bool UpdateRecentFilesList();
 
 public:
     virtual input_t AppProc(input_t code) override final;

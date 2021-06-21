@@ -239,7 +239,7 @@ Wnd* EditorApp::GetEditorWnd(std::filesystem::path path)
 
 bool EditorApp::CloseAllWindows()
 {
-    for (auto& [w, wnd] : m_editors)
+    for (auto& [ptr, wnd] : m_editors)
     {
         if (!wnd->IsChanged())
             continue;
@@ -308,6 +308,18 @@ input_t EditorApp::AppProc(input_t code)
     return code; 
 } 
 
+bool EditorApp::UpdateRecentFilesList()
+{
+    g_menuRecentFiles.clear();
+    input_t n{};
+    for (auto& entry : m_recentFiles)
+        g_menuRecentFiles.emplace_back(menu{ MENU_ITEM, std::get<0>(entry), K_APP_FILE_RECENT + n++ });
+
+    if (m_menuArray.size() >= c_recentFilesMenu)
+        m_menuArray[c_recentFilesMenu] = g_menuRecentFiles;
+    return true;
+}
+
 bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& parseMode, const std::string& cp, bool ro, bool log) try
 {
     auto fullPath = std::filesystem::canonical(path);
@@ -325,6 +337,14 @@ bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& p
         editor->SetRO(ro);
         editor->SetLog(log);
         m_editors[editor.get()] = editor;
+
+        m_recentFiles.erase(std::remove_if(m_recentFiles.begin(), m_recentFiles.end(),
+            [&fullPath](const file_t& file) {return std::get<0>(file) == fullPath;}), m_recentFiles.end());
+        if (m_recentFiles.size() >= c_maxRecentFiles)
+            m_recentFiles.pop_front();
+
+        m_recentFiles.emplace_back(fullPath.u8string(), parseMode, cp, ro, log);
+        UpdateRecentFilesList();
     }
 
     return true;
@@ -383,7 +403,7 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
 
     if (!m_editors.empty())
     {
-        SaveSession(std::nullopt);
+        _TRY(SaveSession(std::nullopt));
     }
 
     return true;
@@ -396,6 +416,19 @@ bool EditorApp::SaveSession(std::optional<const std::filesystem::path> path)
     {
         WndConfig config;
         wnd->SaveCfg(config);
+        sesConfig.SaveConfig(config);
+
+        //update recent files info
+        auto entry = std::find_if(m_recentFiles.begin(), m_recentFiles.end(),
+            [&config](const file_t& file) {return config.filePath == std::get<0>(file); });
+
+        if (entry != m_recentFiles.end())
+            *entry = { config.filePath, config.parser, config.cp, config.ro, config.log };
+    }
+
+    for (auto& [filePath, parse, cp, ro, log] : m_recentFiles)
+    {
+        FileConfig config{ filePath, parse, cp, ro, log };
         sesConfig.SaveConfig(config);
     }
 
@@ -443,6 +476,7 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
     auto&& wndConfig    = sesConfig.GetConfig<std::vector<WndConfig>>();
     auto&& vConfig      = sesConfig.GetConfig<ViewConfig>();
     auto&& dConfig      = sesConfig.GetConfig<DialogsConfig>();
+    auto&& fileConfig   = sesConfig.GetConfig<std::vector<FileConfig>>();
 
     for (auto& wConfig : wndConfig)
     {
@@ -478,6 +512,11 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
     FindDialog::s_vars.findList     = dConfig.findList;
     FindDialog::s_vars.replaceList  = dConfig.replaceList;
     
+    m_recentFiles.clear();
+    for (auto& file : fileConfig)
+        m_recentFiles.emplace_back(file.filePath, file.parser, file.cp, file.ro, file.log);
+    UpdateRecentFilesList();
+
     return true;
 }
 

@@ -77,7 +77,7 @@ class KeyConfig
 
 public:
     bool Load(const path_t& file);
-    bool Save(const path_t& file);
+    bool Save(const path_t& file) const;
 };
 
 struct LexConfig;
@@ -104,31 +104,40 @@ public:
     inline static const std::string Ext{ ".lex" };
 
     bool Load(const path_t& file);
-    bool Save(const path_t& file, const LexConfig& config);
+    bool Save(const path_t& file, const LexConfig& config) const;
 };
 
-class WndConfig
+class FileConfig
 {
+protected:
     inline static const std::string FilePathKey { "FilePath" };
+    inline static const std::string ParserKey   { "Parser" };
+    inline static const std::string CodePageKey { "CodePage" };
+    inline static const std::string ROKey       { "ro" };
+    inline static const std::string LogKey      { "log" };
+
+public:
+    std::string filePath;
+    std::string parser;
+    std::string cp;
+    bool        ro{};
+    bool        log{};
+
+    bool Load(const nlohmann::json& json);
+    bool Save(nlohmann::json& json) const;
+};
+
+class WndConfig : public FileConfig
+{
     inline static const std::string FirstLineKey{ "FirstLine" };
     inline static const std::string XOffsetKey  { "XOffset" };
     inline static const std::string CursorXKey  { "CursorX" };
     inline static const std::string CursorYKey  { "CursorY" };
-    inline static const std::string ROKey       { "ro" };
-    inline static const std::string LogKey      { "log" };
     inline static const std::string TabSizeKey  { "TabSize" };
     inline static const std::string SaveTabsKey { "SaveTabs" };
     inline static const std::string EolKey      { "Eol" };
-    inline static const std::string CodePageKey { "CodePage" };
-    inline static const std::string ParserKey   { "Parser" };
 
 public:
-    std::string filePath;
-    std::string parser{};
-    std::string cp{};
-    bool        ro{};
-    bool        log{};
-
     size_t      firstLine{};
     size_t      xOffset{};
     pos_t       cursorX{};
@@ -198,12 +207,13 @@ public:
     bool SaveConfig(const WndConfig& config);
     bool SaveConfig(const ViewConfig& config);
     bool SaveConfig(const DialogsConfig& config);
+    bool SaveConfig(const FileConfig& config);
 
     template <class T>
-    T GetConfig();
+    T GetConfig() const;
 
     bool Load(const path_t& file);
-    bool Save(const path_t& file);
+    bool Save(const path_t& file) const;
 };
 
 extern class EditorConfig g_editorConfig;

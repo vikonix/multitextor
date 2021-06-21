@@ -86,6 +86,8 @@ bool EditorConfig::Save(const path_t& file, bool force)
     ofs << jsonConfig.dump(2);
     //LOG(DEBUG) << jsonConfig.dump(2);
 
+    m_changed = false;
+
     return true;
 }
 
@@ -132,7 +134,7 @@ bool KeyConfig::Load(const path_t& file)
     return true;
 }
 
-bool KeyConfig::Save(const path_t& file)
+bool KeyConfig::Save(const path_t& file) const
 {
     auto& app = Application::getInstance();
 
@@ -197,6 +199,7 @@ bool ParserConfig::Load(const path_t& file)
     config.notCase          = json[NotCaseKey];
     config.saveTab          = json[SaveTabsKey];
     config.tabSize          = json[TabSizeKey];
+
     for(auto& entry : json[SpecialSymbolsKey])
         config.special.push_back(static_cast<std::string>(entry));
     for (auto& entry : json[LineCommentsKey])
@@ -213,7 +216,7 @@ bool ParserConfig::Load(const path_t& file)
     return true;
 }
 
-bool ParserConfig::Save(const path_t& file, const LexConfig& config)
+bool ParserConfig::Save(const path_t& file, const LexConfig& config) const
 {
     nlohmann::json json;
 
@@ -242,20 +245,43 @@ bool ParserConfig::Save(const path_t& file, const LexConfig& config)
     return true;
 }
 
+bool FileConfig::Load(const nlohmann::json& json)
+{
+    filePath    = json[FilePathKey];
+    parser      = json[ParserKey];
+    cp          = json[CodePageKey];
+    ro          = json[ROKey];
+    log         = json[LogKey];
+
+    return true;
+}
+
+bool FileConfig::Save(nlohmann::json& json) const
+{
+    json[FilePathKey]   = filePath;
+    json[ParserKey]     = parser;
+    json[CodePageKey]   = cp;
+    json[ROKey]         = ro;
+    json[LogKey]        = log;
+
+    return true;
+}
+
 bool WndConfig::Load(const nlohmann::json& json)
 {
     filePath    = json[FilePathKey];
+    parser      = json[ParserKey];
+    cp          = json[CodePageKey];
+    ro          = json[ROKey];
+    log         = json[LogKey];
+
     firstLine   = json[FirstLineKey];
     xOffset     = json[XOffsetKey];
     cursorX     = json[CursorXKey];
     cursorY     = json[CursorYKey];
-    ro          = json[ROKey];
-    log         = json[LogKey];
     tabSize     = json[TabSizeKey];
     saveTabs    = json[SaveTabsKey];
-    eol         = json[EolKey];
-    cp          = json[CodePageKey];
-    parser      = json[ParserKey];
+    eol = json[EolKey];
 
     return true;
 }
@@ -263,17 +289,18 @@ bool WndConfig::Load(const nlohmann::json& json)
 bool WndConfig::Save(nlohmann::json& json) const
 {
     json[FilePathKey]   = filePath;
+    json[ParserKey]     = parser;
+    json[CodePageKey]   = cp;
+    json[ROKey]         = ro;
+    json[LogKey]        = log;
+
     json[FirstLineKey]  = firstLine;
     json[XOffsetKey]    = xOffset;
     json[CursorXKey]    = cursorX;
     json[CursorYKey]    = cursorY;
-    json[ROKey]         = ro;
-    json[LogKey]        = log;
     json[TabSizeKey]    = tabSize;
     json[SaveTabsKey]   = saveTabs;
     json[EolKey]        = eol;
-    json[CodePageKey]   = cp;
-    json[ParserKey]     = parser;
 
     return true;
 }
@@ -306,7 +333,7 @@ bool DialogsConfig::Load(const nlohmann::json& json)
 {
     filePath = json[FilePathKey];
     for(auto& var : json[MaskKey])
-        fileMaskList.push_back(var);
+        fileMaskList.emplace_back(var);
     for(auto& var : json[FindKey])
         findList.emplace(var);
     for(auto& var : json[ReplaceKey])
@@ -333,6 +360,14 @@ bool SessionConfig::SaveConfig(const WndConfig& config)
     return true;
 }
 
+bool SessionConfig::SaveConfig(const FileConfig& config)
+{
+    nlohmann::json json;
+    config.Save(json);
+    m_json[ConfigKey][RecentFilesKey].push_back(json);
+    return true;
+}
+
 bool SessionConfig::SaveConfig(const ViewConfig& config)
 {
     nlohmann::json json;
@@ -350,10 +385,10 @@ bool SessionConfig::SaveConfig(const DialogsConfig& config)
 }
 
 template <>
-std::vector<WndConfig> SessionConfig::GetConfig< std::vector<WndConfig>>()
+std::vector<WndConfig> SessionConfig::GetConfig< std::vector<WndConfig>>() const
 {
     std::vector<WndConfig> config;
-    for (auto& entry : m_json[ConfigKey][WndKey])
+    for (auto& entry : m_json.at(ConfigKey).at(WndKey))
     {
         WndConfig wnd;
         wnd.Load(entry);
@@ -363,22 +398,35 @@ std::vector<WndConfig> SessionConfig::GetConfig< std::vector<WndConfig>>()
 }
 
 template <>
-ViewConfig SessionConfig::GetConfig<ViewConfig>()
+std::vector<FileConfig> SessionConfig::GetConfig< std::vector<FileConfig>>() const
 {
-    ViewConfig config;
-    config.Load(m_json[ConfigKey][ViewKey]);
+    std::vector<FileConfig> config;
+    for (auto& entry : m_json.at(ConfigKey).at(RecentFilesKey))
+    {
+        FileConfig wnd;
+        wnd.Load(entry);
+        config.push_back(std::move(wnd));
+    }
     return config;
 }
 
 template <>
-DialogsConfig SessionConfig::GetConfig<DialogsConfig>()
+ViewConfig SessionConfig::GetConfig<ViewConfig>() const
 {
-    DialogsConfig config;
-    config.Load(m_json[ConfigKey][DialogsKey]);
+    ViewConfig config;
+    config.Load(m_json.at(ConfigKey).at(ViewKey));
     return config;
 }
 
-bool SessionConfig::Save(const path_t& file)
+template <>
+DialogsConfig SessionConfig::GetConfig<DialogsConfig>() const
+{
+    DialogsConfig config;
+    config.Load(m_json.at(ConfigKey).at(DialogsKey));
+    return config;
+}
+
+bool SessionConfig::Save(const path_t& file) const
 {
     LOG(DEBUG) << "Save " << file.u8string();
     std::ofstream ofs(file);

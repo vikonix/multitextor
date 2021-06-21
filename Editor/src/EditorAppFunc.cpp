@@ -275,8 +275,12 @@ bool    EditorApp::SelectBookmarkProc(input_t cmd)
 
 bool    EditorApp::SelectRecentFileProc(input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
-    return true;
+    input_t n = cmd - K_APP_FILE_RECENT;
+    if (m_recentFiles.size() <= n)
+        return true;
+
+    auto& [path, parse, cp, ro, log] = m_recentFiles[n];
+    return OpenFile(path, parse, cp, ro, log);
 }
 
 bool    EditorApp::SelectRecentSessionProc(input_t cmd)

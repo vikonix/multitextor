@@ -97,9 +97,9 @@ static menu_list menuFile
 //    {MENU_ITEM,         "Ne&w Session...",              K_APP_NEW_SESSION,          "Create new session"},
 //    {MENU_ITEM,         "O&pen Session...",             K_APP_OPEN_SESSION,         "Open existing session"},
 //    {MENU_SEPARATOR},
-//    {MENU_ITEM,         "Recent &Files",                K_MENU + 9,                 "Recent files list"},
+    {MENU_ITEM,         "Recent &Files",                K_MENU + 9,                 "Recent files list"},
 //    {MENU_ITEM,         "Recent Sess&ions",             K_MENU + 10,                "Recent sessions list"},
-//    {MENU_SEPARATOR},
+    {MENU_SEPARATOR},
     {MENU_ITEM,         "&Exit",                        K_EXIT,                     "Exit from editor"}
 };
 
@@ -197,16 +197,7 @@ static menu_list menuHelp
 
 menu_list g_menuRecentFiles 
 {
-    {MENU_ITEM, "", K_APP_FILE_RECENT},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 1},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 2},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 3},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 4},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 5},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 6},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 7},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 8},
-    {MENU_ITEM, "", K_APP_FILE_RECENT + 9}
+    {MENU_ITEM, "", K_APP_FILE_RECENT}
 };
 
 menu_list g_menuRecentSessions
@@ -259,5 +250,8 @@ std::vector<menu_list> g_mainMenu
     g_menuRecentFiles,   //9
     g_menuRecentSessions //10
 };
+
+const size_t c_recentFilesMenu{ 9 };
+const size_t c_recentSessionsMenu{ 10 };
 
 } //namespace _Editor
