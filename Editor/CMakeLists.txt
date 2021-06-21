@@ -59,7 +59,7 @@ set_target_properties(${PROJECT_NAME}
 
 if(MSVC)
     # warning level 4
-    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Zc:__cplusplus)
+    target_compile_options(${PROJECT_NAME} PRIVATE /W4 /Zc:__cplusplus /Zi)
     set_property(TARGET ${PROJECT_NAME} PROPERTY
         MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
     if(USE_VLD)
