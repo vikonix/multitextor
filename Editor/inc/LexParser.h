@@ -89,7 +89,7 @@ using string_set = std::unordered_set<std::u16string>;
 class LexParser
 {
 public:    
-    static std::unordered_map<std::string, LexConfig> s_lexConfig;
+    static std::map<std::string, LexConfig> s_lexConfig;
 
 protected:
     static std::unordered_map<char16_t, std::pair<char16_t, bool>> s_lexPairs;

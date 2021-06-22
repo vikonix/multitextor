@@ -34,7 +34,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace _Editor
 {
 
-std::unordered_map<std::string, LexConfig> LexParser::s_lexConfig
+std::map<std::string, LexConfig> LexParser::s_lexConfig
 {
     {
         "Text",
