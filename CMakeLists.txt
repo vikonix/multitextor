@@ -8,8 +8,6 @@ if(MSVC)
     cmake_policy(SET CMP0091 NEW)
 endif()
 
-project(${PROJECT_NAME} VERSION 2.0.0)
-
 #option(USE_VLD "VLD" ON)
 #option(USE_ICONV "LIBICONV" ON)
 #option(BUILD_TEST "BUILD_TEST" ON)
