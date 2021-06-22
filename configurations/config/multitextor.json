@@ -1,0 +1,10 @@
+{
+  "EditorConfig": {
+    "1_ColorFile": "default.clr",
+    "2_KeyMapFile": "default.kmap",
+    "FileSaveTime": 0,
+    "MaxScreenSize": false,
+    "ShowAccessMenu": true,
+    "ShowClock": true
+  }
+}

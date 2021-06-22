@@ -73,10 +73,20 @@ if(MSVC)
             "C:/Program Files (x86)/Visual Leak Detector/lib/Win64/vld.lib"
         )
     endif()
+    
+    add_custom_command(
+        TARGET ${PROJECT_NAME} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../configurations/config ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<CONFIG>/config/
+        COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../configurations/parser ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<CONFIG>/parser/
+    )
+    
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
     #target_link_options(${PROJECT_NAME} PRIVATE -static)
+
+    file(COPY ../configurations/config DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+    file(COPY ../configurations/parser DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
 endif()
 
 if(UNIX)
@@ -84,3 +94,4 @@ if(UNIX)
     set(CMAKE_INSTALL_PREFIX /usr/bin)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT binaries)
 endif()
+

@@ -1,0 +1,1332 @@
+{
+  "KeyConfig": {
+    "AppKeys": [
+      {
+        "Cmd": [
+          "APP_HELP"
+        ],
+        "Key": [
+          "F1"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_SAVE_ALL"
+        ],
+        "Key": [
+          "F2"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_SAVE_ALL"
+        ],
+        "Key": [
+          "Alt+S"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_OPEN"
+        ],
+        "Key": [
+          "F3"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_WND_COPY"
+        ],
+        "Key": [
+          "Shift+F5"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_WND_MOVE"
+        ],
+        "Key": [
+          "Shift+F6"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_FINDFILE"
+        ],
+        "Key": [
+          "Alt+F"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_FINDFILE"
+        ],
+        "Key": [
+          "Esc",
+          "F7"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_FINDFILE"
+        ],
+        "Key": [
+          "Esc",
+          "f"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_FINDFILE"
+        ],
+        "Key": [
+          "Esc",
+          "F"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_REPLACEFILE"
+        ],
+        "Key": [
+          "Alt+H"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_REPLACEFILE"
+        ],
+        "Key": [
+          "Esc",
+          "h"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_REPLACEFILE"
+        ],
+        "Key": [
+          "Esc",
+          "H"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_FOUNDFILE"
+        ],
+        "Key": [
+          "Ctrl+L"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_FOUNDFILE"
+        ],
+        "Key": [
+          "Alt+L"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_WND_LIST"
+        ],
+        "Key": [
+          "Ctrl+W"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_MENU"
+        ],
+        "Key": [
+          "F9"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_MENU"
+        ],
+        "Key": [
+          "Esc",
+          "F1"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_EXIT"
+        ],
+        "Key": [
+          "F10"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_EXIT"
+        ],
+        "Key": [
+          "Alt+X"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_EXIT"
+        ],
+        "Key": [
+          "Esc",
+          "x"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_EXIT"
+        ],
+        "Key": [
+          "Esc",
+          "X"
+        ]
+      },
+      {
+        "Cmd": [
+          "Insert"
+        ],
+        "Key": [
+          "Esc",
+          "0"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SPLIT_MERGE"
+        ],
+        "Key": [
+          "Alt+/"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SPLIT_VH"
+        ],
+        "Key": [
+          "Alt++"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SPLIT_VH"
+        ],
+        "Key": [
+          "Alt+="
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SIZE"
+        ],
+        "Key": [
+          "Alt+-"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SPLIT_MERGE"
+        ],
+        "Key": [
+          "Esc",
+          "/"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SPLIT_VH"
+        ],
+        "Key": [
+          "Esc",
+          "="
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SPLIT_VH"
+        ],
+        "Key": [
+          "Esc",
+          "+"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_SIZE"
+        ],
+        "Key": [
+          "Esc",
+          "-"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_CHANGE"
+        ],
+        "Key": [
+          "Alt+PageUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_CHANGE"
+        ],
+        "Key": [
+          "Alt+PageDn"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_CHANGE"
+        ],
+        "Key": [
+          "Esc",
+          "PageUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_CHANGE"
+        ],
+        "Key": [
+          "Esc",
+          "PageDn"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_CHANGE"
+        ],
+        "Key": [
+          "Esc",
+          "9"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_VIEW_CHANGE"
+        ],
+        "Key": [
+          "Esc",
+          "3"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_DIFF"
+        ],
+        "Key": [
+          "Ctrl+D"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_BOOKMARK"
+        ],
+        "Key": [
+          "Ctrl+\\"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_BOOKMARK"
+        ],
+        "Key": [
+          "Alt+\\"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_0"
+        ],
+        "Key": [
+          "Alt+0"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_1"
+        ],
+        "Key": [
+          "Alt+1"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_2"
+        ],
+        "Key": [
+          "Alt+2"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_3"
+        ],
+        "Key": [
+          "Alt+3"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_4"
+        ],
+        "Key": [
+          "Alt+4"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_5"
+        ],
+        "Key": [
+          "Alt+5"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_6"
+        ],
+        "Key": [
+          "Alt+6"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_7"
+        ],
+        "Key": [
+          "Alt+7"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_8"
+        ],
+        "Key": [
+          "Alt+8"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_BOOKMARK_9"
+        ],
+        "Key": [
+          "Alt+9"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_RECORD_MACRO"
+        ],
+        "Key": [
+          "Ctrl+K"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_PLAY_MACRO"
+        ],
+        "Key": [
+          "Alt+K"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_KEYGEN"
+        ],
+        "Key": [
+          "Ctrl+Q"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_REFRESH"
+        ],
+        "Key": [
+          "F12"
+        ]
+      }
+    ],
+    "EditorKeys": [
+      {
+        "Cmd": [
+          "EDIT_MOVE_LEFT"
+        ],
+        "Key": [
+          "KeyLeft"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_RIGHT"
+        ],
+        "Key": [
+          "KeyRight"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_UP"
+        ],
+        "Key": [
+          "KeyUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_DOWN"
+        ],
+        "Key": [
+          "KeyDown"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_SCROLL3_UP"
+        ],
+        "Key": [
+          "MouseScrollUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_SCROLL3_DOWN"
+        ],
+        "Key": [
+          "MouseScrollDown"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_PAGE_UP"
+        ],
+        "Key": [
+          "PageUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_PAGE_DOWN"
+        ],
+        "Key": [
+          "PageDn"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_STR_BEGIN"
+        ],
+        "Key": [
+          "Home"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_STR_END"
+        ],
+        "Key": [
+          "End"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_BEGIN"
+        ],
+        "Key": [
+          "Ctrl+Home"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_END"
+        ],
+        "Key": [
+          "Ctrl+End"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_BEGIN"
+        ],
+        "Key": [
+          "Alt+Home"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_END"
+        ],
+        "Key": [
+          "Alt+End"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_BEGIN"
+        ],
+        "Key": [
+          "Esc",
+          "Home"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_END"
+        ],
+        "Key": [
+          "Esc",
+          "End"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_BEGIN"
+        ],
+        "Key": [
+          "Esc",
+          "7"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_FILE_END"
+        ],
+        "Key": [
+          "Esc",
+          "1"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_LEFT"
+        ],
+        "Key": [
+          "Ctrl+KeyLeft"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_RIGHT"
+        ],
+        "Key": [
+          "Ctrl+KeyRight"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_LEFT"
+        ],
+        "Key": [
+          "Alt+,"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_RIGHT"
+        ],
+        "Key": [
+          "Alt+."
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_LEFT"
+        ],
+        "Key": [
+          "Alt+<"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_RIGHT"
+        ],
+        "Key": [
+          "Alt+>"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_LEFT"
+        ],
+        "Key": [
+          "Esc",
+          ","
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_WORD_RIGHT"
+        ],
+        "Key": [
+          "Esc",
+          "."
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_BRACKET_MATCH"
+        ],
+        "Key": [
+          "Ctrl+]"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_BRACKET_MATCH"
+        ],
+        "Key": [
+          "Ctrl+["
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_CENTER"
+        ],
+        "Key": [
+          "Ctrl+T"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_SCROLL_UP"
+        ],
+        "Key": [
+          "Alt+KeyUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_SCROLL_DOWN"
+        ],
+        "Key": [
+          "Alt+KeyDown"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_SCROLL_LEFT"
+        ],
+        "Key": [
+          "Alt+KeyLeft"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_MOVE_SCROLL_RIGHT"
+        ],
+        "Key": [
+          "Alt+KeyRight"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DEL_CHAR"
+        ],
+        "Key": [
+          "Delete"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DEL_CHAR"
+        ],
+        "Key": [
+          "Esc",
+          "BackSpace"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DEL_STR"
+        ],
+        "Key": [
+          "Ctrl+Y"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_ENTER"
+        ],
+        "Key": [
+          "Enter"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_TAB"
+        ],
+        "Key": [
+          "Tab"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BS"
+        ],
+        "Key": [
+          "BackSpace"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_WORD"
+        ],
+        "Key": [
+          "MouseLeft2"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_LINE"
+        ],
+        "Key": [
+          "MouseLeft3"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_WORD"
+        ],
+        "Key": [
+          "Ctrl+Space"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_STREAM_BEGIN",
+          "EDIT_MOVE_LEFT"
+        ],
+        "Key": [
+          "Esc",
+          "KeyLeft"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_STREAM_BEGIN",
+          "EDIT_MOVE_RIGHT"
+        ],
+        "Key": [
+          "Esc",
+          "KeyRight"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_STREAM_BEGIN",
+          "EDIT_MOVE_UP"
+        ],
+        "Key": [
+          "Esc",
+          "KeyUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_STREAM_BEGIN",
+          "EDIT_MOVE_DOWN"
+        ],
+        "Key": [
+          "Esc",
+          "KeyDown"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_LEFT"
+        ],
+        "Key": [
+          "Shift+KeyLeft"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_RIGHT"
+        ],
+        "Key": [
+          "Shift+KeyRight"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_UP"
+        ],
+        "Key": [
+          "Shift+KeyUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_DOWN"
+        ],
+        "Key": [
+          "Shift+KeyDown"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_STR_BEGIN"
+        ],
+        "Key": [
+          "Shift+Home"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_STR_END"
+        ],
+        "Key": [
+          "Shift+End"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_PAGE_UP"
+        ],
+        "Key": [
+          "Shift+PageUp"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_BEGIN",
+          "EDIT_MOVE_PAGE_DOWN"
+        ],
+        "Key": [
+          "Shift+PageDn"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_LINES_BEGIN"
+        ],
+        "Key": [
+          "F4"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_COLUMN_BEGIN"
+        ],
+        "Key": [
+          "Shift+F4"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_UNSELECT"
+        ],
+        "Key": [
+          "F8"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_END"
+        ],
+        "Key": [
+          "F4"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_END"
+        ],
+        "Key": [
+          "Esc",
+          "Esc"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_SHIFT_END"
+        ],
+        "Key": [
+          "ShiftRelease"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_SELECT_ALL"
+        ],
+        "Key": [
+          "Ctrl+A"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_COPY"
+        ],
+        "Key": [
+          "F5"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_MOVE"
+        ],
+        "Key": [
+          "F6"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_DEL"
+        ],
+        "Key": [
+          "Alt+Y"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CB_CUT"
+        ],
+        "Key": [
+          "Ctrl+X"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CB_COPY"
+        ],
+        "Key": [
+          "Ctrl+C"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CB_PASTE"
+        ],
+        "Key": [
+          "Ctrl+V"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CB_CUT"
+        ],
+        "Key": [
+          "Shift+Delete"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CB_COPY"
+        ],
+        "Key": [
+          "Ctrl+Insert"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CB_PASTE"
+        ],
+        "Key": [
+          "Shift+Insert"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_INDENT"
+        ],
+        "Key": [
+          "Alt+I"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_UNDENT"
+        ],
+        "Key": [
+          "Alt+U"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_INDENT"
+        ],
+        "Key": [
+          "Esc",
+          "i"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_INDENT"
+        ],
+        "Key": [
+          "Esc",
+          "I"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_UNDENT"
+        ],
+        "Key": [
+          "Esc",
+          "u"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_BLOCK_UNDENT"
+        ],
+        "Key": [
+          "Esc",
+          "U"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_UNDO"
+        ],
+        "Key": [
+          "Ctrl+Z"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_UNDO"
+        ],
+        "Key": [
+          "Alt+BackSpace"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_REDO"
+        ],
+        "Key": [
+          "Alt+Z"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_REDO"
+        ],
+        "Key": [
+          "Esc",
+          "z"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_REDO"
+        ],
+        "Key": [
+          "Esc",
+          "Z"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DLG_GOTO"
+        ],
+        "Key": [
+          "Ctrl+G"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DLG_FIND"
+        ],
+        "Key": [
+          "Ctrl+F"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DLG_FIND"
+        ],
+        "Key": [
+          "F7"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DLG_REPLACE"
+        ],
+        "Key": [
+          "Ctrl+R"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DLG_REPLACE"
+        ],
+        "Key": [
+          "Ctrl+H"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_FIND"
+        ],
+        "Key": [
+          "Ctrl+F7"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_REPEAT"
+        ],
+        "Key": [
+          "Shift+F7"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_FINDUP"
+        ],
+        "Key": [
+          "Ctrl+P"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_FINDDN"
+        ],
+        "Key": [
+          "Ctrl+N"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_FINDUPWORD"
+        ],
+        "Key": [
+          "Alt+P"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_FINDDNWORD"
+        ],
+        "Key": [
+          "Alt+N"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_SAVE"
+        ],
+        "Key": [
+          "Ctrl+S"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_SAVE"
+        ],
+        "Key": [
+          "Esc",
+          "F2"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_SAVEAS"
+        ],
+        "Key": [
+          "Shift+F2"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_RELOAD"
+        ],
+        "Key": [
+          "Shift+F3"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_RELOAD"
+        ],
+        "Key": [
+          "Esc",
+          "F3"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_CLOSE"
+        ],
+        "Key": [
+          "Shift+F10"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_CLOSE"
+        ],
+        "Key": [
+          "Esc",
+          "F10"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_POPUP_MENU"
+        ],
+        "Key": [
+          "Alt+M"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_POPUP_MENU"
+        ],
+        "Key": [
+          "Esc",
+          "m"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_POPUP_MENU"
+        ],
+        "Key": [
+          "Esc",
+          "M"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DLG_PROPERTIES"
+        ],
+        "Key": [
+          "Ctrl+E"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_DLG_FUNC_LIST"
+        ],
+        "Key": [
+          "Ctrl+J"
+        ]
+      },
+      {
+        "Cmd": [
+          "EDIT_CTRL_REFRESH"
+        ],
+        "Key": [
+          "F11"
+        ]
+      }
+    ]
+  }
+}
