@@ -14,7 +14,7 @@ source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_EDITOR_INC} ${_EDITOR_R
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_EDITOR_SRC})
 
 set(PRODUCT_NAME "Multitextor")
-set(PRODUCT_NAME_COLOR "&M&u&l&t&i&t&e&x&t&o&r")
+set(PRODUCT_NAME_COLORED "&M&u&l&t&i&t&e&x&t&o&r")
 set(PRODUCT_VERSION 2.0.0)
 set(PRODUCT_VERSION_RC 2,0,0)
 set(PRODUCT_VERSION_FULL "${PRODUCT_VERSION} MVP (beta)")

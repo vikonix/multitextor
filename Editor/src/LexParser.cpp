@@ -1071,7 +1071,7 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
 {
     //LOG(DEBUG) << "CheckLexPair";
 
-    if(!m_scan || m_lexPosition.empty())
+    if(!m_scan)
         return false;
 
     char16_t ch = wstr[pos];
