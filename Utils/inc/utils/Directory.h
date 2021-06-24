@@ -53,7 +53,8 @@ public:
     static path_t       RunPath() { return s_runPath; }
     static path_t       CurPath();
     static path_t       TmpPath(const std::string& appPrefix = "");
-    static path_t       CfgPath(const std::string& projectName);
+    static path_t       CfgPath(const std::string& appName);
+    static path_t       ProgrammPath(const std::string& appName);
     static path_t       SysCfgPath();
     static path_t       UserCfgPath(const std::string& appName, bool create = false);
     static std::string  UserName();

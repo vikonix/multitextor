@@ -371,14 +371,14 @@ bool EditorApp::LoadCfg()
     //configuration loading
     LOG(DEBUG) << __FUNC__;
     
-    auto cfgPath = Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
+    auto cfgPath = Directory::CfgPath(EDITOR_NAME) / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
     if (std::filesystem::exists(cfgPath))
         _TRY(g_editorConfig.Load(cfgPath));
 
     KeyConfig keyConfig;
-    _TRY(keyConfig.Load(Directory::RunPath() / EditorConfig::ConfigDir / g_editorConfig.keyFile));
+    _TRY(keyConfig.Load(Directory::CfgPath(EDITOR_NAME) / EditorConfig::ConfigDir / g_editorConfig.keyFile));
 
-    auto parserPath = Directory::RunPath() / ParserConfig::ConfigDir / ("*" + ParserConfig::Ext);
+    auto parserPath = Directory::ProgrammPath(EDITOR_NAME) / ParserConfig::ConfigDir / ("*" + ParserConfig::Ext);
     DirectoryList parserDir;
     parserDir.SetMask(parserPath);
     parserDir.Scan();
@@ -397,7 +397,7 @@ bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
     //configuration saving
     LOG(DEBUG) << __FUNC__;
 
-    auto cfgPath = Directory::RunPath() / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
+    auto cfgPath = Directory::CfgPath(EDITOR_NAME) / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
     if (std::filesystem::exists(cfgPath))
         _TRY(g_editorConfig.Save(cfgPath));
 

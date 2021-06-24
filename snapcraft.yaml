@@ -52,3 +52,17 @@ parts:
       - libtinfo5
     prime:
       - -usr/share
+
+  config:
+    source: .
+    plugin: dump
+    override-stage: |
+      mkdir -p $SNAPCRAFT_STAGE/etc/Multitextor
+      mkdir -p $SNAPCRAFT_STAGE/usr/share/Multitextor
+      cp -a -r $SNAPCRAFT_PART_SRC/configurations/config $SNAPCRAFT_STAGE/etc/Multitextor/config
+      cp -a -r $SNAPCRAFT_PART_SRC/configurations/parser $SNAPCRAFT_STAGE/usr/share/Multitextor/parser
+    override-prime: |
+      mkdir -p $SNAPCRAFT_PRIME/etc/Multitextor
+      mkdir -p $SNAPCRAFT_PRIME/usr/share/Multitextor
+      cp -a -r $SNAPCRAFT_STAGE/etc/Multitextor/config $SNAPCRAFT_PRIME/etc/Multitextor/config
+      cp -a -r $SNAPCRAFT_STAGE/usr/share/Multitextor/parser $SNAPCRAFT_PRIME/usr/share/Multitextor/parser

@@ -101,7 +101,7 @@ path_t Directory::TmpPath(const std::string& appPrefix)
     return path / dir;
 }
 
-path_t Directory::CfgPath(const std::string& projectName)
+path_t Directory::ProgrammPath(const std::string& appName)
 {
 #ifdef WIN32
     char* env;
@@ -109,15 +109,41 @@ path_t Directory::CfgPath(const std::string& projectName)
     errno_t err = _dupenv_s(&env, &len, "ProgramFiles");
     _assert(err == 0);
 
-    path_t path{ (env ? env : "") + projectName };
+    path_t path{ (env ? env : "") };
     free(env);
 
+    path /= appName;
     if (std::filesystem::is_directory(path))
         return path;
 
     return s_runPath;
 #else
-    std::string path{ "/etc/" + projectName };
+    std::string path{ "/usr/share/" + appName };
+    if (std::filesystem::is_directory(path))
+        return path;
+
+    return s_runPath;
+#endif
+}
+
+path_t Directory::CfgPath(const std::string& appName)
+{
+#ifdef WIN32
+    char* env;
+    size_t len;
+    errno_t err = _dupenv_s(&env, &len, "ProgramData");
+    _assert(err == 0);
+
+    path_t path{ (env ? env : "") };
+    free(env);
+
+    path /= appName;
+    if (std::filesystem::is_directory(path))
+        return path;
+
+    return s_runPath;
+#else
+    std::string path{ "/etc/" + appName };
     if (std::filesystem::is_directory(path))
         return path;
 
