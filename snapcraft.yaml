@@ -66,3 +66,7 @@ parts:
       mkdir -p $SNAPCRAFT_PRIME/usr/share/Multitextor
       cp -a -r $SNAPCRAFT_STAGE/etc/Multitextor/config $SNAPCRAFT_PRIME/etc/Multitextor/config
       cp -a -r $SNAPCRAFT_STAGE/usr/share/Multitextor/parser $SNAPCRAFT_PRIME/usr/share/Multitextor/parser
+
+layout:
+  /usr/bin/m:
+    symlink: $SNAP/usr/bin/multitextor
