@@ -56,6 +56,9 @@ parts:
   config:
     source: .
     plugin: dump
+    organize:
+      snap/multitextor/current/usr: usr
+      snap/multitextor/current/etc: etc
     override-stage: |
       mkdir -p $SNAPCRAFT_STAGE/etc/Multitextor
       mkdir -p $SNAPCRAFT_STAGE/usr/share/Multitextor
