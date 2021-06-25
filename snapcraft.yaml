@@ -73,3 +73,7 @@ parts:
 layout:
   /usr/bin/m:
     symlink: $SNAP/usr/bin/multitextor
+  /usr/share/Multitextor:
+    symlink: $SNAP/usr/share/Multitextor
+  /etc/Multitextor:
+    symlink: $SNAP/etc/Multitextor  
