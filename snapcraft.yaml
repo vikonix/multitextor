@@ -18,7 +18,7 @@ grade: devel
 
 apps:
   multitextor:
-    command: multitextor
+    command: usr/bin/multitextor
 
 parts:
   gcc-9:
@@ -41,6 +41,8 @@ parts:
     source-branch: main
     source-depth: 1
     plugin: cmake
+    organize:
+      snap/multitextor/current/usr: usr
     configflags:
       - -DCMAKE_BUILD_TYPE=Release
     build-packages:
@@ -71,9 +73,7 @@ parts:
       cp -a -r $SNAPCRAFT_STAGE/usr/share/Multitextor/parser $SNAPCRAFT_PRIME/usr/share/Multitextor/parser
 
 layout:
-  /usr/bin/m:
-    symlink: $SNAP/usr/bin/multitextor
   /usr/share/Multitextor:
     symlink: $SNAP/usr/share/Multitextor
   /etc/Multitextor:
-    symlink: $SNAP/etc/Multitextor  
+    symlink: $SNAP/etc/Multitextor
