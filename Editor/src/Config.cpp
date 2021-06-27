@@ -281,7 +281,7 @@ bool WndConfig::Load(const nlohmann::json& json)
     cursorY     = json[CursorYKey];
     tabSize     = json[TabSizeKey];
     saveTabs    = json[SaveTabsKey];
-    eol = json[EolKey];
+    eol         = json[EolKey];
 
     return true;
 }

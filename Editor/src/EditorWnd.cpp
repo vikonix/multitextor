@@ -197,8 +197,8 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
         m_clientSizeY = GetCSizeY();
     }
 
-    size_t line = 0;
-    size_t pos = 0;
+    size_t line{};
+    size_t pos{};
 
     if (y > m_editor->GetStrCount())
         y = m_editor->GetStrCount();
@@ -206,10 +206,18 @@ bool EditorWnd::_GotoXY(size_t x, size_t y, bool top)
     if (x == 0)
         m_cursorx = 0;
     else if (x < static_cast<size_t>(m_clientSizeX - 1))
-        m_cursorx = static_cast<pos_t>(x);
+    {
+        if (m_xOffset < x)
+        {
+            pos = m_xOffset;
+            m_cursorx = static_cast<pos_t>(x - m_xOffset);
+        }
+        else
+            m_cursorx = static_cast<pos_t>(x);
+    }
     else
     {
-        m_cursorx = m_clientSizeX - 5;//we will see 4 symbols
+        m_cursorx = m_clientSizeX - 5;//we will see 4 next symbols
         pos = x - m_cursorx;
         if (pos >= static_cast<size_t>(m_editor->GetMaxStrLen() - m_clientSizeX))
         {
