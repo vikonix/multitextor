@@ -865,17 +865,18 @@ bool LexParser::CheckForOpenComments(size_t line)
         return true;
 
     auto it = m_lexPosition.upper_bound(line);
+    auto rit = std::make_reverse_iterator(it);
 
     //LOG(DEBUG) << "  CheckForOpenRem line=" << line;
     if (!m_recursiveComment)
     {
         //C style
-        while(--it != m_lexPosition.end())
+        while(++rit != m_lexPosition.rend())
         {
-            if (it->first >= line)
+            if (rit->first >= line)
                 continue;
 
-            auto[l, str] = *it;
+            auto&[l, str] = *rit;
             for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
             {
                 if (*strIt == 'O')
@@ -892,9 +893,9 @@ bool LexParser::CheckForOpenComments(size_t line)
     {
         //pascal style
         m_commentOpen = 0;
-        while (--it != m_lexPosition.end())
+        while (++rit != m_lexPosition.rend())
         {
-            auto[l, str] = *it;
+            auto&[l, str] = *rit;
             for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
             {
                 if (*strIt == 'O')
