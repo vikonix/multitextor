@@ -814,11 +814,11 @@ input_t WndManager::ProcInput(input_t code)
                 {
                     pos_t x = K_GET_X(code);
                     pos_t y = K_GET_Y(code);
-                    if (m_wndList[0]->CheckWndPos(x, y))
+                    if (m_view[2].wnd == nullptr || m_wndList[0]->CheckWndPos(x, y))
                     {
                         out = m_wndList[0]->EventProc(code);
                     }
-                    else if (m_view[2].wnd && m_view[2].wnd->CheckWndPos(x, y))
+                    else if (m_view[2].wnd)
                     {
                         out = m_view[2].wnd->EventProc(code);
                     }

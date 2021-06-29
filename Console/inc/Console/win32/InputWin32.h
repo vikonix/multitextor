@@ -51,6 +51,9 @@ class InputWin32 final : public ConsoleInput
     pos_t   m_prevY { 0x100 };
     input_t m_prevKey { 0 };
     clock_t m_prevTime { 0 };
+    
+    int     m_fontX{};
+    int     m_fontY{};
 
 protected:
     static std::atomic_bool s_fCtrlC;
@@ -74,6 +77,9 @@ protected:
     void ProcessMenuEvent  (MENU_EVENT_RECORD*          pMenuEvent);
 
     void WriteResize(pos_t x, pos_t y);
+    
+    void GetFontSize();
+    void FixWheelCoord(pos_t& x, pos_t& y);
 };
 
 } //namespace _Console

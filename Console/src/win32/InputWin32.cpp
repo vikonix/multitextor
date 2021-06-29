@@ -84,11 +84,13 @@ bool InputWin32::Init()
     LOG(INFO) << "LC_CTYPE=" << pLC_CTYPE;
 
     HWND wnd = GetConsoleWindow();
-
     m_hWnd = GetForegroundWindow();
     LOG(INFO) << "hWnd=" << m_hWnd << " consolewnd=" << wnd;
     
-    SetWindowPos(m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE);
+    GetFontSize();
+
+    //SetWindowPos(m_hWnd, HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE);
+
     return true;
 }
 
@@ -141,7 +143,7 @@ BOOL InputWin32::CtrlHandler(DWORD fdwCtrlType)
 void InputWin32::WriteResize(pos_t x, pos_t y)
 {
     DWORD n;
-    INPUT_RECORD rec;
+    INPUT_RECORD rec{};
 
     rec.EventType = WINDOW_BUFFER_SIZE_EVENT;
     rec.Event.WindowBufferSizeEvent.dwSize.X = x;
@@ -458,6 +460,7 @@ void InputWin32::ProcessMouseEvent(MOUSE_EVENT_RECORD* pMouseEvent)
                     iMKey = K_MOUSEWUP | K_MOUSEW;
                 m_fMouseTrack = false;
             }
+            FixWheelCoord(x, y);
         }
         break;
 #endif
@@ -525,6 +528,8 @@ void InputWin32::ProcessResizeEvent(WINDOW_BUFFER_SIZE_RECORD* pWindowBufferSize
         }
     }
 
+    GetFontSize();
+
     if (x > MAX_COORD) //???
         x = MAX_COORD;
     if (y > MAX_COORD)
@@ -552,6 +557,39 @@ void InputWin32::ProcessFocusEvent(FOCUS_EVENT_RECORD* pFocusEvent)
 void InputWin32::ProcessMenuEvent([[maybe_unused]]MENU_EVENT_RECORD* pMenuEvent)
 {
     //LOG(DEBUG) << "MenuEvent id=" << pMenuEvent->dwCommandId;
+}
+
+void InputWin32::GetFontSize()
+{
+    CONSOLE_SCREEN_BUFFER_INFO sbi;
+    if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbi))
+        return;
+
+    RECT clientRect;
+    if (!GetClientRect(m_hWnd, &clientRect))
+        return;
+
+    m_fontX = static_cast<int>(clientRect.right / sbi.dwSize.X);
+    m_fontY = static_cast<int>(clientRect.bottom / sbi.dwSize.Y);
+}
+
+void InputWin32::FixWheelCoord(pos_t& x, pos_t& y)
+{
+    // get current mouse position insted of the wheel event
+    POINT cursorPos;
+    if (!GetCursorPos(&cursorPos))
+        return;
+
+    auto relativePos = cursorPos;
+    if (!ScreenToClient(m_hWnd, &relativePos))
+        return;
+
+    CONSOLE_SCREEN_BUFFER_INFO sbi;
+    if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbi))
+        return;
+    
+    x = static_cast<pos_t>(std::clamp(static_cast<int>(relativePos.x) / m_fontX, 0, sbi.dwSize.X - 1));
+    y = static_cast<pos_t>(std::clamp(static_cast<int>(relativePos.y) / m_fontY, 0, sbi.dwSize.Y - 1));
 }
 
 } //namespace _Console
