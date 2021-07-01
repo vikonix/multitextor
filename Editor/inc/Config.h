@@ -47,7 +47,6 @@ class EditorConfig
     inline static const std::string ShowAccessMenuKey   { "ShowAccessMenu" };
     inline static const std::string ShowClockKey        { "ShowClock" };
     inline static const std::string FileSaveTimeKey     { "FileSaveTime" };
-    inline static const std::string MaxScreenSizeKey    { "MaxScreenSize" };
 
 public:
     inline static const std::string ConfigDir           { "config" };
@@ -58,7 +57,6 @@ public:
     uint32_t    fileSaveTime    {0};
     bool        showAccessMenu  {true};
     bool        showClock       {true};
-    bool        maxScreenSize   {false};
 
     bool        m_changed{};
 

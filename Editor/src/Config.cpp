@@ -53,14 +53,12 @@ bool EditorConfig::Load(const path_t& file)
     config.showAccessMenu   = jsonConfig[ShowAccessMenuKey];
     config.showClock        = jsonConfig[ShowClockKey];
     config.fileSaveTime     = jsonConfig[FileSaveTimeKey];
-    config.maxScreenSize    = jsonConfig[MaxScreenSizeKey];
 
     colorFile       = config.colorFile;
     keyFile         = config.keyFile;
     showAccessMenu  = config.showAccessMenu;
     showClock       = config.showClock;
     fileSaveTime    = config.fileSaveTime;
-    maxScreenSize   = config.maxScreenSize;
 
     return true;
 }
@@ -77,7 +75,6 @@ bool EditorConfig::Save(const path_t& file, bool force)
     json[ShowAccessMenuKey] = showAccessMenu;
     json[ShowClockKey]      = showClock;
     json[FileSaveTimeKey]   = fileSaveTime;
-    json[MaxScreenSizeKey]  = maxScreenSize;
 
     nlohmann::json jsonConfig;
     jsonConfig[ConfigKey] = json;

@@ -97,7 +97,8 @@ bool ScreenWin32::Init()
     LOG(DEBUG) << __FUNC__ << " x=" << m_saveInfo.dwSize.X << " y=" << m_saveInfo.dwSize.Y;
     LOG(INFO) << "cursor size=" << m_saveCursor.dwSize << "%";
 
-//    return SetSize(MAX_COORD, MAX_COORD);
+//    SetWindowPos(GetConsoleWindow(), HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE);
+
     return SetSize(m_saveInfo.dwMaximumWindowSize.X, m_saveInfo.dwMaximumWindowSize.Y);
 }
 
@@ -129,8 +130,6 @@ bool ScreenWin32::SetSize(pos_t sizex, pos_t sizey)
             LOG(ERROR) << __FUNC__ << "ERROR GetConsoleScreenBufferInfoM err=" << GetLastError();
 
         LOG(DEBUG) << "max=" << sbInfo.dwMaximumWindowSize.X << "/" << sbInfo.dwMaximumWindowSize.Y;
-        //--sbInfo.dwMaximumWindowSize.X;
-        //--sbInfo.dwMaximumWindowSize.Y;
     }
 
     if(sizex > sbInfo.dwMaximumWindowSize.X)

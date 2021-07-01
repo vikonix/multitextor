@@ -125,8 +125,6 @@ int main(int argc, char** argv) try
 
     app.Init();
     app.WriteAppName(EDITOR_NAME);
-    if(g_editorConfig.maxScreenSize)
-        WndManager::getInstance().SetScreenSize(MAX_COORD, MAX_COORD);
     app.SetLogo(g_logo);
     if(g_editorConfig.showAccessMenu)
         app.SetAccessMenu(g_accessMenu);
