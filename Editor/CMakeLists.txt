@@ -3,6 +3,12 @@ cmake_minimum_required(VERSION 3.15)
 set(PROJECT_NAME multitextor)
 project(${PROJECT_NAME})
 
+set(PRODUCT_NAME "Multitextor")
+set(PRODUCT_NAME_COLORED "&M&u&l&t&i&t&e&x&t&o&r")
+set(PRODUCT_VERSION 2.0.0)
+set(PRODUCT_VERSION_RC 2,0,0)
+set(PRODUCT_VERSION_FULL "${PRODUCT_VERSION}-MVP-beta")
+
 file(GLOB_RECURSE _EDITOR_INC "inc/*.h*")
 file(GLOB_RECURSE _EDITOR_SRC "src/*.c*")
 if(MSVC)
@@ -13,11 +19,6 @@ endif()
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_EDITOR_INC} ${_EDITOR_RES_INC})
 source_group(TREE "${CMAKE_CURRENT_SOURCE_DIR}" FILES ${_EDITOR_SRC})
 
-set(PRODUCT_NAME "Multitextor")
-set(PRODUCT_NAME_COLORED "&M&u&l&t&i&t&e&x&t&o&r")
-set(PRODUCT_VERSION 2.0.0)
-set(PRODUCT_VERSION_RC 2,0,0)
-set(PRODUCT_VERSION_FULL "${PRODUCT_VERSION} MVP (beta)")
 configure_file("res/editor.rc.in" "editor.rc" @ONLY)
 configure_file("res/Version.h.in" "Version.h" @ONLY)
 
@@ -73,17 +74,17 @@ if(MSVC)
             "C:/Program Files (x86)/Visual Leak Detector/lib/Win64/vld.lib"
         )
     endif()
-    
+
     target_link_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:Release>:/DEBUG>")
     target_link_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:Release>:/OPT:REF>")
     target_link_options(${PROJECT_NAME} PRIVATE "$<$<CONFIG:Release>:/OPT:ICF>")
-    
+
     add_custom_command(
         TARGET ${PROJECT_NAME} POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../configurations/config ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<CONFIG>/config/
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/../configurations/parser ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}$<CONFIG>/parser/
     )
-    
+
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
