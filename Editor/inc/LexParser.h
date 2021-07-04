@@ -88,7 +88,8 @@ struct LexConfig
 using string_set = std::unordered_set<std::u16string>;
 class LexParser
 {
-public:    
+public:
+    inline static const std::string c_TextType{ "Text" };
     static std::map<std::string, LexConfig> s_lexConfig;
 
 protected:
@@ -148,7 +149,7 @@ public:
 
     static bool SetLexConfig(const LexConfig& config);
     static std::list<std::string> GetFileTypeList();
-    static size_t CheckFileName(const std::string& name);
+    static std::pair<size_t, std::string> GetFileType(const std::string& name);
 
     bool    EnableParsing(bool scan)    { return m_scan = scan; }
     bool    SetParseStyle(const std::string& style = "");

@@ -36,6 +36,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Config.h"
 
 
+#include <filesystem>
+
 using namespace _Editor;
 
 EditorApp app;
@@ -92,8 +94,8 @@ void SaveConfig()
 /////////////////////////////////////////////////////////////////////////////
 int main(int argc, char** argv) try
 {
-    auto path = _Utils::Directory::TmpPath("m");
-    auto log = path / "m-%datetime{%Y%M%d}.log";
+    auto tmpPath = _Utils::Directory::TmpPath("m");
+    auto log = tmpPath / "m-%datetime{%Y%M%d}.log";
 
     ConfigureLogger(log.u8string());
     LOG(INFO);
@@ -139,7 +141,9 @@ int main(int argc, char** argv) try
     {
         for (auto& f : files)
         {
-            app.OpenFile(f, "Text", "UTF-8");
+            std::filesystem::path path = f;
+            auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+            app.OpenFile(f, parser, "UTF-8");
         }
     }
     else

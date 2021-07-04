@@ -218,7 +218,7 @@ input_t FileDialog::DialogProc(input_t code)
                     auto ctrlType = std::dynamic_pointer_cast<CtrlDropList>(type);
                     if (ctrlType)
                     {
-                        size_t pos = LexParser::CheckFileName(info.path().filename().u8string());
+                        auto [pos, parser] = LexParser::GetFileType(info.path().filename().u8string());
                         ctrlType->SetSelect(pos);
                     }
                 }

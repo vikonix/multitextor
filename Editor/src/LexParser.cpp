@@ -37,10 +37,10 @@ namespace _Editor
 std::map<std::string, LexConfig> LexParser::s_lexConfig
 {
     {
-        "Text",
+        c_TextType,
         {
             //plain text
-            "Text",     //name
+            c_TextType, //name
             "",         //file mask
             ",.:;=<>",  //delimiters
             "",         //name symbols
@@ -139,7 +139,7 @@ std::list<std::string> LexParser::GetFileTypeList()
     return typeList;
 }
 
-size_t LexParser::CheckFileName(const std::string& name)
+std::pair<size_t, std::string> LexParser::GetFileType(const std::string& name)
 {
     size_t textType{};  //default type
     size_t lexType{};   //file type
@@ -153,16 +153,18 @@ size_t LexParser::CheckFileName(const std::string& name)
 
             while (std::getline(ss, mask, ';')) 
             {
-                if(Directory::Match<std::string>(name, mask))
-                    return lexType;
+                if (Directory::Match<std::string>(name, mask))
+                {
+                    return { lexType, type};
+                }
             }
         }
-        if (cfg.langName == "Text")
+        if (cfg.langName == c_TextType)
             textType = lexType;
         ++lexType;
     }
 
-    return textType;
+    return { textType, c_TextType };
 }
 
 //////////////////////////////////////////////////////////////////////////////
@@ -224,7 +226,7 @@ bool LexParser::SetParseStyle(const std::string& style)
     if (!style.empty() && FindStyle(style))
         return true;
 
-    return FindStyle("Text");
+    return FindStyle(c_TextType);
 }
 
 //////////////////////////////////////////////////////////////////////////////
