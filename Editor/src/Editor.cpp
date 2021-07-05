@@ -106,12 +106,9 @@ bool Editor::Load(bool log)
     m_fileTime = std::filesystem::last_write_time(m_file);
     m_fileSize = std::filesystem::file_size(m_file);
 
-    uintmax_t fileOffset{};
+    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << m_fileSize;
     if (0 == m_fileSize)
         return true;
-
-    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " size=" << m_fileSize;
-    time_t start{ time(NULL) };
 
     std::ifstream file{m_file, std::ios::binary};
     if (!file)
@@ -123,23 +120,26 @@ bool Editor::Load(bool log)
 
     EditorApp::SetHelpLine("Wait for file loading");
 
+    time_t start{ time(nullptr) };
     time_t t1{ time(nullptr) };
     size_t percent{};
     auto step{ m_fileSize / 100 };//1%
 
-    auto buff{ std::make_shared<std::array<char, buffsize>>() };
+    auto buff{ std::make_shared<std::array<char, c_buffsize>>() };
     size_t buffOffset{0};
+    uintmax_t fileOffset{};
 
     auto readFile = [&]() -> size_t {
         buffOffset = 0;
         if (file.eof())
             return 0;
-        file.read(buff->data(), buffsize);
+
+        file.read(buff->data(), c_buffsize);
         auto read = file.gcount();
         if (0 == read)
             return 0;
 
-        time_t t2{ time(NULL) };
+        time_t t2{ time(nullptr) };
         if (t1 != t2 && step)
         {
             t1 = t2;
@@ -187,7 +187,7 @@ bool Editor::LoadTail()
     m_fileTime = std::filesystem::last_write_time(m_file);
     m_fileSize = std::filesystem::file_size(m_file);
 
-    auto buff{ std::make_shared<std::array<char, buffsize>>() };
+    auto buff{ std::make_shared<std::array<char, c_buffsize>>() };
     size_t buffOffset{ 0 };
 
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff = m_buffer.m_buffList.back();
@@ -197,11 +197,11 @@ bool Editor::LoadTail()
     size_t strOffset{};
 
     uintmax_t fileOffset{strBuff->m_fileOffset};
-    size_t toRead{ std::min(buffsize, static_cast<size_t>(m_fileSize - fileOffset)) };
+    size_t toRead{ std::min(c_buffsize, static_cast<size_t>(m_fileSize - fileOffset)) };
     LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " offset=" << fileOffset << " read=" << toRead;
 
     file.seekg(fileOffset);
-    file.read(buff->data(), std::min(buffsize, toRead));
+    file.read(buff->data(), std::min(c_buffsize, toRead));
     _assert(file.good());
     auto read = file.gcount();
     m_fileSize = fileOffset + read;
@@ -213,7 +213,7 @@ bool Editor::LoadTail()
     return rc;
 }
 
-bool Editor::ApplyBuffer(const std::shared_ptr<std::array<char, buffsize>>& buff, size_t read, size_t& buffOffset,
+bool Editor::ApplyBuffer(const std::shared_ptr<std::array<char, c_buffsize>>& buff, size_t read, size_t& buffOffset,
     std::shared_ptr<StrBuff<std::string, std::string_view>>& strBuff, size_t& strOffset,
     uintmax_t& fileOffset, bool eof)
 {
