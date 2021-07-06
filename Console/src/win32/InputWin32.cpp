@@ -567,8 +567,10 @@ void InputWin32::GetFontSize()
     if (!GetClientRect(m_hWnd, &clientRect))
         return;
 
-    m_fontX = static_cast<int>(clientRect.right / sbi.dwSize.X);
-    m_fontY = static_cast<int>(clientRect.bottom / sbi.dwSize.Y);
+    m_fontX = static_cast<int>(clientRect.right  / (sbi.srWindow.Right  + 1));
+    m_fontY = static_cast<int>(clientRect.bottom / (sbi.srWindow.Bottom + 1));
+    LOG(DEBUG) << "fontX=" << m_fontX << " fontY=" << m_fontY;
+    _assert(m_fontX != 0 && m_fontY != 0);
 }
 
 void InputWin32::FixWheelCoord(pos_t& x, pos_t& y)
