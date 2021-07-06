@@ -79,6 +79,9 @@ enum class file_state
 
 class Editor
 {
+    inline static const size_t c_buffsize{ 0x200000 };//2MB
+    using read_buff_t = std::array<char, c_buffsize>;
+
 private:
     std::shared_ptr<iconvpp::CpConverter>       m_converter;
 
@@ -106,9 +109,7 @@ private:
     size_t          m_curStr{STR_NOTDEFINED};
     bool            m_curChanged{};
 
-    inline static const size_t c_buffsize{ 0x200000 };//2MB
-
-    bool    ApplyBuffer(const std::shared_ptr<std::array<char, c_buffsize>>& buff, size_t read, size_t& buffOffset,
+    bool    ApplyBuffer(const std::shared_ptr<read_buff_t>& buff, size_t read, size_t& buffOffset,
         std::shared_ptr<StrBuff<std::string, std::string_view>>& strBuff, size_t& strOffset,
         uintmax_t& fileOffset, bool eof);
     bool    FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff, size_t size, bool last, size_t& rest);

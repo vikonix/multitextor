@@ -125,12 +125,11 @@ bool Editor::Load(bool log)
     size_t percent{};
     auto step{ m_fileSize / 100 };//1%
 
-    auto buff{ std::make_shared<std::array<char, c_buffsize>>() };
+    auto buff{ std::make_shared<read_buff_t>() };
     size_t buffOffset{0};
     uintmax_t fileOffset{};
 
-    auto readFile = [&]() -> size_t {
-        buffOffset = 0;
+    auto readFile = [&](std::shared_ptr<read_buff_t> buff) -> size_t {
         if (file.eof())
             return 0;
 
@@ -156,14 +155,17 @@ bool Editor::Load(bool log)
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
     size_t strOffset{};
     size_t read;
-    while (0 != (read = readFile()))
+    
+    while (0 != (read = readFile(buff)))
     {
+        buffOffset = 0;
         bool rc = ApplyBuffer(buff, read, buffOffset,
             strBuff, strOffset,
             fileOffset, file.eof());
         if (!rc)
             return false;
     }
+
     _assert(!log || m_fileSize == fileOffset);
     
     EditorApp::ShowProgressBar();
@@ -187,7 +189,7 @@ bool Editor::LoadTail()
     m_fileTime = std::filesystem::last_write_time(m_file);
     m_fileSize = std::filesystem::file_size(m_file);
 
-    auto buff{ std::make_shared<std::array<char, c_buffsize>>() };
+    auto buff{ std::make_shared<read_buff_t>() };
     size_t buffOffset{ 0 };
 
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff = m_buffer.m_buffList.back();
@@ -213,7 +215,7 @@ bool Editor::LoadTail()
     return rc;
 }
 
-bool Editor::ApplyBuffer(const std::shared_ptr<std::array<char, c_buffsize>>& buff, size_t read, size_t& buffOffset,
+bool Editor::ApplyBuffer(const std::shared_ptr<read_buff_t>& buff, size_t read, size_t& buffOffset,
     std::shared_ptr<StrBuff<std::string, std::string_view>>& strBuff, size_t& strOffset,
     uintmax_t& fileOffset, bool eof)
 {
