@@ -75,13 +75,14 @@ enum class file_state
 #endif
 
 /////////////////////////////////////////////////////////////////////////////
-#define STR_NOTDEFINED std::numeric_limits<size_t>::max()
+constexpr size_t    STR_NOTDEFINED{ std::numeric_limits<size_t>::max() };
+constexpr uintmax_t MAX_PARSED_SIZE{ 0x2000000 }; // 32 MB
+
+constexpr size_t    c_buffsize{ 0x200000 };//2MB
+using read_buff_t = std::array<char, c_buffsize>;
 
 class Editor
 {
-    inline static const size_t c_buffsize{ 0x200000 };//2MB
-    using read_buff_t = std::array<char, c_buffsize>;
-
 private:
     std::shared_ptr<iconvpp::CpConverter>       m_converter;
 

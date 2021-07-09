@@ -32,10 +32,88 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "EditorApp.h"
 
+#define SINGLE_THREAD
+
 namespace _Editor
 {
 
-constexpr uintmax_t MAX_PARSED_SIZE{ 0x2000000 }; // 32 MB
+class CoReadFile
+{
+    std::thread                     m_thread;
+    std::condition_variable         m_condition;
+    std::condition_variable         m_conditionBufferReady;
+    std::mutex                      m_mutex;
+    std::atomic_bool                m_bufferReady{ false };
+    std::atomic<size_t>             m_read{};
+    bool                            m_eof{};
+
+    std::shared_ptr<read_buff_t>    m_buff1{ std::make_shared<read_buff_t>() };
+    std::shared_ptr<read_buff_t>    m_buff2{ std::make_shared<read_buff_t>() };
+
+    void Read(const std::filesystem::path& path)
+    {
+        std::ifstream file{ path, std::ios::binary };
+
+        auto readFile = [&](std::shared_ptr<read_buff_t> buff) -> size_t {
+            if (file.eof())
+                return 0;
+
+            file.read(buff->data(), c_buffsize);
+            auto read = file.gcount();
+            if (0 == read)
+                return 0;
+
+            return static_cast<size_t>(read);
+        };
+
+        size_t read;
+        while (0 != (read = readFile(m_buff1)))
+        {
+            std::unique_lock lock{ m_mutex };
+            m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady; });
+
+            std::swap(m_buff1, m_buff2);
+            m_bufferReady = true;
+            m_read = read;
+            m_eof = file.eof();
+            m_condition.notify_one();
+        }
+
+        std::unique_lock lock{ m_mutex };
+        m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady; });
+
+        m_bufferReady = true;
+        m_read = 0;
+        m_condition.notify_one();
+    }
+
+public:
+    CoReadFile(const std::filesystem::path& path)
+    {
+        m_thread = std::thread(&CoReadFile::Read, this, path);
+    }
+
+    ~CoReadFile()
+    {
+        if (m_thread.joinable())
+            m_thread.join();
+    }
+
+    std::tuple<size_t, std::shared_ptr<read_buff_t>, bool> Wait()
+    {
+        std::unique_lock lock{ m_mutex };
+        m_condition.wait(lock, [this]() -> bool {return m_bufferReady; });
+
+        return { m_read, m_buff2, m_eof };
+    }
+
+    void Next()
+    {
+        m_bufferReady = false;
+        m_conditionBufferReady.notify_one();
+    }
+};
+
 
 bool Editor::SetCP(const std::string& cp) 
 {
@@ -110,10 +188,6 @@ bool Editor::Load(bool log)
     if (0 == m_fileSize)
         return true;
 
-    std::ifstream file{m_file, std::ios::binary};
-    if (!file)
-        return false;
-
     m_buffer.SetLoadBuffFunc(std::bind(&Editor::LoadBuff, this, std::placeholders::_1, std::placeholders::_2, std::placeholders::_3));
     if (m_fileSize > MAX_PARSED_SIZE)
         m_lexParser.EnableParsing(false);
@@ -125,10 +199,17 @@ bool Editor::Load(bool log)
     size_t percent{};
     auto step{ m_fileSize / 100 };//1%
 
-    auto buff{ std::make_shared<read_buff_t>() };
     size_t buffOffset{0};
     uintmax_t fileOffset{};
+    std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
+    size_t strOffset{};
 
+#ifdef SINGLE_THREAD
+    std::ifstream file{ m_file, std::ios::binary };
+    if (!file)
+        return false;
+
+    auto buff{ std::make_shared<read_buff_t>() };
     auto readFile = [&](std::shared_ptr<read_buff_t> buff) -> size_t {
         if (file.eof())
             return 0;
@@ -152,10 +233,7 @@ bool Editor::Load(bool log)
         return static_cast<size_t>(read);
     };
 
-    std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
-    size_t strOffset{};
     size_t read;
-    
     while (0 != (read = readFile(buff)))
     {
         buffOffset = 0;
@@ -165,6 +243,37 @@ bool Editor::Load(bool log)
         if (!rc)
             return false;
     }
+#else
+    CoReadFile rfile(m_file);
+
+    for (;;)
+    {
+        auto [read, buff, eof] = rfile.Wait();
+        if (read == 0)
+            break;
+
+        buffOffset = 0;
+        bool rc = ApplyBuffer(buff, read, buffOffset,
+            strBuff, strOffset,
+            fileOffset, eof);
+        if (!rc)
+            return false;
+
+        rfile.Next();
+
+        time_t t2{ time(nullptr) };
+        if (t1 != t2 && step)
+        {
+            t1 = t2;
+            size_t pr{ static_cast<size_t>((fileOffset + read) / step) };
+            if (pr != percent)
+            {
+                percent = pr;
+                EditorApp::ShowProgressBar(pr);
+            }
+        }
+    }
+#endif
 
     _assert(!log || m_fileSize == fileOffset);
     
