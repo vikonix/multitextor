@@ -87,12 +87,12 @@ public:
     virtual bool SetName(const std::string& name);
     virtual std::string GetName() { return utf8::utf16to8(m_name); }
     virtual std::u16string GetWName() { return m_name; };
-    virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = MAX_COORD, pos_t sizey = MAX_COORD)
+    virtual bool SetPos(pos_t x = MAX_COORD, pos_t y = MAX_COORD, pos_t sizex = 0, pos_t sizey = 0)
     {
-        if (x != MAX_COORD)     m_posx = x;
-        if (y != MAX_COORD)     m_posy = y;
-        if (sizex != MAX_COORD) m_sizex = sizex;
-        if (sizey != MAX_COORD) m_sizey = sizey;
+        if (x != MAX_COORD) m_posx = x;
+        if (y != MAX_COORD) m_posy = y;
+        if (sizex > 0)      m_sizex = sizex;
+        if (sizey > 0)      m_sizey = sizey;
         return true;
     }
     virtual pos_t GetSizeX() { return m_sizex; }

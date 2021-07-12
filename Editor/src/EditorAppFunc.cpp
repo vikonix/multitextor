@@ -114,22 +114,22 @@ bool    EditorApp::WndCloseAllProc([[maybe_unused]] input_t cmd)
 
 bool    EditorApp::WndListProc([[maybe_unused]] input_t cmd)
 {
-    WindowListDialog Dlg;
-    [[maybe_unused]] auto ret = Dlg.Activate();
+    WindowListDialog dlg;
+    [[maybe_unused]] auto ret = dlg.Activate();
     return true;
 }
 
 bool    EditorApp::WndCopyProc([[maybe_unused]] input_t cmd)
 {
-    WindowListDialog Dlg(WindowsDlgMode::CopyFrom);
-    [[maybe_unused]] auto ret = Dlg.Activate();
+    WindowListDialog dlg(WindowsDlgMode::CopyFrom);
+    [[maybe_unused]] auto ret = dlg.Activate();
     return true;
 }
 
 bool    EditorApp::WndMoveProc([[maybe_unused]] input_t cmd)
 {
-    WindowListDialog Dlg(WindowsDlgMode::MoveFrom);
-    [[maybe_unused]] auto ret = Dlg.Activate();
+    WindowListDialog dlg(WindowsDlgMode::MoveFrom);
+    [[maybe_unused]] auto ret = dlg.Activate();
     return true;
 }
 
@@ -186,15 +186,19 @@ bool    EditorApp::AboutProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::FindInFilesProc(input_t cmd)
+bool    EditorApp::FindInFilesProc([[maybe_unused]] input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    FindFileDialog dlg(false);
+    auto ret = dlg.Activate();
+
     return true;
 }
 
-bool    EditorApp::ReplaceInFilesProc(input_t cmd)
+bool    EditorApp::ReplaceInFilesProc([[maybe_unused]] input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    FindFileDialog dlg(true);
+    auto ret = dlg.Activate();
+
     return true;
 }
 

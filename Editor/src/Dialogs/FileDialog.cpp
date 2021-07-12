@@ -64,7 +64,7 @@ std::list<control> fileDialog
     {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",       ID_CANCEL,      {},                        54,  7},
     {CTRL_STATIC,                       "File &type:",  ID_OF_STAT_TYPE,{},                        54,  9, 14},
     {CTRL_DROPLIST,                     "",             ID_OF_TYPE,     &FileDialog::s_vars.type,  54, 10, 13,  6, "Select file type"},
-    {CTRL_STATIC,                       "Code &page:",  ID_OF_STAT_CP,  {},                        54, 12, 14},
+    {CTRL_STATIC,                       "&Code page:",  ID_OF_STAT_CP,  {},                        54, 12, 14},
     {CTRL_DROPLIST,                     "",             ID_OF_CP,       &FileDialog::s_vars.cp,    54, 13, 13,  6, "Select file code page"},
 
     {CTRL_CHECK,                        "&Read only",   ID_OF_RO,       &FileDialog::s_vars.ro,    54, 15,  0,  0, "Open file as read only"},
@@ -107,6 +107,7 @@ bool FileDialog::OnActivate()
         }
         break;
     default: //???
+        _assert(0);
         return false;
     }
 

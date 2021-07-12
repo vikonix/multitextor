@@ -178,10 +178,10 @@ bool FindDialog::OnClose(int id)
         if (m_replace)
         {
             seach = GetItem(ID_FF_REPLACE);
-            ctrlSearch = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
-            if (ctrlSearch)
+            auto ctrlReplace = std::dynamic_pointer_cast<CtrlEditDropList>(seach);
+            if (ctrlReplace)
             {
-                auto str = ctrlSearch->GetName();
+                auto str = ctrlReplace->GetName();
                 if (str.empty())
                 {
                     Application::getInstance().SetErrorLine("Replace string empty");
@@ -193,10 +193,10 @@ bool FindDialog::OnClose(int id)
                     _TRY(s_vars.replaceList.emplace(str))
                 s_vars.replaceStrW = utf8::utf8to16(str);
 
-                size_t n = ctrlSearch->GetStrCount();
+                size_t n = ctrlReplace->GetStrCount();
                 s_vars.replaceList.clear();
                 for (size_t i = 0; i < n && i < 16; ++i) 
-                    _TRY(s_vars.replaceList.emplace(ctrlSearch->GetStr(i)))
+                    _TRY(s_vars.replaceList.emplace(ctrlReplace->GetStr(i)))
             }
         }
     }

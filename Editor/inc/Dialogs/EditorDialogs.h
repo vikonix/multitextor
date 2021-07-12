@@ -73,9 +73,9 @@ public:
 
     FileDialog(FileDlgMode mode = FileDlgMode::Open, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
-    virtual input_t DialogProc(input_t code) override;
-    virtual bool OnActivate() override;
-    virtual bool OnClose(int id) override;
+    virtual input_t DialogProc(input_t code) override final;
+    virtual bool OnActivate() override final;
+    virtual bool OnClose(int id) override final;
 };
     
 /////////////////////////////////////////////////////////////////////////////
@@ -98,9 +98,9 @@ class WindowListDialog : public Dialog
 public:
     WindowListDialog(WindowsDlgMode mode = WindowsDlgMode::List, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
-    virtual input_t DialogProc(input_t code) override;
-    virtual bool OnActivate() override;
-    virtual bool OnClose(int id) override;
+    virtual input_t DialogProc(input_t code) override final;
+    virtual bool OnActivate() override final;
+    virtual bool OnClose(int id) override final;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -146,8 +146,8 @@ public:
 
     FindDialog(bool replace, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
-    bool OnActivate();
-    bool OnClose(int id);
+    virtual bool OnActivate() override final;
+    virtual bool OnClose(int id) override final;
 };
 
 /////////////////////////////////////////////////////////////////////////////
@@ -177,8 +177,33 @@ public:
 
     PropertiesDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
-    bool OnActivate();
-    bool OnClose(int id);
+    virtual bool OnActivate() override final;
+    virtual bool OnClose(int id) override final;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+struct FindFileDialogVars
+{
+    bool            inOpen{};
+    bool            recursive{true};
+};
+
+class FindFileDialog : public Dialog
+{
+    bool m_replace;//false-find true-replace
+
+    _Utils::DirectoryList   m_dirList;
+
+    bool ScanDir(const std::string& mask);
+
+public:
+    static FindFileDialogVars s_vars;
+
+    FindFileDialog(bool replace, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+
+    virtual input_t DialogProc(input_t code) override final;
+    virtual bool OnActivate() override final;
+    virtual bool OnClose(int id) override final;
 };
 
 } //namespace _Editor

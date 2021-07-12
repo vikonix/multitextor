@@ -53,6 +53,9 @@ CmdMap g_defaultAppKeyMap
     {{'H' | K_ALT},             {K_APP_REPLACEFILE}},
     {{K_ESC, 'h'},              {K_APP_REPLACEFILE}},
     {{K_ESC, 'H'},              {K_APP_REPLACEFILE}},
+    {{'R' | K_ALT},             {K_APP_REPLACEFILE}},
+    {{K_ESC, 'r'},              {K_APP_REPLACEFILE}},
+    {{K_ESC, 'R'},              {K_APP_REPLACEFILE}},
 
     {{'L' | K_CTRL},            {K_APP_FOUNDFILE}},
     {{'L' | K_ALT},             {K_APP_FOUNDFILE}},
