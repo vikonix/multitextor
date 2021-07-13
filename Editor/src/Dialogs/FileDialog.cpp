@@ -97,8 +97,7 @@ bool FileDialog::OnActivate()
         GetItem(ID_OK)->SetHelpLine("Save file with new name");
         hide = true;
 
-        Wnd* wnd = WndManager::getInstance().GetWnd();
-        auto path = wnd->GetFilePath();
+        auto& path = s_vars.filepath;
 
         auto name = GetItem(ID_OF_NAME);
         auto ctrlName = std::dynamic_pointer_cast<CtrlEditDropList>(name);

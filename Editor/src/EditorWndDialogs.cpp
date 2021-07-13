@@ -74,6 +74,7 @@ bool EditorWnd::DlgReplace([[maybe_unused]] input_t cmd)
 bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
 {
     FileDialog dlg{ FileDlgMode::SaveAs };
+    dlg.s_vars.filepath = m_editor->GetFilePath();
     auto ret = dlg.Activate();
     if (ret == ID_OK)
     {
