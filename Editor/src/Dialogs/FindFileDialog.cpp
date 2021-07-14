@@ -299,6 +299,12 @@ bool FindFileDialog::OnClose(int id)
 
         FileDialog::s_vars.path = path.u8string();
         FileDialog::s_vars.cpName = GetItem(ID_FF_CP)->GetName();
+
+        FileDialog::s_vars.maskList.remove(mask);
+        FileDialog::s_vars.maskList.push_front(mask);
+        if (FileDialog::s_vars.maskList.size() > MAX_MASK_LIST)
+            FileDialog::s_vars.maskList.pop_back();
+
     }
     return true;
 }
