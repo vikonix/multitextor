@@ -86,8 +86,11 @@ if(MSVC)
     )
 
 else()
+    find_package( Threads REQUIRED)
+    
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
+    target_link_options(${PROJECT_NAME} PRIVATE -pthread)
     #target_link_options(${PROJECT_NAME} PRIVATE -static)
 
     file(COPY ../configurations/config DESTINATION ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
