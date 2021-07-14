@@ -863,52 +863,65 @@ lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& e
 
 bool LexParser::CheckForOpenComments(size_t line)
 {
+    m_commentOpen = 0;
     if (m_lexPosition.empty())
-        return true;
+        return false;
 
-    auto it = m_lexPosition.upper_bound(line);
-    auto rit = std::make_reverse_iterator(it);
-
-    //LOG(DEBUG) << "  CheckForOpenRem line=" << line;
-    if (!m_recursiveComment)
-    {
-        //C style
-        while(++rit != m_lexPosition.rend())
+    //C style
+    auto StdComment = [this](auto it) {
+        auto& [l, str] = *it;
+        for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
         {
-            if (rit->first >= line)
-                continue;
-
-            auto&[l, str] = *rit;
-            for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
+            if (*strIt == 'O')
             {
-                if (*strIt == 'O')
-                {
-                    //LOG(DEBUG) << "  OpenComment for line=" << line << " at line=" << it->first;
-                    return 0 != (m_commentOpen = 1);
-                }
-                else if (*strIt == 'C')
-                    return 0 != (m_commentOpen = 0);
+                //LOG(DEBUG) << "  OpenComment for line=" << line << " at line=" << it->first;
+                m_commentOpen = 1;
+                return true;
             }
-        } 
-    }
-    else
-    {
-        //pascal style
-        m_commentOpen = 0;
-        while (++rit != m_lexPosition.rend())
-        {
-            auto&[l, str] = *rit;
-            for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
+            else if (*strIt == 'C')
             {
-                if (*strIt == 'O')
-                    ++m_commentOpen;
-                else if (*strIt == 'C' && m_commentOpen > 0)
-                    --m_commentOpen;
+                m_commentOpen = 0;
+                return true;
             }
         }
-    }
+        return false;
+    };
 
-    return 0 != (m_commentOpen = 0);
+    //pascal style
+    auto RecursComment = [this](auto it) {
+        auto& [l, str] = *it;
+        for (auto strIt = str.rbegin(); strIt != str.rend(); ++strIt)
+        {
+            if (*strIt == 'O')
+                ++m_commentOpen;
+            else if (*strIt == 'C' && m_commentOpen > 0)
+                --m_commentOpen;
+        }
+        return false;
+    };
+
+    auto it = m_lexPosition.upper_bound(line);
+
+    //LOG(DEBUG) << "  CheckForOpenRem line=" << line;
+    while(it != m_lexPosition.begin())
+    {
+        --it;
+        if (it->first >= line)
+            continue;
+
+        if (!m_recursiveComment)
+        {
+            if (StdComment(it))
+                break;
+        }
+        else
+        {
+            if (RecursComment(it))
+                break;
+        }
+    } 
+
+    return m_commentOpen > 0;
 }
 
 bool LexParser::ChangeStr(size_t line, const std::u16string& wstr, invalidate_t& inv)
