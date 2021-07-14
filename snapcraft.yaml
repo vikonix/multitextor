@@ -1,5 +1,5 @@
 name: multitextor
-version: "2.0.0-MVP-beta"
+version: "2.0.0-beta"
 summary: Cross platform console mode text editor
 description: |
   Multitextor is simple cross platform console mode text editor.

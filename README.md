@@ -6,7 +6,7 @@ This project is mostly recreated version of my old text editor.
 [![BSD-2 license](https://img.shields.io/github/license/vikonix/multitextor)](https://github.com/vikonix/multitextor/blob/main/LICENSE)
 
 ### In progress
-- Editor 2.0.0 MVP (beta) version.
+- Editor 2.0.0-beta version.
  
 ### Key features
 - Simple interface same in different environments (with menu and dialog)
@@ -21,9 +21,9 @@ This project is mostly recreated version of my old text editor.
 - Customizable key commands and some interface parameters
 - Customizable syntax highlighting
 - Editor session saving/restoring
-
-Not implemented now (not MVP):
 - Searching in on disk files
+
+Not implemented now:
 - Backup files
 - Random access bookmarks
 - Build-in file comparing mode

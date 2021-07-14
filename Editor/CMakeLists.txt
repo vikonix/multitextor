@@ -7,7 +7,7 @@ set(PRODUCT_NAME "Multitextor")
 set(PRODUCT_NAME_COLORED "&M&u&l&t&i&t&e&x&t&o&r")
 set(PRODUCT_VERSION 2.0.0)
 set(PRODUCT_VERSION_RC 2,0,0)
-set(PRODUCT_VERSION_FULL "${PRODUCT_VERSION}-MVP-beta")
+set(PRODUCT_VERSION_FULL "${PRODUCT_VERSION}-beta")
 
 file(GLOB_RECURSE _EDITOR_INC "inc/*.h*")
 file(GLOB_RECURSE _EDITOR_SRC "src/*.c*")
