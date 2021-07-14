@@ -156,6 +156,9 @@ public:
             return pos + 1;
     }
 
+    using progress_func = std::function<bool()>;
+    static bool ScanFile(const std::filesystem::path& file, const std::u16string& toFind, const std::string& cp, bool checkCase, bool findWord, progress_func func);
+
     bool                    SetFilePath(const std::filesystem::path& file);
     std::filesystem::path   GetFilePath() const {return m_file;}
 
@@ -191,7 +194,7 @@ public:
     bool                    IsChanged() const {return m_curChanged || m_buffer.IsChanged(); }
     bool                    FlushCurStr();
     uint64_t                GetSize() const {return m_buffer.GetSize(); }
-    time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
+//    time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
     std::u16string          GetStr(size_t line, size_t offset = 0, size_t size = MAX_STRLEN + 1);
     std::u16string          GetStrForFind(size_t line, bool checkCase, bool fast);

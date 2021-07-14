@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/WndManager.h"
 #include "utils/CpConverter.h"
 #include "EditorWnd.h"
+#include "EditorApp.h"
 
 using namespace _Utils;
 
@@ -38,6 +39,8 @@ namespace _Editor
 {
 
 /////////////////////////////////////////////////////////////////////////////
+FindFileDialogVars FindFileDialog::s_vars;
+
 #define ID_FF_SEARCH   (ID_USER +  1)
 #define ID_FF_REPLACE  (ID_USER +  2)
 #define ID_FF_SREPLACE (ID_USER +  3)
@@ -52,10 +55,6 @@ namespace _Editor
 #define ID_FF_PROMPT   (ID_USER + 12)
 #define ID_FF_INMARKED (ID_USER + 13)
 #define ID_FF_CP       (ID_USER + 14)
-
-
-FindFileDialogVars FindFileDialog::s_vars;
-
 
 std::list<control> findFileDialog 
 {
@@ -301,6 +300,251 @@ bool FindFileDialog::OnClose(int id)
         FileDialog::s_vars.path = path.u8string();
         FileDialog::s_vars.cpName = GetItem(ID_FF_CP)->GetName();
     }
+    return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+std::vector<path_t> SearchFileDialog::s_foundList;
+size_t SearchFileDialog::s_listPos{};
+
+#define ID_SF_PATH     (ID_USER +  1)
+#define ID_SF_FILELIST (ID_USER +  2)
+#define ID_SF_PROGRESS (ID_USER +  3)
+#define ID_SF_COUNT    (ID_USER +  4)
+
+std::list<control> dlgSearchFile
+{
+    {CTRL_TITLE,                    "File Search",  0,              {},  1,  0, 70, 21},
+
+    {CTRL_STATIC,                   "In:",          0,              {},  1,  0,  4},
+    {CTRL_STATIC,                   "",             ID_SF_PATH,     {},  5,  0, 62},
+
+    {CTRL_LIST,                     "",             ID_SF_FILELIST, {},  0,  1, 68, 17},
+    {CTRL_STATIC,                   "",             ID_SF_PROGRESS, {},  1, 18,  1},
+    {CTRL_STATIC,                   "",             ID_SF_COUNT,    {},  3, 18, 35},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,"Stop",         ID_CANCEL,      {}, 40, 18}
+};
+
+SearchFileDialog::SearchFileDialog(pos_t x, pos_t y)
+    : Dialog(dlgSearchFile, x, y)
+{
+}
+
+input_t SearchFileDialog::Activate()
+{
+    path_t path{ utf8::utf8to16(FileDialog::s_vars.path) };
+    LOG(DEBUG) << "SearchFile path=" << path << " mask=" << m_mask << " to find=" << utf8::utf16to8(m_toFind) << " cp=" << m_cp;
+
+    m_activeView = WndManager::getInstance().GetActiveView();
+
+    AllignButtons();
+    Show();
+    Refresh();
+    InputCapture();
+
+    Application::getInstance().SetErrorLine("Wait for file scan. Press any key for stop");
+    s_foundList.clear();
+    s_listPos = 0;
+    [[maybe_unused]]auto rc = ScanDir(path / utf8::utf8to16(m_mask));
+
+    Hide();
+    WndManager::getInstance().SetActiveView(m_activeView);
+    Application::getInstance().SetHelpLine();
+
+    return ID_OK;
+}
+
+bool SearchFileDialog::ScanDir(const path_t& path)
+{
+    //LOG(DEBUG) << __FUNC__ << "path=" << path.u8string();
+    
+    auto sizex = GetItem(ID_SF_PATH)->GetSizeX();
+    //std::string shortPath = Directory::CutPath(path, sizex);
+    //shortPath.resize(sizex, ' ');
+    //GetItem(ID_SF_PATH)->SetName(shortPath);
+
+    _Utils::DirectoryList dirList;
+
+    dirList.SetMask(path);
+    dirList.SetMask(m_mask);
+    dirList.Scan();
+    
+    bool putPath{};
+    auto fList = GetItem(ID_SF_FILELIST);
+    auto fListPtr = std::dynamic_pointer_cast<CtrlList>(fList);
+
+    for (auto& file : dirList.GetFileList())
+    {
+        if(!ShowProgress())
+            return false;
+
+        if (FindFileDialog::s_vars.inOpen)
+        {
+            auto& app = Application::getInstance();
+            auto& editorApp = dynamic_cast<EditorApp&>(app);
+            auto wnd = editorApp.GetEditorWnd(file.path());
+            if (nullptr == wnd)
+                continue;
+        }
+        
+        std::string shortPath = Directory::CutPath(file.path(), sizex);
+        shortPath.resize(sizex, ' ');
+        GetItem(ID_SF_PATH)->SetName(shortPath);
+
+        bool ret = Editor::ScanFile(file.path(), m_toFind, m_cp, m_checkCase, m_findWord, std::bind(&SearchFileDialog::ShowProgress, this));
+        if (ret)
+        {
+            //found
+            LOG(DEBUG) << "found in file=" << file.path().u8string();
+            s_foundList.emplace_back(file.path());
+            std::string count = "Matched " + std::to_string(s_foundList.size()) + " file(s).";
+            GetItem(ID_SF_COUNT)->SetName(count);
+
+            if (!putPath)
+            {
+                putPath = true;
+                fListPtr->AppendStr(file.path().parent_path().u8string());
+            }
+            fListPtr->AppendStr("  " + file.path().filename().u8string());
+            fListPtr->SetSelect(fListPtr->GetStrCount() - 1);
+        }
+    }
+
+    auto key = CheckInput();
+    if (key)
+        return false;
+
+    if(m_recursive)
+        for (auto& dir : dirList.GetDirList())
+        {
+            if (dir == "..")
+                continue;
+            bool rc = ScanDir(dirList.GetPath() / utf8::utf8to16(dir));
+            if (!rc)
+                return false;
+        }
+
+    return true;
+}
+
+bool SearchFileDialog::ShowProgress()
+{
+    if (m_cancel)
+        return false;
+
+    char buff[2]{ s_progress[m_pos], 0 };
+    if (++m_pos >= s_progress.size())
+        m_pos = 0;
+
+    GetItem(ID_SF_PROGRESS)->SetName(buff);
+
+    auto key = CheckInput();
+    if (key)
+    {
+        m_cancel = true;
+        return false;
+    }
+
+    return true;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////
+path_t MatchedFileDialog::s_path;
+
+#define ID_MF_COUNT    (ID_USER +  1)
+#define ID_MF_FILELIST (ID_USER +  2)
+
+std::list<control> dlgMatchedFile 
+{
+    {CTRL_TITLE,                        "Matched Files",    0,              {},                             1,  0, 70, 21},
+
+    {CTRL_LIST,                         "",                 ID_MF_FILELIST, &SearchFileDialog::s_listPos,   0,  0, 68, 18, "Select file for open"},
+    {CTRL_STATIC,                       "",                 ID_MF_COUNT,    {},                             1, 18, 47},
+
+    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Open",             ID_OK,          {},                            40, 18,  0,  0, "Open selected file in new windows"},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",           ID_CANCEL,      {},                            50, 18}
+};
+
+MatchedFileDialog::MatchedFileDialog(pos_t x, pos_t y)
+    : Dialog(dlgMatchedFile, x, y)
+{
+}
+
+bool MatchedFileDialog::OnActivate()
+{
+    if(SearchFileDialog::s_foundList.empty())
+    {
+        BeginPaint();
+        Application::getInstance().SetErrorLine("Matched files absent");
+        StopPaint();
+        return false;
+    }
+
+    auto fList = GetItem(ID_MF_FILELIST);
+    auto fListPtr = std::dynamic_pointer_cast<CtrlList>(fList);
+    path_t curPath;
+
+    for (auto& fullPath : SearchFileDialog::s_foundList)
+    {
+        auto path = fullPath.parent_path();
+        if (curPath != path)
+        {
+            if(curPath != "")
+                fListPtr->AppendStr("");
+
+            curPath = path;
+            fListPtr->AppendStr(path.u8string());
+        }
+        fListPtr->AppendStr("  " + fullPath.filename().u8string());
+    }
+
+    fListPtr->SetSelect(SearchFileDialog::s_listPos);
+    GetItem(ID_MF_COUNT)->SetName("Found " + std::to_string(SearchFileDialog::s_foundList.size()) + " file(s).");
+
+    return true;
+}
+
+bool MatchedFileDialog::OnClose(int id)
+{
+    if (id == ID_OK)
+    {
+        auto fList = GetItem(ID_MF_FILELIST);
+        auto fListPtr = std::dynamic_pointer_cast<CtrlList>(fList);
+
+        auto pos = fListPtr->GetSelected();
+        auto str = fListPtr->GetStr(pos);
+        if (str.empty() || str[0] != ' ')
+        {
+            SelectItem(ID_MF_FILELIST);
+            Refresh();
+            return false;
+        }
+
+        size_t entry{};
+        path_t curPath;
+        for (auto& fullPath : SearchFileDialog::s_foundList)
+        {
+            auto path = fullPath.parent_path();
+            if (curPath != path)
+            {
+                if (curPath != "")
+                    ++entry;
+
+                curPath = path;
+                ++entry;
+            }
+            if (entry == pos)
+            {
+                s_path = fullPath;
+                break;
+            }
+            ++entry;
+        }
+
+    }
+
     return true;
 }
 

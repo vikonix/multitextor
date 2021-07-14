@@ -190,6 +190,23 @@ bool    EditorApp::FindInFilesProc([[maybe_unused]] input_t cmd)
 {
     FindFileDialog dlg(false);
     auto ret = dlg.Activate();
+    if (ret == ID_OK)
+    {
+        FileSaveAllProc(0);
+        SearchFileDialog sdlg;
+        ret = sdlg.Activate();
+
+        MatchedFileDialog mdlg;
+        ret = mdlg.Activate();
+        if (ret == ID_OK)
+        {
+            std::filesystem::path path = mdlg.s_path;
+            auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+            auto rc = OpenFile(path, parser, FileDialog::s_vars.cpName);
+            if (rc)
+                PutCode(K_ED(E_CTRL_FINDDN));
+        }
+    }
 
     return true;
 }
@@ -198,13 +215,38 @@ bool    EditorApp::ReplaceInFilesProc([[maybe_unused]] input_t cmd)
 {
     FindFileDialog dlg(true);
     auto ret = dlg.Activate();
+    if (ret == ID_OK)
+    {
+        FileSaveAllProc(0);
+        SearchFileDialog sdlg;
+        ret = sdlg.Activate();
+
+        MatchedFileDialog mdlg;
+        ret = mdlg.Activate();
+        if (ret == ID_OK)
+        {
+            std::filesystem::path path = mdlg.s_path;
+            auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+            auto rc = OpenFile(path, parser, FileDialog::s_vars.cpName);
+            if (rc)
+                PutCode(K_ED(E_CTRL_REPEAT));
+        }
+    }
 
     return true;
 }
 
-bool    EditorApp::FoundFilesProc(input_t cmd)
+bool    EditorApp::FoundFilesProc([[maybe_unused]] input_t cmd)
 {
-    LOG(DEBUG) << __FUNC__ << " not implemented";
+    MatchedFileDialog mDlg;
+    auto ret = mDlg.Activate();
+    if (ret == ID_OK)
+    {
+        std::filesystem::path path = mDlg.s_path;
+        auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+        ret = OpenFile(path, parser, FileDialog::s_vars.cpName);
+    }
+
     return true;
 }
 

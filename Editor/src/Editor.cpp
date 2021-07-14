@@ -32,7 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "EditorApp.h"
 
-#define SINGLE_THREAD
+//#define SINGLE_THREAD
 
 namespace _Editor
 {
@@ -43,12 +43,20 @@ class CoReadFile
     std::condition_variable         m_condition;
     std::condition_variable         m_conditionBufferReady;
     std::mutex                      m_mutex;
-    std::atomic_bool                m_bufferReady{ false };
+    bool                            m_cancel{false};
+
+    std::atomic_bool                m_bufferReady{false};
     std::atomic<size_t>             m_read{};
     bool                            m_eof{};
+    
+    std::optional<const std::string>        m_cp;
+    bool                                    m_toUpper{};
+    std::shared_ptr<iconvpp::CpConverter>   m_converter;
 
     std::shared_ptr<read_buff_t>    m_buff1{ std::make_shared<read_buff_t>() };
     std::shared_ptr<read_buff_t>    m_buff2{ std::make_shared<read_buff_t>() };
+    std::shared_ptr<std::u16string> m_u16buff1{ std::make_shared<std::u16string>() };
+    std::shared_ptr<std::u16string> m_u16buff2{ std::make_shared<std::u16string>() };
 
     void Read(const std::filesystem::path& path)
     {
@@ -66,30 +74,63 @@ class CoReadFile
             return static_cast<size_t>(read);
         };
 
+        auto ConvertCp = [&]() {
+            if (!m_cp)
+                return;
+            if(1)//*m_cp != "UTF-8")//???
+            {
+                [[maybe_unused]] bool rc = m_converter->Convert(std::string_view(m_buff2->data(), m_read), *m_u16buff1);
+            }
+            else
+            {
+                m_u16buff1->resize(m_read);
+                auto it = utf8::utf8to16(m_buff2->cbegin(), m_buff2->cbegin() + m_read, m_u16buff1->begin());
+                m_u16buff1->erase(it, m_u16buff1->end());
+            }
+            
+            if (!m_toUpper)
+                return;
+            std::transform(m_u16buff1->begin(), m_u16buff1->end(), m_u16buff1->begin(),
+                [](char16_t c) { return std::towupper(c); }
+            );
+        };
+
         size_t read;
         while (0 != (read = readFile(m_buff1)))
         {
+            ConvertCp();
+
             std::unique_lock lock{ m_mutex };
-            m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady; });
+            m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady || m_cancel; });
+
+            if (m_cancel)
+                return;
 
             std::swap(m_buff1, m_buff2);
+            std::swap(m_u16buff1, m_u16buff2);
             m_bufferReady = true;
             m_read = read;
             m_eof = file.eof();
+
             m_condition.notify_one();
         }
 
         std::unique_lock lock{ m_mutex };
-        m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady; });
+        m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady || m_cancel; });
 
         m_bufferReady = true;
         m_read = 0;
+        m_eof = true;
         m_condition.notify_one();
     }
 
 public:
-    CoReadFile(const std::filesystem::path& path)
+    CoReadFile(const std::filesystem::path& path, std::optional<const std::string> cp, bool toUpper = false)
+        : m_cp{cp}
+        , m_toUpper{toUpper}
     {
+        if(m_cp)
+            m_converter = std::make_shared<iconvpp::CpConverter>(*m_cp);
         m_thread = std::thread(&CoReadFile::Read, this, path);
     }
 
@@ -107,9 +148,23 @@ public:
         return { m_read, m_buff2, m_eof };
     }
 
+    std::tuple<size_t, std::shared_ptr<std::u16string>, bool> WaitU16()
+    {
+        std::unique_lock lock{ m_mutex };
+        m_condition.wait(lock, [this]() -> bool {return m_bufferReady; });
+
+        return { m_read, m_u16buff2, m_eof };
+    }
+
     void Next()
     {
         m_bufferReady = false;
+        m_conditionBufferReady.notify_one();
+    }
+
+    void Cancel()
+    {
+        m_cancel = true;
         m_conditionBufferReady.notify_one();
     }
 };
@@ -244,7 +299,7 @@ bool Editor::Load(bool log)
             return false;
     }
 #else
-    CoReadFile rfile(m_file);
+    CoReadFile rfile(m_file, std::nullopt);
 
     for (;;)
     {
@@ -1693,6 +1748,99 @@ bool Editor::IsFileInMemory()
             return false;
     }
     return true;
+}
+
+bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& toFind, const std::string& cp, bool checkCase, bool findWord, progress_func func)
+{
+    try
+    {
+        if (!std::filesystem::exists(file) || !std::filesystem::is_regular_file(file))
+            return false;
+    }
+    catch (...)
+    {
+        return false;
+    }
+
+    std::u16string find{ toFind };
+    size_t findSize = find.size();
+    if (!checkCase)
+    {
+        std::transform(find.begin(), find.end(), find.begin(),
+            [](char16_t c) { return std::towupper(c); }
+        );
+    }
+
+    auto fileSize = std::filesystem::file_size(file);
+
+    //LOG(DEBUG) << __FUNC__ << " path=" << file.u8string() << " size=" << fileSize;
+    if (0 == fileSize)
+        return false;
+
+    uintmax_t fileOffset{};
+
+    CoReadFile rfile(file, cp, !checkCase);
+    std::u16string prevBuff;
+
+    for (;;)
+    {
+        auto [read, buff, eof] = rfile.WaitU16();
+        if (read == 0)
+            break;
+
+        if (!prevBuff.empty())
+            buff->insert(0, prevBuff);
+
+        auto itFound = std::search(buff->cbegin(), buff->cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
+        if (itFound != buff->cend())
+        {
+            if (!findWord)
+            {
+                rfile.Cancel();
+                return true;
+            }
+            else
+            {
+
+                if ((itFound == buff->cbegin() || GetSymbolType(*(itFound - 1)) != symbol_t::alnum)
+                    && (itFound + findSize != buff->cend() || GetSymbolType(*(itFound + findSize)) != symbol_t::alnum))
+                {
+                    rfile.Cancel();
+                    return true;
+                }
+            }
+        }
+        fileOffset += read;
+
+        prevBuff.clear();
+        if(!eof)
+            for (auto rit = buff->crbegin(); rit != buff->crend(); ++rit)
+            {
+                if (*rit < ' ')
+                {
+                    //save last not full string
+                    auto size = std::distance(buff->crbegin(), rit);
+                    prevBuff.resize(size);
+                    std::copy_n(std::prev(buff->cend(), size), size, prevBuff.begin());
+                    break;
+                }
+            }
+
+        rfile.Next();
+        if (func)
+        {
+            auto ret = func();
+            if (!ret)
+            {
+                rfile.Cancel();
+                return false;
+            }
+        }
+    }
+
+    _assert(fileSize == fileOffset);
+
+    return false;
 }
 
 } //namespace _Editor

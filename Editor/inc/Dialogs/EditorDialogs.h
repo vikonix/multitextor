@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <set>
 
+using namespace _Utils;
 using namespace _WndManager;
 
 namespace _Editor
@@ -48,6 +49,8 @@ enum class FileDlgMode
 #define MAX_MASK_LIST 16
 struct FileDialogVars
 {
+    path_t      filepath;
+
     std::list<std::string> maskList;
 
     std::string path{ "." };
@@ -202,6 +205,43 @@ public:
     FindFileDialog(bool replace, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 
     virtual input_t DialogProc(input_t code) override final;
+    virtual bool OnActivate() override final;
+    virtual bool OnClose(int id) override final;
+};
+
+/////////////////////////////////////////////////////////////////////////////
+class SearchFileDialog : public Dialog
+{
+    inline static const std::string s_progress{"-\\|/"};
+    size_t              m_pos{};
+    bool                m_cancel{};
+
+    bool ScanDir(const path_t& path);
+    bool ShowProgress();
+
+    std::string&    m_mask{ FileDialog::s_vars.file };
+    std::u16string& m_toFind{ FindDialog::s_vars.findStrW };
+    std::string&    m_cp{ FileDialog::s_vars.cpName };
+    bool            m_recursive{ FindFileDialog::s_vars.recursive };
+    bool            m_checkCase{ FindDialog::s_vars.checkCase };
+    bool            m_findWord{ FindDialog::s_vars.findWord };
+
+public:
+    static std::vector<path_t>  s_foundList;
+    static size_t               s_listPos;
+
+    SearchFileDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+
+    virtual input_t Activate() override final;
+};
+
+class MatchedFileDialog : public Dialog
+{
+public:
+    static path_t s_path;
+
+    MatchedFileDialog(pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+
     virtual bool OnActivate() override final;
     virtual bool OnClose(int id) override final;
 };
