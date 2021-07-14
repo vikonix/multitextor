@@ -32,6 +32,8 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "EditorApp.h"
 
+#include <condition_variable>
+
 //#define SINGLE_THREAD
 
 namespace _Editor
