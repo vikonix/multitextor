@@ -167,6 +167,7 @@ bool FindFileDialog::OnActivate()
         FileDialog::s_vars.maskList.push_front("*.*");
     for (const std::string& str : FileDialog::s_vars.maskList)
         ctrlName->AppendStr(str);
+    ctrlName->SetName(FileDialog::s_vars.maskList.front());
 
     m_dirList.SetMask(FileDialog::s_vars.maskList.front());
     ScanDir(FileDialog::s_vars.path);
@@ -225,6 +226,12 @@ input_t FindFileDialog::DialogProc(input_t code)
                 auto dir = listPtr->GetStr(item);
 
                 ScanDir(std::string(dir));
+                code = 0;
+            }
+            else if (GetSelectedId() == ID_FF_MASK)
+            {
+                auto name = GetItem(ID_FF_MASK)->GetName();
+                ScanDir(std::string(name));
                 code = 0;
             }
         }

@@ -77,17 +77,17 @@ class CoReadFile
             return static_cast<size_t>(read);
         };
 
-        auto ConvertCp = [&]() {
+        auto ConvertCp = [&](size_t read) {
             if (!m_cp)
                 return;
             if(1)//*m_cp != "UTF-8")//???
             {
-                [[maybe_unused]] bool rc = m_converter->Convert(std::string_view(m_buff2->data(), m_read), *m_u16buff1);
+                [[maybe_unused]] bool rc = m_converter->Convert(std::string_view(m_buff1->data(), read), *m_u16buff1);
             }
             else
             {
-                m_u16buff1->resize(m_read);
-                auto it = utf8::utf8to16(m_buff2->cbegin(), m_buff2->cbegin() + m_read, m_u16buff1->begin());
+                m_u16buff1->resize(read);
+                auto it = utf8::utf8to16(m_buff1->cbegin(), m_buff1->cbegin() + read, m_u16buff1->begin());
                 m_u16buff1->erase(it, m_u16buff1->end());
             }
             
@@ -101,7 +101,7 @@ class CoReadFile
         size_t read;
         while (0 != (read = readFile(m_buff1)))
         {
-            ConvertCp();
+            ConvertCp(read);
 
             std::unique_lock lock{ m_mutex };
             m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady || m_cancel; });
