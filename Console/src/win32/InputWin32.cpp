@@ -563,14 +563,24 @@ void InputWin32::GetFontSize()
     if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbi))
         return;
 
-    RECT clientRect;
-    if (!GetClientRect(m_hWnd, &clientRect))
+    WINDOWINFO info;
+    info.cbSize = sizeof(WINDOWINFO);
+
+    if (!GetWindowInfo(m_hWnd, &info))
         return;
 
-    m_fontX = static_cast<int>(clientRect.right  / (sbi.srWindow.Right  + 1));
-    m_fontY = static_cast<int>(clientRect.bottom / (sbi.srWindow.Bottom + 1));
+    auto sizex = info.rcClient.right - info.rcClient.left;
+    auto sizey = info.rcClient.bottom - info.rcClient.top;
+
+    m_fontX = static_cast<int>(sizex  / (sbi.srWindow.Right  + 1));
+    m_fontY = static_cast<int>(sizey / (sbi.srWindow.Bottom + 1));
     LOG(DEBUG) << "fontX=" << m_fontX << " fontY=" << m_fontY;
-    _assert(m_fontX != 0 && m_fontY != 0);
+    if (m_fontX == 0 || m_fontY == 0)
+    {
+        _assert(!"font size");
+        m_fontX = 1;
+        m_fontY = 1;
+    }
 }
 
 void InputWin32::FixWheelCoord(pos_t& x, pos_t& y)
