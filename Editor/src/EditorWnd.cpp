@@ -1568,7 +1568,7 @@ bool EditorWnd::UpdateProgress(size_t step)
 bool EditorWnd::IsWord(const std::u16string& str, size_t offset, size_t len)
 {
     if ((offset == 0 || GetSymbolType(str[offset - 1]) != symbol_t::alnum)
-     && (offset + len <= str.size() || GetSymbolType(str[offset + len]) != symbol_t::alnum))
+     && (offset + len >= str.size() || GetSymbolType(str[offset + len]) != symbol_t::alnum))
         return true;
     else
         return false;
@@ -1649,38 +1649,46 @@ bool EditorWnd::FindUp(bool silence)
             offset = str.size();
         }
 
-        auto itBegin = offset ? std::next(str.rbegin(), str.size() - offset) : str.rbegin();
-        auto itFound = std::search(itBegin, str.rend(), std::boyer_moore_horspool_searcher(find.rbegin(), find.rend())); 
-        if (itFound != str.rend())
+        auto itBegin = offset ? std::next(str.crbegin(), str.size() - offset) : str.crbegin();
+        while (itBegin != str.crend())
         {
-            if (fast && offset == 0)
+            auto itFound = std::search(itBegin, str.crend(), std::boyer_moore_horspool_searcher(find.crbegin(), find.crend()));
+            if (itFound != str.crend())
             {
-                str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
-                itFound = std::search(str.rbegin(), str.rend(), std::boyer_moore_horspool_searcher(find.rbegin(), find.rend()));
-            }
+                if (fast && offset == 0)
+                {
+                    str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
+                    itFound = std::search(str.crbegin(), str.crend(), std::boyer_moore_horspool_searcher(find.crbegin(), find.crend()));
+                }
 
-            offset = std::distance(itFound, str.rend()) - size;
-            if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
-            {
-                LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
-                _GotoXY(offset, line);
+                offset = std::distance(itFound, str.crend()) - size;
+                if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
+                {
+                    LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
+                    _GotoXY(offset, line);
 
-                m_foundX = offset;
-                m_foundY = line;
-                if (offset - m_xOffset + size < static_cast<size_t>(m_clientSizeX))
-                    m_foundSize = size;
+                    m_foundX = offset;
+                    m_foundY = line;
+                    if (offset - m_xOffset + size < static_cast<size_t>(m_clientSizeX))
+                        m_foundSize = size;
+                    else
+                        m_foundSize = m_clientSizeX - (offset - m_xOffset);
+
+                    Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
+
+                    if (!silence)
+                        EditorApp::SetHelpLine();
+                    return true;
+                }
                 else
-                    m_foundSize = m_clientSizeX - (offset - m_xOffset);
-
-                Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
-
-                if (!silence)
-                    EditorApp::SetHelpLine();
-                return true;
+                    itBegin = itFound + 1;
+            }
+            else
+            {
+                offset = 0;
+                break;
             }
         }
-        else
-            offset = 0;
 
         if (line)
             --line;
@@ -1778,38 +1786,46 @@ bool EditorWnd::FindDown(bool silence)
             continue;
         }
 
-        auto itBegin = offset ? std::next(str.begin(), offset) : str.begin();
-        auto itFound = std::search(itBegin, str.end(), std::boyer_moore_horspool_searcher(find.begin(), find.end()));
-        if(itFound != str.end())
+        auto itBegin = offset ? std::next(str.cbegin(), offset) : str.cbegin();
+        while (itBegin != str.cend())
         {
-            if (fast && offset == 0)
+            auto itFound = std::search(itBegin, str.cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
+            if (itFound != str.cend())
             {
-                str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
-                itFound = std::search(str.begin(), str.end(), std::boyer_moore_horspool_searcher(find.begin(), find.end()));
-            }
+                if (fast && offset == 0)
+                {
+                    str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
+                    itFound = std::search(str.cbegin(), str.cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
+                }
 
-            offset = std::distance(str.begin(), itFound);
-            if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
-            {
-                LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
-                _GotoXY(offset, line);
+                offset = std::distance(str.cbegin(), itFound);
+                if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
+                {
+                    LOG_IF(time(NULL) - t, DEBUG) << "    Found time=" << time(NULL) - t;
+                    _GotoXY(offset, line);
 
-                m_foundX = offset;
-                m_foundY = line;
-                if (offset - m_xOffset + size < static_cast<size_t>(m_clientSizeX))
-                    m_foundSize = size;
+                    m_foundX = offset;
+                    m_foundY = line;
+                    if (offset - m_xOffset + size < static_cast<size_t>(m_clientSizeX))
+                        m_foundSize = size;
+                    else
+                        m_foundSize = m_clientSizeX - (offset - m_xOffset);
+
+                    Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
+
+                    if (!silence)
+                        EditorApp::SetHelpLine();
+                    return true;
+                }
                 else
-                    m_foundSize = m_clientSizeX - (offset - m_xOffset);
-
-                Invalidate(m_foundY, invalidate_t::find, m_foundX, m_foundSize);
-
-                if (!silence)
-                    EditorApp::SetHelpLine();
-                return true;
+                    itBegin = itFound + 1;
+            }
+            else
+            {
+                offset = 0;
+                break;
             }
         }
-        else
-            offset = 0;
 
         ++line;
 

@@ -1794,24 +1794,31 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
         if (!prevBuff.empty())
             buff->insert(0, prevBuff);
 
-        auto itFound = std::search(buff->cbegin(), buff->cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
-        if (itFound != buff->cend())
+        auto itBegin = buff->cbegin();
+        while (itBegin != buff->cend())
         {
-            if (!findWord)
+            auto itFound = std::search(itBegin, buff->cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
+            if (itFound != buff->cend())
             {
-                rfile.Cancel();
-                return true;
-            }
-            else
-            {
-
-                if ((itFound == buff->cbegin() || GetSymbolType(*(itFound - 1)) != symbol_t::alnum)
-                    && (itFound + findSize != buff->cend() || GetSymbolType(*(itFound + findSize)) != symbol_t::alnum))
+                if (!findWord)
                 {
                     rfile.Cancel();
                     return true;
                 }
+                else
+                {
+
+                    if ((itFound == buff->cbegin() || GetSymbolType(*(itFound - 1)) != symbol_t::alnum)
+                        && (itFound + findSize == buff->cend() || GetSymbolType(*(itFound + findSize)) != symbol_t::alnum))
+                    {
+                        rfile.Cancel();
+                        return true;
+                    }
+                }
+                itBegin = itFound + 1;
             }
+            else
+                break;
         }
         fileOffset += read;
 
