@@ -9,13 +9,13 @@ This project is mostly recreated version of my old text editor.
 - Editor 2.0.0-beta version.
  
 ### Key features
-- Simple interface same in different environments (with menu and dialog)
+- Simple user friendly interface same in different environments (with menu and dialog)
 - Mouse and keyboard cursor movement and selection
 - Multi-window
 - Split view mode with 2 panels
 - Clear working with different text code pages
 - Different select modes
-- Working with macros 
+- Working with macros
 - Big files editing over 4 GBytes (with small memory using)
 - Deep Undo/Redo
 - Customizable key commands and some interface parameters
@@ -23,7 +23,7 @@ This project is mostly recreated version of my old text editor.
 - Editor session saving/restoring
 - Searching in on disk files
 
-Not implemented now:
+Will be implemented in the next versions:
 - Backup files
 - Random access bookmarks
 - Build-in file comparing mode
