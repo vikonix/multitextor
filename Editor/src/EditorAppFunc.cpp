@@ -245,6 +245,8 @@ bool    EditorApp::FoundFilesProc([[maybe_unused]] input_t cmd)
         std::filesystem::path path = mDlg.s_path;
         auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
         ret = OpenFile(path, parser, FileDialog::s_vars.cpName);
+        if (ret)
+            PutCode(K_ED(E_CTRL_REPEAT));
     }
 
     return true;

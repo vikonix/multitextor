@@ -356,7 +356,7 @@ input_t SearchFileDialog::Activate()
     Refresh();
     InputCapture();
 
-    Application::getInstance().SetErrorLine("Wait for file scan. Press any key for stop");
+    Application::getInstance().SetErrorLine("Wait for files scan. Press any key for cancel.");
     s_foundList.clear();
     s_listPos = 0;
     [[maybe_unused]]auto rc = ScanDir(path / utf8::utf8to16(m_mask));
@@ -452,7 +452,7 @@ bool SearchFileDialog::ShowProgress()
 
     GetItem(ID_SF_PROGRESS)->SetName(buff);
 
-    auto key = CheckInput();
+    auto key = CheckInput(1ms);
     if (key)
     {
         m_cancel = true;
