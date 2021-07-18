@@ -1130,23 +1130,6 @@ CtrlEditDropList::CtrlEditDropList(Dialog& dialog, const control& control, size_
         m_list.m_posy += 1;
     else
         m_list.m_posy -= m_sizey - 1;
-
-/* //???  
-  if(pControl->pName && *((long*)pControl->pName) == STR_SIGN)
-  {
-    //TPRINT(("SaveStr buff\n"));
-    m_pSave = (StrSaveList*)pControl->pName;
-    for(size_t i = 0; i < STR_SAVE; ++i)
-    {
-      char* pStr = m_pSave->GetStr(i);
-      if(!pStr)
-        break;
-      m_List.AppendStr(pStr);
-    }
-  }
-  else
-    m_pSave = NULL;
-*/
 }
 
 input_t CtrlEditDropList::SetFocus()
