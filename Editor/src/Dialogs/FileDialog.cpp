@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "WndManager/DlgControls.h"
 #include "WndManager/WndManager.h"
+#include "WndManager/App.h"
 #include "utils/CpConverter.h"
 #include "LexParser.h"
 
@@ -157,7 +158,9 @@ bool FileDialog::ScanDir(const std::string& mask)
 {
     std::u16string wmask = utf8::utf8to16(mask);
     m_dirList.SetMask(wmask);
+    Application::getInstance().SetErrorLine("Scan subdirectory ...");
     m_dirList.Scan();
+    Application::getInstance().ChangeStatusLine(0);
 
     if (m_mode != FileDlgMode::SaveAs && m_mode != FileDlgMode::NewSess)
         GetItem(ID_OF_NAME)->SetName("");
