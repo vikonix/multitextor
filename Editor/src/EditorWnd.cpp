@@ -1766,7 +1766,7 @@ bool EditorWnd::FindDown(bool silence)
     }
 
     size_t offset{ m_xOffset + m_cursorx };
-    if (m_foundY == line && m_foundX == offset)
+    if (m_foundY != 0 && m_foundY == line && m_foundY != 0 && m_foundX == offset)
         offset += size;
     else
         ++offset;

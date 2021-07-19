@@ -380,7 +380,7 @@ bool DirectoryList::Scan()
             std::string d;
             d = 'a' + i;
             d += ":\\";
-            m_drvList.push_back(std::move(d));
+            m_drvList.emplace_back(d);
         }
         drv >>= 1;
     }
@@ -397,19 +397,19 @@ bool DirectoryList::Scan()
             {
                 if (entry.path().filename() == "." || entry.path().filename() == "..")
                     continue;
-                m_dirList.push_back(entry.path().filename().u8string());
+                m_dirList.emplace_back(entry.path().filename().u8string());
             }
             else if (entry.is_regular_file())
             {
                 if(m_maskList.empty())
-                    m_fileList.push_back(entry);
+                    m_fileList.emplace_back(entry);
                 else
                 {
                     for (const auto& mask : m_maskList)
                     {
                         if (Directory::Match<std::u16string>(entry.path().filename().u16string(), mask, true))
                         {
-                            m_fileList.push_back(entry);
+                            m_fileList.emplace_back(entry);
                             break;
                         }
                     }
