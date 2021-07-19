@@ -424,8 +424,7 @@ bool SearchFileDialog::ScanDir(const path_t& path)
         }
     }
 
-    auto key = CheckInput();
-    if (key)
+    if (!ShowProgress())
         return false;
 
     if(m_recursive)
