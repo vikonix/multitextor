@@ -49,7 +49,7 @@ class Directory
     static path_t   s_runPath;
 
     template<typename T>
-    static bool Match(const T& name, const T& mask, bool nametoupper = false)
+    static bool Match(const T& name, const T& mask, bool nametoupper)
     {
         auto cmp_chars = [nametoupper](auto c1, auto c2) -> bool
         {
