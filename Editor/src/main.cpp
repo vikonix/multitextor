@@ -142,7 +142,7 @@ int main(int argc, char** argv) try
         for (auto& f : files)
         {
             std::filesystem::path path = f;
-            auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+            auto [t, parser] = LexParser::GetFileType(path);
             app.OpenFile(f, parser, "UTF-8");
         }
     }

@@ -139,7 +139,7 @@ std::list<std::string> LexParser::GetFileTypeList()
     return typeList;
 }
 
-std::pair<size_t, std::string> LexParser::GetFileType(const std::string& name)
+std::pair<size_t, std::string> LexParser::GetFileType(const std::filesystem::path& name)
 {
     size_t textType{};  //default type
     size_t lexType{};   //file type
@@ -153,7 +153,7 @@ std::pair<size_t, std::string> LexParser::GetFileType(const std::string& name)
 
             while (std::getline(ss, mask, ';')) 
             {
-                if (Directory::Match<std::string>(name, mask))
+                if (Directory::MatchMask(name, mask))
                 {
                     return { lexType, type};
                 }

@@ -201,7 +201,7 @@ bool    EditorApp::FindInFilesProc([[maybe_unused]] input_t cmd)
         if (ret == ID_OK)
         {
             std::filesystem::path path = mdlg.s_path;
-            auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+            auto [t, parser] = LexParser::GetFileType(path);
             auto rc = OpenFile(path, parser, FileDialog::s_vars.cpName);
             if (rc)
                 PutCode(K_ED(E_CTRL_FINDDN));
@@ -226,7 +226,7 @@ bool    EditorApp::ReplaceInFilesProc([[maybe_unused]] input_t cmd)
         if (ret == ID_OK)
         {
             std::filesystem::path path = mdlg.s_path;
-            auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+            auto [t, parser] = LexParser::GetFileType(path);
             auto rc = OpenFile(path, parser, FileDialog::s_vars.cpName);
             if (rc)
                 PutCode(K_ED(E_CTRL_REPEAT));
@@ -243,7 +243,7 @@ bool    EditorApp::FoundFilesProc([[maybe_unused]] input_t cmd)
     if (ret == ID_OK)
     {
         std::filesystem::path path = mDlg.s_path;
-        auto [t, parser] = LexParser::GetFileType(path.filename().u8string());
+        auto [t, parser] = LexParser::GetFileType(path);
         ret = OpenFile(path, parser, FileDialog::s_vars.cpName);
         if (ret)
             PutCode(K_ED(E_CTRL_REPEAT));

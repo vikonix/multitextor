@@ -48,33 +48,9 @@ class Directory
 {
     static path_t   s_runPath;
 
-public:
-    static bool         SetCurDir(const std::string& path);
-    static path_t       RunPath() { return s_runPath; }
-    static path_t       CurPath();
-    static path_t       TmpPath(const std::string& appPrefix = "");
-    static path_t       CfgPath(const std::string& appName);
-    static path_t       ProgrammPath(const std::string& appName);
-    static path_t       SysCfgPath();
-    static path_t       UserCfgPath(const std::string& appName, bool create = false);
-    static std::string  UserName();
-    static std::string  CutPath(const path_t& path, size_t len);
-    static std::string  GetFileInfo(const std::filesystem::file_time_type& ftime, const uintmax_t& size, size_t size_width = 8);
-    static std::string  GetFileInfo(const path_t& path);
-    static fileaccess_t GetAccessMode(const path_t& path);
-
     template<typename T>
     static bool Match(const T& name, const T& mask, bool nametoupper = false)
     {
-        T mm;
-        if constexpr (sizeof(*name.cbegin()) == 1)
-            mm = "*.*";
-        else
-            mm = u"*.*";
-
-        if (mask == mm)
-            return true;
-
         auto cmp_chars = [nametoupper](auto c1, auto c2) -> bool
         {
             if (!nametoupper)
@@ -133,6 +109,36 @@ public:
             ++maskIt;
 
         return maskIt == mask.cend();
+    }
+
+public:
+    static bool         SetCurDir(const std::string& path);
+    static path_t       RunPath() { return s_runPath; }
+    static path_t       CurPath();
+    static path_t       TmpPath(const std::string& appPrefix = "");
+    static path_t       CfgPath(const std::string& appName);
+    static path_t       ProgrammPath(const std::string& appName);
+    static path_t       SysCfgPath();
+    static path_t       UserCfgPath(const std::string& appName, bool create = false);
+    static std::string  UserName();
+    static std::string  CutPath(const path_t& path, size_t len);
+    static std::string  GetFileInfo(const std::filesystem::file_time_type& ftime, const uintmax_t& size, size_t size_width = 8);
+    static std::string  GetFileInfo(const path_t& path);
+    static fileaccess_t GetAccessMode(const path_t& path);
+
+    static bool MatchMask(const path_t& name, const path_t& mask, bool nametoupper = false)
+    {
+        auto nameStem = name.stem().u16string();
+        auto maskStem = mask.stem().u16string();
+        if(maskStem != u"*" && !Match(nameStem, maskStem, nametoupper))
+            return false;
+
+        auto nameExt  = name.extension().u16string();
+        auto maskExt  = mask.extension().u16string();
+        if (maskExt != u".*" && !Match(nameExt, maskExt, nametoupper))
+            return false;
+
+        return true;
     }
 };
 

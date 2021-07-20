@@ -407,7 +407,7 @@ bool DirectoryList::Scan()
                 {
                     for (const auto& mask : m_maskList)
                     {
-                        if (Directory::Match<std::u16string>(entry.path().filename().u16string(), mask, true))
+                        if (Directory::MatchMask(entry.path(), mask, true))
                         {
                             m_fileList.emplace_back(entry);
                             break;

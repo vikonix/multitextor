@@ -35,6 +35,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <optional>
 #include <unordered_set>
 #include <unordered_map>
+#include <filesystem>
 
 using namespace _Utils;
 using namespace _Console;
@@ -149,7 +150,7 @@ public:
 
     static bool SetLexConfig(const LexConfig& config);
     static std::list<std::string> GetFileTypeList();
-    static std::pair<size_t, std::string> GetFileType(const std::string& name);
+    static std::pair<size_t, std::string> GetFileType(const std::filesystem::path& name);
 
     bool    EnableParsing(bool scan)    { return m_scan = scan; }
     bool    SetParseStyle(const std::string& style = "");
