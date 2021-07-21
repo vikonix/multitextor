@@ -286,8 +286,8 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
     for (size_t i = 0; i < lexstr.size(); ++i)
         switch (lexstr[i])
         {
-        case '3'://back slash
-        case '5'://operator
+        case '0' + static_cast<char>(lex_t::BACKSLASH):
+        case '0' + static_cast<char>(lex_t::OPERATOR):
         case 'K'://key word
             color.push_back(ColorWindowLKeyW);
             break;
@@ -295,17 +295,16 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
             color.push_back(ColorWindowLRem);
             break;
         case 'N'://number
-        case '2'://str
+        case '0' + static_cast<char>(lex_t::STRING):
             color.push_back(ColorWindowLConst);
             break;
-        case '8'://delim
+        case '0' + static_cast<char>(lex_t::DELIMITER):
             color.push_back(ColorWindowLDelim);
             break;
         default:
-            //case ' '://space
-            //case '1'://space
-            //case '3'://back slash
-            //case '6'://symbol
+        //case ' '://space
+        //case '0' + static_cast<char>(lex_t::SPACE)://space
+        //case '0' + static_cast<char>(lex_t::SYMBOL)://symbol
             if (wstr[i] != S_TAB || !m_showTab)
                 color.push_back(ColorWindow);
             else
@@ -327,7 +326,7 @@ bool LexParser::CheckForConcatenatedLine(size_t line)
         if (prevIt != m_lexPosition.end())
         {
             //check for concatenated string with '\\' 
-            auto[prevLine, prevLex] = *prevIt;
+            auto&[prevLine, prevLex] = *prevIt;
             if (!prevLex.empty() && prevLex.back() == '\\')
             {
                 cutLine = m_cutLine = true;
@@ -1000,7 +999,7 @@ bool LexParser::AddStr(size_t line, const std::u16string& wstr, invalidate_t& in
     if (!lexstr.empty())
     {
         if (lexstr.find('O') != std::string::npos
-            || lexstr.find('C') != std::string::npos)
+         || lexstr.find('C') != std::string::npos)
         {
             //if comment changed then invalidate full screen
             inv = invalidate_t::full;
@@ -1026,7 +1025,7 @@ bool LexParser::DelStr(size_t line, invalidate_t& inv)
     {
         const std::string& prevLex = it->second;
         if (prevLex.find('O') != std::string::npos
-            || prevLex.find('C') != std::string::npos)
+         || prevLex.find('C') != std::string::npos)
         {
             //if comment changed then invalidate full screen
             inv = invalidate_t::full;
@@ -1102,7 +1101,7 @@ bool LexParser::CheckLexPair(const std::u16string& wstr, size_t& line, size_t& p
 
     std::string curLex;
     LexicalParse(wstr, curLex, true);
-    const char delimiter{ '8' };
+    const char delimiter{ '0' + static_cast<char>(lex_t::DELIMITER) };
 
     //LOG(DEBUG) << "    lex=" << curLex << ". pos=" << pos;
     if(curLex[pos] != delimiter)
@@ -1272,7 +1271,7 @@ bool LexParser::GetLexPair(const std::u16string& wstr, size_t line, char16_t ch,
 
     std::string lex;
     LexicalParse(wstr, lex, true);
-    const char delimiter{ '8' };
+    const char delimiter{ '0' + static_cast<char>(lex_t::DELIMITER) };
     
     //LOG(DEBUG) << "    lex=" << lex;
     auto& [chPair, up] = pair->second;
