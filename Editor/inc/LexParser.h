@@ -57,9 +57,10 @@ enum class lex_t
     OTHER           = static_cast<int>(symbol_t::other),    //7
     DELIMITER       = static_cast<int>(symbol_t::max),      //8...
     
+    COMMENT_LINE,
     COMMENT_OPEN,
     COMMENT_CLOSE,
-    COMMENT_LINE
+    COMMENT_TOGGLED
 };
 
 struct LexConfig 
@@ -100,7 +101,7 @@ protected:
     bool        m_scan{};
     std::string m_parseStyle;
 
-    static const inline size_t lexTabSize = 0x80;
+    inline static const size_t lexTabSize = 0x80;
     lex_t       m_lexTab[lexTabSize]{};
 
     string_set  m_special;
@@ -122,11 +123,7 @@ protected:
     bool        m_cutLine{};
     bool        m_commentLine{};
     size_t      m_commentOpen{};
-
-    //function check
-//    bool        m_funcCheck{};
-//    size_t      m_funcLine{};
-//    size_t      m_curlyBracketCount{}; //{
+    bool        m_commentToggled{};
 
 protected:
     bool    CheckForOpenComments(size_t line);
@@ -172,8 +169,6 @@ public:
     bool    ChangeStr(size_t line, const std::u16string& str, invalidate_t& inv);
     bool    AddStr(size_t line, const std::u16string& str, invalidate_t& inv);
     bool    DelStr(size_t line, invalidate_t& inv);
-
-    //std::optional<size_t> CheckFunc(size_t line, const std::u16string& str);
 };
 
 } //namespace _Editor
