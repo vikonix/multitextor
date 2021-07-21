@@ -8,11 +8,12 @@
     "6_LineComments": [],
     "7_OpenComments": [],
     "8_ClosedComments": [],
+    "9_ToggledComments": [],
     "NotCase": false,
     "RecursiveComments": false,
     "SaveTabs": false,
+    "ScanFile": false,
     "TabSize": 8,
-    "ToggledComments": false,
     "_KeyWords": []
   }
 }

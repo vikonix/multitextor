@@ -90,10 +90,11 @@ class ParserConfig
     inline static const std::string LineCommentsKey     { "6_LineComments" };
     inline static const std::string OpenCommentsKey     { "7_OpenComments" };
     inline static const std::string CloseCommentsKey    { "8_ClosedComments" };
+    inline static const std::string ToggledCommentsKey  { "9_ToggledComments" };
     inline static const std::string RecursiveCommentsKey{ "RecursiveComments" };
-    inline static const std::string ToggledCommentsKey  { "ToggledComments" };
     inline static const std::string NotCaseKey          { "NotCase" };
     inline static const std::string SaveTabsKey         { "SaveTabs" };
+    inline static const std::string ScanFileKey         { "ScanFile" };
     inline static const std::string TabSizeKey          { "TabSize" };
     inline static const std::string KeywordsKey         { "_KeyWords" };
 

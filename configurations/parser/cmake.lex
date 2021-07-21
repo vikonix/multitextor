@@ -8,11 +8,12 @@
     "6_LineComments": ["#"],
     "7_OpenComments": ["#[["],
     "8_ClosedComments": ["]]"],
+    "9_ToggledComments": [],
     "NotCase": true,
     "RecursiveComments": false,
     "SaveTabs": false,
+    "ScanFile": true,
     "TabSize": 4,
-    "ToggledComments": false,
     "_KeyWords": [
         "break",
         "cmake_host_system_information",

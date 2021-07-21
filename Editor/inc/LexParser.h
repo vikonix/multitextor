@@ -74,12 +74,13 @@ struct LexConfig
     std::list<std::string> lineComment;
     std::list<std::string> openComment;
     std::list<std::string> closeComment;
+    std::list<std::string> toggledComment;
   
     bool        recursiveComment{}; //like pascal
-    bool        toggledComment{};   //like asn1 -- comment --
     bool        notCase{};          //key words not case sensitive
     bool        saveTab{};
-    size_t      tabSize{8};
+    bool        scanFile{};         //scan file for brackets and remarks
+    size_t      tabSize{4};
 
     std::unordered_set<std::string> keyWords;
 };
@@ -106,10 +107,10 @@ protected:
     string_set  m_lineComment;
     string_set  m_openComment;
     string_set  m_closeComment;
+    string_set  m_toggledComment;
     string_set  m_keyWords;
 
     bool        m_recursiveComment{};
-    bool        m_toggledComment{};
     bool        m_notCase{};
     bool        m_saveTab{};
     size_t      m_tabSize{8};

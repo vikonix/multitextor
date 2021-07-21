@@ -14,11 +14,12 @@
     "8_ClosedComments": [
       "*/"
     ],
+    "9_ToggledComments": [],
     "NotCase": false,
     "RecursiveComments": false,
     "SaveTabs": false,
+    "ScanFile": true,
     "TabSize": 4,
-    "ToggledComments": false,
     "_KeyWords": [
       "noexept",
       "alignas",

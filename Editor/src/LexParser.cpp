@@ -48,10 +48,11 @@ std::map<std::string, LexConfig> LexParser::s_lexConfig
             {},         //line
             {},         //open
             {},         //close
-            false,      //toggled
+            {},         //toggled
             false,      //recursive
             false,      //not case
-            false,      //Save Tab
+            false,      //save tab
+            false,      //scan
             8,          //tab size
             {}          //key words
         }
@@ -68,10 +69,11 @@ std::map<std::string, LexConfig> LexParser::s_lexConfig
             {"//"},     //line
             {"/*"},     //open
             {"*/"},     //close
-            false,      //toggled
+            {},         //toggled
             false,      //recursive
             false,      //not case
-            false,      //Save Tab
+            false,      //save tab
+            true,       //scan
             4,          //tab size
             //key words
             {
@@ -101,10 +103,11 @@ std::map<std::string, LexConfig> LexParser::s_lexConfig
             {"//"},     //line
             {"/*"},     //open
             {"*/"},     //close
-            false,      //toggled
+            {},         //toggled
             false,      //recursive
             false,      //not case
-            false,      //Save Tab
+            false,      //save tab
+            true,       //scan
             4,          //tab size
             //key words
             {"true", "false"}
@@ -202,20 +205,18 @@ bool LexParser::SetParseStyle(const std::string& style)
                     m_openComment.insert(utf8::utf8to16(openComment));
                 for (auto& closeComment : cfg.closeComment)
                     m_closeComment.insert(utf8::utf8to16(closeComment));
+                for (auto& toggledComment : cfg.toggledComment)
+                    m_toggledComment.insert(utf8::utf8to16(toggledComment));
 
                 for (auto& kword : cfg.keyWords)
                     m_keyWords.insert(utf8::utf8to16(kword));
 
                 m_recursiveComment = cfg.recursiveComment;
-                m_toggledComment = cfg.toggledComment;
                 m_notCase = cfg.notCase;
                 m_saveTab = cfg.saveTab;
                 m_tabSize = cfg.tabSize;
-
+                m_scan    = cfg.scanFile;
                 m_showTab = false;
-
-                if (!m_openComment.empty() && !m_closeComment.empty())
-                    m_scan = true;
 
                 return true;
             }
@@ -416,8 +417,8 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                         //LOG(DEBUG) << "    COMMENT_LINE";
                         if (!m_commentLine)
                             m_commentLine = true;
-                        else if (m_toggledComment)
-                            m_commentLine = false;
+//???                        else if (m_toggledComment)
+//                            m_commentLine = false;
                     }
 
                     if (!m_commentLine && comment == lex_t::COMMENT_OPEN)
@@ -751,7 +752,7 @@ bool LexParser::IsKeyWord(std::u16string_view lexem)
 //closed comment always only one
 lex_t LexParser::ScanCommentFromBegin(std::u16string_view lexem, size_t& end)
 {
-    if (!m_commentLine || m_toggledComment)
+    if (!m_commentLine)//??? || m_toggledComment)
         //check for line comment
         for (auto& comment : m_lineComment)
         {

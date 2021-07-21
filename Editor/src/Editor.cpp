@@ -367,7 +367,7 @@ bool Editor::LoadTail()
 
     uintmax_t fileOffset{strBuff->m_fileOffset};
     size_t toRead{ std::min(c_buffsize, static_cast<size_t>(m_fileSize - fileOffset)) };
-    LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " offset=" << fileOffset << " read=" << toRead;
+    //LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " offset=" << fileOffset << " read=" << toRead;
 
     file.seekg(fileOffset);
     file.read(buff->data(), std::min(c_buffsize, toRead));

@@ -192,9 +192,9 @@ bool ParserConfig::Load(const path_t& file)
     config.delimiters       = json[DelimitersKey];
     config.nameSymbols      = json[NameSymbolsKey];
     config.recursiveComment = json[RecursiveCommentsKey];
-    config.toggledComment   = json[ToggledCommentsKey];
     config.notCase          = json[NotCaseKey];
     config.saveTab          = json[SaveTabsKey];
+    config.scanFile         = json[ScanFileKey];
     config.tabSize          = json[TabSizeKey];
 
     for(auto& entry : json[SpecialSymbolsKey])
@@ -205,6 +205,8 @@ bool ParserConfig::Load(const path_t& file)
         config.openComment.push_back(static_cast<std::string>(entry));
     for (auto& entry : json[CloseCommentsKey])
         config.closeComment.push_back(static_cast<std::string>(entry));
+    for (auto& entry : json[ToggledCommentsKey])
+        config.toggledComment.push_back(static_cast<std::string>(entry));
     for (auto& entry : json[KeywordsKey])
         config.keyWords.insert(static_cast<std::string>(entry));
 
@@ -225,10 +227,11 @@ bool ParserConfig::Save(const path_t& file, const LexConfig& config) const
     json[LineCommentsKey]       = config.lineComment;
     json[OpenCommentsKey]       = config.openComment;
     json[CloseCommentsKey]      = config.closeComment;
-    json[RecursiveCommentsKey]  = config.recursiveComment;
     json[ToggledCommentsKey]    = config.toggledComment;
+    json[RecursiveCommentsKey]  = config.recursiveComment;
     json[NotCaseKey]            = config.notCase;
     json[SaveTabsKey]           = config.saveTab;
+    json[ScanFileKey]           = config.scanFile;
     json[TabSizeKey]            = config.tabSize;
     json[KeywordsKey]           = config.keyWords;
 
