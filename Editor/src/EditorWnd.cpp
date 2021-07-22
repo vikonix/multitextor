@@ -2086,6 +2086,9 @@ catch (const std::exception& ex)
 
 bool EditorWnd::SaveCfg(WndConfig& config)
 {
+    if (m_untitled)
+        return false;
+
     config.filePath     = GetFilePath().u8string();
     config.parser       = m_editor->GetParseStyle();
     config.cp           = m_editor->GetCP();

@@ -513,7 +513,7 @@ input_t Application::ParseCommand(input_t code)
         LOG_IF(code != K_TIME, INFO) << "  " << ConsoleInput::CastKeyCode(code);
 
         if(code == K_EXIT)
-            SaveCfg();
+            SaveCfg(code);
 
         code = m_wndManager.ProcInput(code);
     }

@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Dialogs/EditorDialogs.h"
 #include "Version.h"
 #include "Config.h"
+#include "utfcpp/utf8.h"
 
 
 namespace _Editor
@@ -392,14 +393,17 @@ bool EditorApp::LoadCfg()
     return true;
 }
 
-bool EditorApp::SaveCfg([[maybe_unused]] input_t code)
+bool EditorApp::SaveCfg(input_t code)
 { 
     //configuration saving
     LOG(DEBUG) << __FUNC__;
 
-    auto cfgPath = Directory::CfgPath(EDITOR_NAME) / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
-    if (std::filesystem::exists(cfgPath))
-        _TRY(g_editorConfig.Save(cfgPath));
+    if (code == K_EXIT)
+    {
+        auto cfgPath = Directory::CfgPath(EDITOR_NAME) / EditorConfig::ConfigDir / EditorConfig::ConfigFile;
+        if (std::filesystem::exists(cfgPath))
+            _TRY(g_editorConfig.Save(cfgPath));
+    }
 
     if (!m_editors.empty())
     {
@@ -415,7 +419,9 @@ bool EditorApp::SaveSession(std::optional<const std::filesystem::path> path)
     for (auto& [w, wnd] : m_editors)
     {
         WndConfig config;
-        wnd->SaveCfg(config);
+        if (!wnd->SaveCfg(config))
+            continue;
+
         sesConfig.SaveConfig(config);
 
         //update recent files info
@@ -480,7 +486,7 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
 
     for (auto& wConfig : wndConfig)
     {
-        OpenFile(wConfig.filePath, wConfig.parser, wConfig.cp, wConfig.ro, wConfig.log);
+        OpenFile(utf8::utf8to16(wConfig.filePath), wConfig.parser, wConfig.cp, wConfig.ro, wConfig.log);
         auto wnd = GetEditorWnd(wConfig.filePath);
         if (wnd)
         {
