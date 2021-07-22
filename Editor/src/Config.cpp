@@ -443,7 +443,7 @@ bool SessionConfig::Load(const path_t& file)
 {
     std::ifstream ifs(file);
     if (!ifs)
-        return true;
+        return false;
 
     LOG(DEBUG) << "Load " << file.u8string();
     m_json = nlohmann::json::parse(ifs);

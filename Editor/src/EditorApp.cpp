@@ -474,10 +474,14 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
     LOG(DEBUG) << __FUNC__;
 
     SessionConfig sesConfig;
+    bool rc;
     if (path)
-        sesConfig.Load(*path);
+        rc = sesConfig.Load(*path);
     else
-        sesConfig.Load(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
+        rc = sesConfig.Load(Directory::UserCfgPath(EDITOR_NAME) / SessionConfig::File);
+
+    if (!rc)
+        return rc;
 
     auto&& wndConfig    = sesConfig.GetConfig<std::vector<WndConfig>>();
     auto&& vConfig      = sesConfig.GetConfig<ViewConfig>();
