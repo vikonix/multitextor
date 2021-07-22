@@ -8,7 +8,7 @@
     "6_LineComments": ["#"],
     "7_OpenComments": [],
     "8_ClosedComments": [],
-    "9_ToggledComments": ["'''"],
+    "9_ToggledComments": ["\"\"\""],
     "NotCase": false,
     "RecursiveComments": false,
     "SaveTabs": false,
