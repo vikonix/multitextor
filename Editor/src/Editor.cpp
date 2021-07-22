@@ -543,7 +543,7 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
 
     if (0 == strBuff->m_fileOffset)
     {
-        LOG(DEBUG) << "cr=" << cr << " lf=" << lf << " crlf=" << crlf;
+        auto eol = m_eol;
         auto m = std::max({lf, crlf, cr});
         if(m == lf)
             m_eol = eol_t::unix_eol; //unix
@@ -551,6 +551,8 @@ bool Editor::FillStrOffset(std::shared_ptr<StrBuff<std::string, std::string_view
             m_eol = eol_t::win_eol; //windows
         else
             m_eol = eol_t::mac_eol; //apple
+
+        LOG_IF(eol != m_eol, DEBUG) << "cr=" << cr << " lf=" << lf << " crlf=" << crlf;
     }
 
     str->resize(i);
