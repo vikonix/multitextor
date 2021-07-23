@@ -656,6 +656,15 @@ bool WndManager::DelWnd(Wnd* wnd)
             break;
         }
     }
+    if (m_wndList.empty() && nullptr != m_view[2].wnd)
+    {
+        if (!m_activeView)
+        {
+            SetTopWnd(m_view[2].wnd);
+        }
+
+    }
+
     m_invalidate = true;
     m_invalidTitle = true;
 

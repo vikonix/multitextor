@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 
 #include "utils/logger.h"
 #include "utils/Directory.h"
+#include "utfcpp/utf8.h"
 #include "cxxopts/cxxopts.hpp"
 #include "EditorApp.h"
 #include "Version.h"
@@ -141,7 +142,7 @@ int main(int argc, char** argv) try
     {
         for (auto& f : files)
         {
-            std::filesystem::path path = f;
+            std::filesystem::path path = utf8::utf8to16(f);
             auto [t, parser] = LexParser::GetFileType(path);
             app.OpenFile(f, parser, "UTF-8");
         }

@@ -328,7 +328,7 @@ bool    EditorApp::SelectRecentFileProc(input_t cmd)
         return true;
 
     auto& [path, parse, cp, ro, log] = m_recentFiles[n];
-    return OpenFile(path, parse, cp, ro, log);
+    return OpenFile(utf8::utf8to16(path), parse, cp, ro, log);
 }
 
 bool    EditorApp::SelectRecentSessionProc(input_t cmd)

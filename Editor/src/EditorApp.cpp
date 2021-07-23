@@ -501,19 +501,34 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
 
     WndManager::getInstance().m_splitX      = vConfig.sizex;
     WndManager::getInstance().m_splitY      = vConfig.sizey;
-    WndManager::getInstance().m_splitType   = static_cast<split_t>(vConfig.type);
-    WndManager::getInstance().m_activeView  = vConfig.active;
+    auto splitType = static_cast<split_t>(vConfig.type);
+    auto activeView = vConfig.active;
 
     if (!vConfig.file1.empty())
     {
         auto wnd = GetEditorWnd(vConfig.file1);
-        WndManager::getInstance().SetTopWnd(wnd, 0);
+        if(nullptr != wnd)
+            WndManager::getInstance().SetTopWnd(wnd, 0);
+        else
+        {
+            activeView = 0;
+            splitType = split_t::no_split;
+        }
     }
     if (!vConfig.file2.empty())
     {
         auto wnd = GetEditorWnd(vConfig.file2);
-        WndManager::getInstance().SetTopWnd(wnd, 1);
+        if (nullptr != wnd)
+            WndManager::getInstance().SetTopWnd(wnd, 1);
+        else
+        {
+            activeView = 0;
+            splitType = split_t::no_split;
+        }
     }
+
+    WndManager::getInstance().m_splitType = static_cast<split_t>(splitType);
+    WndManager::getInstance().m_activeView = activeView;
 
     WndManager::getInstance().CalcView();
 
