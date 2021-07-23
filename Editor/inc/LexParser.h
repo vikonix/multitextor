@@ -37,6 +37,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_map>
 #include <filesystem>
 
+
 using namespace _Utils;
 using namespace _Console;
 using namespace _WndManager;
@@ -119,8 +120,10 @@ protected:
     bool        m_showTab{};
 
     std::map<size_t, std::string> m_lexPosition;
-    char16_t    m_stringSymbol{};
-    bool        m_cutLine{};
+    
+    std::list<char16_t>           m_stringSymbol;
+    bool                          m_cutLine{};
+
     bool        m_commentLine{};
     size_t      m_commentOpen{};
     bool        m_commentToggled{};

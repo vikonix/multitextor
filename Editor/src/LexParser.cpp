@@ -279,7 +279,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
     lexstr.reserve(strLen);
     LexicalParse(std::u16string_view(wstr).substr(0, strLen), lexstr, true);
 
-    //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol;
+    //LOG(DEBUG) << "GetColor(" << line << ") '" << str << "' len=" << len << " cut=" << m_cutLine << " strSymbol=" << m_stringSymbol.front();
     //LOG(DEBUG) << "  color='" << lex << "'";
 
     color.reserve(len);
@@ -319,6 +319,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
 //////////////////////////////////////////////////////////////////////////////
 bool LexParser::CheckForConcatenatedLine(size_t line)
 {
+    m_stringSymbol.clear();
     bool cutLine{};
     if (line)
     {
@@ -330,14 +331,13 @@ bool LexParser::CheckForConcatenatedLine(size_t line)
             if (!prevLex.empty() && prevLex.back() == '\\')
             {
                 cutLine = m_cutLine = true;
-                m_stringSymbol = prevLex[prevLex.size() - 2];
+                m_stringSymbol.push_back(prevLex[prevLex.size() - 2]);
             }
         }
     }
     if (!cutLine)
     {
         m_cutLine = false;
-        m_stringSymbol = 0;
     }
     
     return true;
@@ -346,7 +346,7 @@ bool LexParser::CheckForConcatenatedLine(size_t line)
 bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool color)
 {
     if (!m_cutLine)
-        m_stringSymbol = 0;
+        m_stringSymbol.clear();
 
     m_cutLine = false;
     m_commentLine = false;
@@ -518,7 +518,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                         {
                             if (str[end] == '\\')
                             {
-                                buff += static_cast<char>(m_stringSymbol);
+                                buff += static_cast<char>(m_stringSymbol.front());
                                 buff += '\\';
                             }
                         }
@@ -677,7 +677,7 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
 
     end = begin;
 
-    if (m_stringSymbol && type != lex_t::END)
+    if (!m_stringSymbol.empty() && type != lex_t::END)
         //string continues from prev line
         type = lex_t::STRING;
     else if(!m_toggledComment.empty())
@@ -721,10 +721,10 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
         {
             if (m_commentLine || m_commentOpen)
                 break;
-            if (!m_stringSymbol)
+            if (m_stringSymbol.empty())
             {
                 //begin of the string
-                m_stringSymbol = str[begin];
+                m_stringSymbol.push_back(str[begin]);
                 if(end < strSize - 1)
                     ++end;
             }
@@ -732,11 +732,32 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
             lex_t t;
             while (end < strSize - 1 && (t = SymbolType(str[end])) != lex_t::END)
             {
-                if (t == lex_t::STRING && str[end] == m_stringSymbol)
+                if (t == lex_t::STRING)
                 {
-                    //end of string
-                    m_stringSymbol = 0;
-                    break;
+                    if constexpr (1)
+                    {
+                        //standard string
+                        if (str[end] == m_stringSymbol.front())
+                        {
+                            m_stringSymbol.clear();
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        //recursive string
+                        if (str[end] == m_stringSymbol.back())
+                        {
+                            m_stringSymbol.pop_back();
+                            if (m_stringSymbol.empty())
+                            {
+                                //end of string
+                                break;
+                            }
+                        }
+                        else
+                            m_stringSymbol.push_back(str[end]);
+                    }
                 }
                 else if (t == lex_t::BACKSLASH)
                 {
