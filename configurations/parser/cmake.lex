@@ -2,7 +2,7 @@
   "ParserConfig": {
     "1_LanguageName": "CMake",
     "2_FileExtentions": "CMakeLists.txt;*.cmake",
-    "3_Delimiters": "()[]{}",
+    "3_Delimiters": "(){}",
     "4_NameSymbols": "",
     "5_SpecialSymbols": ["$"],
     "6_LineComments": ["#"],
