@@ -503,6 +503,8 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
     WndManager::getInstance().m_splitY      = vConfig.sizey;
     auto splitType = static_cast<split_t>(vConfig.type);
     auto activeView = vConfig.active;
+    WndManager::getInstance().m_splitType = static_cast<split_t>(splitType);
+    WndManager::getInstance().m_activeView = activeView;
 
     if (!vConfig.file1.empty())
     {

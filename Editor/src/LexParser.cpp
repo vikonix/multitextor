@@ -190,6 +190,13 @@ bool LexParser::SetParseStyle(const std::string& style)
             {
                 m_parseStyle = cfg.langName;
 
+                m_recursiveComment = cfg.recursiveComment;
+                m_notCase = cfg.notCase;
+                m_saveTab = cfg.saveTab;
+                m_tabSize = cfg.tabSize;
+                m_scan = cfg.scanFile;
+                m_showTab = false;
+
                 for (char16_t i = 0; i < lexTabSize; ++i)
                     m_lexTab[i] = static_cast<lex_t>(GetSymbolType(i));
                 for (int d : cfg.delimiters)
@@ -209,14 +216,14 @@ bool LexParser::SetParseStyle(const std::string& style)
                     m_toggledComment.insert(utf8::utf8to16(toggledComment));
 
                 for (auto& kword : cfg.keyWords)
-                    m_keyWords.insert(utf8::utf8to16(kword));
-
-                m_recursiveComment = cfg.recursiveComment;
-                m_notCase = cfg.notCase;
-                m_saveTab = cfg.saveTab;
-                m_tabSize = cfg.tabSize;
-                m_scan    = cfg.scanFile;
-                m_showTab = false;
+                {
+                    auto kword16 = utf8::utf8to16(kword);
+                    if (m_notCase)
+                        std::transform(kword16.begin(), kword16.end(), kword16.begin(),
+                            [](char16_t c) { return std::towupper(c); }
+                        );
+                    m_keyWords.insert(kword16);
+                }
 
                 return true;
             }
@@ -805,7 +812,16 @@ bool LexParser::IsNumeric(std::u16string_view lexem)
 
 bool LexParser::IsKeyWord(std::u16string_view lexem)
 {
-    if (m_keyWords.empty() || m_keyWords.find(std::u16string(lexem)) == m_keyWords.end())
+    if (m_keyWords.empty())
+        return false;
+    
+    auto lexem16 = std::u16string(lexem);
+    if (m_notCase)
+        std::transform(lexem16.begin(), lexem16.end(), lexem16.begin(),
+            [](char16_t c) { return std::towupper(c); }
+    );
+
+    if(m_keyWords.find(lexem16) == m_keyWords.end())
         return false;
     else
         return true;

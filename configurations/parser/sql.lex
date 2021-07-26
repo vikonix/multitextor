@@ -3,7 +3,7 @@
     "1_LanguageName": "SQL",
     "2_FileExtentions": "*.sql",
     "3_Delimiters": "();",
-    "4_NameSymbols": "",
+    "4_NameSymbols": ".@",
     "5_SpecialSymbols": [],
     "6_LineComments": ["#", "--"],
     "7_OpenComments": ["/*"],
@@ -947,7 +947,21 @@
 
         "SUM",
         "DATEDIFF",
-        "CAST"
+        "CAST",
+        "DATE_FORMAT",
+        "SYSDATE",
+        "IFNULL",
+        "LENGTH",
+        "ROUND",
+        "DELIMITER",
+        "SUBSTRING",
+        "JSON_OBJECT",
+        "JSON_INSERT",
+        "JSON_MERGE",
+
+        "InnoDB",
+        "utf8",
+        "utf8mb4"
     ]
   }
 }

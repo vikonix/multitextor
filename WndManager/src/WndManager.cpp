@@ -642,6 +642,8 @@ bool WndManager::AddLastWnd(Wnd* wnd)
 bool WndManager::DelWnd(Wnd* wnd)
 {
     //LOG(DEBUG) << __FUNC__ << " wnd=" << wnd;
+    if (nullptr == wnd)
+        return true;
 
     //del from list
     if (wnd == m_view[2].wnd)
