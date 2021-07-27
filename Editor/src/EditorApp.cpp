@@ -517,7 +517,7 @@ bool EditorApp::LoadSession(std::optional<const std::filesystem::path> path)
             splitType = split_t::no_split;
         }
     }
-    if (!vConfig.file2.empty())
+    if (!vConfig.file2.empty() && splitType != split_t::no_split)
     {
         auto wnd = GetEditorWnd(vConfig.file2);
         if (nullptr != wnd)
