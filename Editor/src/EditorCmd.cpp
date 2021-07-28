@@ -177,6 +177,7 @@ CmdMap g_defaultEditKeyMap
     {{K_ESC, K_ESC},            {K_ED(E_SELECT_END)}},
     {{K_RELEASE | K_SHIFT},     {K_ED(E_SELECT_END) + 1}},
     {{'A' | K_CTRL},            {K_ED(E_SELECT_ALL)}},
+    {{'B' | K_CTRL},            {K_ED(E_SELECT_ALL_FOUND)}},
 
     {{K_F5},                    {K_ED(E_EDIT_BLOCK_COPY)}},
     {{K_F6},                    {K_ED(E_EDIT_BLOCK_MOVE)}},
@@ -263,6 +264,7 @@ std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select
     {E_SELECT_END,          {&EditorWnd::SelectEnd,              EditorWnd::select_state::no}},
     {E_SELECT_UNSELECT,     {&EditorWnd::SelectUnselect,         EditorWnd::select_state::no}},
     {E_SELECT_MODE,         {&EditorWnd::SelectMode,             EditorWnd::select_state::no}},
+    {E_SELECT_ALL_FOUND,    {&EditorWnd::SelectAllFound,         EditorWnd::select_state::no}},
 
     {E_EDIT_C,              {&EditorWnd::EditC,                  EditorWnd::select_state::end}},
     {E_EDIT_DEL_C,          {&EditorWnd::EditDelC,               EditorWnd::select_state::end}},
@@ -430,6 +432,7 @@ std::unordered_map<input_t, std::string> g_CmdNames
     { K_ED(E_SELECT_END),           "EDIT_SELECT_END"},
     { K_ED(E_SELECT_UNSELECT),      "EDIT_SELECT_UNSELECT"},
     { K_ED(E_SELECT_MODE),          "EDIT_SELECT_LINES_BEGIN"},
+    { K_ED(E_SELECT_ALL_FOUND),     "EDIT_SELECT_ALL_FOUND" },
 
     { K_ED(E_EDIT_DEL_C),           "EDIT_DEL_CHAR"},
     { K_ED(E_EDIT_BS),              "EDIT_BS"},

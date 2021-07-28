@@ -966,6 +966,14 @@
       },
       {
         "Cmd": [
+          "EDIT_SELECT_ALL_FOUND"
+        ],
+        "Key": [
+          "Ctrl+B"
+        ]
+      },
+      {
+        "Cmd": [
           "EDIT_BLOCK_COPY"
         ],
         "Key": [

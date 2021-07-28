@@ -429,6 +429,7 @@ bool EditorWnd::PrintStr(pos_t x, pos_t y, const std::u16string& wstr, size_t of
     {
         std::vector<color_t> colorBuff;
         rc = m_editor->GetColor(m_firstLine + y, wstr, colorBuff, offset + len);
+        [[maybe_unused]]bool rc1 = MarkAllFound(wstr, colorBuff);
 
         if (rc)
             rc = WriteColorStr(x, y, str, std::vector<color_t>(colorBuff.cbegin() + offset, colorBuff.cend()));
@@ -1587,18 +1588,18 @@ bool EditorWnd::FindUp(bool silence)
 
     time_t t{ time(NULL) };
 
-    std::u16string find{ FindDialog::s_vars.findStrW };
-    size_t size = find.size();
+    m_findStr = FindDialog::s_vars.findStrW;
+    size_t size = m_findStr.size();
     if (!FindDialog::s_vars.checkCase)
     {
-        std::transform(find.begin(), find.end(), find.begin(),
+        std::transform(m_findStr.begin(), m_findStr.end(), m_findStr.begin(),
             [](char16_t c) { return std::towupper(c); }
         );
     }
 
     //find only latin symbols
     bool fast{ true };
-    for (auto c : find)
+    for (auto c : m_findStr)
         if (c >= 0x80)
         {
             fast = false;
@@ -1652,13 +1653,13 @@ bool EditorWnd::FindUp(bool silence)
         auto itBegin = offset ? std::next(str.crbegin(), str.size() - offset) : str.crbegin();
         while (itBegin != str.crend())
         {
-            auto itFound = std::search(itBegin, str.crend(), std::boyer_moore_horspool_searcher(find.crbegin(), find.crend()));
+            auto itFound = std::search(itBegin, str.crend(), std::boyer_moore_horspool_searcher(m_findStr.crbegin(), m_findStr.crend()));
             if (itFound != str.crend())
             {
                 if (fast && offset == 0)
                 {
                     str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
-                    itFound = std::search(str.crbegin(), str.crend(), std::boyer_moore_horspool_searcher(find.crbegin(), find.crend()));
+                    itFound = std::search(str.crbegin(), str.crend(), std::boyer_moore_horspool_searcher(m_findStr.crbegin(), m_findStr.crend()));
                 }
 
                 offset = std::distance(itFound, str.crend()) - size;
@@ -1728,18 +1729,18 @@ bool EditorWnd::FindDown(bool silence)
 
     time_t t{ time(NULL) };
 
-    std::u16string find{ FindDialog::s_vars.findStrW };
-    size_t size = find.size();
+    m_findStr = FindDialog::s_vars.findStrW;
+    size_t size = m_findStr.size();
     if (!FindDialog::s_vars.checkCase)
     {
-        std::transform(find.begin(), find.end(), find.begin(),
+        std::transform(m_findStr.begin(), m_findStr.end(), m_findStr.begin(),
             [](char16_t c) { return std::towupper(c); }
         );
     }
     
     //find only latin symbols
     bool fast{true};
-    for(auto c : find)
+    for(auto c : m_findStr)
         if (c >= 0x80)
         {
             fast = false;
@@ -1789,13 +1790,13 @@ bool EditorWnd::FindDown(bool silence)
         auto itBegin = offset ? std::next(str.cbegin(), offset) : str.cbegin();
         while (itBegin != str.cend())
         {
-            auto itFound = std::search(itBegin, str.cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
+            auto itFound = std::search(itBegin, str.cend(), std::boyer_moore_horspool_searcher(m_findStr.cbegin(), m_findStr.cend()));
             if (itFound != str.cend())
             {
                 if (fast && offset == 0)
                 {
                     str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
-                    itFound = std::search(str.cbegin(), str.cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
+                    itFound = std::search(str.cbegin(), str.cend(), std::boyer_moore_horspool_searcher(m_findStr.cbegin(), m_findStr.cend()));
                 }
 
                 offset = std::distance(str.cbegin(), itFound);
@@ -1847,6 +1848,45 @@ bool EditorWnd::FindDown(bool silence)
     }
 
     return false;
+}
+
+bool EditorWnd::MarkAllFound(const std::u16string& wstr, std::vector<color_t>& colorBuff)
+{
+    if (!m_markAllFound)
+        return true;
+    if (m_findStr.empty())
+        return true;
+
+    auto size = m_findStr.size();
+    std::u16string str{wstr};
+    if (!FindDialog::s_vars.checkCase)
+    {
+        std::transform(str.begin(), str.end(), str.begin(),
+            [](char16_t c) { return std::towupper(c); }
+        );
+    }
+
+    auto itBegin = str.cbegin();
+    while (itBegin != str.cend())
+    {
+        auto itFound = std::search(itBegin, str.cend(), std::boyer_moore_horspool_searcher(m_findStr.cbegin(), m_findStr.cend()));
+        if (itFound != str.cend())
+        {
+            auto offset = std::distance(str.cbegin(), itFound);
+            if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
+            {
+                //mark found
+                for (size_t i = 0; i < size; ++i)
+                    colorBuff[offset + i] = ColorWindowSelect;
+            }
+
+            itBegin = itFound + size;
+        }
+        else
+            break;
+    }
+
+    return true;
 }
 
 bool EditorWnd::EditWndCopy(EditorWnd* from)

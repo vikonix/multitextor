@@ -852,6 +852,26 @@ bool EditorWnd::SelectAll(input_t cmd)
     return true;
 }
 
+bool EditorWnd::SelectAllFound(input_t cmd)
+{
+    pos_t hide = K_GET_CODE(cmd);
+
+    auto mark = m_markAllFound;
+
+    if (0 == hide)
+        m_markAllFound = !m_markAllFound;
+    else
+        m_markAllFound = false;
+
+    if (mark != m_markAllFound)
+    {
+        InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
+        Repaint();
+    }
+
+    return true;
+}
+
 bool EditorWnd::MoveLexMatch([[maybe_unused]]input_t cmd)
 {
     //LOG(DEBUG) << "    MoveLexMatch";

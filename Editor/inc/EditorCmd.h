@@ -116,6 +116,7 @@ enum EditorCmd : input_t
     E_SELECT_END,
     E_SELECT_UNSELECT,
     E_SELECT_MODE,
+    E_SELECT_ALL_FOUND,
 
     E_EDIT_C,
     E_EDIT_DEL_C,

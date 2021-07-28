@@ -120,10 +120,12 @@ class EditorWnd : public FrameWnd
     size_t          m_endY{};
 
     //search coord
+    std::u16string  m_findStr;
     size_t          m_foundX{};
     size_t          m_foundY{};
     size_t          m_foundSize{};
     size_t          m_progress{};
+    bool            m_markAllFound{};
 
     //file position info
     size_t          m_infoStrSize{};
@@ -148,6 +150,7 @@ class EditorWnd : public FrameWnd
     bool    _GotoXY(size_t x, size_t y, bool top = false);
     bool    InvalidateRect(pos_t x = 0, pos_t y = 0, pos_t sizex = 0, pos_t sizey = 0);
     bool    PrintStr(pos_t x, pos_t y, const std::u16string& str, size_t offset, size_t len);
+    bool    MarkAllFound(const std::u16string& str, std::vector<color_t>& colorBuff);
 
     bool    UpdateAccessInfo();
     bool    UpdateNameInfo();
@@ -263,6 +266,7 @@ public:
     bool SelectEnd(input_t cmd);
     bool SelectUnselect(input_t cmd);
     bool SelectMode(input_t cmd);
+    bool SelectAllFound(input_t cmd);
 
     bool EditC(input_t cmd);
     bool EditDelC(input_t cmd);
