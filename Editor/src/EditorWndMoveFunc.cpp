@@ -610,6 +610,7 @@ bool EditorWnd::MoveCenter([[maybe_unused]]input_t cmd)
 bool EditorWnd::SelectBegin(input_t cmd)
 {
     //LOG(DEBUG) << "    SelectBegin code " << std::hex << cmd << std::dec << " s=" << m_selectKeyShift;
+    SelectAllFound(1);
     if ((m_selectState & select_state::end) != 0)
         SelectUnselect(cmd);
 
@@ -777,6 +778,7 @@ bool EditorWnd::SelectMode(input_t cmd)
         SelectEnd(0);
     else
     {
+        SelectAllFound(1);
         if (IsSelectFinished())
             SelectUnselect(0);
 
@@ -796,6 +798,7 @@ bool EditorWnd::SelectMode(input_t cmd)
 
 bool EditorWnd::SelectWord(input_t cmd)
 {
+    SelectAllFound(1);
     if (IsSelectFinished())
         SelectUnselect(cmd);
 
@@ -818,6 +821,7 @@ bool EditorWnd::SelectWord(input_t cmd)
 
 bool EditorWnd::SelectLine(input_t cmd)
 {
+    SelectAllFound(1);
     if (IsSelectFinished())
         SelectUnselect(cmd);
 
@@ -836,6 +840,7 @@ bool EditorWnd::SelectLine(input_t cmd)
 
 bool EditorWnd::SelectAll(input_t cmd)
 {
+    SelectAllFound(1);
     if (IsSelectFinished())
         SelectUnselect(cmd);
 
@@ -865,6 +870,12 @@ bool EditorWnd::SelectAllFound(input_t cmd)
 
     if (mark != m_markAllFound)
     {
+        if (m_markAllFound)
+        {
+            if ((m_selectState & select_state::end) != 0)
+                SelectUnselect(cmd);
+        }
+
         InvalidateRect(0, 0, m_clientSizeX, m_clientSizeY);
         Repaint();
     }
