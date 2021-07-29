@@ -3,7 +3,7 @@
     "1_LanguageName": "XML",
     "2_FileExtentions": "*.xml",
     "3_Delimiters": "/&=?<>",
-    "4_NameSymbols": ":.@*,;-",
+    "4_NameSymbols": ":.@*,;!-",
     "5_SpecialSymbols": [],
     "6_LineComments": [],
     "7_OpenComments": ["!--"],
