@@ -1876,7 +1876,7 @@ bool EditorWnd::MarkAllFound(const std::u16string& wstr, std::vector<color_t>& c
             if (!FindDialog::s_vars.findWord || IsWord(str, offset, size))
             {
                 //mark found
-                for (size_t i = 0; i < size; ++i)
+                for (size_t i = 0; i < size && offset + i < colorBuff.size(); ++i)
                     colorBuff[offset + i] = ColorWindowSelect;
             }
 
