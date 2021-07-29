@@ -63,22 +63,22 @@ Windows list dialog.
 |Esc  PageDn     	|APP_VIEW_CHANGE|
 |Esc  9          	|APP_VIEW_CHANGE|
 |Esc  3          	|APP_VIEW_CHANGE|
-|Ctrl+D          	|APP_DLG_DIFF| not implemented
-|Ctrl+\          	|APP_DLG_BOOKMARK| not implemented
-|Alt+\           	|APP_DLG_BOOKMARK| not implemented
-|Alt+0           	|APP_BOOKMARK_0| not implemented
-|Alt+1           	|APP_BOOKMARK_1| not implemented
-|Alt+2           	|APP_BOOKMARK_2| not implemented
-|Alt+3           	|APP_BOOKMARK_3| not implemented
-|Alt+4           	|APP_BOOKMARK_4| not implemented
-|Alt+5           	|APP_BOOKMARK_5| not implemented
-|Alt+6           	|APP_BOOKMARK_6| not implemented
-|Alt+7           	|APP_BOOKMARK_7| not implemented
-|Alt+8           	|APP_BOOKMARK_8| not implemented
-|Alt+9           	|APP_BOOKMARK_9| not implemented
+|Ctrl+D          	|~~APP_DLG_DIFF~~|
+|Ctrl+\          	|~~APP_DLG_BOOKMARK~~|
+|Alt+\           	|~~APP_DLG_BOOKMARK~~|
+|Alt+0           	|~~APP_BOOKMARK_0~~|
+|Alt+1           	|~~APP_BOOKMARK_1~~|
+|Alt+2           	|~~APP_BOOKMARK_2~~|
+|Alt+3           	|~~APP_BOOKMARK_3~~|
+|Alt+4           	|~~APP_BOOKMARK_4~~|
+|Alt+5           	|~~APP_BOOKMARK_5~~|
+|Alt+6           	|~~APP_BOOKMARK_6~~|
+|Alt+7           	|~~APP_BOOKMARK_7~~|
+|Alt+8           	|~~APP_BOOKMARK_8~~|
+|Alt+9           	|~~APP_BOOKMARK_9~~|
 |Ctrl+K          	|APP_RECORD_MACRO|
 |Alt+K           	|APP_PLAY_MACRO|
-|Ctrl+Q          	|APP_DLG_KEYGEN| not implemented
+|Ctrl+Q          	|~~APP_DLG_KEYGEN~~|
 |F12             	|APP_REFRESH|
 |KeyLeft         	|EDIT_MOVE_LEFT|
 |KeyRight        	|EDIT_MOVE_RIGHT|
@@ -184,5 +184,5 @@ Windows list dialog.
 |Esc  m          	|EDIT_POPUP_MENU|
 |Esc  M          	|EDIT_POPUP_MENU|
 |Ctrl+E          	|EDIT_DLG_PROPERTIES|
-|Ctrl+J          	|EDIT_DLG_FUNC_LIST| not implemented
+|Ctrl+J          	|~~EDIT_DLG_FUNC_LIST~~|
 |F11             	|EDIT_CTRL_REFRESH|
