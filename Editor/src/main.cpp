@@ -59,7 +59,7 @@ void PrintKeys()
             for (auto c : cmd)
                 cmdstr += (cmdstr.size() ? " + " : "") + app.GetCodeName(c);
 
-            std::cout << "Keys: " << std::left << std::setw(16) << keystr << "\t cmd: " << cmdstr << std::endl;
+            std::cout << "|" << std::left << std::setw(16) << keystr << "\t|" << cmdstr << "|" <<std::endl;
         }
 }
 
