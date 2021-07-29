@@ -23,7 +23,7 @@ Windows list dialog.
 
 |Keys               |Commands|
 |----               |--------|
-|F1              	|APP_HELP| not implemented
+|F1              	|~~APP_HELP~~|
 |F2              	|APP_SAVE_ALL|
 |Alt+S           	|APP_SAVE_ALL|
 |F3              	|APP_DLG_OPEN|
