@@ -177,6 +177,7 @@ bool LexParser::SetParseStyle(const std::string& style)
     m_parseStyle.clear();
     m_lexPosition.clear();
 
+    m_commentTest.reset();
     m_special.clear();
     m_lineComment.clear();
     m_openComment.clear();
@@ -207,13 +208,25 @@ bool LexParser::SetParseStyle(const std::string& style)
                 for (auto& special : cfg.special)
                     m_special.insert(utf8::utf8to16(special));
                 for (auto& lineComment : cfg.lineComment)
+                {
                     m_lineComment.insert(utf8::utf8to16(lineComment));
+                    m_commentTest.set(lineComment[0]);
+                }
                 for (auto& openComment : cfg.openComment)
+                {
                     m_openComment.insert(utf8::utf8to16(openComment));
+                    m_commentTest.set(openComment[0]);
+                }
                 for (auto& closeComment : cfg.closeComment)
+                {
                     m_closeComment.insert(utf8::utf8to16(closeComment));
+                    m_commentTest.set(closeComment[0]);
+                }
                 for (auto& toggledComment : cfg.toggledComment)
+                {
                     m_toggledComment.insert(utf8::utf8to16(toggledComment));
+                    m_commentTest.set(toggledComment[0]);
+                }
 
                 for (auto& kword : cfg.keyWords)
                 {
@@ -383,10 +396,76 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
         }
 
         size_t offset = 0;
-        if (type == lex_t::STRING
-         || type == lex_t::DELIMITER
-         || type == lex_t::SYMBOL
-         || type == lex_t::OPERATOR
+        if (type == lex_t::COMMENT_LINE
+         || type == lex_t::COMMENT_OPEN
+         || type == lex_t::COMMENT_TOGGLED
+         || type == lex_t::COMMENT_CLOSE
+        )
+        {
+            //LOG(DEBUG) << "    Comment from begin";
+            //LOG(DEBUG) << "    comment 1 t=" << static_cast<int>(comment);
+            if (!m_commentOpen && type == lex_t::COMMENT_LINE && !skipComment)
+            {
+                //LOG(DEBUG) << "    COMMENT_LINE";
+                if (!m_commentLine)
+                    m_commentLine = true;
+            }
+
+            if (!m_commentLine && type == lex_t::COMMENT_TOGGLED)
+            {
+                //LOG(DEBUG) << "    COMMENT_TOGGLED";
+                m_commentToggled = !m_commentToggled;
+                if (m_commentToggled)
+                    ++m_commentOpen;
+                else
+                    --m_commentOpen;
+            }
+
+            if (!m_commentLine && type == lex_t::COMMENT_OPEN)
+            {
+                //LOG(DEBUG) << "    COMMENT_OPEN";
+                ++m_commentOpen;
+            }
+
+            if (type == lex_t::COMMENT_CLOSE)
+            {
+                //LOG(DEBUG) << "    COMMENT_CLOSE";
+                if (m_commentLine && m_commentOpen != 0)
+                    m_commentLine = false;
+                if (m_recursiveComment)
+                    --m_commentOpen;
+                else
+                    m_commentOpen = 0;
+            }
+
+            offset = end;
+
+            if (color)
+            {
+                buff.resize(end + 1, 'R');
+            }
+            else
+            {
+                if (!m_commentLine && type == lex_t::COMMENT_OPEN)
+                {
+                    if (buff.empty() || buff.back() != 'O')
+                        buff += 'O';
+                }
+                else if (!m_commentLine && type == lex_t::COMMENT_TOGGLED)
+                {
+                    if (buff.empty() || buff.back() != 'T')
+                        buff += 'T';
+                    else
+                        buff.pop_back();
+                }
+                else if (type == lex_t::COMMENT_CLOSE)
+                    buff += 'C';
+            }
+        }
+        else if (type == lex_t::STRING
+              || type == lex_t::DELIMITER
+              || type == lex_t::SYMBOL
+              || type == lex_t::OPERATOR
             )
         {
             //for symbols need full matching
@@ -405,78 +484,11 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                 }
             }
 
-            lex_t comment{};
             size_t e;
             if (ScanSpecial(str.substr(begin, end - begin + 1), e))
             {
                 end = begin + e;
                 offset = end;
-            }
-            else if ((comment = ScanCommentFromBegin(str.substr(begin, end - begin + 1), e)) != lex_t::END)
-            {
-                //LOG(DEBUG) << "    Comment from begin";
-                if (type != lex_t::SYMBOL || e == end - begin)
-                {
-                    //LOG(DEBUG) << "    comment 1 t=" << static_cast<int>(comment);
-                    if (!m_commentOpen && comment == lex_t::COMMENT_LINE && !skipComment)
-                    {
-                        //LOG(DEBUG) << "    COMMENT_LINE";
-                        if (!m_commentLine)
-                            m_commentLine = true;
-                    }
-
-                    if (!m_commentLine && comment == lex_t::COMMENT_TOGGLED)
-                    {
-                        //LOG(DEBUG) << "    COMMENT_TOGGLED";
-                        m_commentToggled = !m_commentToggled;
-                        if (m_commentToggled)
-                            ++m_commentOpen;
-                        else
-                            --m_commentOpen;
-                    }
-
-                    if (!m_commentLine && comment == lex_t::COMMENT_OPEN)
-                    {
-                        //LOG(DEBUG) << "    COMMENT_OPEN";
-                        ++m_commentOpen;
-                    }
-
-                    if (comment == lex_t::COMMENT_CLOSE)
-                    {
-                        //LOG(DEBUG) << "    COMMENT_CLOSE";
-                        if (m_commentLine && m_commentOpen != 0)
-                            m_commentLine = false;
-                        if (m_recursiveComment)
-                            --m_commentOpen;
-                        else
-                            m_commentOpen = 0;
-                    }
-
-                    end = begin + e;
-                    offset = end;
-
-                    if (color)
-                    {
-                        buff.resize(end + 1, 'R');
-                    }
-                    else
-                    {
-                        if (!m_commentLine && comment == lex_t::COMMENT_OPEN)
-                        {
-                            if (buff.empty() || buff.back() != 'O')
-                                buff += 'O';
-                        }
-                        else if (!m_commentLine && comment == lex_t::COMMENT_TOGGLED)
-                        {
-                            if (buff.empty() || buff.back() != 'T')
-                                buff += 'T';
-                            else
-                                buff.pop_back();
-                        }
-                        else if (comment == lex_t::COMMENT_CLOSE)
-                            buff += 'C';
-                    }
-                }
             }
             else
             {
@@ -571,7 +583,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
         {
             lex_t comment;
             size_t r1, r2;
-            while (begin + offset <= end && (comment = ScanComment(str.substr(begin + offset, end - begin - offset), r1, r2)) != lex_t::END)
+            while (begin + offset <= end && (comment = ScanComment(str.substr(begin + offset, end - begin - offset + 1), r1, r2)) != lex_t::END)
             {
                 //LOG(DEBUG) << "    Comment inside";
                 if (offset && begin + offset + r2 == end)
@@ -681,23 +693,52 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
 
     if (begin < strSize)
         type = SymbolType(str[begin]);
+    else
+        return lex_t::END;
+    if (type == lex_t::END)
+        return type;
 
-    end = begin;
+    end = 0;
+    str.remove_prefix(begin);
+    strSize = str.size();
 
     if (!m_stringSymbol.empty() && type != lex_t::END)
         //string continues from prev line
         type = lex_t::STRING;
-    else if(!m_toggledComment.empty())
+    else if (str[0] < lexTabSize && m_commentTest[str[0]])
     {
-        for (auto& comment : m_toggledComment)
+        //line comment shields opened and hides closed
+        //first opened comment shields other opened comments
+        //closed comment always only one
+        if (!m_commentLine)
         {
-            if (auto pos = str.find(comment, begin); pos != std::string::npos)
+            std::array<lex_t, 3> ret{ lex_t::COMMENT_TOGGLED, lex_t::COMMENT_LINE, lex_t::COMMENT_OPEN };
+            size_t i{};
+            for (auto& list : {m_toggledComment, m_lineComment, m_openComment})
             {
-                if (pos == begin)
+                if (!list.empty())
                 {
-                    //toggled comment
-                    end += comment.size() - 1;
-                    return lex_t::OPERATOR;
+                    for (auto& comment : list)
+                    {
+                        if (strSize >= comment.size() && str.substr(0, comment.size()) == comment)
+                        {
+                            end = begin + comment.size() - 1;
+                            return ret[i];
+                        }
+                    }
+                }
+                ++i;
+            }
+        }
+
+        if (!m_closeComment.empty())
+        {
+            for (auto& comment : m_closeComment)
+            {
+                if (strSize >= comment.size() && str.substr(0, comment.size()) == comment)
+                {
+                    end = begin + comment.size() - 1;
+                    return lex_t::COMMENT_CLOSE;
                 }
             }
         }
@@ -731,7 +772,7 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
             if (m_stringSymbol.empty())
             {
                 //begin of the string
-                m_stringSymbol.push_back(str[begin]);
+                m_stringSymbol.push_back(str[0]);
                 if(end < strSize - 1)
                     ++end;
             }
@@ -781,10 +822,11 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
                 }
                 ++end;
             }
-            break;
         }
+        break;
     }
 
+    end += begin;
     return type;
 }
 
@@ -792,7 +834,7 @@ bool LexParser::ScanSpecial(std::u16string_view lexem, size_t& end)
 {
     for (auto& special : m_special)
     {
-        if (lexem.find(special) == 0)
+        if (lexem.size() >= special.size() && lexem.substr(0, special.size()) == special)
         {
             end = special.size() - 1;
             return true;
@@ -827,83 +869,12 @@ bool LexParser::IsKeyWord(std::u16string_view lexem)
         return true;
 }
 
-//line comment shields opened and hides closed
-//first opened comment shields other opened comments
-//closed comment always only one
-lex_t LexParser::ScanCommentFromBegin(std::u16string_view lexem, size_t& end)
-{
-    if (!m_commentLine)
-    {
-        //check for toggled comment
-        for (auto& comment : m_toggledComment)
-        {
-            if (auto pos = lexem.find(comment); pos != std::string::npos)
-            {
-                if (pos != 0)
-                {
-                    end = pos;
-                    return lex_t::END;
-                }
-                end = comment.size() - 1;
-                return lex_t::COMMENT_TOGGLED;
-            }
-        }
-
-        //check for open comment
-        for (auto& comment : m_openComment)
-        {
-            if (auto pos = lexem.find(comment); pos != std::string::npos)
-            {
-                if (pos != 0)
-                {
-                    end = pos;
-                    return lex_t::END;
-                }
-                end = comment.size() - 1;
-                return lex_t::COMMENT_OPEN;
-            }
-        }
-
-        //check for line comment
-        for (auto& comment : m_lineComment)
-        {
-            if (auto pos = lexem.find(comment); pos != std::string::npos)
-            {
-                if (pos != 0)
-                {
-                    end = pos;
-                    return lex_t::END;
-                }
-                end = comment.size() - 1;
-                return lex_t::COMMENT_LINE;
-            }
-        }
-    }
-
-    //check for close comment
-    for (auto& comment : m_closeComment)
-    {
-        if (auto pos = lexem.find(comment); pos != std::string::npos)
-        {
-            if (pos != 0)
-            {
-                end = pos;
-                return lex_t::END;
-            }
-            end = pos + comment.size() - 1;
-            return lex_t::COMMENT_CLOSE;
-        }
-    }
-
-    return lex_t::END;
-}
-
 lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& end)
 {
-    size_t line{};
-    size_t open{};
-    size_t close{};
-    size_t toggled{};
+    size_t line{ std::string::npos };
+    size_t open{ std::string::npos };
+    size_t close{ std::string::npos };
+    size_t toggled{ std::string::npos };
     size_t lineSize{};
     size_t openSize{};
     size_t closeSize{};
@@ -912,7 +883,7 @@ lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& e
     if (!m_commentLine)
     {
         //check for toggled comment
-        for (auto& comment : m_toggledComment)
+        for (const auto& comment : m_toggledComment)
         {
             if ((toggled = lexem.find(comment)) != std::string::npos)
             {
@@ -922,7 +893,7 @@ lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& e
         }
 
         //check for open comment
-        for (auto& comment : m_openComment)
+        for (const auto& comment : m_openComment)
         {
             if ((open = lexem.find(comment)) != std::string::npos)
             {
@@ -932,7 +903,7 @@ lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& e
         }
 
         //check for line comment
-        for (auto& comment : m_lineComment)
+        for (const auto& comment : m_lineComment)
         {
             if ((line = lexem.find(comment)) != std::string::npos)
             {
@@ -943,7 +914,7 @@ lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& e
     }
 
     //check for close comment
-    for (auto& comment : m_closeComment)
+    for (const auto& comment : m_closeComment)
     {
         if ((close = lexem.find(comment)) != std::string::npos)
         {
@@ -952,33 +923,32 @@ lex_t LexParser::ScanComment(std::u16string_view lexem, size_t& begin, size_t& e
         }
     }
 
-    lex_t type{};
-    if (lineSize && (!openSize || line < open) && (!closeSize || line < close))
+    if (toggledSize && toggled < line)
     {
-        type = lex_t::COMMENT_LINE;
-        begin = line;
-        end = begin + lineSize;
-    }
-    else if (toggledSize && (!lineSize || toggled < line))
-    {
-        type = lex_t::COMMENT_TOGGLED;
         begin = toggled;
-        end = begin + toggledSize;
+        end = begin + toggledSize - 1;
+        return lex_t::COMMENT_TOGGLED;
     }
-    else if (openSize && (!lineSize || open < line) && (!closeSize || open < close))
+    else if (lineSize && line < open && line < close)
     {
-        type = lex_t::COMMENT_OPEN;
+        begin = line;
+        end = begin + lineSize - 1;
+        return lex_t::COMMENT_LINE;
+    }
+    else if (openSize && open < line && open < close)
+    {
         begin = open;
-        end = begin + openSize;
+        end = begin + openSize - 1;
+        return lex_t::COMMENT_OPEN;
     }
-    else if (closeSize && (!lineSize || close < line) && (!openSize || close < open))
+    else if (closeSize && close < line && close < open)
     {
-        type = lex_t::COMMENT_CLOSE;
         begin = close;
-        end = begin + closeSize;
+        end = begin + closeSize - 1;
+        return lex_t::COMMENT_CLOSE;
     }
 
-    return type;
+    return lex_t::END;
 }
 
 bool LexParser::CheckForOpenComments(size_t line)

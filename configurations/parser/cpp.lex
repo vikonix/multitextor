@@ -126,7 +126,12 @@
       "line",
       "pragma",
       "once",
-      "NULL"
+      "NULL",
+      "__LINE__",
+      "__FILE__",
+      "__FUNCTION__",
+      "WIN32",
+      "_DEBUG"
     ]
   }
 }

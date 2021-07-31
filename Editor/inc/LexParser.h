@@ -36,7 +36,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <unordered_set>
 #include <unordered_map>
 #include <filesystem>
-
+#include <bitset>
 
 using namespace _Utils;
 using namespace _Console;
@@ -104,6 +104,7 @@ protected:
 
     inline static const size_t lexTabSize = 0x80;
     lex_t       m_lexTab[lexTabSize]{};
+    std::bitset<lexTabSize> m_commentTest;
 
     string_set  m_special;
     string_set  m_lineComment;
@@ -136,7 +137,6 @@ protected:
     bool    DeleteLexem(size_t line);
 
     lex_t   SymbolType(char16_t c) const ;
-    lex_t   ScanCommentFromBegin(std::u16string_view lexem, size_t& end);
     lex_t   ScanComment(std::u16string_view lexem, size_t& begin, size_t& end);
     bool    ScanSpecial(std::u16string_view lexem, size_t& end);
     bool    IsNumeric(std::u16string_view lexem);
