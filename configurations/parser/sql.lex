@@ -4,7 +4,7 @@
     "2_FileExtentions": "*.sql",
     "3_Delimiters": "();,",
     "4_NameSymbols": ".@",
-    "5_SpecialSymbols": [],
+    "5_SpecialCombination": [],
     "6_LineComments": ["#", "--"],
     "7_OpenComments": ["/*"],
     "8_ClosedComments": ["*/"],

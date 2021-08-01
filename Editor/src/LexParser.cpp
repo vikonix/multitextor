@@ -174,10 +174,13 @@ std::pair<size_t, std::string> LexParser::GetFileType(const std::filesystem::pat
 bool LexParser::SetParseStyle(const std::string& style)
 {
     m_scan = false;
+    m_recursiveString = false;
     m_parseStyle.clear();
     m_lexPosition.clear();
 
     m_commentTest.reset();
+    m_specialTest.reset();
+
     m_special.clear();
     m_lineComment.clear();
     m_openComment.clear();
@@ -190,6 +193,8 @@ bool LexParser::SetParseStyle(const std::string& style)
             if (cfg.langName == style)
             {
                 m_parseStyle = cfg.langName;
+                if (style == "Bash")
+                    m_recursiveString = true;
 
                 m_recursiveComment = cfg.recursiveComment;
                 m_notCase = cfg.notCase;
@@ -206,7 +211,11 @@ bool LexParser::SetParseStyle(const std::string& style)
                     m_lexTab[s] = lex_t::SYMBOL;
 
                 for (auto& special : cfg.special)
+                {
                     m_special.insert(utf8::utf8to16(special));
+                    m_specialTest.set(special[0]);
+                }
+
                 for (auto& lineComment : cfg.lineComment)
                 {
                     m_lineComment.insert(utf8::utf8to16(lineComment));
@@ -319,6 +328,7 @@ bool LexParser::GetColor(size_t line, const std::u16string& wstr, std::vector<co
             color.push_back(ColorWindowLConst);
             break;
         case '0' + static_cast<char>(lex_t::DELIMITER):
+        case '0' + static_cast<char>(lex_t::SPECIAL):
             color.push_back(ColorWindowLDelim);
             break;
         default:
@@ -395,6 +405,19 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                 buff.resize(begin, ' ');
         }
 
+        if (type == lex_t::SPECIAL)
+        {
+            if (str[end] == '{' || str[end] == '(' && end < str.size() - 1)
+            {
+                //LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin, end - begin + 1));
+                //bash var test
+                if (str[end] == '(')
+                    skipComment = ')';
+                else if (str[end] == '{')
+                    skipComment = '}';
+            }
+        }
+
         size_t offset = 0;
         if (type == lex_t::COMMENT_LINE
          || type == lex_t::COMMENT_OPEN
@@ -466,116 +489,98 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
               || type == lex_t::DELIMITER
               || type == lex_t::SYMBOL
               || type == lex_t::OPERATOR
+              || type == lex_t::SPECIAL
             )
         {
             //for symbols need full matching
             //for string check only some beginning symbols
             //for delimiters check first symbol as comment and if it matches then check some beginning symbols
-            if (type == lex_t::OPERATOR)
+            if (!m_commentLine)
             {
-                if (str[end] == '$' && str.size() > 2 && end < str.size() - 2)
+                auto c = str[begin];
+                if (!color)
                 {
-                    //LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin, end - begin + 1));
-                    //bash var test
-                    if (str[end + 1] == '(')
-                        skipComment = ')';
-                    else if (str[end + 1] == '{')
-                        skipComment = '}';
-                }
-            }
-
-            size_t e;
-            if (ScanSpecial(str.substr(begin, end - begin + 1), e))
-            {
-                end = begin + e;
-                offset = end;
-            }
-            else
-            {
-                if (!m_commentLine)
-                {
-                    auto c = str[begin];
-                    if (!color)
+                    if (type == lex_t::DELIMITER)
                     {
-                        if (type == lex_t::DELIMITER)
+                        if (c == '('
+                            || c == '{'
+                            || c == '['
+                            || c == '<')
+                            buff += static_cast<char>(c);
+                        else if (c == ')')
                         {
-                            if (c == '('
-                             || c == '{'
-                             || c == '['
-                             || c == '<')
-                                buff += static_cast<char>(c);
-                            else if (c == ')')
-                            {
-                                if (buff.empty() || buff.back() != '(')
-                                    buff += ')';
-                                else
-                                    buff.pop_back();
-                            }
-                            else if (c == '}')
-                            {
-                                if (buff.empty() || buff.back() != '{')
-                                    buff += '}';
-                                else
-                                    buff.pop_back();
-                            }
-                            else if (c == ']')
-                            {
-                                if (buff.empty() || buff.back() != '[')
-                                    buff += ']';
-                                else
-                                    buff.pop_back();
-                            }
-                            else if (c == '>')
-                            {
-                                if (buff.empty() || buff.back() != '<')
-                                    buff += '>';
-                                else
-                                    buff.pop_back();
-                            }
+                            if (buff.empty() || buff.back() != '(')
+                                buff += ')';
+                            else
+                                buff.pop_back();
                         }
-                        else if (type == lex_t::STRING)
+                        else if (c == '}')
                         {
-                            if (str[end] == '\\')
-                            {
-                                buff += static_cast<char>(m_stringSymbol.front());
-                                buff += '\\';
-                            }
+                            if (buff.empty() || buff.back() != '{')
+                                buff += '}';
+                            else
+                                buff.pop_back();
+                        }
+                        else if (c == ']')
+                        {
+                            if (buff.empty() || buff.back() != '[')
+                                buff += ']';
+                            else
+                                buff.pop_back();
+                        }
+                        else if (c == '>')
+                        {
+                            if (buff.empty() || buff.back() != '<')
+                                buff += '>';
+                            else
+                                buff.pop_back();
                         }
                     }
-
-                    if (c == '(')
+                    else if (type == lex_t::STRING)
                     {
-                        if (skipComment == ')')
-                            ++skipCount;
-                    }
-                    else if (c == '{')
-                    {
-                        if (skipComment == '}')
-                            ++skipCount;
-                    }
-                    else if (c == ')')
-                    {
-                        if (skipComment == ')' && --skipCount == 0)
-                            skipComment = 0;
-                    }
-                    else if (c == '}')
-                    {
-                        if (skipComment == '}' && --skipCount == 0)
-                            skipComment = 0;
+                        if (str[end] == '\\')
+                        {
+                            buff += static_cast<char>(m_stringSymbol.front());
+                            buff += '\\';
+                        }
                     }
                 }
 
-                if (color && !m_commentLine && !m_commentOpen)
-                    if (type == lex_t::SYMBOL)
-                    {
-                        char fill = '0' + static_cast<char>(type);
-                        if (IsNumeric(str.substr(begin, end - begin + 1)))
-                            fill = 'N';
-                        else if (IsKeyWord(str.substr(begin, end - begin + 1)))
-                            fill = 'K';
+                if (c == '(')
+                {
+                    if (skipComment == ')')
+                        ++skipCount;
+                }
+                else if (c == '{')
+                {
+                    if (skipComment == '}')
+                        ++skipCount;
+                }
+                else if (c == ')')
+                {
+                    if (skipComment == ')' && --skipCount == 0)
+                        skipComment = 0;
+                }
+                else if (c == '}')
+                {
+                    if (skipComment == '}' && --skipCount == 0)
+                        skipComment = 0;
+                }
+            }
 
-                        buff.resize(end + 1, fill);
-                    }
+            if (color && !m_commentLine && !m_commentOpen)
+            {
+                if (type == lex_t::SYMBOL
+                 || type == lex_t::SPECIAL)
+                {
+                    char fill = '0' + static_cast<char>(type);
+                    if (IsNumeric(str.substr(begin, end - begin + 1)))
+                        fill = 'N';
+                    else if (IsKeyWord(str.substr(begin, end - begin + 1)))
+                        fill = 'K';
+
+                    buff.resize(end + 1, fill);
+                }
             }
         }
 
@@ -705,6 +710,20 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
     if (!m_stringSymbol.empty() && type != lex_t::END)
         //string continues from prev line
         type = lex_t::STRING;
+    else if (str[0] < lexTabSize && m_specialTest[str[0]])
+    {
+        if (!m_special.empty())
+        {
+            for (auto& special : m_special)
+            {
+                if (strSize >= special.size() && str.substr(0, special.size()) == special)
+                {
+                    end = begin + special.size() - 1;
+                    return lex_t::SPECIAL;
+                }
+            }
+        }
+    }
     else if (str[0] < lexTabSize && m_commentTest[str[0]])
     {
         //line comment shields opened and hides closed
@@ -712,9 +731,9 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
         //closed comment always only one
         if (!m_commentLine)
         {
-            std::array<lex_t, 3> ret{ lex_t::COMMENT_TOGGLED, lex_t::COMMENT_LINE, lex_t::COMMENT_OPEN };
+            std::array<lex_t, 3> ret{ lex_t::COMMENT_TOGGLED, lex_t::COMMENT_OPEN, lex_t::COMMENT_LINE };
             size_t i{};
-            for (auto& list : {m_toggledComment, m_lineComment, m_openComment})
+            for (auto& list : { m_toggledComment, m_openComment, m_lineComment })
             {
                 if (!list.empty())
                 {
@@ -782,7 +801,7 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
             {
                 if (t == lex_t::STRING)
                 {
-                    if constexpr (1)
+                    if (!m_recursiveString || m_stringSymbol.front() != '\'')
                     {
                         //standard string
                         if (str[end] == m_stringSymbol.front())
@@ -794,6 +813,7 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
                     else
                     {
                         //recursive string
+                        // Bash begins from '
                         if (str[end] == m_stringSymbol.back())
                         {
                             m_stringSymbol.pop_back();
@@ -828,20 +848,6 @@ lex_t LexParser::LexicalScan(std::u16string_view str, size_t& begin, size_t& end
 
     end += begin;
     return type;
-}
-
-bool LexParser::ScanSpecial(std::u16string_view lexem, size_t& end)
-{
-    for (auto& special : m_special)
-    {
-        if (lexem.size() >= special.size() && lexem.substr(0, special.size()) == special)
-        {
-            end = special.size() - 1;
-            return true;
-        }
-    }
-    
-    return false;
 }
 
 bool LexParser::IsNumeric(std::u16string_view lexem)

@@ -4,7 +4,7 @@
     "2_FileExtentions": "*.c;*.cc;*.cpp;*.h;*.hpp",
     "3_Delimiters": "[]{}();",
     "4_NameSymbols": "$",
-    "5_SpecialSymbols": [],
+    "5_SpecialCombination": [],
     "6_LineComments": [
       "//"
     ],

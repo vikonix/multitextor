@@ -58,6 +58,7 @@ enum class lex_t
     OTHER           = static_cast<int>(symbol_t::other),    //7
     DELIMITER       = static_cast<int>(symbol_t::max),      //8...
     
+    SPECIAL,
     COMMENT_LINE,
     COMMENT_OPEN,
     COMMENT_CLOSE,
@@ -99,12 +100,14 @@ public:
 protected:
     static std::unordered_map<char16_t, std::pair<char16_t, bool>> s_lexPairs;
 
-    bool        m_scan{};
     std::string m_parseStyle;
+    bool        m_scan{};
+    bool        m_recursiveString{};
 
     inline static const size_t lexTabSize = 0x80;
     lex_t       m_lexTab[lexTabSize]{};
     std::bitset<lexTabSize> m_commentTest;
+    std::bitset<lexTabSize> m_specialTest;
 
     string_set  m_special;
     string_set  m_lineComment;
@@ -138,7 +141,6 @@ protected:
 
     lex_t   SymbolType(char16_t c) const ;
     lex_t   ScanComment(std::u16string_view lexem, size_t& begin, size_t& end);
-    bool    ScanSpecial(std::u16string_view lexem, size_t& end);
     bool    IsNumeric(std::u16string_view lexem);
     bool    IsKeyWord(std::u16string_view lexem);
 

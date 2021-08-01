@@ -197,7 +197,7 @@ bool ParserConfig::Load(const path_t& file)
     config.scanFile         = json[ScanFileKey];
     config.tabSize          = json[TabSizeKey];
 
-    for(auto& entry : json[SpecialSymbolsKey])
+    for(auto& entry : json[SpecialCombinationKey])
         config.special.push_back(static_cast<std::string>(entry));
     for (auto& entry : json[LineCommentsKey])
         config.lineComment.push_back(static_cast<std::string>(entry));
@@ -223,7 +223,7 @@ bool ParserConfig::Save(const path_t& file, const LexConfig& config) const
     json[FileExtKey]            = config.fileExt;
     json[DelimitersKey]         = config.delimiters;
     json[NameSymbolsKey]        = config.nameSymbols;
-    json[SpecialSymbolsKey]     = config.special;
+    json[SpecialCombinationKey] = config.special;
     json[LineCommentsKey]       = config.lineComment;
     json[OpenCommentsKey]       = config.openComment;
     json[CloseCommentsKey]      = config.closeComment;

@@ -86,7 +86,7 @@ class ParserConfig
     inline static const std::string FileExtKey          { "2_FileExtentions" };
     inline static const std::string DelimitersKey       { "3_Delimiters" };
     inline static const std::string NameSymbolsKey      { "4_NameSymbols" };
-    inline static const std::string SpecialSymbolsKey   { "5_SpecialSymbols" };
+    inline static const std::string SpecialCombinationKey{ "5_SpecialCombination" };
     inline static const std::string LineCommentsKey     { "6_LineComments" };
     inline static const std::string OpenCommentsKey     { "7_OpenComments" };
     inline static const std::string CloseCommentsKey    { "8_ClosedComments" };
