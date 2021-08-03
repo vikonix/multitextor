@@ -584,21 +584,21 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
             }
         }
 
-        if (type == lex_t::OPERATOR)
+        if (type == lex_t::OPERATOR || type == lex_t::SYMBOL)
         {
             lex_t comment;
-            size_t r1, r2;
-            while (begin + offset <= end && (comment = ScanComment(str.substr(begin + offset, end - begin - offset + 1), r1, r2)) != lex_t::END)
+            size_t beginComment, endComment;
+            while (begin + offset <= end && (comment = ScanComment(str.substr(begin + offset, end - begin - offset + 1), beginComment, endComment)) != lex_t::END)
             {
                 //LOG(DEBUG) << "    Comment inside";
-                if (offset && begin + offset + r2 == end)
+                if (offset && begin + offset + endComment == end)
                 {
                     //LOG(DEBUG) << "    OUT comment r1=" << r1 << " r2=" << r2 << " =" << std::string(str.substr(begin + offset));
                     break;
                 }
 
-                if (color && !m_commentLine && !m_commentOpen && r1)
-                    buff.resize(begin + offset + r1, '0' + static_cast<char>(type));
+                if (color && !m_commentLine && !m_commentOpen && beginComment)
+                    buff.resize(begin + offset + beginComment, '0' + static_cast<char>(type));
 
                 if (!m_commentOpen && comment == lex_t::COMMENT_LINE)
                 {
@@ -636,7 +636,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
                         m_commentOpen = 0;
                 }
 
-                offset += r2 + 1;
+                offset += endComment + 1;
 
                 if (color)
                 {
