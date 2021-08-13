@@ -89,6 +89,7 @@ FindFileDialog::FindFileDialog(bool replace, pos_t x, pos_t y)
     : Dialog(findFileDialog, x, y)
     , m_replace{ replace }
 {
+    FindDialog::s_vars.replaceMode = replace;
 }
 
 bool FindFileDialog::OnActivate()
@@ -373,9 +374,9 @@ bool SearchFileDialog::ScanDir(const path_t& path)
     //LOG(DEBUG) << __FUNC__ << "path=" << path.u8string();
     
     auto sizex = GetItem(ID_SF_PATH)->GetSizeX();
-    //std::string shortPath = Directory::CutPath(path, sizex);
-    //shortPath.resize(sizex, ' ');
-    //GetItem(ID_SF_PATH)->SetName(shortPath);
+    std::string dirPath = Directory::CutPath(path / m_mask, sizex);
+    dirPath.resize(sizex, ' ');
+    GetItem(ID_SF_PATH)->SetName(dirPath);
 
     _Utils::DirectoryList dirList;
 
