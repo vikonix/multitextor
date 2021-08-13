@@ -54,7 +54,7 @@ scancmd_t CmdParser::ScanKey(input_t key)
     if ((key & K_TYPEMASK) >= K_MOUSE && (key & K_TYPEMASK) <= K_MOUSEWDN)
         //cut mouse coordinates info
         key &= (K_TYPEMASK | K_MODMASK);
-    else if ((key & K_TYPEMASK) == K_SYMBOL)
+    else if ((key & K_TYPEMASK) == K_SYMBOL && (key & (K_ALT | K_CTRL)) == 0)
         //cut shift key info
         key &= ~K_SHIFT;
     else if (key == K_TIME)
