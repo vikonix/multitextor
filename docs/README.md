@@ -33,9 +33,11 @@ Windows list dialog.
 |Esc  F7         	|APP_DLG_FINDFILE|
 |Esc  f          	|APP_DLG_FINDFILE|
 |Esc  F          	|APP_DLG_FINDFILE|
+|Ctrl+Shift+F     	|APP_DLG_FINDFILE|
 |Alt+H           	|APP_DLG_REPLACEFILE|
 |Esc  h          	|APP_DLG_REPLACEFILE|
 |Esc  H          	|APP_DLG_REPLACEFILE|
+|Ctrl+Shift+H      	|APP_DLG_REPLACEFILE|
 |Alt+R           	|APP_DLG_REPLACEFILE|
 |Esc  r          	|APP_DLG_REPLACEFILE|
 |Esc  R          	|APP_DLG_REPLACEFILE|

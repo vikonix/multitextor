@@ -27,10 +27,26 @@
       },
       {
         "Cmd": [
+          "APP_SAVE_ALL"
+        ],
+        "Key": [
+          "Ctrl+Shift+S"
+        ]
+      },
+      {
+        "Cmd": [
           "APP_DLG_OPEN"
         ],
         "Key": [
           "F3"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_OPEN"
+        ],
+        "Key": [
+          "Ctrl+O"
         ]
       },
       {
@@ -124,6 +140,32 @@
         ],
         "Key": [
           "Shift+Ctrl+H"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_REPLACEFILE"
+        ],
+        "Key": [
+          "Alt+R"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_REPLACEFILE"
+        ],
+        "Key": [
+          "Esc",
+          "r"
+        ]
+      },
+      {
+        "Cmd": [
+          "APP_DLG_REPLACEFILE"
+        ],
+        "Key": [
+          "Esc",
+          "R"
         ]
       },
       {

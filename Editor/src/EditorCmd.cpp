@@ -40,8 +40,10 @@ CmdMap g_defaultAppKeyMap
 
     {{K_F2},                    {K_APP_SAVE_ALL}},
     {{'S' | K_ALT},             {K_APP_SAVE_ALL}},
+    {{'S' | K_CTRL | K_SHIFT},  {K_APP_SAVE_ALL}},
 
     {{K_F3},                    {K_APP_DLG_OPEN}},
+    {{'O' | K_CTRL},            {K_APP_SAVE_ALL}},
 
     {{K_F5 | K_SHIFT},          {K_APP_WND_COPY}},
     {{K_F6 | K_SHIFT},          {K_APP_WND_MOVE}},
@@ -54,10 +56,10 @@ CmdMap g_defaultAppKeyMap
     {{'H' | K_ALT},             {K_APP_REPLACEFILE}},
     {{K_ESC, 'h'},              {K_APP_REPLACEFILE}},
     {{K_ESC, 'H'},              {K_APP_REPLACEFILE}},
+    {{'H' | K_CTRL | K_SHIFT},  {K_APP_REPLACEFILE}},
     {{'R' | K_ALT},             {K_APP_REPLACEFILE}},
     {{K_ESC, 'r'},              {K_APP_REPLACEFILE}},
     {{K_ESC, 'R'},              {K_APP_REPLACEFILE}},
-    {{'R' | K_CTRL | K_SHIFT},  {K_APP_REPLACEFILE}},
 
     {{'L' | K_CTRL},            {K_APP_FOUNDFILE}},
     {{'L' | K_ALT},             {K_APP_FOUNDFILE}},

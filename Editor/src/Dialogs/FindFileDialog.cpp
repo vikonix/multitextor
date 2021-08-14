@@ -234,6 +234,7 @@ input_t FindFileDialog::DialogProc(input_t code)
                 auto name = GetItem(ID_FF_MASK)->GetName();
                 ScanDir(std::string(name));
                 code = 0;
+                SelectItem(ID_FF_SEARCH);
             }
         }
         else if (code == K_BS)
