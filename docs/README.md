@@ -26,7 +26,9 @@ Windows list dialog.
 |F1              	|~~APP_HELP~~|
 |F2              	|APP_SAVE_ALL|
 |Alt+S           	|APP_SAVE_ALL|
+|Ctrl+Shift+S      	|APP_SAVE_ALL|
 |F3              	|APP_DLG_OPEN|
+|Ctrl+O            	|APP_DLG_OPEN|
 |Shift+F5        	|APP_DLG_WND_COPY|
 |Shift+F6        	|APP_DLG_WND_MOVE|
 |Alt+F           	|APP_DLG_FINDFILE|
