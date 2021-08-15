@@ -407,7 +407,7 @@ bool LexParser::LexicalParse(std::u16string_view str, std::string& buff, bool co
 
         if (type == lex_t::SPECIAL)
         {
-            if (str[end] == '{' || str[end] == '(' && end < str.size() - 1)
+            if ((str[end] == '{' || str[end] == '(') && end < str.size() - 1)
             {
                 //LOG(DEBUG) << "    Check skip comment begin=" << begin << " end=" << end << " '" << std::string(str.substr(begin, end - begin + 1));
                 //bash var test
