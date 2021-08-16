@@ -342,9 +342,9 @@ bool EditorApp::OpenFile(const std::filesystem::path& path, const std::string& p
         m_recentFiles.erase(std::remove_if(m_recentFiles.begin(), m_recentFiles.end(),
             [&fullPath](const file_t& file) {return std::get<0>(file) == fullPath;}), m_recentFiles.end());
         if (m_recentFiles.size() >= c_maxRecentFiles)
-            m_recentFiles.pop_front();
+            m_recentFiles.pop_back();
 
-        m_recentFiles.emplace_back(fullPath.u8string(), parseMode, cp, ro, log);
+        m_recentFiles.emplace_front(fullPath.u8string(), parseMode, cp, ro, log);
         UpdateRecentFilesList();
     }
 
