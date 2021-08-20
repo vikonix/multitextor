@@ -32,6 +32,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
     #include <windows.h>
 
 const std::u16string c_eol{ u"\r\n" };
+const std::u16string c_eol1{ u"\n" };
 #else
     #include <filesystem>
 
@@ -135,11 +136,17 @@ bool PasteFromClipboard(std::vector<std::u16string>& strArray)
     size_t offset = 0;
     while (offset < str.size())
     {
+        size_t eolSize = c_eol.size();
         size_t strEnd = str.find(c_eol, offset);
+        if (strEnd == std::string::npos)
+        {
+            strEnd = str.find(c_eol1, offset);
+            eolSize = c_eol1.size();
+        }
         strArray.push_back(std::u16string{ str.substr(offset, strEnd - offset) });
         if (strEnd == std::string::npos)
             break;
-        offset = strEnd + 2;
+        offset = strEnd + eolSize;
     }
     
     GlobalUnlock(hglb);
