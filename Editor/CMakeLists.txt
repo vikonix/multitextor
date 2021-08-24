@@ -103,3 +103,7 @@ if(UNIX)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX} COMPONENT binaries)
 endif()
 
+if(APPLE)
+    target_link_options(${PROJECT_NAME} PRIVATE -liconv)
+endif()
+
