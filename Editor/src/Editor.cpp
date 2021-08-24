@@ -65,7 +65,7 @@ class CoReadFile
     {
         std::ifstream file{ path, std::ios::binary };
 
-        auto readFile = [&](std::shared_ptr<read_buff_t> buff) -> size_t {
+        auto readFile = [&file](std::shared_ptr<read_buff_t> buff) -> size_t {
             if (file.eof())
                 return 0;
 
@@ -77,7 +77,7 @@ class CoReadFile
             return static_cast<size_t>(read);
         };
 
-        auto ConvertCp = [&](size_t read) {
+        auto ConvertCp = [this](size_t read) {
             if (!m_cp)
                 return;
             if(1)//*m_cp != "UTF-8")//???
@@ -118,13 +118,15 @@ class CoReadFile
             m_condition.notify_one();
         }
 
-        std::unique_lock lock{ m_mutex };
-        m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady || m_cancel; });
+        {
+            std::unique_lock lock{ m_mutex };
+            m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady || m_cancel; });
 
-        m_bufferReady = true;
-        m_read = 0;
-        m_eof = true;
-        m_condition.notify_one();
+            m_bufferReady = true;
+            m_read = 0;
+            m_eof = true;
+            m_condition.notify_one();
+        }
     }
 
 public:
@@ -146,7 +148,8 @@ public:
     std::tuple<size_t, std::shared_ptr<read_buff_t>, bool> Wait()
     {
         std::unique_lock lock{ m_mutex };
-        m_condition.wait(lock, [this]() -> bool {return m_bufferReady; });
+        if (!m_condition.wait_for(lock, 10s, [this]() -> bool {return m_bufferReady;}))
+            throw std::runtime_error{"Wait read ready timeout"};
 
         return { m_read, m_buff2, m_eof };
     }
@@ -154,7 +157,8 @@ public:
     std::tuple<size_t, std::shared_ptr<std::u16string>, bool> WaitU16()
     {
         std::unique_lock lock{ m_mutex };
-        m_condition.wait(lock, [this]() -> bool {return m_bufferReady; });
+        if(!m_condition.wait_for(lock, 10s, [this]() -> bool {return m_bufferReady;}))
+            throw std::runtime_error{ "WaitU16 read ready timeout" };
 
         return { m_read, m_u16buff2, m_eof };
     }
@@ -304,32 +308,40 @@ bool Editor::Load(bool log)
 #else
     CoReadFile rfile(m_file, std::nullopt);
 
-    for (;;)
+    try
     {
-        auto [read, buff, eof] = rfile.Wait();
-        if (read == 0)
-            break;
-
-        buffOffset = 0;
-        bool rc = ApplyBuffer(buff, read, buffOffset,
-            strBuff, strOffset,
-            fileOffset, eof);
-        if (!rc)
-            return false;
-
-        rfile.Next();
-
-        time_t t2{ time(nullptr) };
-        if (t1 != t2 && step)
+        for (;;)
         {
-            t1 = t2;
-            size_t pr{ static_cast<size_t>((fileOffset + read) / step) };
-            if (pr != percent)
+            auto [read, buff, eof] = rfile.Wait();
+            if (read == 0)
+                break;
+
+            buffOffset = 0;
+            bool rc = ApplyBuffer(buff, read, buffOffset,
+                strBuff, strOffset,
+                fileOffset, eof);
+            if (!rc)
+                return false;
+
+            rfile.Next();
+
+            time_t t2{ time(nullptr) };
+            if (t1 != t2 && step)
             {
-                percent = pr;
-                EditorApp::ShowProgressBar(pr);
+                t1 = t2;
+                size_t pr{ static_cast<size_t>((fileOffset + read) / step) };
+                if (pr != percent)
+                {
+                    percent = pr;
+                    EditorApp::ShowProgressBar(pr);
+                }
             }
         }
+    }
+    catch (...)
+    {
+        _assert(0);
+        return false;
     }
 #endif
 
@@ -1787,67 +1799,75 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
     CoReadFile rfile(file, cp, !checkCase);
     std::u16string prevBuff;
 
-    for (;;)
+    try
     {
-        auto [read, buff, eof] = rfile.WaitU16();
-        if (read == 0)
-            break;
-
-        if (!prevBuff.empty())
-            buff->insert(0, prevBuff);
-
-        auto itBegin = buff->cbegin();
-        while (itBegin != buff->cend())
+        for (;;)
         {
-            auto itFound = std::search(itBegin, buff->cend(), std::boyer_moore_horspool_searcher(find.cbegin(), find.cend()));
-            if (itFound != buff->cend())
-            {
-                if (!findWord)
-                {
-                    rfile.Cancel();
-                    return true;
-                }
-                else
-                {
+            auto [read, buff, eof] = rfile.WaitU16();
+            if (read == 0)
+                break;
 
-                    if ((itFound == buff->cbegin() || GetSymbolType(*(itFound - 1)) != symbol_t::alnum)
-                        && (itFound + findSize == buff->cend() || GetSymbolType(*(itFound + findSize)) != symbol_t::alnum))
+            if (!prevBuff.empty())
+                buff->insert(0, prevBuff);
+
+            searcher_t searcher(find.cbegin(), find.cend());
+            auto itBegin = buff->cbegin();
+            while (itBegin != buff->cend())
+            {
+                auto itFound = std::search(itBegin, buff->cend(), searcher);
+                if (itFound != buff->cend())
+                {
+                    if (!findWord)
                     {
                         rfile.Cancel();
                         return true;
                     }
-                }
-                itBegin = itFound + 1;
-            }
-            else
-                break;
-        }
-        fileOffset += read;
+                    else
+                    {
 
-        prevBuff.clear();
-        if(!eof)
-            for (auto rit = buff->crbegin(); rit != buff->crend(); ++rit)
-            {
-                if (*rit < ' ')
-                {
-                    //save last not full string
-                    auto size = std::distance(buff->crbegin(), rit);
-                    prevBuff.resize(size);
-                    std::copy_n(std::prev(buff->cend(), size), size, prevBuff.begin());
+                        if ((itFound == buff->cbegin() || GetSymbolType(*(itFound - 1)) != symbol_t::alnum)
+                            && (itFound + findSize == buff->cend() || GetSymbolType(*(itFound + findSize)) != symbol_t::alnum))
+                        {
+                            rfile.Cancel();
+                            return true;
+                        }
+                    }
+                    itBegin = itFound + 1;
+                }
+                else
                     break;
+            }
+            fileOffset += read;
+
+            prevBuff.clear();
+            if (!eof)
+                for (auto rit = buff->crbegin(); rit != buff->crend(); ++rit)
+                {
+                    if (*rit < ' ')
+                    {
+                        //save last not full string
+                        auto size = std::distance(buff->crbegin(), rit);
+                        prevBuff.resize(size);
+                        std::copy_n(std::prev(buff->cend(), size), size, prevBuff.begin());
+                        break;
+                    }
+                }
+
+            rfile.Next();
+            if (func)
+            {
+                auto ret = func();
+                if (!ret)
+                {
+                    rfile.Cancel();
+                    return false;
                 }
             }
-
-        rfile.Next();
-        if (func)
-        {
-            auto ret = func();
-            if (!ret)
-            {
-                rfile.Cancel();
-                return false;
-            }
         }
+    }
+    catch (...)
+    {
+        _assert(0);
     }
 
     _assert(fileSize == fileOffset);

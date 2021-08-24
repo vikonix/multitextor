@@ -1650,16 +1650,17 @@ bool EditorWnd::FindUp(bool silence)
             offset = str.size();
         }
 
+        rsearcher_t searcher(m_findStr.crbegin(), m_findStr.crend());
         auto itBegin = offset ? std::next(str.crbegin(), str.size() - offset) : str.crbegin();
         while (itBegin != str.crend())
         {
-            auto itFound = std::search(itBegin, str.crend(), std::boyer_moore_horspool_searcher(m_findStr.crbegin(), m_findStr.crend()));
+            auto itFound = std::search(itBegin, str.crend(), searcher);
             if (itFound != str.crend())
             {
                 if (fast && offset == 0)
                 {
                     str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
-                    itFound = std::search(str.crbegin(), str.crend(), std::boyer_moore_horspool_searcher(m_findStr.crbegin(), m_findStr.crend()));
+                    itFound = std::search(str.crbegin(), str.crend(), searcher);
                 }
 
                 offset = std::distance(itFound, str.crend()) - size;
@@ -1787,16 +1788,17 @@ bool EditorWnd::FindDown(bool silence)
             continue;
         }
 
+        searcher_t searcher(m_findStr.cbegin(), m_findStr.cend());
         auto itBegin = offset ? std::next(str.cbegin(), offset) : str.cbegin();
         while (itBegin != str.cend())
         {
-            auto itFound = std::search(itBegin, str.cend(), std::boyer_moore_horspool_searcher(m_findStr.cbegin(), m_findStr.cend()));
+            auto itFound = std::search(itBegin, str.cend(), searcher);
             if (itFound != str.cend())
             {
                 if (fast && offset == 0)
                 {
                     str = m_editor->GetStrForFind(line, FindDialog::s_vars.checkCase, false);
-                    itFound = std::search(str.cbegin(), str.cend(), std::boyer_moore_horspool_searcher(m_findStr.cbegin(), m_findStr.cend()));
+                    itFound = std::search(str.cbegin(), str.cend(), searcher);
                 }
 
                 offset = std::distance(str.cbegin(), itFound);
@@ -1866,10 +1868,11 @@ bool EditorWnd::MarkAllFound(const std::u16string& wstr, std::vector<color_t>& c
         );
     }
 
+    searcher_t searcher(m_findStr.cbegin(), m_findStr.cend());
     auto itBegin = str.cbegin();
     while (itBegin != str.cend())
     {
-        auto itFound = std::search(itBegin, str.cend(), std::boyer_moore_horspool_searcher(m_findStr.cbegin(), m_findStr.cend()));
+        auto itFound = std::search(itBegin, str.cend(), searcher);
         if (itFound != str.cend())
         {
             auto offset = std::distance(str.cbegin(), itFound);

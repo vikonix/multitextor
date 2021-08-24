@@ -36,8 +36,16 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <filesystem>
 #include <limits>
 #include <algorithm>
+#include <functional>
 
 
+#ifndef __APPLE__
+using searcher_t = std::boyer_moore_horspool_searcher<std::u16string::const_iterator>;
+using rsearcher_t = std::boyer_moore_horspool_searcher<std::u16string::const_reverse_iterator>;
+#else
+using searcher_t = std::default_searcher<std::u16string::const_iterator>;
+using rsearcher_t = std::default_searcher<std::u16string::const_reverse_iterator>;
+#endif
 
 using namespace _Utils;
 using namespace _WndManager;
