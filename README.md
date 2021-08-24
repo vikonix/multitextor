@@ -32,7 +32,7 @@ Editor screenshot.
   ![Screenshot](docs/multitextor1.png)
 
 ### Tested on
-Linux/Windows build (Travis CI): [![Build Status](https://travis-ci.com/vikonix/multitextor.svg?branch=main)](https://travis-ci.com/vikonix/multitextor)
+Linux/Windows/OSX build (Travis CI): [![Build Status](https://travis-ci.com/vikonix/multitextor.svg?branch=main)](https://travis-ci.com/vikonix/multitextor)
 
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Windows 7 - Microsoft Visual Studio Community 2017
