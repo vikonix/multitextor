@@ -32,7 +32,7 @@ script:
         "windows")
           cmake --build . --target ALL_BUILD --config Release
           ;;
-        "linux"|"osx")
+        "linux"|"osx"|"freebsd")
           make
           ;;
       esac
