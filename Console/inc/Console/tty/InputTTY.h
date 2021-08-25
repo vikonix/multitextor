@@ -125,8 +125,10 @@ class InputTTY final: public ConsoleInput
 
     int             m_stdin {-1};
     bool            m_fTerm{false};
+#ifdef __linux__    
     bool            m_fTiocLinux{false}; //linux only
     input_t         m_prevMode{K_UNUSED}; //linux only
+#endif
 
     pos_t           m_prevX {MAX_COORD};
     pos_t           m_prevY {MAX_COORD};
