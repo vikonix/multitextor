@@ -1,14 +1,18 @@
 language: cpp
-dist: focal
 
-os:
-  - linux
-  - osx
-#  - windows
+matrix:
+  include:
+    - os: osx
+      osx_image: xcode12
+      
+    - os: freebsd
+    
+    - os: linux
+      dist: focal
+      compiler: clang
 
-compiler:
-  - gcc
-  - clang
+    - os: windows
+      dist: server-2016
 
 install:
   - |-
@@ -32,12 +36,3 @@ script:
           make
           ;;
       esac
-
-jobs:
-  include:
-    - os: linux
-      dist: focal
-    - os: osx
-      osx_image: xcode12  
-#    - os: windows
-#      dist: server-2016
