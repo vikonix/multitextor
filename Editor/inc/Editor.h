@@ -39,7 +39,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <functional>
 
 
-#ifndef __APPLE__
+#if !defined(__APPLE__) && !defined(__FreeBSD__)
 using searcher_t = std::boyer_moore_horspool_searcher<std::u16string::const_iterator>;
 using rsearcher_t = std::boyer_moore_horspool_searcher<std::u16string::const_reverse_iterator>;
 #else

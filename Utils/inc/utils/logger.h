@@ -31,6 +31,10 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #endif
 #include "easyloggingpp/easylogging++.h"
 
+#ifdef _assert
+#undef _assert
+#endif
+
 #ifdef WIN32
 #define __FUNC__ __FUNCTION__ " "
 #ifdef _DEBUG
