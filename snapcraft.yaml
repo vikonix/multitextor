@@ -13,8 +13,8 @@ icon: docs/m.png
 license: BSD-2-Clause
 
 base: core18
-confinement: devmode
-grade: devel
+confinement: strict
+grade: stable
 
 apps:
   multitextor:
