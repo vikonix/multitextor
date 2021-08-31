@@ -126,7 +126,7 @@ static menu_list menuBlock
     {MENU_ITEM,         "Window Mo&ve...",              K_APP_WND_MOVE,             "Move block selected in another window"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "&Indent In Block",             K_ED(E_EDIT_BLOCK_INDENT),  "Indent inside of selected block"},
-    {MENU_ITEM,         "&Undent In Block",             K_ED(E_EDIT_BLOCK_UNDENT),  "Undent inside of selected block"},
+    {MENU_ITEM,         "&Unident In Block",            K_ED(E_EDIT_BLOCK_UNDENT),  "Unident inside of selected block"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "&Select;Shift+Arrows|Esc,Arrows",K_ED(E_SELECT_BEGIN),     "Begin of stream selection"},
     {MENU_ITEM,         "Select &All",                  K_ED(E_SELECT_ALL),         "Select whole file"},
@@ -192,7 +192,7 @@ static menu_list menuHelp
 //    {MENU_ITEM,         "&View Help",                   K_APP_HELP,               "Help documentation"},
 //    {MENU_ITEM,         "Keyboard &Map",                K_APP_HELP_KEYMAP,        "Keyboard command description"},
 //    {MENU_SEPARATOR},
-    {MENU_ITEM,         "&About",                       K_APP_ABOUT,                "About Application"}
+    {MENU_ITEM,         "&About...",                    K_APP_ABOUT,                "About Application"}
 };
 
 menu_list g_menuRecentFiles 
@@ -218,8 +218,8 @@ menu_list menuMain
 {
     {MENU_ITEM,         "&File",     K_MENU + 1},
     {MENU_ITEM,         "&Edit",     K_MENU + 2},
-    {MENU_ITEM,         "&Block",    K_MENU + 3},
-    {MENU_ITEM,         "&Search",   K_MENU + 4},
+    {MENU_ITEM,         "&Selection",K_MENU + 3},
+    {MENU_ITEM,         "Sea&rch",   K_MENU + 4},
     {MENU_ITEM,         "&Tools",    K_MENU + 5},
     {MENU_ITEM,         "&Windows",  K_MENU + 7},
     {MENU_ITEM,         "&Help",     K_MENU + 8}
