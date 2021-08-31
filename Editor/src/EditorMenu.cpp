@@ -126,7 +126,7 @@ static menu_list menuBlock
     {MENU_ITEM,         "Window Mo&ve...",              K_APP_WND_MOVE,             "Move block selected in another window"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "&Indent In Block",             K_ED(E_EDIT_BLOCK_INDENT),  "Indent inside of selected block"},
-    {MENU_ITEM,         "&Unident In Block",            K_ED(E_EDIT_BLOCK_UNDENT),  "Unident inside of selected block"},
+    {MENU_ITEM,         "&Unindent In Block",           K_ED(E_EDIT_BLOCK_UNDENT),  "Unindent inside of selected block"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "&Select;Shift+Arrows|Esc,Arrows",K_ED(E_SELECT_BEGIN),     "Begin of stream selection"},
     {MENU_ITEM,         "Select &All",                  K_ED(E_SELECT_ALL),         "Select whole file"},
