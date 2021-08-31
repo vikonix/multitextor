@@ -30,6 +30,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "Console/KeyCodes.h"
 
 #include <unordered_map>
+#include <string>
 
 using namespace _Console;
 
