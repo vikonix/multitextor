@@ -91,6 +91,9 @@ using read_buff_t = std::array<char, c_buffsize>;
 
 class Editor
 {
+    inline const static std::string     c_utf8Bom{ "\xef\xbb\xbf" };
+    inline const static std::u16string  c_utf16Bom{ u"\xfeff" };
+
 private:
     std::shared_ptr<iconvpp::CpConverter>       m_converter;
 

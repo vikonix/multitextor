@@ -403,7 +403,7 @@ bool Editor::ApplyBuffer(const std::shared_ptr<read_buff_t>& buff, size_t read, 
         if (m_cp == "UTF-8" && buff->size() >= 3)
         {
             std::string bom{buff->data(), 3};
-            if (bom == "\xef\xbb\xbf")
+            if (bom == c_utf8Bom)
                 m_bom = true;
         }
     }
@@ -590,8 +590,18 @@ bool Editor::FlushCurStr()
     bool rc{ true };
     if (m_curChanged)
     {
-        rc = ChangeStr(m_curStr, m_curStrBuff);
-        m_curChanged = false;
+        if (m_curChanged)
+        {
+            if (m_curStr == 0 && m_bom)
+            {
+                //add bom
+                std::u16string str{ c_utf16Bom + m_curStrBuff };
+                ChangeStr(0, str);
+            }
+            else
+                ChangeStr(m_curStr, m_curStrBuff);
+            m_curChanged = false;
+        }
     }
 
     return rc;
@@ -601,12 +611,7 @@ bool Editor::SetCurStr(size_t line)
 {
     if (line != m_curStr)
     {
-        if (m_curChanged)
-        {
-            ChangeStr(m_curStr, m_curStrBuff);
-            m_curChanged = false;
-        }
-
+        FlushCurStr();
         m_curStr = line;
         m_curStrBuff = _GetStr(line, 0, m_maxStrlen);
     }
@@ -639,6 +644,11 @@ std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
     }
 
     auto str{ m_buffer.GetStr(line) };
+    if (line == 0 && m_bom)
+    {
+        //remove bom
+        str.remove_prefix(3);
+    }
     std::u16string wstr;
     [[maybe_unused]]bool rc = m_converter->Convert(str, wstr);
     std::u16string outstr;

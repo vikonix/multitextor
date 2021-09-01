@@ -376,9 +376,9 @@ bool EditorWnd::EditUndo([[maybe_unused]] input_t cmd)
     if (!editCmd)
     {
         EditorApp::SetErrorLine("Undo command absents");
-        m_editor->SetCurStr(STR_NOTDEFINED);
         if (!m_saved)
             m_editor->ClearModifyFlag();
+        m_editor->SetCurStr(STR_NOTDEFINED);
         return true;
     }
 
