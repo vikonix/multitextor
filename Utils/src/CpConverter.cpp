@@ -190,7 +190,7 @@ std::u16string CpConverter::FixPrintWidth(const std::u16string& str, size_t offs
     for (auto c : std::u16string_view(str).substr(offset, width))
     {
         auto w = s_wcChar[c];
-        if(w == 1 || w == widechar_ambiguous)
+        if(w == 1 || w == widechar_ambiguous || c == '\x9')
             fixed[pos++] = c;
 #if 0
         else if (w == 2 || w == widechar_widened_in_9)
