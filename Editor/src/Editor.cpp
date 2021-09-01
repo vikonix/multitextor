@@ -825,7 +825,7 @@ bool Editor::ChangeStr(size_t n, const std::u16string& wstr)
 char Editor::GetAccessInfo()
 {
     if (IsChanged())//modified
-        return 'M';
+        return '*';
     
     auto mode = Directory::GetAccessMode(m_file);
     if (mode == fileaccess_t::notexists)

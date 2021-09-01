@@ -75,14 +75,14 @@ std::list<control> findFileDialog
     {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",                       ID_CANCEL,      {},                                 54,  8},
     {CTRL_LINE,                         "",                             0,              {},                                 54, 12, 13},
 
-    {CTRL_CHECK,                        "C&ase sensitive",              ID_FF_CASE,     &FindDialog::s_vars.checkCase,      20, 13,  0,  0, "Search case sensitive or not"},
+    {CTRL_CHECK,                        "&Case sensitive",              ID_FF_CASE,     &FindDialog::s_vars.checkCase,      20, 13,  0,  0, "Search case sensitive or not"},
     {CTRL_CHECK,                        "&Whole word",                  3,              &FindDialog::s_vars.findWord,       20, 14,  0,  0, "Search whole word or phrase"},
     {CTRL_CHECK,                        "Search in s&ub-directories",   ID_FF_SUBDIR,   &FindFileDialog::s_vars.recursive,  20, 15,  0,  0, "Recursive search in subdirectories or not"},
     {CTRL_CHECK,                        "Search in &opened files only", ID_FF_OPEN,     &FindFileDialog::s_vars.inOpen,     20, 16,  0,  0, "Search just in all opened files"},
     {CTRL_CHECK,                        "Without &prompt for replace",  ID_FF_PROMPT,   &FindDialog::s_vars.noPrompt,       20, 17,  0,  0, "Replace in all files without prompt"},
 
-    {CTRL_STATIC,                       "&Code page:",                  0,              {},                                 54, 13, 14},
-    {CTRL_DROPLIST,                     "",                             ID_FF_CP,       &FileDialog::s_vars.cp,             54, 14, 13,  6, "Select file code page"}
+    {CTRL_STATIC,                       "&Encoding:",                   0,              {},                                 54, 13, 14},
+    {CTRL_DROPLIST,                     "",                             ID_FF_CP,       &FileDialog::s_vars.cp,             54, 14, 13,  6, "Select file encoding"}
 };
 
 FindFileDialog::FindFileDialog(bool replace, pos_t x, pos_t y)
