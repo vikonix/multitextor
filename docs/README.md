@@ -156,11 +156,11 @@ Windows list dialog.
 |Ctrl+Insert     	|EDIT_CB_COPY|
 |Shift+Insert    	|EDIT_CB_PASTE|
 |Alt+I           	|EDIT_BLOCK_INDENT|
-|Alt+U           	|EDIT_BLOCK_UNDENT|
+|Alt+U           	|EDIT_BLOCK_UNINDENT|
 |Esc  i          	|EDIT_BLOCK_INDENT|
 |Esc  I          	|EDIT_BLOCK_INDENT|
-|Esc  u          	|EDIT_BLOCK_UNDENT|
-|Esc  U          	|EDIT_BLOCK_UNDENT|
+|Esc  u          	|EDIT_BLOCK_UNINDENT|
+|Esc  U          	|EDIT_BLOCK_UNINDENT|
 |Ctrl+Z          	|EDIT_UNDO|
 |Alt+BackSpace   	|EDIT_UNDO|
 |Alt+Z           	|EDIT_REDO|

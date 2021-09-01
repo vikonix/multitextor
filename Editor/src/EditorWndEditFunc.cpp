@@ -576,14 +576,14 @@ bool EditorWnd::EditBlockIndent(input_t cmd)
     return rc;
 }
 
-bool EditorWnd::EditBlockUndent(input_t cmd)
+bool EditorWnd::EditBlockUnindent(input_t cmd)
 {
     if (m_readOnly)
         return true;
     if (m_selectState != select_state::complete)
         return true;
 
-    LOG(DEBUG) << "    EditBlockUndent " << std::hex << cmd << std::dec;
+    LOG(DEBUG) << "    EditBlockUnindent " << std::hex << cmd << std::dec;
 
     input_t count{ K_GET_CODE(cmd) };
     if (!count)
@@ -593,7 +593,7 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
 
     EditCmd edit { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
     EditCmd undo { cmd_t::CMD_BEGIN, m_beginY, m_beginX };
-    m_editor->SetUndoRemark("Undent");
+    m_editor->SetUndoRemark("Unindent");
     m_editor->AddUndoCommand(edit, undo);
 
     size_t n { m_endY - m_beginY };
@@ -644,7 +644,7 @@ bool EditorWnd::EditBlockUndent(input_t cmd)
             size = m_editor->GetMaxStrLen();
 
         if (size > count)
-            rc = m_editor->Undent(save, y, bx, size, count);
+            rc = m_editor->Unindent(save, y, bx, size, count);
     }
 
     edit.command = cmd_t::CMD_END;

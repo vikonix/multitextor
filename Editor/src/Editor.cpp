@@ -398,6 +398,16 @@ bool Editor::ApplyBuffer(const std::shared_ptr<read_buff_t>& buff, size_t read, 
     std::shared_ptr<StrBuff<std::string, std::string_view>>& strBuff, size_t& strOffset,
     uintmax_t& fileOffset, bool eof)
 {
+    if (fileOffset == 0)
+    {
+        if (m_cp == "UTF-8" && buff->size() >= 3)
+        {
+            std::string bom{buff->data(), 3};
+            if (bom == "\xef\xbb\xbf")
+                m_bom = true;
+        }
+    }
+
     while (read)
     {
         if (!strBuff)
@@ -1307,7 +1317,7 @@ bool Editor::Indent(bool save, size_t line, size_t pos, size_t len, size_t n)
         if (save)
         {
             m_undoList.AddEditCmd(cmd_t::CMD_INDENT, line, pos, count, len, {});
-            m_undoList.AddUndoCmd(cmd_t::CMD_UNDENT, line, pos, count, len, {});
+            m_undoList.AddUndoCmd(cmd_t::CMD_UNINDENT, line, pos, count, len, {});
         }
 
         CorrectTab(save, line, m_curStrBuff);
@@ -1316,7 +1326,7 @@ bool Editor::Indent(bool save, size_t line, size_t pos, size_t len, size_t n)
     return true;
 }
 
-bool Editor::Undent(bool save, size_t line, size_t pos, size_t len, size_t n)
+bool Editor::Unindent(bool save, size_t line, size_t pos, size_t len, size_t n)
 {
     if (line >= GetStrCount())
         return true;
@@ -1343,7 +1353,7 @@ bool Editor::Undent(bool save, size_t line, size_t pos, size_t len, size_t n)
 
         if (save)
         {
-            m_undoList.AddEditCmd(cmd_t::CMD_UNDENT, line, pos, count, len, {});
+            m_undoList.AddEditCmd(cmd_t::CMD_UNINDENT, line, pos, count, len, {});
             m_undoList.AddUndoCmd(cmd_t::CMD_INDENT, line, pos, count, len, {});
         }
 
@@ -1404,8 +1414,8 @@ bool Editor::Command(const EditCmd& cmd)
     case cmd_t::CMD_INDENT:
         rc = Indent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
         break;
-    case cmd_t::CMD_UNDENT:
-        rc = Undent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
+    case cmd_t::CMD_UNINDENT:
+        rc = Unindent(false, cmd.line, cmd.pos, cmd.len, cmd.count);
         break;
     case cmd_t::CMD_CORRECT_TAB:
         break;

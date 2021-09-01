@@ -281,7 +281,7 @@ public:
     bool EditBlockMove(input_t cmd);
     bool EditBlockDel(input_t cmd);
     bool EditBlockIndent(input_t cmd);
-    bool EditBlockUndent(input_t cmd);
+    bool EditBlockUnindent(input_t cmd);
     bool EditCopyToClipboard(input_t cmd);
     bool EditCutToClipboard(input_t cmd);
     bool EditPasteFromClipboard(input_t cmd);

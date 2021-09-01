@@ -1112,7 +1112,7 @@
       },
       {
         "Cmd": [
-          "EDIT_BLOCK_UNDENT"
+          "EDIT_BLOCK_UNINDENT"
         ],
         "Key": [
           "Alt+U"
@@ -1138,7 +1138,7 @@
       },
       {
         "Cmd": [
-          "EDIT_BLOCK_UNDENT"
+          "EDIT_BLOCK_UNINDENT"
         ],
         "Key": [
           "Esc",
@@ -1147,7 +1147,7 @@
       },
       {
         "Cmd": [
-          "EDIT_BLOCK_UNDENT"
+          "EDIT_BLOCK_UNINDENT"
         ],
         "Key": [
           "Esc",

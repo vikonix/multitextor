@@ -112,6 +112,7 @@ private:
     bool            m_saveTab{};//save tab or not
     bool            m_showTab{};
     bool            m_ro{};
+    bool            m_bom{};
 
     //editor variables
     std::u16string  m_curStrBuff;
@@ -224,7 +225,7 @@ public:
     bool                    DelSubstr(bool save, size_t line, size_t pos, size_t len);
     bool                    ReplaceSubstr(bool save, size_t line, size_t pos, size_t len, const std::u16string& substr);
     bool                    Indent(bool save, size_t line, size_t pos, size_t len, size_t n);
-    bool                    Undent(bool save, size_t line, size_t pos, size_t len, size_t n);
+    bool                    Unindent(bool save, size_t line, size_t pos, size_t len, size_t n);
 
     bool                    AddCh(bool save, size_t line, size_t pos, char16_t ch);
     bool                    ChangeCh(bool save, size_t line, size_t pos, char16_t ch);
