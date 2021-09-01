@@ -55,5 +55,6 @@ else()
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
     
     #additional libraries
-    target_link_libraries(${PROJECT_NAME} PRIVATE termcap)
+    find_package(Curses REQUIRED)
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${CURSES_LIBRARY})
 endif()
