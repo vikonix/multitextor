@@ -84,14 +84,9 @@ enum ScreenCapType
 
     S_TermInit,
     S_TermReset,
-    S_Reset1str,
+    S_DefaultColor,
 
-    S_TestCap1,
-    S_TestCap2,
-    S_TestCap3,
-    S_TestCap4,
-
-    CAP_NUMBER //41
+    CAP_NUMBER
 };
 
 //////////////////////////////////////////////////////////////////////////////

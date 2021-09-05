@@ -93,8 +93,8 @@ bool ScreenTTY::Init()
         if(!m_cap[i].str.empty())
             LOG(DEBUG) << " Cap[" << i << "][" << m_cap[i].id << "]" << CastEscString(m_cap[i].str);
 
-    //use alternative screen buffer
-    std::string cmd { "\x1b[?47h"};
+    //save parameters and use alternative screen buffer
+    std::string cmd { "\0337\x1b[?47h"};
     write(m_stdout, cmd.c_str(), cmd.size());
 
     [[maybe_unused]] bool rc = _WriteStr(m_cap[S_AltCharEnable].str)
@@ -128,28 +128,22 @@ void ScreenTTY::Deinit()
     if(m_stdout <= 0)
         return;
 
-    SetCursor(cursor_t::CURSOR_NORMAL);
-    SetTextAttr(DEFAULT_COLOR);
-    GotoXY(0, m_sizey - 1);
-    _WriteStr("\n");
-
     std::string param = m_cap[S_TermReset].str;
     if(!param.empty())
     {
         write(m_stdout, param.c_str(), param.size());
     }
 
-    //use normal screen buffer
-    param = "\x1b[?47l";
-    write(m_stdout, param.c_str(), param.size());
-    //set default foreground
-    param = "\x1b[39m";
-    write(m_stdout, param.c_str(), param.size());
-    //set default background
-    param = "\x1b[49m";
+    //use normal screen buffer and restore parameters
+    param = "\x1b[?47l\0338\x1b[0m";
     write(m_stdout, param.c_str(), param.size());
 
-    Flush();
+    //set default foreground/background
+    param = m_cap[S_DefaultColor].str;
+    if(!param.empty())
+    {
+        write(m_stdout, param.c_str(), param.size());
+    }
 
     m_stdout = -1;
 }
@@ -345,7 +339,7 @@ bool ScreenTTY::Flush()
     }
 
     //LOG(DEBUG) << "Flush buff size=" << m_OutBuff.size() << "->" << rc;
-    //LOG(DEBUG) << m_OutBuff;
+    //LOG(DEBUG) << CastEscString(m_OutBuff);
     m_OutBuff.clear();
 
     return rc > 0;

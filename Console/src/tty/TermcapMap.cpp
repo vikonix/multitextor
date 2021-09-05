@@ -124,7 +124,7 @@ std::list<ScreenCap> g_screenCap
 
   {"ti", S_TermInit,      ""},
   {"te", S_TermReset,     ""},
-  {"r1", S_Reset1str,     "\x1b""c"}//"\x1b]R",// need for linux in UTF8
+  {"op", S_DefaultColor,  "\x1b[0;39;49m"}
 };
 
 } //namespace _Console
