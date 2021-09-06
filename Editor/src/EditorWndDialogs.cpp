@@ -145,15 +145,15 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
 
 bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
 {
-    PropertiesDialog::s_vars.untitled = m_untitled;
-    PropertiesDialog::s_vars.ro       = m_readOnly;
-    PropertiesDialog::s_vars.log      = m_log;
-    PropertiesDialog::s_vars.cpName   = m_editor->GetCP();
-    PropertiesDialog::s_vars.eol      = static_cast<size_t>(m_editor->GetEol());
-    PropertiesDialog::s_vars.tabSize  = m_editor->GetTab();
-    PropertiesDialog::s_vars.saveTab  = m_editor->GetSaveTab();
-    PropertiesDialog::s_vars.showTab  = m_editor->GetShowTab();
-    PropertiesDialog::s_vars.typeName = m_editor->GetParseStyle();
+    PropertiesDialog::s_vars.untitled   = m_untitled;
+    PropertiesDialog::s_vars.ro         = m_readOnly;
+    PropertiesDialog::s_vars.log        = m_log;
+    PropertiesDialog::s_vars.cpName     = m_editor->GetCP();
+    PropertiesDialog::s_vars.eol        = static_cast<size_t>(m_editor->GetEol());
+    PropertiesDialog::s_vars.tabSize    = m_editor->GetTab() - 1;
+    PropertiesDialog::s_vars.replaceTab = !m_editor->GetSaveTab();
+    PropertiesDialog::s_vars.showTab    = m_editor->GetShowTab();
+    PropertiesDialog::s_vars.typeName   = m_editor->GetParseStyle();
 
     PropertiesDialog dlg;
     auto ret = dlg.Activate();
@@ -167,11 +167,11 @@ bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
 
         m_editor->SetCP(dlg.s_vars.cpName);
         m_editor->SetEol(static_cast<eol_t>(dlg.s_vars.eol));
-        m_editor->SetTab(dlg.s_vars.tabSize);
-        m_editor->SetSaveTab(dlg.s_vars.saveTab);
+        m_editor->SetTab(dlg.s_vars.tabSize + 1);
+        m_editor->SetSaveTab(!dlg.s_vars.replaceTab);
 
-        m_editor->SetParseStyle(dlg.s_vars.typeName);//???
         m_editor->SetShowTab(dlg.s_vars.showTab);
+        m_editor->SetParseStyle(dlg.s_vars.typeName);//???
     }
 
     return true;

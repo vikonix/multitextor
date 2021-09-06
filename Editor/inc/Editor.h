@@ -196,21 +196,20 @@ public:
     eol_t                   GetEol() const          {return m_eol;}
     void                    SetEol(eol_t eol)       {m_eol = eol;}
     size_t                  GetTab() const          {return m_tab;}
-    void                    SetTab(size_t tabsize)  {m_tab = tabsize;}
+    void                    SetTab(size_t tabsize);
     bool                    GetSaveTab() const      {return m_saveTab;}
     void                    SetSaveTab(bool save)   {m_saveTab = save;}
     bool                    GetShowTab() const      {return m_showTab;}
     void                    SetShowTab(bool show)   {m_lexParser.SetShowTab(m_showTab = show);}
 
-    size_t                  GetStrCount() const {return m_buffer.GetStrCount(); }
-    bool                    IsChanged() const {return m_curChanged || m_buffer.IsChanged(); }
+    size_t                  GetStrCount() const     {return m_buffer.GetStrCount(); }
+    bool                    IsChanged() const       {return m_curChanged || m_buffer.IsChanged(); }
+    uint64_t                GetSize() const         {return m_buffer.GetSize(); }
+    bool                    SetCurStr(size_t line);
     bool                    FlushCurStr();
-    uint64_t                GetSize() const {return m_buffer.GetSize(); }
-//    time_t                  GetModTime() const;// {return m_pDObject->GetTime(); }
 
     std::u16string          GetStr(size_t line, size_t offset = 0, size_t size = MAX_STRLEN + 1);
     std::u16string          GetStrForFind(size_t line, bool checkCase, bool fast);
-    bool                    SetCurStr(size_t line);
 
     //editor API with undo
     bool                    CorrectTab(bool save, size_t line, std::u16string& str);

@@ -590,18 +590,15 @@ bool Editor::FlushCurStr()
     bool rc{ true };
     if (m_curChanged)
     {
-        if (m_curChanged)
+        if (m_curStr == 0 && m_bom)
         {
-            if (m_curStr == 0 && m_bom)
-            {
-                //add bom
-                std::u16string str{ c_utf16Bom + m_curStrBuff };
-                ChangeStr(0, str);
-            }
-            else
-                ChangeStr(m_curStr, m_curStrBuff);
-            m_curChanged = false;
+            //add bom
+            std::u16string str{ c_utf16Bom + m_curStrBuff };
+            ChangeStr(0, str);
         }
+        else
+            ChangeStr(m_curStr, m_curStrBuff);
+        m_curChanged = false;
     }
 
     return rc;
@@ -617,6 +614,13 @@ bool Editor::SetCurStr(size_t line)
     }
 
     return true;
+}
+
+void Editor::SetTab(size_t tabsize) 
+{ 
+    FlushCurStr();
+    m_tab = tabsize;
+    m_curStrBuff = _GetStr(m_curStr, 0, m_maxStrlen);
 }
 
 std::u16string  Editor::GetStr(size_t line, size_t offset, size_t size)

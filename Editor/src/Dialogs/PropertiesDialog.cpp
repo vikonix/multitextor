@@ -54,7 +54,7 @@ PropertiesVars PropertiesDialog::s_vars;
 
 std::list<control> propertiesDialog
 {
-    {CTRL_TITLE,                        "File Properties",      0,                  {},                                 1,  0, 70, 17},
+    {CTRL_TITLE,                        "File Properties",      0,                  {},                                 1,  0, 70, 16},
 
     {CTRL_STATIC,                       "",                     ID_DP_PATH,         {},                                 1,  1, 66,  7},
     {CTRL_STATIC,                       "",                     ID_DP_NAME,         {},                                 1,  2, 66,  7},
@@ -69,14 +69,13 @@ std::list<control> propertiesDialog
     {CTRL_STATIC,                       "En&d of line:",        0,                  {},                                 35,  6, 13},
     {CTRL_DROPLIST,                     "",                     ID_DP_EOL,          &PropertiesDialog::s_vars.eol,      49,  6, 18,  6, "Select the end of line type"},
     {CTRL_STATIC,                       "&Tab size:",           0,                  {},                                 35,  8, 13},
-    {CTRL_EDIT,                         "",                     ID_DP_TAB,          {},                                 64,  8,  3,  7, "Input tabulation size (1-10)"},
-    {CTRL_RADIO,                        "&Convert tabs to space",ID_DP_TAB_CONVERT, &PropertiesDialog::s_vars.saveTab,  35,  9, 30,  1, "Convert all tabulations to space"},
-    {CTRL_RADIO,                        "&Use tabs as space",   ID_DP_TAB_SAVE,     &PropertiesDialog::s_vars.saveTab,  35, 10, 30,  1, "Save tabulations"},
-    {CTRL_CHECK,                        "S&how tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,  35, 11, 30,  1, "Highlight tabulations"},
+    {CTRL_DROPLIST,                     "",                     ID_DP_TAB,          &PropertiesDialog::s_vars.tabSize,  62,  8,  5,  7, "Select tabulation size"},
+    {CTRL_CHECK,                        "Ta&b as space",        ID_DP_TAB_CONVERT,  &PropertiesDialog::s_vars.replaceTab,35,  9, 30,  1, "Convert all tabulations to space"},
+    {CTRL_CHECK,                        "S&how tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,  35, 10, 30,  1, "Highlight tabulations"},
 
-    {CTRL_LINE,                         "",                     0,                  {},                                  1, 13, 66},
-    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Ok",                   ID_OK,              {},                                 50, 14,  0,  0, "Apply changes and reload file if need"},
-    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",               ID_CANCEL,          {},                                 60, 14}
+    {CTRL_LINE,                         "",                     0,                  {},                                  1, 12, 66},
+    {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Ok",                   ID_OK,              {},                                 50, 13,  0,  0, "Apply changes and reload file if need"},
+    {CTRL_BUTTON | CTRL_ALIGN_RIGHT,    "Cancel",               ID_CANCEL,          {},                                 60, 13}
 };
 
 PropertiesDialog::PropertiesDialog(pos_t x, pos_t y)
@@ -128,7 +127,11 @@ bool PropertiesDialog::OnActivate()
         listPtr->AppendStr(str);
     listPtr->SetSelect(s_vars.eol);
 
-    GetItem(ID_DP_TAB)->SetName(std::to_string(std::min(s_vars.tabSize, static_cast<size_t>(10))));
+    ctrl = GetItem(ID_DP_TAB);
+    listPtr = std::dynamic_pointer_cast<CtrlDropList>(ctrl);
+    for (size_t i = 1; i <= 10; ++i)//tab size 1-10
+        listPtr->AppendStr(std::to_string(i));
+    listPtr->SetSelect(s_vars.tabSize);
 
     return true;
 }
@@ -137,29 +140,6 @@ bool PropertiesDialog::OnClose(int id)
 {
     if (id == ID_OK)
     {
-        auto tabStr = GetItem(ID_DP_TAB)->GetName();
-
-        size_t tabSize{};
-        bool badFormat{};
-        try
-        {
-            tabSize = std::stoul(tabStr);
-            if (std::to_string(tabSize) != tabStr)
-                badFormat = true;
-        }
-        catch (...)
-        {
-            badFormat = true;
-        }
-        if (badFormat || tabSize > 10)
-        {
-            Application::getInstance().SetErrorLine("Bad tab size");
-            SelectItem(ID_DP_TAB);
-            Refresh();
-            return false;
-        }
-
-        s_vars.tabSize = tabSize;
         s_vars.typeName = GetItem(ID_DP_TYPE)->GetName();
         s_vars.cpName = GetItem(ID_DP_CP)->GetName();
 

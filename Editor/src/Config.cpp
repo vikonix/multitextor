@@ -388,6 +388,9 @@ template <>
 std::vector<WndConfig> SessionConfig::GetConfig< std::vector<WndConfig>>() const
 {
     std::vector<WndConfig> config;
+    if (!m_json.at(ConfigKey).contains(WndKey))
+        return config;
+
     for (auto& entry : m_json.at(ConfigKey).at(WndKey))
     {
         WndConfig wnd;
@@ -401,6 +404,9 @@ template <>
 std::vector<FileConfig> SessionConfig::GetConfig< std::vector<FileConfig>>() const
 {
     std::vector<FileConfig> config;
+    if (!m_json.at(ConfigKey).contains(RecentFilesKey))
+        return config;
+
     for (auto& entry : m_json.at(ConfigKey).at(RecentFilesKey))
     {
         FileConfig wnd;

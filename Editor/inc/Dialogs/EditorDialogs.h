@@ -165,8 +165,8 @@ struct PropertiesVars
     std::string typeName;
     std::string cpName;
     size_t eol{};
-    size_t tabSize{ 4 };
-    size_t saveTab{};
+    size_t tabSize{ 3 };//real tab size - 1
+    bool replaceTab{};
     bool showTab{};
     bool ro{};
     bool log{};

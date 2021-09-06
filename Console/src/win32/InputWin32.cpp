@@ -577,7 +577,7 @@ void InputWin32::GetFontSize()
     LOG(DEBUG) << "fontX=" << m_fontX << " fontY=" << m_fontY;
     if (m_fontX == 0 || m_fontY == 0)
     {
-        _assert(!"font size");
+        _assert(!"zero font size");
         m_fontX = 1;
         m_fontY = 1;
     }
