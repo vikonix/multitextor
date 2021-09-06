@@ -44,7 +44,7 @@ namespace _Editor
 #define ID_DP_CP           (ID_USER +  5)
 #define ID_DP_EOL          (ID_USER +  6)
 #define ID_DP_TAB          (ID_USER +  7)
-#define ID_DP_TAB_CONVERT  (ID_USER +  8)
+#define ID_DP_TAB_TYPE     (ID_USER +  8)
 #define ID_DP_TAB_SAVE     (ID_USER +  9)
 #define ID_DP_TAB_SHOW     (ID_USER + 10)
 #define ID_DP_LOG          (ID_USER + 11)
@@ -54,24 +54,24 @@ PropertiesVars PropertiesDialog::s_vars;
 
 std::list<control> propertiesDialog
 {
-    {CTRL_TITLE,                        "File Properties",      0,                  {},                                 1,  0, 70, 16},
+    {CTRL_TITLE,                        "File Properties",      0,                  {},                                  1,  0, 70, 16},
 
-    {CTRL_STATIC,                       "",                     ID_DP_PATH,         {},                                 1,  1, 66,  7},
-    {CTRL_STATIC,                       "",                     ID_DP_NAME,         {},                                 1,  2, 66,  7},
-    {CTRL_STATIC,                       "",                     ID_DP_INFO,         {},                                 1,  3, 66,  7},
-    {CTRL_LINE,                         "",                     0,                  {},                                 1,  5, 66},
-    {CTRL_STATIC,                       "&Syntax:",             0,                  {},                                 1,  6, 14},
-    {CTRL_DROPLIST,                     "",                     ID_DP_TYPE,         &PropertiesDialog::s_vars.type,    15,  6, 17,  7, "Select file syntax highlightin"},
-    {CTRL_STATIC,                       "&Encoding:",           0,                  {},                                 1,  7, 14},
-    {CTRL_DROPLIST,                     "",                     ID_DP_CP,           &PropertiesDialog::s_vars.cp,      15,  7, 17,  7, "Select file encoding"},
-    {CTRL_CHECK,                        "&Read only",           ID_DP_RO,           &PropertiesDialog::s_vars.ro,       1,  9, 30,  1, "Protect file from changing"},
-    {CTRL_CHECK,                        "&Log file",            ID_DP_LOG,          &PropertiesDialog::s_vars.log,      1, 10, 30,  1, "File will be reload without confirmation if it changed"},
+    {CTRL_STATIC,                       "",                     ID_DP_PATH,         {},                                  1,  1, 66,  7},
+    {CTRL_STATIC,                       "",                     ID_DP_NAME,         {},                                  1,  2, 66,  7},
+    {CTRL_STATIC,                       "",                     ID_DP_INFO,         {},                                  1,  3, 66,  7},
+    {CTRL_LINE,                         "",                     0,                  {},                                  1,  5, 66},
+    {CTRL_STATIC,                       "Synta&x:",             0,                  {},                                  1,  6, 14},
+    {CTRL_DROPLIST,                     "",                     ID_DP_TYPE,         &PropertiesDialog::s_vars.type,     15,  6, 17,  7, "Select file syntax highlightin"},
+    {CTRL_STATIC,                       "&Encoding:",           0,                  {},                                  1,  7, 14},
+    {CTRL_DROPLIST,                     "",                     ID_DP_CP,           &PropertiesDialog::s_vars.cp,       15,  7, 17,  7, "Select file encoding"},
+    {CTRL_CHECK,                        "&Read only",           ID_DP_RO,           &PropertiesDialog::s_vars.ro,        1,  9, 30,  1, "Protect file from changing"},
+    {CTRL_CHECK,                        "&Log file",            ID_DP_LOG,          &PropertiesDialog::s_vars.log,       1, 10, 30,  1, "File will be reload without confirmation if it changed"},
     {CTRL_STATIC,                       "En&d of line:",        0,                  {},                                 35,  6, 13},
     {CTRL_DROPLIST,                     "",                     ID_DP_EOL,          &PropertiesDialog::s_vars.eol,      49,  6, 18,  6, "Select the end of line type"},
     {CTRL_STATIC,                       "&Tab size:",           0,                  {},                                 35,  8, 13},
     {CTRL_DROPLIST,                     "",                     ID_DP_TAB,          &PropertiesDialog::s_vars.tabSize,  62,  8,  5,  7, "Select tabulation size"},
-    {CTRL_CHECK,                        "Ta&b as space",        ID_DP_TAB_CONVERT,  &PropertiesDialog::s_vars.replaceTab,35,  9, 30,  1, "Convert all tabulations to space"},
-    {CTRL_CHECK,                        "S&how tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,  35, 10, 30,  1, "Highlight tabulations"},
+    {CTRL_CHECK,                        "Use &spaces as Tabs",  ID_DP_TAB_TYPE,     &PropertiesDialog::s_vars.replaceTab,35,  9, 30,  1, "Use spaces as tabulations"},
+    {CTRL_CHECK,                        "S&how Tabs",           ID_DP_TAB_SHOW,     &PropertiesDialog::s_vars.showTab,  35, 10, 30,  1, "Highlight tabulations"},
 
     {CTRL_LINE,                         "",                     0,                  {},                                  1, 12, 66},
     {CTRL_DEFBUTTON | CTRL_ALIGN_RIGHT, "Ok",                   ID_OK,              {},                                 50, 13,  0,  0, "Apply changes and reload file if need"},
