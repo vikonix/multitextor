@@ -13,7 +13,7 @@ icon: docs/m.png
 license: BSD-2-Clause
 
 base: core18
-confinement: strict
+confinement: classic
 grade: stable
 
 apps:
