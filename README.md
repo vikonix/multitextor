@@ -67,10 +67,10 @@ Minimal requirement: gcc 8.0 or MSVS 2017
 Snap packet link: [![snap packet](https://snapcraft.io/multitextor/badge.svg)](https://snapcraft.io/multitextor)
 
  - Install:
-    ***snap install --edge --classic multitextor***
+    ***snap install --edge --devmode multitextor***
 
  - Update: 
-    ***snap refresh --edge --classic multitextor***
+    ***snap refresh --edge --devmode multitextor***
     
 ### Windows: get zip archive from AppVeyor CI artifacts
 Zip archive link: [![zip archive](https://ci.appveyor.com/api/projects/status/m98q8sh347k0cdu6/branch/main?svg=true)](https://ci.appveyor.com/project/vikonix/multitextor/branch/main/artifacts)
