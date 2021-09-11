@@ -52,6 +52,7 @@ Windows list dialog.
 |Alt+X           	|APP_EXIT|
 |Esc  x          	|APP_EXIT|
 |Esc  X          	|APP_EXIT|
+|Ctrl+Q           	|APP_EXIT|
 |Esc  0          	|Insert|
 |Alt+/           	|APP_VIEW_SPLIT_MERGE|
 |Alt++           	|APP_VIEW_SPLIT_VH|
@@ -82,7 +83,6 @@ Windows list dialog.
 |Alt+9           	|~~APP_BOOKMARK_9~~|
 |Ctrl+K          	|APP_RECORD_MACRO|
 |Alt+K           	|APP_PLAY_MACRO|
-|Ctrl+Q          	|~~APP_DLG_KEYGEN~~|
 |F12             	|APP_REFRESH|
 |KeyLeft         	|EDIT_MOVE_LEFT|
 |KeyRight        	|EDIT_MOVE_RIGHT|

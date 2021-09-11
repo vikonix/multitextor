@@ -73,6 +73,7 @@ CmdMap g_defaultAppKeyMap
     {{'X' | K_ALT},             {K_EXIT}},
     {{K_ESC, 'x'},              {K_EXIT}},
     {{K_ESC, 'X'},              {K_EXIT}},
+    {{'Q' | K_CTRL},            {K_EXIT}},
 
     {{K_ESC, '0'},              {K_INSERT}},
 
@@ -108,7 +109,6 @@ CmdMap g_defaultAppKeyMap
 
     {{'K' | K_CTRL},            {K_APP_RECORD_MACRO}},
     {{'K' | K_ALT},             {K_APP_PLAY_MACRO}},
-    {{'Q' | K_CTRL},            {K_APP_KEYGEN}},
 
     //for test
     {{K_F12},                   {K_REFRESH}}

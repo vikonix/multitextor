@@ -245,6 +245,14 @@
       },
       {
         "Cmd": [
+          "APP_EXIT"
+        ],
+        "Key": [
+          "Ctrl+Q"
+        ]
+      },
+      {
+        "Cmd": [
           "Insert"
         ],
         "Key": [
@@ -490,14 +498,6 @@
         ],
         "Key": [
           "Alt+K"
-        ]
-      },
-      {
-        "Cmd": [
-          "APP_DLG_KEYGEN"
-        ],
-        "Key": [
-          "Ctrl+Q"
         ]
       },
       {
