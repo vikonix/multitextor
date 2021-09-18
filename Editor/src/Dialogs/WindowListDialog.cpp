@@ -161,7 +161,14 @@ size_t WindowListDialog::GetWndList(bool skip)
     {
         auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX() - 2);
         m_wndList[shortPath] = w;
-        listPtr->AppendStr(shortPath);
+
+        std::string prefix{ w->GetAccessInfo() };
+        if (path == active)
+            prefix += ">";
+        else
+            prefix += " ";
+        m_prefixSize = prefix.size();
+        listPtr->AppendStr(prefix + shortPath);
         if (path == active)
             listPtr->SetSelect(n);
         ++n;
@@ -184,7 +191,7 @@ input_t WindowListDialog::DialogProc(input_t code)
         auto listPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
         auto n = listPtr->GetSelected();
         std::string path{ listPtr->GetStr(n) };
-        auto wndIt = m_wndList.find({ path });
+        auto wndIt = m_wndList.find(path.substr(m_prefixSize));
         if (wndIt == m_wndList.end())
         {
             _assert(0);
@@ -239,7 +246,7 @@ bool WindowListDialog::OnClose(int id)
         auto listPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
         auto n = listPtr->GetSelected();
         std::string path{ listPtr->GetStr(n) };
-        auto wndIt = m_wndList.find({ path });
+        auto wndIt = m_wndList.find(path.substr(m_prefixSize));
         if (wndIt == m_wndList.end())
         {
             _assert(0);

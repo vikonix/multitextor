@@ -95,6 +95,7 @@ class WindowListDialog : public Dialog
 {
     WindowsDlgMode m_mode;
     std::map<std::string, EditorWnd*> m_wndList;
+    size_t m_prefixSize;
 
     size_t GetWndList(bool skip = false);
 
