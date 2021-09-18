@@ -92,7 +92,8 @@ bool    EditorApp::FileNewProc([[maybe_unused]] input_t cmd)
 {
     for (size_t n = 0; n < 1000; ++n)
     {
-        std::filesystem::path path{ "untitled_" + std::to_string(n) + ".txt" };
+        std::filesystem::path path{ FileDialog::s_vars.path };
+        path /= "untitled_" + std::to_string(n) + ".txt";
 
         if (!std::filesystem::exists(path) && GetEditorWnd(path) == nullptr)
         {
