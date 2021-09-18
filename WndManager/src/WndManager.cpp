@@ -664,7 +664,6 @@ bool WndManager::DelWnd(Wnd* wnd)
         {
             SetTopWnd(m_view[2].wnd);
         }
-
     }
 
     m_invalidate = true;

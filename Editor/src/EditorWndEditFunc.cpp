@@ -924,7 +924,13 @@ bool EditorWnd::Save(input_t cmd)
         return false;
     }
 
-    UpdateAccessInfo();
+    auto wndList = m_editor->GetLinkedWnd();
+    for (auto wnd : wndList)
+    {
+        auto editorWnd = reinterpret_cast<EditorWnd*>(wnd);
+        editorWnd->UpdateAccessInfo();
+    }
+
     m_saved = true;
 
     return true;

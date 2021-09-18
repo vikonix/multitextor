@@ -129,7 +129,12 @@ bool EditorWnd::SaveAs([[maybe_unused]]input_t cmd)
                 throw std::runtime_error{ "File saveing error" };
             }
 
-            UpdateAccessInfo();
+            auto wndList = m_editor->GetLinkedWnd();
+            for (auto wnd : wndList)
+            {
+                auto editorWnd = reinterpret_cast<EditorWnd*>(wnd);
+                editorWnd->UpdateAccessInfo();
+            }
             m_saved = true;
         }
         catch (...)
