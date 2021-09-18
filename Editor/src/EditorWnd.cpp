@@ -1211,6 +1211,7 @@ bool EditorWnd::PasteSelected(const std::vector<std::u16string>& strArray, selec
         return true;
 
     LOG(DEBUG) << "    PasteSelected";
+    TryDeleteSelectedBlock();
 
     size_t posX = m_xOffset + m_cursorx;
     size_t posY = m_firstLine + m_cursory;
