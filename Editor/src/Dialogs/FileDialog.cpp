@@ -31,6 +31,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "WndManager/App.h"
 #include "utils/CpConverter.h"
 #include "LexParser.h"
+#include "EditorWnd.h"
 
 using namespace _Utils;
 
@@ -149,7 +150,14 @@ bool FileDialog::OnActivate()
         ctrlName->AppendStr(str);
 
     m_dirList.SetMask(s_vars.maskList.front());
-    ScanDir(s_vars.path);
+
+    if (auto activeWnd = dynamic_cast<EditorWnd*>(WndManager::getInstance().GetWnd(0)); activeWnd != nullptr)
+    {
+        auto path = activeWnd->GetFilePath();
+        ScanDir(path.parent_path().u8string());
+    }
+    else
+        ScanDir(s_vars.path);
 
     return true;
 }
@@ -273,7 +281,11 @@ input_t FileDialog::DialogProc(input_t code)
                 auto name = GetItem(ID_OF_NAME)->GetName();
                 auto found = ScanDir(std::string(name));
 
-                if (!found || !m_dirList.IsSingleMask())
+                if (m_mode == FileDlgMode::SaveAs && m_dirList.IsSingleMask())
+                {
+                    //LOG(DEBUG) << "SaveAs";
+                }
+                else if (!found || !m_dirList.IsSingleMask())
                 {
                     //if not simple mask or found many files
                     auto mask = m_dirList.GetMask();
