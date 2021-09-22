@@ -159,7 +159,7 @@ size_t WindowListDialog::GetWndList(bool skip)
     size_t n{};
     for (auto& [path, w] : wndList)
     {
-        auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX() - 2);
+        auto shortPath = Directory::CutPath(path, listCtrl->GetSizeX() - 2 - m_prefixSize);
         m_wndList[shortPath] = w;
 
         std::string prefix{ w->GetAccessInfo() };
