@@ -42,11 +42,13 @@ namespace _Editor
 
 class CoReadFile
 {
+    static const inline auto        c_waitTime{10s};
+
     std::thread                     m_thread;
     std::condition_variable         m_condition;
     std::condition_variable         m_conditionBufferReady;
     std::mutex                      m_mutex;
-    bool                            m_cancel{false};
+    std::atomic_bool                m_cancel{false};
 
     std::atomic_bool                m_bufferReady{false};
     std::atomic<size_t>             m_read{};
@@ -104,7 +106,8 @@ class CoReadFile
             ConvertCp(read);
 
             std::unique_lock lock{ m_mutex };
-            m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady || m_cancel; });
+            if (!m_conditionBufferReady.wait_for(lock, c_waitTime, [this]() -> bool {return !m_bufferReady || m_cancel; }))
+                return;
 
             if (m_cancel)
                 return;
@@ -120,7 +123,8 @@ class CoReadFile
 
         {
             std::unique_lock lock{ m_mutex };
-            m_conditionBufferReady.wait(lock, [this]() -> bool {return !m_bufferReady || m_cancel; });
+            if (!m_conditionBufferReady.wait_for(lock, c_waitTime, [this]() -> bool {return !m_bufferReady || m_cancel; }))
+                return;
 
             m_bufferReady = true;
             m_read = 0;
@@ -148,8 +152,12 @@ public:
     std::tuple<size_t, std::shared_ptr<read_buff_t>, bool> Wait()
     {
         std::unique_lock lock{ m_mutex };
-        if (!m_condition.wait_for(lock, 10s, [this]() -> bool {return m_bufferReady;}))
-            throw std::runtime_error{"Wait read ready timeout"};
+        if (!m_condition.wait_for(lock, c_waitTime, [this]() -> bool {return m_bufferReady; }))
+        {
+            m_cancel = true;
+            LOG(ERROR) << __FUNC__ << "read ready timeout";
+            throw std::runtime_error{ "Wait read ready timeout" };
+        }
 
         return { m_read, m_buff2, m_eof };
     }
@@ -157,8 +165,12 @@ public:
     std::tuple<size_t, std::shared_ptr<std::u16string>, bool> WaitU16()
     {
         std::unique_lock lock{ m_mutex };
-        if(!m_condition.wait_for(lock, 10s, [this]() -> bool {return m_bufferReady;}))
+        if (!m_condition.wait_for(lock, c_waitTime, [this]() -> bool {return m_bufferReady; }))
+        {
+            m_cancel = true;
+            LOG(ERROR) << __FUNC__ << "read ready timeout";
             throw std::runtime_error{ "WaitU16 read ready timeout" };
+        }
 
         return { m_read, m_u16buff2, m_eof };
     }
