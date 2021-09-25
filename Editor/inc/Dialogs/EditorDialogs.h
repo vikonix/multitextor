@@ -66,7 +66,7 @@ struct FileDialogVars
 
 class FileDialog : public Dialog
 {
-    FileDlgMode             m_mode;
+    FileDlgMode             m_mode{};
     _Utils::DirectoryList   m_dirList;
 
     bool ScanDir(const std::string& mask);
@@ -93,9 +93,9 @@ enum class WindowsDlgMode
 class EditorWnd;
 class WindowListDialog : public Dialog
 {
-    WindowsDlgMode m_mode;
+    WindowsDlgMode m_mode{};
     std::map<std::string, EditorWnd*> m_wndList;
-    size_t m_prefixSize;
+    size_t m_prefixSize{2};
 
     size_t GetWndList(bool skip = false);
 
@@ -110,7 +110,7 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 class GotoDialog : public Dialog
 {
-    size_t m_maxLine;
+    size_t m_maxLine{};
 
 public:
     static std::string m_line;
@@ -194,7 +194,7 @@ struct FindFileDialogVars
 
 class FindFileDialog : public Dialog
 {
-    bool m_replace;//false-find true-replace
+    bool m_replace{};//false-find true-replace
 
     _Utils::DirectoryList   m_dirList;
 
