@@ -163,26 +163,23 @@ std::optional<path_t> Directory::UserCfgPath(const std::string& appName, bool cr
     free(env);
 
     path /= appName;
-    if (std::filesystem::is_directory(path))
-        return path;
-    
-    if(create)
-        std::filesystem::create_directory(path);
-
-    return std::nullopt;
 #else
     const char* home = getenv("HOME");
     path_t path = home;
     path /= ".config/" + appName;
+#endif
 
     if (std::filesystem::is_directory(path))
         return path;
 
     if (create)
+    {
         std::filesystem::create_directory(path);
+        if (std::filesystem::is_directory(path))
+            return path;
+    }
 
     return std::nullopt;
-#endif
 }
 
 path_t Directory::UserLocalPath(const std::string& appName, bool create)
@@ -197,11 +194,15 @@ path_t Directory::UserLocalPath(const std::string& appName, bool create)
     free(env);
 
     path /= appName;
+
     if (std::filesystem::is_directory(path))
         return path;
-
     if (create)
+    {
         std::filesystem::create_directory(path);
+        if (std::filesystem::is_directory(path))
+            return path;
+    }
 
     return s_runPath;
 #else
@@ -213,8 +214,17 @@ path_t Directory::UserLocalPath(const std::string& appName, bool create)
         return path;
 
     if (create)
+    {
         std::filesystem::create_directory(path);
+        if (std::filesystem::is_directory(path))
+            return path;
+    }
 
+    if (s_runPath.u8string().find("/snap/") == 0)
+    {
+        //snap packet
+        return home;
+    }
     return s_runPath;
 #endif
 }

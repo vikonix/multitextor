@@ -88,8 +88,9 @@ void SaveConfig()
         config.Save(parserPath / file, parser.second);
     }
 
-    //user config dir
-    auto userPath = Directory::UserCfgPath(EDITOR_NAME, true);
+    //user config dirs
+    auto cfgPath = Directory::UserCfgPath(EDITOR_NAME, true);
+    auto localPath = Directory::UserLocalPath(EDITOR_NAME, true);
 }
 
 /////////////////////////////////////////////////////////////////////////////
