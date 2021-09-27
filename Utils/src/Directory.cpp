@@ -101,7 +101,7 @@ path_t Directory::TmpPath(const std::string& appPrefix)
     return path / dir;
 }
 
-path_t Directory::ProgrammPath(const std::string& appName)
+path_t Directory::ProgramPath(const std::string& appName)
 {
 #ifdef WIN32
     char* env;
@@ -126,7 +126,7 @@ path_t Directory::ProgrammPath(const std::string& appName)
 #endif
 }
 
-path_t Directory::CfgPath(const std::string& appName)
+std::optional<path_t> Directory::SysCfgPath(const std::string& appName)
 {
 #ifdef WIN32
     char* env;
@@ -141,29 +141,17 @@ path_t Directory::CfgPath(const std::string& appName)
     if (std::filesystem::is_directory(path))
         return path;
 
-    return s_runPath;
+    return std::nullopt;
 #else
     std::string path{ "/etc/" + appName };
     if (std::filesystem::is_directory(path))
         return path;
 
-    return s_runPath;
+    return std::nullopt;
 #endif
 }
 
-path_t Directory::SysCfgPath()
-{
-#ifdef WIN32
-    TCHAR buff[c_BuffLen];
-    [[maybe_unused]]bool rc = GetWindowsDirectory(buff, c_BuffLen);
-    _assert(rc);
-    return buff;
-#else
-    return "/etc";
-#endif
-}
-
-path_t Directory::UserCfgPath([[maybe_unused]]const std::string& appName, [[maybe_unused]]bool create)
+std::optional<path_t> Directory::UserCfgPath(const std::string& appName, bool create)
 {
 #ifdef WIN32
     char* env;
@@ -181,10 +169,53 @@ path_t Directory::UserCfgPath([[maybe_unused]]const std::string& appName, [[mayb
     if(create)
         std::filesystem::create_directory(path);
 
+    return std::nullopt;
+#else
+    const char* home = getenv("HOME");
+    path_t path = home;
+    path /= ".config/" + appName;
+
+    if (std::filesystem::is_directory(path))
+        return path;
+
+    if (create)
+        std::filesystem::create_directory(path);
+
+    return std::nullopt;
+#endif
+}
+
+path_t Directory::UserLocalPath(const std::string& appName, bool create)
+{
+#ifdef WIN32
+    char* env;
+    size_t len;
+    errno_t err = _dupenv_s(&env, &len, "LOCALAPPDATA");
+    _assert(err == 0);
+
+    path_t path{ env ? env : "" };
+    free(env);
+
+    path /= appName;
+    if (std::filesystem::is_directory(path))
+        return path;
+
+    if (create)
+        std::filesystem::create_directory(path);
+
     return s_runPath;
 #else
     const char* home = getenv("HOME");
-    return home;
+    path_t path = home;
+    path /= ".local/share/" + appName;
+
+    if (std::filesystem::is_directory(path))
+        return path;
+
+    if (create)
+        std::filesystem::create_directory(path);
+
+    return s_runPath;
 #endif
 }
 

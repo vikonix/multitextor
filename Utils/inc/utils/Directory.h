@@ -28,6 +28,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <filesystem>
 #include <vector>
 #include <cwctype>
+#include <optional>
 
 /////////////////////////////////////////////////////////////////////////////
 namespace _Utils
@@ -113,13 +114,15 @@ class Directory
 
 public:
     static bool         SetCurDir(const std::string& path);
-    static path_t       RunPath() { return s_runPath; }
     static path_t       CurPath();
-    static path_t       TmpPath(const std::string& appPrefix = "");
-    static path_t       CfgPath(const std::string& appName);
-    static path_t       ProgrammPath(const std::string& appName);
-    static path_t       SysCfgPath();
-    static path_t       UserCfgPath(const std::string& appName, bool create = false);
+    static path_t       RunPath() { return s_runPath; }
+
+    static path_t                   TmpPath(const std::string& appPrefix = "");
+    static path_t                   ProgramPath(const std::string& appName);
+    static path_t                   UserLocalPath(const std::string& appName, bool create = false);
+    static std::optional<path_t>    UserCfgPath(const std::string& appName, bool create = false);
+    static std::optional<path_t>    SysCfgPath(const std::string& appName);
+
     static std::string  UserName();
     static std::string  CutPath(const path_t& path, size_t len);
     static std::string  GetFileInfo(const std::filesystem::file_time_type& ftime, const uintmax_t& size, size_t size_width = 8);

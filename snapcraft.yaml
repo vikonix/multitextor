@@ -60,20 +60,15 @@ parts:
     plugin: dump
     organize:
       snap/multitextor/current/usr: usr
-      snap/multitextor/current/etc: etc
     override-stage: |
-      mkdir -p $SNAPCRAFT_STAGE/etc/Multitextor
       mkdir -p $SNAPCRAFT_STAGE/usr/share/Multitextor
-      cp -a -r $SNAPCRAFT_PART_SRC/configurations/config $SNAPCRAFT_STAGE/etc/Multitextor/config
+      cp -a -r $SNAPCRAFT_PART_SRC/configurations/config $SNAPCRAFT_STAGE/usr/share/Multitextor/config
       cp -a -r $SNAPCRAFT_PART_SRC/configurations/parser $SNAPCRAFT_STAGE/usr/share/Multitextor/parser
     override-prime: |
-      mkdir -p $SNAPCRAFT_PRIME/etc/Multitextor
       mkdir -p $SNAPCRAFT_PRIME/usr/share/Multitextor
-      cp -a -r $SNAPCRAFT_STAGE/etc/Multitextor/config $SNAPCRAFT_PRIME/etc/Multitextor/config
+      cp -a -r $SNAPCRAFT_STAGE/usr/share/Multitextor/config $SNAPCRAFT_PRIME/usr/share/Multitextor/config
       cp -a -r $SNAPCRAFT_STAGE/usr/share/Multitextor/parser $SNAPCRAFT_PRIME/usr/share/Multitextor/parser
 
 layout:
   /usr/share/Multitextor:
     symlink: $SNAP/usr/share/Multitextor
-  /etc/Multitextor:
-    symlink: $SNAP/etc/Multitextor
