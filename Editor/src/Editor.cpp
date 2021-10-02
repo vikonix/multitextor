@@ -42,26 +42,25 @@ namespace _Editor
 
 class CoReadFile
 {
-    static const inline auto        c_waitTime{10s};
+    using outBuff = std::tuple<std::shared_ptr<read_buff_t>, size_t, bool, std::shared_ptr<std::u16string>>;
 
-    std::thread                     m_thread;
-    std::condition_variable         m_condition;
-    std::condition_variable         m_conditionBufferReady;
-    std::mutex                      m_mutex;
-    std::atomic_bool                m_cancel{false};
+    static const inline size_t              c_buffCount{3};
 
-    std::atomic_bool                m_bufferReady{false};
-    std::atomic<size_t>             m_read{};
-    bool                            m_eof{};
-    
     std::optional<const std::string>        m_cp;
-    bool                                    m_toUpper{};
     std::shared_ptr<iconvpp::CpConverter>   m_converter;
+    bool                                    m_toUpper{};
+    bool                                    m_eof{};
 
-    std::shared_ptr<read_buff_t>    m_buff1{ std::make_shared<read_buff_t>() };
-    std::shared_ptr<read_buff_t>    m_buff2{ std::make_shared<read_buff_t>() };
-    std::shared_ptr<std::u16string> m_u16buff1{ std::make_shared<std::u16string>() };
-    std::shared_ptr<std::u16string> m_u16buff2{ std::make_shared<std::u16string>() };
+    std::thread                             m_thread;
+    std::atomic_bool                        m_cancel{false};
+    
+    std::mutex                              m_readMutex;
+    std::condition_variable                 m_readCondition;
+    std::list<std::shared_ptr<read_buff_t>> m_readBuffList;
+
+    std::mutex                              m_outMutex;
+    std::condition_variable                 m_outCondition;
+    std::list<outBuff>                      m_outBuffList;
 
     void Read(const std::filesystem::path& path)
     {
@@ -73,63 +72,68 @@ class CoReadFile
 
             file.read(buff->data(), c_buffsize);
             auto read = file.gcount();
-            if (0 == read)
-                return 0;
-
             return static_cast<size_t>(read);
         };
 
-        auto ConvertCp = [this](size_t read) {
+        auto ConvertCp = [this](std::shared_ptr<read_buff_t> buff, size_t read) -> std::shared_ptr<std::u16string> {
             if (!m_cp)
-                return;
+                return {};
+
+            std::shared_ptr<std::u16string> u16buff = std::make_shared<std::u16string>();
             if(1)//*m_cp != "UTF-8")//???
             {
-                [[maybe_unused]] bool rc = m_converter->Convert(std::string_view(m_buff1->data(), read), *m_u16buff1);
+                [[maybe_unused]] bool rc = m_converter->Convert(std::string_view(buff->data(), read), *u16buff);
             }
             else
             {
-                m_u16buff1->resize(read);
-                auto it = utf8::utf8to16(m_buff1->cbegin(), m_buff1->cbegin() + read, m_u16buff1->begin());
-                m_u16buff1->erase(it, m_u16buff1->end());
+                u16buff->resize(read);
+                auto it = utf8::utf8to16(buff->cbegin(), buff->cbegin() + read, u16buff->begin());
+                u16buff->erase(it, u16buff->end());
             }
             
-            if (!m_toUpper)
-                return;
-            std::transform(m_u16buff1->begin(), m_u16buff1->end(), m_u16buff1->begin(),
-                [](char16_t c) { return std::towupper(c); }
-            );
+            if (m_toUpper)
+            {
+                std::transform(u16buff->begin(), u16buff->end(), u16buff->begin(),
+                    [](char16_t c) { return std::towupper(c); }
+                );
+            }
+            return u16buff;
         };
 
         size_t read;
-        while (0 != (read = readFile(m_buff1)))
+        //no mutex for first read
+        auto buff = m_readBuffList.back();
+        if (!buff)
         {
-            ConvertCp(read);
+            _assert(0);
+            return;
+        }
+        m_readBuffList.pop_back();
 
-            std::unique_lock lock{ m_mutex };
-            if (!m_conditionBufferReady.wait_for(lock, c_waitTime, [this]() -> bool {return !m_bufferReady || m_cancel; }))
-                return;
-
+        while (0 != (read = readFile(buff)))
+        {
             if (m_cancel)
                 return;
 
-            std::swap(m_buff1, m_buff2);
-            std::swap(m_u16buff1, m_u16buff2);
-            m_bufferReady = true;
-            m_read = read;
             m_eof = file.eof();
+            auto u16buff = ConvertCp(buff, read);
+            {
+                std::unique_lock lock{ m_outMutex };
+                m_outBuffList.emplace_front(buff, read, m_eof, u16buff);
+                m_outCondition.notify_one();
+            }
 
-            m_condition.notify_one();
-        }
+            if (m_eof)
+                break;
 
-        {
-            std::unique_lock lock{ m_mutex };
-            if (!m_conditionBufferReady.wait_for(lock, c_waitTime, [this]() -> bool {return !m_bufferReady || m_cancel; }))
+            std::unique_lock lock{ m_readMutex };
+            if(m_readBuffList.empty())
+                m_readCondition.wait(lock, [this]() -> bool {return m_cancel || !m_readBuffList.empty(); });
+            if (m_cancel)
                 return;
 
-            m_bufferReady = true;
-            m_read = 0;
-            m_eof = true;
-            m_condition.notify_one();
+            buff = m_readBuffList.back();
+            m_readBuffList.pop_back();
         }
     }
 
@@ -140,51 +144,49 @@ public:
     {
         if(m_cp)
             m_converter = std::make_shared<iconvpp::CpConverter>(*m_cp);
+        for (size_t i = 0; i < c_buffCount; ++i)
+            m_readBuffList.push_front(std::make_shared<read_buff_t>());
+
         m_thread = std::thread(&CoReadFile::Read, this, path);
     }
 
     ~CoReadFile()
     {
+        m_cancel = true;
+        m_readCondition.notify_one();
+        m_outCondition.notify_one();
         if (m_thread.joinable())
             m_thread.join();
     }
 
-    std::tuple<size_t, std::shared_ptr<read_buff_t>, bool> Wait()
+    outBuff Wait()
     {
-        std::unique_lock lock{ m_mutex };
-        if (!m_condition.wait_for(lock, c_waitTime, [this]() -> bool {return m_bufferReady; }))
-        {
-            m_cancel = true;
-            LOG(ERROR) << __FUNC__ << "read ready timeout";
-            throw std::runtime_error{ "Wait read ready timeout" };
-        }
+        if(m_eof)
+            return { {}, 0, true, {} };
 
-        return { m_read, m_buff2, m_eof };
+        std::unique_lock lock{ m_outMutex };
+        m_outCondition.wait(lock, [this]() -> bool {return m_cancel || !m_outBuffList.empty(); });
+        if (m_cancel)
+            return { {}, 0, true, {} };
+
+        auto buff = m_outBuffList.back();
+        m_outBuffList.pop_back();
+
+        return buff;
     }
 
-    std::tuple<size_t, std::shared_ptr<std::u16string>, bool> WaitU16()
+    void Next(std::shared_ptr<read_buff_t> buff)
     {
-        std::unique_lock lock{ m_mutex };
-        if (!m_condition.wait_for(lock, c_waitTime, [this]() -> bool {return m_bufferReady; }))
-        {
-            m_cancel = true;
-            LOG(ERROR) << __FUNC__ << "read ready timeout";
-            throw std::runtime_error{ "WaitU16 read ready timeout" };
-        }
-
-        return { m_read, m_u16buff2, m_eof };
-    }
-
-    void Next()
-    {
-        m_bufferReady = false;
-        m_conditionBufferReady.notify_one();
+        std::unique_lock lock{ m_readMutex };
+        m_readBuffList.push_front(buff);
+        m_readCondition.notify_one();
     }
 
     void Cancel()
     {
         m_cancel = true;
-        m_conditionBufferReady.notify_one();
+        m_eof = true;
+        m_readCondition.notify_one();
     }
 };
 
@@ -324,7 +326,7 @@ bool Editor::Load(bool log)
     {
         for (;;)
         {
-            auto [read, buff, eof] = rfile.Wait();
+            auto [buff, read, eof, _] = rfile.Wait();
             if (read == 0)
                 break;
 
@@ -334,8 +336,6 @@ bool Editor::Load(bool log)
                 fileOffset, eof);
             if (!rc)
                 return false;
-
-            rfile.Next();
 
             time_t t2{ time(nullptr) };
             if (t1 != t2 && step)
@@ -348,6 +348,11 @@ bool Editor::Load(bool log)
                     EditorApp::ShowProgressBar(pr);
                 }
             }
+
+            if (eof)
+                break;
+
+            rfile.Next(buff);
         }
     }
     catch (...)
@@ -1839,19 +1844,19 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
     {
         for (;;)
         {
-            auto [read, buff, eof] = rfile.WaitU16();
+            auto [_buff, read, eof, u16buff] = rfile.Wait();
             if (read == 0)
                 break;
 
             if (!prevBuff.empty())
-                buff->insert(0, prevBuff);
+                u16buff->insert(0, prevBuff);
 
             searcher_t searcher(find.cbegin(), find.cend());
-            auto itBegin = buff->cbegin();
-            while (itBegin != buff->cend())
+            auto itBegin = u16buff->cbegin();
+            while (itBegin != u16buff->cend())
             {
-                auto itFound = std::search(itBegin, buff->cend(), searcher);
-                if (itFound != buff->cend())
+                auto itFound = std::search(itBegin, u16buff->cend(), searcher);
+                if (itFound != u16buff->cend())
                 {
                     if (!findWord)
                     {
@@ -1861,8 +1866,8 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
                     else
                     {
 
-                        if ((itFound == buff->cbegin() || GetSymbolType(*(itFound - 1)) != symbol_t::alnum)
-                            && (itFound + findSize == buff->cend() || GetSymbolType(*(itFound + findSize)) != symbol_t::alnum))
+                        if ((itFound == u16buff->cbegin() || GetSymbolType(*(itFound - 1)) != symbol_t::alnum)
+                            && (itFound + findSize == u16buff->cend() || GetSymbolType(*(itFound + findSize)) != symbol_t::alnum))
                         {
                             rfile.Cancel();
                             return true;
@@ -1877,19 +1882,22 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
 
             prevBuff.clear();
             if (!eof)
-                for (auto rit = buff->crbegin(); rit != buff->crend(); ++rit)
+                for (auto rit = u16buff->crbegin(); rit != u16buff->crend(); ++rit)
                 {
                     if (*rit < ' ')
                     {
                         //save last not full string
-                        auto size = std::distance(buff->crbegin(), rit);
+                        auto size = std::distance(u16buff->crbegin(), rit);
                         prevBuff.resize(size);
-                        std::copy_n(std::prev(buff->cend(), size), size, prevBuff.begin());
+                        std::copy_n(std::prev(u16buff->cend(), size), size, prevBuff.begin());
                         break;
                     }
                 }
 
-            rfile.Next();
+            if (eof)
+                break;
+
+            rfile.Next(_buff);
             if (func)
             {
                 auto ret = func();
