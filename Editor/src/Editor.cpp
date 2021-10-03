@@ -61,6 +61,7 @@ class CoReadFile
     std::mutex                              m_outMutex;
     std::condition_variable                 m_outCondition;
     std::list<outBuff>                      m_outBuffList;
+    std::shared_ptr<read_buff_t>            m_buff;
 
     void Read(const std::filesystem::path& path)
     {
@@ -100,30 +101,39 @@ class CoReadFile
             return u16buff;
         };
 
-        size_t read;
-        //no mutex for first read
-        auto buff = m_readBuffList.back();
+        auto fileSize = std::filesystem::file_size(path);
+        if (fileSize == 0)
+        {
+            m_eof = true;
+            return;
+        }
+
+        size_t count = static_cast<size_t>(fileSize / c_buffsize);
+        count = std::min(count, c_buffCount - 1);
+        for (size_t i = 0; i < count; ++i)
+            m_readBuffList.push_front(std::make_shared<read_buff_t>());
+
+        auto buff = std::make_shared<read_buff_t>();
         if (!buff)
         {
             _assert(0);
             return;
         }
-        m_readBuffList.pop_back();
 
+        size_t read;
         while (0 != (read = readFile(buff)))
         {
             if (m_cancel)
                 return;
 
-            m_eof = file.eof();
             auto u16buff = ConvertCp(buff, read);
             {
                 std::unique_lock lock{ m_outMutex };
-                m_outBuffList.emplace_front(buff, read, m_eof, u16buff);
+                m_outBuffList.emplace_front(buff, read, file.eof(), u16buff);
                 m_outCondition.notify_one();
             }
 
-            if (m_eof)
+            if (file.eof())
                 break;
 
             std::unique_lock lock{ m_readMutex };
@@ -144,8 +154,6 @@ public:
     {
         if(m_cp)
             m_converter = std::make_shared<iconvpp::CpConverter>(*m_cp);
-        for (size_t i = 0; i < c_buffCount; ++i)
-            m_readBuffList.push_front(std::make_shared<read_buff_t>());
 
         m_thread = std::thread(&CoReadFile::Read, this, path);
     }
@@ -161,7 +169,7 @@ public:
 
     outBuff Wait()
     {
-        if(m_eof)
+        if(m_eof || m_cancel)
             return { {}, 0, true, {} };
 
         std::unique_lock lock{ m_outMutex };
@@ -171,14 +179,16 @@ public:
 
         auto buff = m_outBuffList.back();
         m_outBuffList.pop_back();
+        m_buff = std::get<0>(buff);
+        m_eof = std::get<2>(buff);
 
         return buff;
     }
 
-    void Next(std::shared_ptr<read_buff_t> buff)
+    void Next()
     {
         std::unique_lock lock{ m_readMutex };
-        m_readBuffList.push_front(buff);
+        m_readBuffList.push_front(std::move(m_buff));
         m_readCondition.notify_one();
     }
 
@@ -352,7 +362,7 @@ bool Editor::Load(bool log)
             if (eof)
                 break;
 
-            rfile.Next(buff);
+            rfile.Next();
         }
     }
     catch (...)
@@ -1844,7 +1854,7 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
     {
         for (;;)
         {
-            auto [_buff, read, eof, u16buff] = rfile.Wait();
+            auto [_, read, eof, u16buff] = rfile.Wait();
             if (read == 0)
                 break;
 
@@ -1897,7 +1907,7 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
             if (eof)
                 break;
 
-            rfile.Next(_buff);
+            rfile.Next();
             if (func)
             {
                 auto ret = func();
