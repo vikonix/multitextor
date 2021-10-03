@@ -35,7 +35,6 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <thread>
 #include <condition_variable>
 
-//#define SINGLE_THREAD
 
 namespace _Editor
 {
@@ -290,46 +289,6 @@ bool Editor::Load(bool log)
     std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff;
     size_t strOffset{};
 
-#ifdef SINGLE_THREAD
-    std::ifstream file{ m_file, std::ios::binary };
-    if (!file)
-        return false;
-
-    auto buff{ std::make_shared<read_buff_t>() };
-    auto readFile = [&](std::shared_ptr<read_buff_t> buff) -> size_t {
-        if (file.eof())
-            return 0;
-
-        file.read(buff->data(), c_buffsize);
-        auto read = file.gcount();
-        if (0 == read)
-            return 0;
-
-        time_t t2{ time(nullptr) };
-        if (t1 != t2 && step)
-        {
-            t1 = t2;
-            size_t pr{ static_cast<size_t>((fileOffset + read) / step) };
-            if (pr != percent)
-            {
-                percent = pr;
-                EditorApp::ShowProgressBar(pr);
-            }
-        }
-        return static_cast<size_t>(read);
-    };
-
-    size_t read;
-    while (0 != (read = readFile(buff)))
-    {
-        buffOffset = 0;
-        bool rc = ApplyBuffer(buff, read, buffOffset,
-            strBuff, strOffset,
-            fileOffset, file.eof());
-        if (!rc)
-            return false;
-    }
-#else
     CoReadFile rfile(m_file, std::nullopt);
 
     try
@@ -370,7 +329,6 @@ bool Editor::Load(bool log)
         _assert(0);
         return false;
     }
-#endif
 
     _assert(!log || m_fileSize == fileOffset);
     
