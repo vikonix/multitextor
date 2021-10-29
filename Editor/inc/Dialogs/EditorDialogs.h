@@ -46,7 +46,9 @@ enum class FileDlgMode
     OpenSess
 };
 
-#define MAX_MASK_LIST 16
+#define MAX_MASK_LIST   16
+#define MAX_FR_LIST     16
+
 struct FileDialogVars
 {
     path_t      filepath;

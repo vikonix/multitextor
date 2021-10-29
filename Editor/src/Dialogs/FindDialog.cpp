@@ -171,8 +171,12 @@ bool FindDialog::OnClose(int id)
 
             size_t n = ctrlSearch->GetStrCount();
             s_vars.findList.clear();
-            for (size_t i = 0; i < n && i < 16; ++i) 
+            for (size_t i = 0; i < n; ++i)
+            {
                 _TRY(s_vars.findList.emplace(ctrlSearch->GetStr(i)))
+                if (s_vars.findList.size() == MAX_FR_LIST)
+                    break;
+            }
         }
         
         if (m_replace)
@@ -195,8 +199,12 @@ bool FindDialog::OnClose(int id)
 
                 size_t n = ctrlReplace->GetStrCount();
                 s_vars.replaceList.clear();
-                for (size_t i = 0; i < n && i < 16; ++i) 
+                for (size_t i = 0; i < n; ++i)
+                {
                     _TRY(s_vars.replaceList.emplace(ctrlReplace->GetStr(i)))
+                    if (s_vars.replaceList.size() == MAX_FR_LIST)
+                        break;
+                }
             }
         }
     }
