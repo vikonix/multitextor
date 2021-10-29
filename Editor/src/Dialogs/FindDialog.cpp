@@ -165,8 +165,8 @@ bool FindDialog::OnClose(int id)
                 Refresh();
                 return false;
             }
-            if(str.size() > 2)
-                _TRY(s_vars.findList.emplace(str))
+            if (str.size() > 2)
+                ctrlSearch->AddStr(0, str);
             s_vars.findStrW = utf8::utf8to16(str);
 
             size_t n = ctrlSearch->GetStrCount();
@@ -190,7 +190,7 @@ bool FindDialog::OnClose(int id)
                     return false;
                 }
                 if (str.size() > 2)
-                    _TRY(s_vars.replaceList.emplace(str))
+                    ctrlReplace->AddStr(0, str);
                 s_vars.replaceStrW = utf8::utf8to16(str);
 
                 size_t n = ctrlReplace->GetStrCount();

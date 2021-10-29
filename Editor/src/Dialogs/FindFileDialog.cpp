@@ -268,8 +268,8 @@ bool FindFileDialog::OnClose(int id)
                 return false;
             }
             if (str.size() > 2)
-                _TRY(FindDialog::s_vars.findList.emplace(str))
-                FindDialog::s_vars.findStrW = utf8::utf8to16(str);
+                ctrlSearch->AddStr(0, str);
+            FindDialog::s_vars.findStrW = utf8::utf8to16(str);
 
             size_t n = ctrlSearch->GetStrCount();
             FindDialog::s_vars.findList.clear();
@@ -292,8 +292,8 @@ bool FindFileDialog::OnClose(int id)
                     return false;
                 }
                 if (str.size() > 2)
-                    _TRY(FindDialog::s_vars.replaceList.emplace(str))
-                    FindDialog::s_vars.replaceStrW = utf8::utf8to16(str);
+                    ctrlReplace->AddStr(0, str);
+                FindDialog::s_vars.replaceStrW = utf8::utf8to16(str);
 
                 size_t n = ctrlReplace->GetStrCount();
                 FindDialog::s_vars.replaceList.clear();
