@@ -29,6 +29,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "utfcpp/utf8.h"
 #include "Dialog.h"
 
+#include <deque>
 
 /////////////////////////////////////////////////////////////////////////////
 namespace _WndManager
@@ -223,7 +224,7 @@ friend class CtrlEditDropList;
     bool    m_mouse2{};
 
 public:
-    std::vector<std::string> m_list;
+    std::deque<std::string> m_list;
 
     CtrlList(Dialog& dialog, const control& control, size_t pos);
 
