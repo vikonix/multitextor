@@ -268,17 +268,11 @@ bool FindFileDialog::OnClose(int id)
                 return false;
             }
             if (str.size() > 2)
-                ctrlSearch->AddStr(0, str);
-            FindDialog::s_vars.findStrW = utf8::utf8to16(str);
-
-            size_t n = ctrlSearch->GetStrCount();
-            FindDialog::s_vars.findList.clear();
-            for (size_t i = 0; i < n; ++i)
             {
-                _TRY(FindDialog::s_vars.findList.emplace(ctrlSearch->GetStr(i)))
-                if (FindDialog::s_vars.findList.size() == MAX_FR_LIST)
-                    break;
+                ctrlSearch->AddStr(0, str);
+                FindDialog::SaveToFindList(str);
             }
+            FindDialog::s_vars.findStrW = utf8::utf8to16(str);
         }
 
         if (m_replace)
@@ -296,17 +290,11 @@ bool FindFileDialog::OnClose(int id)
                     return false;
                 }
                 if (str.size() > 2)
-                    ctrlReplace->AddStr(0, str);
-                FindDialog::s_vars.replaceStrW = utf8::utf8to16(str);
-
-                size_t n = ctrlReplace->GetStrCount();
-                FindDialog::s_vars.replaceList.clear();
-                for (size_t i = 0; i < n; ++i)
                 {
-                    _TRY(FindDialog::s_vars.replaceList.emplace(ctrlReplace->GetStr(i)))
-                    if (FindDialog::s_vars.replaceList.size() == MAX_FR_LIST)
-                        break;
+                    ctrlReplace->AddStr(0, str);
+                    FindDialog::SaveToReplaceList(str);
                 }
+                FindDialog::s_vars.replaceStrW = utf8::utf8to16(str);
             }
         }
 

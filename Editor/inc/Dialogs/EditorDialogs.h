@@ -126,9 +126,6 @@ public:
 /////////////////////////////////////////////////////////////////////////////
 struct FindReplaceVars
 {
-    std::set<std::string>  findList;
-    std::set<std::string>  replaceList;
-
     std::string     findStr;
     std::string     replaceStr;
     std::u16string  findStrW;
@@ -141,6 +138,9 @@ struct FindReplaceVars
 
     bool            replaceMode{};
     bool            noPrompt{};
+
+    std::list<std::string>  findList;
+    std::list<std::string>  replaceList;
 };
 
 class FindDialog : public Dialog
@@ -149,6 +149,9 @@ class FindDialog : public Dialog
 
 public:
     static FindReplaceVars s_vars;
+    
+    static void SaveToFindList(const std::string& word);
+    static void SaveToReplaceList(const std::string& word);
 
     FindDialog(bool replace, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
 

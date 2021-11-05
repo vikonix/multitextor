@@ -929,8 +929,7 @@ bool EditorWnd::FindUpWord([[maybe_unused]] input_t cmd)
         return false;
     }
 
-    if(FindDialog::s_vars.findStrW.size() > 2)
-        _TRY(FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW)))
+    FindDialog::SaveToFindList(utf8::utf16to8(FindDialog::s_vars.findStrW));
 
     return FindUp();
 }
@@ -943,8 +942,7 @@ bool EditorWnd::FindDownWord([[maybe_unused]] input_t cmd)
         return false;
     }
 
-    if (FindDialog::s_vars.findStrW.size() > 2)
-        _TRY(FindDialog::s_vars.findList.emplace(utf8::utf16to8(FindDialog::s_vars.findStrW)))
+    FindDialog::SaveToFindList(utf8::utf16to8(FindDialog::s_vars.findStrW));
 
     return FindDown();
 }

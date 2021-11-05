@@ -335,9 +335,9 @@ bool DialogsConfig::Load(const nlohmann::json& json)
     for(auto& var : json[MaskKey])
         fileMaskList.emplace_back(var);
     for(auto& var : json[FindKey])
-        findList.emplace(var);
+        findList.push_back(var);
     for(auto& var : json[ReplaceKey])
-        replaceList.emplace(var);
+        replaceList.push_back(var);
 
     return true;
 }

@@ -166,17 +166,11 @@ bool FindDialog::OnClose(int id)
                 return false;
             }
             if (str.size() > 2)
-                ctrlSearch->AddStr(0, str);
-            s_vars.findStrW = utf8::utf8to16(str);
-
-            size_t n = ctrlSearch->GetStrCount();
-            s_vars.findList.clear();
-            for (size_t i = 0; i < n; ++i)
             {
-                _TRY(s_vars.findList.emplace(ctrlSearch->GetStr(i)))
-                if (s_vars.findList.size() == MAX_FR_LIST)
-                    break;
+                ctrlSearch->AddStr(0, str);
+                SaveToFindList(str);
             }
+            s_vars.findStrW = utf8::utf8to16(str);
         }
         
         if (m_replace)
@@ -194,22 +188,48 @@ bool FindDialog::OnClose(int id)
                     return false;
                 }
                 if (str.size() > 2)
-                    ctrlReplace->AddStr(0, str);
-                s_vars.replaceStrW = utf8::utf8to16(str);
-
-                size_t n = ctrlReplace->GetStrCount();
-                s_vars.replaceList.clear();
-                for (size_t i = 0; i < n; ++i)
                 {
-                    _TRY(s_vars.replaceList.emplace(ctrlReplace->GetStr(i)))
-                    if (s_vars.replaceList.size() == MAX_FR_LIST)
-                        break;
+                    ctrlReplace->AddStr(0, str);
+                    SaveToReplaceList(str);
                 }
+                s_vars.replaceStrW = utf8::utf8to16(str);
             }
         }
     }
 
     return true;
+}
+
+void FindDialog::SaveToFindList(const std::string& word)
+{
+    if (word.size() <= 2)
+        return;
+
+    std::set<std::string> check;
+    for (const auto& entry : s_vars.findList)
+        check.insert(entry);
+
+    if (auto [_, insert] = check.insert(word); insert)
+        s_vars.findList.push_front(word);
+    
+    if (s_vars.findList.size() > MAX_FR_LIST)
+        s_vars.findList.pop_back();
+}
+
+void FindDialog::SaveToReplaceList(const std::string& word)
+{
+    if (word.size() <= 2)
+        return;
+
+    std::set<std::string> check;
+    for (const auto& entry : s_vars.replaceList)
+        check.insert(entry);
+
+    if (auto [_, insert] = check.insert(word); insert)
+        s_vars.replaceList.push_front(word);
+
+    if (s_vars.replaceList.size() > MAX_FR_LIST)
+        s_vars.replaceList.pop_back();
 }
 
 } //namespace _Editor

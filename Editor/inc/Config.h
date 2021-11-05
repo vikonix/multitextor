@@ -182,8 +182,8 @@ class DialogsConfig
 public:
     std::string             filePath;
     std::list<std::string>  fileMaskList;
-    std::set<std::string>   findList;
-    std::set<std::string>   replaceList;
+    std::list<std::string>  findList;
+    std::list<std::string>  replaceList;
 
     bool Load(const nlohmann::json& json);
     bool Save(nlohmann::json& json) const;
