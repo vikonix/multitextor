@@ -34,6 +34,7 @@ Editor screenshot.
 ### Tested on
 Linux/Windows/OSX/FreeBSD build (Travis CI): [![Build Status](https://travis-ci.com/vikonix/multitextor.svg?branch=main)](https://travis-ci.com/vikonix/multitextor)
 
+ - Windows 11 - Microsoft Visual Studio Community 2022 / 2019 / 2017
  - Windows 10 - Microsoft Visual Studio Community 2019 / 2017
  - Windows 7 - Microsoft Visual Studio Community 2017
  - Linux Ubuntu 18.04 - gcc version 9.3.0

@@ -246,9 +246,9 @@ bool  Application::PrintClock(bool print)
 
     std::stringstream stream;
     if(curTime & 2)
-        stream << std::put_time(&_tm, "%H:%M");
+        stream << std::put_time(&_tm, "%H:%M|");
     else
-        stream << std::put_time(&_tm, "%H %M");
+        stream << std::put_time(&_tm, "%H %M|");
 
     pos_t len = static_cast<pos_t>(stream.str().size());
     pos_t y = (clock_pos::bottom == m_clock) ? m_wndManager.m_sizey - 1 : 0;
@@ -290,7 +290,7 @@ bool  Application::PrintStatusLine()
 
     //fill rest of line
     rc = m_wndManager.SetTextAttr(ColorStatusLine);
-    rc = m_wndManager.FillRect(x, y, m_wndManager.m_sizex - x - ((m_clock == clock_pos::bottom) ? 5 : 0), 1, ' ', ColorStatusLine);
+    rc = m_wndManager.FillRect(x, y, m_wndManager.m_sizex - x - ((m_clock == clock_pos::bottom) ? s_clockSize : 0), 1, ' ', ColorStatusLine);
 
     std::stringstream sstr;
     for (++li; li != m_sLine.end() && x < m_wndManager.m_sizex; ++li)
@@ -304,9 +304,9 @@ bool  Application::PrintStatusLine()
         sstr << "|";
     }
 
-    if (m_wndManager.m_sizex >= static_cast<pos_t>(sstr.str().size()) + 5)
+    if (m_wndManager.m_sizex >= static_cast<pos_t>(sstr.str().size()) + s_clockSize)
     {
-        rc = m_wndManager.GotoXY(m_wndManager.m_sizex - static_cast<pos_t>(sstr.str().size()) - 5, y); //reserv 5 positions for clock
+        rc = m_wndManager.GotoXY(m_wndManager.m_sizex - static_cast<pos_t>(sstr.str().size()) - s_clockSize, y); //reserv n positions for clock
         li = m_sLine.cbegin();
         for (auto c : sstr.str())
         {

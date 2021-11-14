@@ -574,17 +574,17 @@ void InputWin32::GetFontSize()
 
     m_fontX = static_cast<int>(sizex  / (sbi.srWindow.Right  + 1));
     m_fontY = static_cast<int>(sizey / (sbi.srWindow.Bottom + 1));
-    LOG(DEBUG) << "fontX=" << m_fontX << " fontY=" << m_fontY;
+    LOG(DEBUG) << "  fontX=" << m_fontX << " fontY=" << m_fontY;
     if (m_fontX == 0 || m_fontY == 0)
     {
-        _assert(!"zero font size");
-        m_fontX = 1;
-        m_fontY = 1;
+        m_fontX = 8;
+        m_fontY = 8;
     }
 }
 
 void InputWin32::FixWheelCoord(pos_t& x, pos_t& y)
 {
+    //LOG(DEBUG) << " wheel x=" << x << " y=" << y;
     // get current mouse position insted of the wheel event
     POINT cursorPos;
     if (!GetCursorPos(&cursorPos))

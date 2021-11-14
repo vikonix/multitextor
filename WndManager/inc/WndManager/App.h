@@ -62,6 +62,7 @@ enum class clock_pos
 //////////////////////////////////////////////////////////////////////////////
 class Application
 {
+    static const inline size_t  s_clockSize{6};
 public:
     std::string                 m_appName;
 
