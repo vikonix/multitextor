@@ -144,6 +144,9 @@ class CoReadFile
             buff = m_readBuffList.back();
             m_readBuffList.pop_back();
         }
+
+        if (file.eof())
+            m_eof = true;
     }
 
 public:
