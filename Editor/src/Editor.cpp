@@ -145,8 +145,8 @@ class CoReadFile
             m_readBuffList.pop_back();
         }
 
-        if (file.eof())
-            m_eof = true;
+        m_eof = true;
+        m_outCondition.notify_one();
     }
 
 public:
@@ -175,8 +175,8 @@ public:
             return { {}, 0, true, {} };
 
         std::unique_lock lock{ m_outMutex };
-        m_outCondition.wait(lock, [this]() -> bool {return m_cancel || !m_outBuffList.empty(); });
-        if (m_cancel)
+        m_outCondition.wait(lock, [this]() -> bool {return m_cancel || m_eof || !m_outBuffList.empty(); });
+        if (m_cancel || m_outBuffList.empty())
             return { {}, 0, true, {} };
 
         auto buff = m_outBuffList.back();
