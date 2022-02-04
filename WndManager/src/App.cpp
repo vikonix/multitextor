@@ -510,7 +510,7 @@ input_t Application::ParseCommand(input_t code)
     //5 check user
     if(code)
     {
-        LOG_IF(code != K_TIME, INFO) << "  " << ConsoleInput::CastKeyCode(code);
+        //LOG_IF(code != K_TIME, DEBUG) << "  " << ConsoleInput::CastKeyCode(code);
 
         if(code == K_EXIT)
             SaveCfg(code);

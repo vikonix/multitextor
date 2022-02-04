@@ -109,7 +109,7 @@ private:
 
     //config variables
     std::string     m_cp{};
-    size_t          m_maxStrlen{0x800};
+    size_t          m_maxStrlen{0x1000};
     eol_t           m_eol{DEF_EOL};
     size_t          m_tab{8};   //tab position
     bool            m_saveTab{};//save tab or not

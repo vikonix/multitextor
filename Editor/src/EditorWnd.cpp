@@ -2054,7 +2054,12 @@ bool EditorWnd::CheckFileChanging() try
                 //check is all file in memory
                 if (!m_editor->IsFileInMemory())
                 {
-                    _assert(0);
+                    auto ret = MsgBox(MBoxKey::OK, "Close",
+                        { "File has been deleted outside of editor",
+                        "and will be closed." },
+                        { "Close" }
+                    );
+                    m_close = true;
                     return true;
                 }
                 //ask for rewrite

@@ -171,11 +171,12 @@ public:
 
     outBuff Wait()
     {
-        if(m_eof || m_cancel)
-            return { {}, 0, true, {} };
-
-        std::unique_lock lock{ m_outMutex };
-        m_outCondition.wait(lock, [this]() -> bool {return m_cancel || m_eof || !m_outBuffList.empty(); });
+        if (!m_eof)
+        {
+            std::unique_lock lock{ m_outMutex };
+            m_outCondition.wait(lock, [this]() -> bool {return m_cancel || m_eof || !m_outBuffList.empty(); });
+        }        
+        
         if (m_cancel || m_outBuffList.empty())
             return { {}, 0, true, {} };
 
@@ -189,6 +190,9 @@ public:
 
     void Next()
     {
+        if (m_eof || m_cancel)
+            return;
+
         std::unique_lock lock{ m_readMutex };
         m_readBuffList.push_front(std::move(m_buff));
         m_readCondition.notify_one();
@@ -321,9 +325,6 @@ bool Editor::Load(bool log)
                 }
             }
 
-            if (eof)
-                break;
-
             rfile.Next();
         }
     }
@@ -353,33 +354,50 @@ bool Editor::LoadTail()
         return false;
     }
 
-    m_fileTime = std::filesystem::last_write_time(m_file);
-    m_fileSize = std::filesystem::file_size(m_file);
+    auto fileTime = std::filesystem::last_write_time(m_file);
+    auto fileSize = std::filesystem::file_size(m_file);
+    if (fileTime == m_fileTime && fileSize == m_fileSize)
+        return true;
 
+    if (fileSize < m_fileSize)
+        return Load();
+
+    m_fileTime = fileTime;
     auto buff{ std::make_shared<read_buff_t>() };
-    size_t buffOffset{ 0 };
 
-    std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff = m_buffer.m_buffList.back();
-    strBuff->m_lostData = false;
-    m_buffer.m_totalStrCount -= strBuff->GetStrCount();
-    strBuff->m_strOffsetList.clear();
-    size_t strOffset{};
+    do
+    {
+        std::shared_ptr<StrBuff<std::string, std::string_view>> strBuff = m_buffer.m_buffList.back();
+        _assert(m_buffer.m_buffList.size() == 1 || strBuff->m_fileOffset > 0);
 
-    uintmax_t fileOffset{strBuff->m_fileOffset};
-    size_t toRead{ std::min(c_buffsize, static_cast<size_t>(m_fileSize - fileOffset)) };
-    //LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " offset=" << fileOffset << " read=" << toRead;
+        strBuff->m_lostData = false;
+        m_buffer.m_totalStrCount -= strBuff->GetStrCount();
+        strBuff->m_strOffsetList.clear();
 
-    file.seekg(fileOffset);
-    file.read(buff->data(), std::min(c_buffsize, toRead));
-    _assert(file.good());
-    auto read = file.gcount();
-    m_fileSize = fileOffset + read;
-    
-    bool rc = ApplyBuffer(buff, read, buffOffset,
-        strBuff, strOffset,
-        fileOffset, true);
+        uintmax_t fileOffset{ strBuff->m_fileOffset };
+        size_t toRead{ std::min(c_buffsize, static_cast<size_t>(fileSize - fileOffset)) };
+        //LOG(DEBUG) << __FUNC__ << " path=" << m_file.u8string() << " offset=" << fileOffset << " read=" << toRead;
 
-    return rc;
+        file.seekg(fileOffset);
+        file.read(buff->data(), toRead);
+        _assert(file.good());
+        auto read = file.gcount();
+        m_fileSize = fileOffset + read;
+
+        size_t buffOffset{};
+        size_t strOffset{};
+
+        bool rc = ApplyBuffer(buff, read, buffOffset,
+            strBuff, strOffset,
+            fileOffset, true);
+
+        if (!rc)
+            return false;
+
+        fileSize = std::filesystem::file_size(m_file);
+    } while (m_fileSize < fileSize);
+
+    return true;
 }
 
 bool Editor::ApplyBuffer(const std::shared_ptr<read_buff_t>& buff, size_t read, size_t& buffOffset,
@@ -401,6 +419,7 @@ bool Editor::ApplyBuffer(const std::shared_ptr<read_buff_t>& buff, size_t read, 
         if (!strBuff)
         {
             strBuff = m_buffer.GetNewBuff();
+            strBuff->m_fileOffset = fileOffset;
             strOffset = 0;
         }
         auto strBuffData{ strBuff->GetBuff() };
@@ -420,7 +439,7 @@ bool Editor::ApplyBuffer(const std::shared_ptr<read_buff_t>& buff, size_t read, 
         else
         {
             //now fill string offset table
-            strBuff->m_fileOffset = fileOffset;
+            _assert(strBuff->m_fileOffset == fileOffset);
 
             size_t rest;
             //LOG(DEBUG) << std::hex << "file offset=" << fileOffset << " read=" << read << " strOffset=" << strOffset << " tocopy=" << tocopy << std:: dec;
