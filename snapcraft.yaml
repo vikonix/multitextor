@@ -55,20 +55,6 @@ parts:
     prime:
       - -usr/share
 
-  config:
-    source: .
-    plugin: dump
-    organize:
-      snap/multitextor/current/usr: usr
-    override-stage: |
-      mkdir -p $SNAPCRAFT_STAGE/usr/local/share/Multitextor
-      cp -a -r $SNAPCRAFT_PART_SRC/configurations/config $SNAPCRAFT_STAGE/usr/local/share/Multitextor/config
-      cp -a -r $SNAPCRAFT_PART_SRC/configurations/parser $SNAPCRAFT_STAGE/usr/local/share/Multitextor/parser
-    override-prime: |
-      mkdir -p $SNAPCRAFT_PRIME/usr/local/share/Multitextor
-      cp -a -r $SNAPCRAFT_STAGE/usr/local/share/Multitextor/config $SNAPCRAFT_PRIME/usr/local/share/Multitextor/config
-      cp -a -r $SNAPCRAFT_STAGE/usr/local/share/Multitextor/parser $SNAPCRAFT_PRIME/usr/local/share/Multitextor/parser
-
 layout:
   /usr/local/share/Multitextor:
     symlink: $SNAP/usr/local/share/Multitextor
