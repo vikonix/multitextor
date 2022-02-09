@@ -121,6 +121,9 @@ path_t Directory::ProgramPath(const std::string& appName)
     std::string path{ "/usr/share/" + appName };
     if (std::filesystem::is_directory(path))
         return path;
+    std::string path{ "/usr/local/share/" + appName };
+    if (std::filesystem::is_directory(path))
+        return path;
 
     return s_runPath;
 #endif
