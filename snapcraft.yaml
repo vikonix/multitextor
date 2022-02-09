@@ -57,4 +57,4 @@ parts:
 
 layout:
   /usr/share/Multitextor:
-    symlink: $SNAP/usr/share/Multitextor
+    symlink: $SNAP/share/Multitextor
