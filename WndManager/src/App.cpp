@@ -304,7 +304,7 @@ bool  Application::PrintStatusLine()
         sstr << "|";
     }
 
-    if (m_wndManager.m_sizex >= static_cast<pos_t>(sstr.str().size()) + s_clockSize)
+    if (m_wndManager.m_sizex >= static_cast<pos_t>(sstr.str().size() + s_clockSize))
     {
         rc = m_wndManager.GotoXY(m_wndManager.m_sizex - static_cast<pos_t>(sstr.str().size()) - s_clockSize, y); //reserv n positions for clock
         li = m_sLine.cbegin();

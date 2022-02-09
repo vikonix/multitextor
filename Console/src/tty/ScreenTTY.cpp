@@ -95,7 +95,7 @@ bool ScreenTTY::Init()
 
     //save parameters and use alternative screen buffer
     std::string cmd { "\0337\x1b[?47h"};
-    write(m_stdout, cmd.c_str(), cmd.size());
+    (void)write(m_stdout, cmd.c_str(), cmd.size());
 
     [[maybe_unused]] bool rc = _WriteStr(m_cap[S_AltCharEnable].str)
         && Flush();
@@ -136,13 +136,13 @@ void ScreenTTY::Deinit()
 
     //use normal screen buffer and restore parameters
     param = "\x1b[?47l\0338\x1b[0m";
-    write(m_stdout, param.c_str(), param.size());
+    (void)write(m_stdout, param.c_str(), param.size());
 
     //set default foreground/background
     param = m_cap[S_DefaultColor].str;
     if(!param.empty())
     {
-        write(m_stdout, param.c_str(), param.size());
+        (void)write(m_stdout, param.c_str(), param.size());
     }
 
     m_stdout = -1;
@@ -220,7 +220,7 @@ bool ScreenTTY::WriteConsoleTitle(const std::string& title)
     if(m_fXTERMconsole)
     {
         std::string str {"\x1b]0;" + title + "\7"};
-        write(m_stdout, str.c_str(), str.size());
+        (void)write(m_stdout, str.c_str(), str.size());
     }
 
     return true;

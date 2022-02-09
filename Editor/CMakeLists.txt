@@ -99,6 +99,7 @@ endif()
 
 if(UNIX)
     install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION bin COMPONENT binaries)
+    install(DIRECTORY ../configurations/ DESTINATION share/multitextor)
 endif()
 
 if(APPLE)
