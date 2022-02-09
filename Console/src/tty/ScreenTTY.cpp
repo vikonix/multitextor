@@ -40,6 +40,9 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <iomanip>
 #include <filesystem>
 
+template<typename T>
+inline T IGUR(T func) { return func; }  /* Ignore GCC Unused Result */
+
 using namespace _Utils;
 
 namespace _Console
@@ -95,7 +98,7 @@ bool ScreenTTY::Init()
 
     //save parameters and use alternative screen buffer
     std::string cmd { "\0337\x1b[?47h"};
-    (void)write(m_stdout, cmd.c_str(), cmd.size());
+    IGUR(write(m_stdout, cmd.c_str(), cmd.size()));
 
     [[maybe_unused]] bool rc = _WriteStr(m_cap[S_AltCharEnable].str)
         && Flush();
@@ -131,18 +134,18 @@ void ScreenTTY::Deinit()
     std::string param = m_cap[S_TermReset].str;
     if(!param.empty())
     {
-        write(m_stdout, param.c_str(), param.size());
+        IGUR(write(m_stdout, param.c_str(), param.size()));
     }
 
     //use normal screen buffer and restore parameters
     param = "\x1b[?47l\0338\x1b[0m";
-    (void)write(m_stdout, param.c_str(), param.size());
+    IGUR(write(m_stdout, param.c_str(), param.size()));
 
     //set default foreground/background
     param = m_cap[S_DefaultColor].str;
     if(!param.empty())
     {
-        (void)write(m_stdout, param.c_str(), param.size());
+        IGUR(write(m_stdout, param.c_str(), param.size()));
     }
 
     m_stdout = -1;
@@ -220,7 +223,7 @@ bool ScreenTTY::WriteConsoleTitle(const std::string& title)
     if(m_fXTERMconsole)
     {
         std::string str {"\x1b]0;" + title + "\7"};
-        (void)write(m_stdout, str.c_str(), str.size());
+        IGUR(write(m_stdout, str.c_str(), str.size()));
     }
 
     return true;
