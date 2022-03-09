@@ -189,13 +189,18 @@ input_t WindowListDialog::DialogProc(input_t code)
 
         auto listCtrl = GetItem(ID_WL_WNDLIST);
         auto listPtr = std::dynamic_pointer_cast<CtrlList>(listCtrl);
+        if (listPtr->GetStrCount() == 0)
+        {
+            return 0;
+        }
+
         auto n = listPtr->GetSelected();
         std::string path{ listPtr->GetStr(n) };
         auto wndIt = m_wndList.find(path.substr(m_prefixSize));
         if (wndIt == m_wndList.end())
         {
             _assert(0);
-            return false;
+            return 0;
         }
         auto& [p, wnd] = *wndIt;
 
