@@ -53,8 +53,15 @@ if(MSVC)
 else()
     # lots of warnings
     target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -pedantic)
-    
+
     #additional libraries
+    # Use CURSES_NEED_NCURSES to enable termcap compatibility API in ncurses
+    # (needed for tgoto() from <term.h>). Some Linux distributions don't provide
+    # it by default as part of -lcurses / -lncurses:
+    #    https://bugs.gentoo.org/836155
+    #    https://gitlab.kitware.com/cmake/cmake/-/issues/23236
+    # The alternative would be to detect the need for a termcap library.
+    set(CURSES_NEED_NCURSES TRUE)
     find_package(Curses REQUIRED)
-    target_link_libraries(${PROJECT_NAME} PRIVATE ${CURSES_LIBRARY})
+    target_link_libraries(${PROJECT_NAME} PRIVATE ${CURSES_LIBRARIES})
 endif()
