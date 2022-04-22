@@ -84,11 +84,14 @@ bool ScreenTTY::Init()
     GetScreenSize(m_sizex, m_sizey);
 
     char* term = getenv("TERM");
-    if(!strncmp(term, "xterm", 5))
-        m_fXTERMconsole = true;
-    if(nullptr != strstr(term, "256"))
-        m_256colors = true;
-    
+    if (term)
+    {
+        if (!strncmp(term, "xterm", 5))
+            m_fXTERMconsole = true;
+        if (nullptr != strstr(term, "256"))
+            m_256colors = true;
+    }
+
     LOG(DEBUG) << "term x=" << m_sizex << " y=" << m_sizey
         << " xterm=" << m_fXTERMconsole << " 256=" << m_256colors;
 
