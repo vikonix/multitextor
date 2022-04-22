@@ -106,7 +106,7 @@ bool ScreenTTY::Init()
     [[maybe_unused]] bool rc = _WriteStr(m_cap[S_AltCharEnable].str)
         && Flush();
 
-    if(!strncmp(term, "vt100", 5))
+    if(term && !strncmp(term, "vt100", 5))
     {
         //cut $<2> or $<5>
         std::string str = m_cap[S_GotoXY].str;
