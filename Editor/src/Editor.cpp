@@ -48,7 +48,7 @@ class CoReadFile
     std::optional<const std::string>        m_cp;
     std::shared_ptr<iconvpp::CpConverter>   m_converter;
     bool                                    m_toUpper{};
-    bool                                    m_eof{};
+    std::atomic_bool                        m_eof{ false };
 
     std::thread                             m_thread;
     std::atomic_bool                        m_cancel{false};
@@ -171,11 +171,9 @@ public:
 
     outBuff Wait()
     {
-        if (!m_eof)
-        {
-            std::unique_lock lock{ m_outMutex };
+        std::unique_lock lock{ m_outMutex };
+        if (!m_eof && m_outBuffList.empty())
             m_outCondition.wait(lock, [this]() -> bool {return m_cancel || m_eof || !m_outBuffList.empty(); });
-        }        
         
         if (m_cancel || m_outBuffList.empty())
             return { {}, 0, true, {} };
@@ -183,7 +181,6 @@ public:
         auto buff = m_outBuffList.back();
         m_outBuffList.pop_back();
         m_buff = std::get<0>(buff);
-        m_eof = std::get<2>(buff);
 
         return buff;
     }
@@ -1871,21 +1868,20 @@ bool Editor::ScanFile(const std::filesystem::path& file, const std::u16string& t
             fileOffset += read;
 
             prevBuff.clear();
-            if (!eof)
-                for (auto rit = u16buff->crbegin(); rit != u16buff->crend(); ++rit)
-                {
-                    if (*rit < ' ')
-                    {
-                        //save last not full string
-                        auto size = std::distance(u16buff->crbegin(), rit);
-                        prevBuff.resize(size);
-                        std::copy_n(std::prev(u16buff->cend(), size), size, prevBuff.begin());
-                        break;
-                    }
-                }
-
             if (eof)
                 break;
+
+            for (auto rit = u16buff->crbegin(); rit != u16buff->crend(); ++rit)
+            {
+                if (*rit < ' ')
+                {
+                    //save last not full string
+                    auto size = std::distance(u16buff->crbegin(), rit);
+                    prevBuff.resize(size);
+                    std::copy_n(std::prev(u16buff->cend(), size), size, prevBuff.begin());
+                    break;
+                }
+            }
 
             rfile.Next();
             if (func)
