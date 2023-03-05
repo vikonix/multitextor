@@ -157,6 +157,7 @@ public:
         AddDiaps(widechar_ambiguous_table, widechar_ambiguous);
         AddDiaps(widechar_doublewide_table, 2);
         AddDiaps(widechar_combining_table, widechar_combining);
+        AddDiaps(widechar_combiningletters_table, widechar_combining);
         AddDiaps(widechar_nonchar_table, widechar_non_character);
         AddDiaps(widechar_nonprint_table, widechar_nonprint);
         AddDiaps(widechar_private_table, widechar_private_use);
