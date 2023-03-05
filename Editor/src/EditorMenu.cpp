@@ -160,7 +160,7 @@ static menu_list menuTools
     {MENU_ITEM,         "Goto &Matched Bracket",        K_ED(E_MOVE_LEX_MATCH),     "Go to opposite bracket"},
 //    {MENU_ITEM,         "Fu&nctions List...",           K_ED(E_CTRL_FUNC_LIST),     "Get functions list in file"},
 //    {MENU_ITEM,         "Bookmark&s...",                K_APP_BOOKMARK_LIST,        "Set or go to bookmark"},
-//    {MENU_ITEM,         "&Compare Files...",            K_APP_DIFF,                 "Compare two files for difference"},
+    {MENU_ITEM,         "&Compare Files...",            K_APP_DIFF,                 "Compare two files for difference"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "Start/Stop &Record Macro",     K_APP_RECORD_MACRO,         "Start/Stop recording of editing command"},
     {MENU_ITEM,         "&Play Macro",                  K_APP_PLAY_MACRO,           "Repeat recorded editing commands"},

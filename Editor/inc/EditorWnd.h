@@ -228,6 +228,8 @@ public:
     bool    SaveCfg(WndConfig& config);
     bool    LoadCfg(const WndConfig& config);
 
+    size_t  GetCurStr()    { return m_firstLine + m_cursory; }
+
 /*
   virtual Wnd*          GetLinkWnd() override   {return m_pTBuff->GetLinkWnd(this);}
   int       IsUntitled()             {return m_fUntitled;}

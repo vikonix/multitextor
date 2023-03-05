@@ -252,4 +252,23 @@ public:
     virtual bool OnClose(int id) override final;
 };
 
+/////////////////////////////////////////////////////////////////////////////
+struct DiffDialogVars
+{
+    size_t  diffArea;
+    bool    diffWithoutSpace;
+    bool    markDiff;
+};
+
+class DiffDialog : public Dialog
+{
+public:
+    static DiffDialogVars s_vars;
+
+    DiffDialog(bool markDiff, pos_t x = MAX_COORD, pos_t y = MAX_COORD);
+
+    virtual bool OnActivate() override final;
+    virtual bool OnClose(int id) override final;
+};
+
 } //namespace _Editor

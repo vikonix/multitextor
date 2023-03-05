@@ -26,6 +26,7 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 */
 #include "EditorApp.h"
 #include "Dialogs/EditorDialogs.h"
+#include "Diff.h"
 #include "utfcpp/utf8.h"
 #include "Version.h"
 
@@ -276,10 +277,48 @@ bool    EditorApp::FileSaveAllProc([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool    EditorApp::DiffProc(input_t cmd)
+bool    EditorApp::DiffProc([[maybe_unused]] input_t cmd)
 {
+#if 0 //???
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
+#else    
+    DiffDialog mDlg(false);
+    auto ret = mDlg.Activate();
+    if (ret == ID_OK)
+    {
+        auto wnd1 = WndManager::getInstance().GetWnd(0, 0);
+        auto wnd2 = WndManager::getInstance().GetWnd(0, 1);
+        auto edWnd1 = dynamic_cast<EditorWnd*>(wnd1);
+        auto edWnd2 = dynamic_cast<EditorWnd*>(wnd2);
+
+        size_t first1{}, last1{STR_NOTDEFINED};
+        size_t first2{}, last2{STR_NOTDEFINED};
+        auto where = DiffDialog::s_vars.diffArea;
+        if (where == 1)//from current position
+        {
+            first1 = edWnd1->GetCurStr();
+            first2 = edWnd2->GetCurStr();
+        }
+        else if (where == 2)//restrict in selected area
+        {
+            edWnd1->GetSelectedLines(first1, last1);
+            edWnd2->GetSelectedLines(first2, last2);
+        }
+        if (last1 == STR_NOTDEFINED)
+        {
+            last1 = edWnd1->GetEditor()->GetStrCount() - 1;
+        }
+        if (last2 == STR_NOTDEFINED)
+        {
+            last2 = edWnd2->GetEditor()->GetStrCount() - 1;
+        }
+
+        Diff diff{edWnd1->GetEditor(), edWnd2->GetEditor(), DiffDialog::s_vars.diffWithoutSpace, first1, last1, first2, last2};
+        auto d = diff.Compare();
+        return true;
+    }
+#endif
     return true;
 }
 
