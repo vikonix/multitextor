@@ -157,7 +157,7 @@ protected:
     int     GetSelectedId();
     std::shared_ptr<Control> GetItem(int id);
 
-    bool    CtrlRadioSelect(size_t pos);
+    std::pair<bool, size_t> CtrlRadioSelect(size_t pos);
     bool    SaveHelpLine(bool save = true) {return m_saveHelpLine = save;}
 };
 

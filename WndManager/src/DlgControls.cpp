@@ -354,10 +354,13 @@ bool CtrlRadio::UpdateVar()
 bool CtrlRadio::SetCheck()
 {
     bool chk = m_checked;
-    bool select = m_dialog.CtrlRadioSelect(m_pos);
-    if(select)
-        m_checked = 1;
-    else
+    auto [select, count] = m_dialog.CtrlRadioSelect(m_pos);
+    if (select)
+    {
+        m_checked = true;
+        m_dialog.Select(m_pos);
+    }
+    else if(count == 0)
     {
         //alone radio button
         m_checked = !chk;

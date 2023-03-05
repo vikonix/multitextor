@@ -1976,7 +1976,7 @@ bool EditorWnd::GetSelectedLines(size_t& begin, size_t& end)
 {
     if (!IsMarked())
         return false;
-    if (m_beginY >= m_endY)
+    if (m_beginY <= m_endY)
     {
         begin = m_beginY;
         end = m_endY;

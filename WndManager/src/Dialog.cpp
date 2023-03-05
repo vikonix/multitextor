@@ -418,6 +418,9 @@ int Dialog::SelectItem(int id)
 
 input_t Dialog::Select(size_t n)
 {
+    if (n == m_selected)
+        return {};
+
     m_controls[m_selected]->LostFocus();
     auto rc = m_controls[n]->SetFocus();
     m_selected = n;
@@ -636,10 +639,11 @@ input_t Dialog::EventProc(input_t code)
     return 0;
 }
 
-bool Dialog::CtrlRadioSelect(size_t pos)
+std::pair<bool, size_t> Dialog::CtrlRadioSelect(size_t pos)
 {
     //radio button checked
     bool uncheck{false};
+    size_t count{0};
 
     size_t i;
     for(i = 1; i <= pos; ++i)
@@ -653,6 +657,7 @@ bool Dialog::CtrlRadioSelect(size_t pos)
             continue;
 
         auto ctrl = std::dynamic_pointer_cast<CtrlRadio>(m_controls[pos - i]);
+        ++count;
         if (ctrl->m_checked)
         {
             ctrl->m_checked = 0;
@@ -673,6 +678,7 @@ bool Dialog::CtrlRadioSelect(size_t pos)
             continue;
 
         auto ctrl = std::dynamic_pointer_cast<CtrlRadio>(m_controls[i]);
+        ++count;
         if (ctrl->m_checked)
         {
             ctrl->m_checked = 0;
@@ -682,7 +688,7 @@ bool Dialog::CtrlRadioSelect(size_t pos)
         }
     }
 
-    return uncheck;
+    return {uncheck, count};
 }
 
 /////////////////////////////////////////////////////////////////////////////
