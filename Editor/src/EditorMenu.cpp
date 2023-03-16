@@ -149,10 +149,10 @@ static menu_list menuSearch
     {MENU_ITEM,         "Current Word Dow&n",           K_ED(E_CTRL_FINDDNW),       "Get word under the cursor and find down"},
     {MENU_SEPARATOR},
     {MENU_ITEM,         "&Goto Line...",                K_ED(E_DLG_GOTO),           "Go to line number"},
-//    {MENU_SEPARATOR},
-//    {MENU_ITEM,         "F&ind in Files...",            K_APP_FINDFILE,             "Find in all files"},
-//    {MENU_ITEM,         "R&eplace in Files...",         K_APP_REPLACEFILE,          "Find and replace in all files"},
-//    {MENU_ITEM,         "Match &List...",               K_APP_FOUNDFILE,            "Get matched files list"}
+    {MENU_SEPARATOR},
+    {MENU_ITEM,         "F&ind in Files...",            K_APP_FINDFILE,             "Find in all files"},
+    {MENU_ITEM,         "R&eplace in Files...",         K_APP_REPLACEFILE,          "Find and replace in all files"},
+    {MENU_ITEM,         "Match &List...",               K_APP_FOUNDFILE,            "Get matched files list"}
 };
 
 static menu_list menuTools 
