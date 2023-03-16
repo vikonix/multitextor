@@ -89,7 +89,7 @@ Diff::Diff(EditorPtr editor1, EditorPtr editor2, bool withoutSpace,
     {
         LOG(DEBUG) << "diff same";
     }
-    if (l1 <= f1)
+    else if (l1 <= f1)
     {
         LOG(DEBUG) << "diff f2-l2 inserted";
         m_diffBuff[1].ChangedLines(f2, l2);
