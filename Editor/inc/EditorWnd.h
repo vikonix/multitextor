@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -87,7 +87,7 @@ class EditorWnd : public FrameWnd
     };
     
     using EditorFunc = std::function<bool(EditorWnd*, input_t)>;
-    static std::unordered_map<EditorCmd, std::pair<EditorFunc, select_state>> s_funcMap;
+    static std::unordered_map<EditorCmd, std::pair<EditorFunc, select_state>> s_cmdMap;
 
     EditorPtr       m_editor;
     std::shared_ptr<EditorWnd>  m_clonedWnd;

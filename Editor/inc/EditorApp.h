@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -43,12 +43,12 @@ extern std::vector<menu_list> g_mainMenu;
 extern const size_t c_recentFilesMenu;
 extern const size_t c_recentSessionsMenu;
 
-using file_t = std::tuple < std::string, std::string, std::string, bool, bool >;
+using file_t = std::tuple<std::string, std::string, std::string, bool, bool>;
 
 class EditorApp : public Application
 {
     using AppFunc = std::function<bool(EditorApp*, input_t)>;
-    static std::unordered_map<AppCmd, AppFunc> s_funcMap;
+    static std::unordered_map<AppCmd, AppFunc> s_cmdMap;
     
     inline static const size_t c_maxRecentFiles{16};
     std::deque<file_t> m_recentFiles;
@@ -105,36 +105,36 @@ public:
     bool OpenFile(const std::filesystem::path& path, const std::string& parseMode, const std::string& cp, bool ro = false, bool log = false);
 
     //editor app commands
-    bool    AboutProc(input_t cmd);
-    bool    HelpProc(input_t cmd);
-    bool    HelpKeymapProc(input_t cmd);
-    bool    FileNewProc(input_t cmd);
-    bool    FileSaveAllProc(input_t cmd);
-    bool    FileOpenProc(input_t cmd);
-    bool    WndCloseAllProc(input_t cmd);
-    bool    WndListProc(input_t cmd);
-    bool    FindInFilesProc(input_t cmd);
-    bool    ReplaceInFilesProc(input_t cmd);
-    bool    FoundFilesProc(input_t cmd);
-    bool    WndCopyProc(input_t cmd);
-    bool    WndMoveProc(input_t cmd);
-    bool    ViewSplitProc(input_t cmd);
-    bool    ViewModeProc(input_t cmd);
-    bool    ViewSelectProc(input_t cmd);
-    bool    ViewMoveProc(input_t cmd);
-    bool    DiffProc(input_t cmd);
-    bool    BookmarkListProc(input_t cmd);
-    bool    KeygenProc(input_t cmd);
-    bool    NewSessionProc(input_t cmd);
-    bool    OpenSessionProc(input_t cmd);
-    bool    RecordMacroProc(input_t cmd);
-    bool    PlayMacroProc(input_t cmd);
-    bool    ColorDlgProc(input_t cmd);
-    bool    SettingsDlgProc(input_t cmd);
+    bool    AboutCmd(input_t cmd);
+    bool    HelpCmd(input_t cmd);
+    bool    HelpKeymapCmd(input_t cmd);
+    bool    FileNewCmd(input_t cmd);
+    bool    FileSaveAllCmd(input_t cmd);
+    bool    FileOpenCmd(input_t cmd);
+    bool    WndCloseAllCmd(input_t cmd);
+    bool    WndListCmd(input_t cmd);
+    bool    FindInFilesCmd(input_t cmd);
+    bool    ReplaceInFilesCmd(input_t cmd);
+    bool    FoundFilesCmd(input_t cmd);
+    bool    WndCopyCmd(input_t cmd);
+    bool    WndMoveCmd(input_t cmd);
+    bool    ViewSplitCmd(input_t cmd);
+    bool    ViewModeCmd(input_t cmd);
+    bool    ViewSelectCmd(input_t cmd);
+    bool    ViewMoveCmd(input_t cmd);
+    bool    DiffCmd(input_t cmd);
+    bool    BookmarkListCmd(input_t cmd);
+    bool    KeygenCmd(input_t cmd);
+    bool    NewSessionCmd(input_t cmd);
+    bool    OpenSessionCmd(input_t cmd);
+    bool    RecordMacroCmd(input_t cmd);
+    bool    PlayMacroCmd(input_t cmd);
+    bool    ColorDlgCmd(input_t cmd);
+    bool    SettingsDlgCmd(input_t cmd);
 
-    bool    SelectBookmarkProc(input_t cmd);
-    bool    SelectRecentFileProc(input_t cmd);
-    bool    SelectRecentSessionProc(input_t cmd);
+    bool    SelectBookmarkCmd(input_t cmd);
+    bool    SelectRecentFileCmd(input_t cmd);
+    bool    SelectRecentSessionCmd(input_t cmd);
 };
 
 } //namespace _Editor

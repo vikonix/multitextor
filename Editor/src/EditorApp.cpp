@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -298,7 +298,7 @@ input_t EditorApp::AppProc(input_t code)
         else if (code > K_APP_SESSION_RECENT)
             cmd = K_APP_SESSION_RECENT;
 
-        if (auto it = s_funcMap.find(cmd); it != s_funcMap.end())
+        if (auto it = s_cmdMap.find(cmd); it != s_cmdMap.end())
         {
             auto& [k, func] = *it;
             [[maybe_unused]]bool rc = func(this, code);

@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -240,7 +240,7 @@ CmdMap g_defaultEditKeyMap
 };
 CmdMap g_EditKeyMap = g_defaultEditKeyMap;
 
-std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_funcMap 
+std::unordered_map<EditorCmd, std::pair<EditorWnd::EditorFunc, EditorWnd::select_state>> EditorWnd::s_cmdMap 
 {
     {E_MOVE_LEFT,           {&EditorWnd::MoveLeft,               EditorWnd::select_state::begin}},
     {E_MOVE_RIGHT,          {&EditorWnd::MoveRight,              EditorWnd::select_state::begin}},

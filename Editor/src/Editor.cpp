@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -660,10 +660,11 @@ std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
     std::u16string wstr;
     [[maybe_unused]]bool rc = m_converter->Convert(str, wstr);
     std::u16string outstr;
-    if (offset + size <= m_maxStrlen)
+    _assert(size <= MAX_STRLEN + 1);
+    //if (offset + size <= m_maxStrlen)//???
         outstr.resize(size, ' ');
-    else
-        outstr.resize(wstr.size(), ' ');
+    //else
+    //    outstr.resize(wstr.size(), ' ');
 
     //go from begin of string for right tabulation calculating 
     size_t pos{ 0 };
@@ -674,12 +675,13 @@ std::u16string Editor::_GetStr(size_t line, size_t offset, size_t size)
             if (pos >= offset)
             {
                 outstr[pos - offset] = c;
+                ++pos;
             }
         }
-        if (c == S_TAB)
+        else if (c == S_TAB)
         {
             size_t tabpos = (pos + m_tab) - (pos + m_tab) % m_tab;
-            outstr.resize(std::min(outstr.size() + tabpos, size), ' ');
+            //???outstr.resize(std::min(outstr.size() + tabpos, size), ' ');
 
             if (m_saveTab || m_showTab)
                 while (pos < tabpos)
@@ -1457,6 +1459,8 @@ bool Editor::CheckLexPair(size_t& line, size_t& pos)
     auto str{ GetStr(line, 0, m_maxStrlen) };
     size_t y{ line };
     char16_t c{ str[pos] };
+    if (c <= ' ')
+        return false;
 
     bool rc = m_lexParser.CheckLexPair(str, line, pos);
     if (!rc)

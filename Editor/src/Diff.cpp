@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ void HashBuff::ChangedLines(size_t first, size_t last, bool calcHash)
 {
     m_firstChanged = first;
     m_lastChanged = last;
-    auto n = last - first;
+    auto n = last - first + 1;
 
     m_changed.resize(n);
     m_hash.resize(n);
@@ -74,6 +74,11 @@ Diff::Diff(EditorPtr editor1, EditorPtr editor2, bool withoutSpace,
         if (str1 != str2)
             break;
     }
+    if (f1 > l1 && f2 > l2)
+    {
+        LOG(DEBUG) << "diff same";
+        return;
+    }
 
     //skip the identical lines from end
     for (; l1 > f1 && l2 > f2; --l1, --l2)
@@ -85,16 +90,12 @@ Diff::Diff(EditorPtr editor1, EditorPtr editor2, bool withoutSpace,
             break;
     }
 
-    if (l1 <= f1 && l2 <= f2)
-    {
-        LOG(DEBUG) << "diff same";
-    }
-    else if (l1 <= f1)
+    if (f1 > l1)
     {
         LOG(DEBUG) << "diff f2-l2 inserted";
         m_diffBuff[1].ChangedLines(f2, l2);
     }
-    else if (l2 <= f2)
+    else if (f2 > l2)
     {
         LOG(DEBUG) << "diff f1-l1 deleted";
         m_diffBuff[0].ChangedLines(f1, l1);
@@ -324,6 +325,7 @@ void Diff::AddChanges(int64_t bottom1, int64_t bottom2, int64_t top1, int64_t to
 
 void Diff::MergeEmptyLine()
 {
+    //???
 }
 
 } //namespace _Editor

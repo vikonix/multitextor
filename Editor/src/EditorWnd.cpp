@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -779,8 +779,8 @@ input_t EditorWnd::ParseCommand(input_t cmd)
             return 0;
         }
 
-        auto it = s_funcMap.find(ecmd);
-        if(it == s_funcMap.end())
+        auto it = s_cmdMap.find(ecmd);
+        if(it == s_cmdMap.end())
         {
             LOG(ERROR) << __FUNC__ << "    ??? editor cmd=" << std::hex << cmd << std::dec;
         }

@@ -1,7 +1,7 @@
 /*
 FreeBSD License
 
-Copyright (c) 2020-2021 vikonix: valeriy.kovalev.software@gmail.com
+Copyright (c) 2020-2023 vikonix: valeriy.kovalev.software@gmail.com
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,49 +33,49 @@ SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace _Editor
 {
 
-std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_funcMap
+std::unordered_map<AppCmd, EditorApp::AppFunc> EditorApp::s_cmdMap
 {
-    {K_APP_ABOUT,           &EditorApp::AboutProc},
-    {K_APP_HELP,            &EditorApp::HelpProc},
-    {K_APP_HELP_KEYMAP,     &EditorApp::HelpKeymapProc},
+    {K_APP_ABOUT,           &EditorApp::AboutCmd},
+    {K_APP_HELP,            &EditorApp::HelpCmd},
+    {K_APP_HELP_KEYMAP,     &EditorApp::HelpKeymapCmd},
 
-    {K_APP_NEW,             &EditorApp::FileNewProc},
-    {K_APP_SAVE_ALL,        &EditorApp::FileSaveAllProc},
-    {K_APP_DLG_OPEN,        &EditorApp::FileOpenProc},
-    {K_APP_WND_CLOSEALL,    &EditorApp::WndCloseAllProc},
-    {K_APP_WND_LIST,        &EditorApp::WndListProc},
+    {K_APP_NEW,             &EditorApp::FileNewCmd},
+    {K_APP_SAVE_ALL,        &EditorApp::FileSaveAllCmd},
+    {K_APP_DLG_OPEN,        &EditorApp::FileOpenCmd},
+    {K_APP_WND_CLOSEALL,    &EditorApp::WndCloseAllCmd},
+    {K_APP_WND_LIST,        &EditorApp::WndListCmd},
 
 
-    {K_APP_FINDFILE,        &EditorApp::FindInFilesProc},
-    {K_APP_REPLACEFILE,     &EditorApp::ReplaceInFilesProc},
-    {K_APP_FOUNDFILE,       &EditorApp::FoundFilesProc},
-    {K_APP_WND_COPY,        &EditorApp::WndCopyProc},
-    {K_APP_WND_MOVE,        &EditorApp::WndMoveProc},
+    {K_APP_FINDFILE,        &EditorApp::FindInFilesCmd},
+    {K_APP_REPLACEFILE,     &EditorApp::ReplaceInFilesCmd},
+    {K_APP_FOUNDFILE,       &EditorApp::FoundFilesCmd},
+    {K_APP_WND_COPY,        &EditorApp::WndCopyCmd},
+    {K_APP_WND_MOVE,        &EditorApp::WndMoveCmd},
 
-    {K_APP_VIEW_SPLIT,      &EditorApp::ViewSplitProc},
-    {K_APP_VIEW_MODE,       &EditorApp::ViewModeProc},
-    {K_APP_VIEW_SET,        &EditorApp::ViewSelectProc},
-    {K_APP_VIEW_SIZE,       &EditorApp::ViewMoveProc},
+    {K_APP_VIEW_SPLIT,      &EditorApp::ViewSplitCmd},
+    {K_APP_VIEW_MODE,       &EditorApp::ViewModeCmd},
+    {K_APP_VIEW_SET,        &EditorApp::ViewSelectCmd},
+    {K_APP_VIEW_SIZE,       &EditorApp::ViewMoveCmd},
 
-    {K_APP_DIFF,            &EditorApp::DiffProc},
-    {K_APP_BOOKMARK_LIST,   &EditorApp::BookmarkListProc},
-    {K_APP_KEYGEN,          &EditorApp::KeygenProc},
-    {K_APP_NEW_SESSION,     &EditorApp::NewSessionProc},
-    {K_APP_OPEN_SESSION,    &EditorApp::OpenSessionProc},
+    {K_APP_DIFF,            &EditorApp::DiffCmd},
+    {K_APP_BOOKMARK_LIST,   &EditorApp::BookmarkListCmd},
+    {K_APP_KEYGEN,          &EditorApp::KeygenCmd},
+    {K_APP_NEW_SESSION,     &EditorApp::NewSessionCmd},
+    {K_APP_OPEN_SESSION,    &EditorApp::OpenSessionCmd},
 
-    {K_APP_RECORD_MACRO,    &EditorApp::RecordMacroProc},
-    {K_APP_PLAY_MACRO,      &EditorApp::PlayMacroProc},
+    {K_APP_RECORD_MACRO,    &EditorApp::RecordMacroCmd},
+    {K_APP_PLAY_MACRO,      &EditorApp::PlayMacroCmd},
 
-    {K_APP_COLOR,           &EditorApp::ColorDlgProc},
-    {K_APP_SETTINGS,        &EditorApp::SettingsDlgProc},
+    {K_APP_COLOR,           &EditorApp::ColorDlgCmd},
+    {K_APP_SETTINGS,        &EditorApp::SettingsDlgCmd},
 
-    {K_APP_BOOKMARK,        &EditorApp::SelectBookmarkProc},
-    {K_APP_FILE_RECENT,     &EditorApp::SelectRecentFileProc},
-    {K_APP_SESSION_RECENT,  &EditorApp::SelectRecentSessionProc}
+    {K_APP_BOOKMARK,        &EditorApp::SelectBookmarkCmd},
+    {K_APP_FILE_RECENT,     &EditorApp::SelectRecentFileCmd},
+    {K_APP_SESSION_RECENT,  &EditorApp::SelectRecentSessionCmd}
 };
 
 
-bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::FileOpenCmd([[maybe_unused]] input_t cmd)
 {
     FileDialog dlg{ FileDlgMode::Open };
     auto ret = dlg.Activate();
@@ -89,7 +89,7 @@ bool    EditorApp::FileOpenProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::FileNewProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::FileNewCmd([[maybe_unused]] input_t cmd)
 {
     for (size_t n = 0; n < 1000; ++n)
     {
@@ -109,53 +109,53 @@ bool    EditorApp::FileNewProc([[maybe_unused]] input_t cmd)
     return false;
 }
 
-bool    EditorApp::WndCloseAllProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::WndCloseAllCmd([[maybe_unused]] input_t cmd)
 {
     return CloseAllWindows();
 }
 
-bool    EditorApp::WndListProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::WndListCmd([[maybe_unused]] input_t cmd)
 {
     WindowListDialog dlg;
     [[maybe_unused]] auto ret = dlg.Activate();
     return true;
 }
 
-bool    EditorApp::WndCopyProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::WndCopyCmd([[maybe_unused]] input_t cmd)
 {
     WindowListDialog dlg(WindowsDlgMode::CopyFrom);
     [[maybe_unused]] auto ret = dlg.Activate();
     return true;
 }
 
-bool    EditorApp::WndMoveProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::WndMoveCmd([[maybe_unused]] input_t cmd)
 {
     WindowListDialog dlg(WindowsDlgMode::MoveFrom);
     [[maybe_unused]] auto ret = dlg.Activate();
     return true;
 }
 
-bool    EditorApp::ViewSplitProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::ViewSplitCmd([[maybe_unused]] input_t cmd)
 {
     return WndManager::getInstance().ChangeViewMode();
 }
 
-bool    EditorApp::ViewModeProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::ViewModeCmd([[maybe_unused]] input_t cmd)
 {
     return WndManager::getInstance().ChangeViewMode(1);
 }
 
-bool    EditorApp::ViewSelectProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::ViewSelectCmd([[maybe_unused]] input_t cmd)
 {
     return WndManager::getInstance().SetActiveView();
 }
 
-bool    EditorApp::ViewMoveProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::ViewMoveCmd([[maybe_unused]] input_t cmd)
 {
     return WndManager::getInstance().TrackView("Track view");
 }
 
-bool    EditorApp::RecordMacroProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::RecordMacroCmd([[maybe_unused]] input_t cmd)
 {
     auto ret = MsgBox(MBoxKey::OK_CANCEL, "Macro Recording",
         { "Warning!",
@@ -170,13 +170,13 @@ bool    EditorApp::RecordMacroProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::PlayMacroProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::PlayMacroCmd([[maybe_unused]] input_t cmd)
 {
     PlayMacro();
     return true;
 }
 
-bool    EditorApp::AboutProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::AboutCmd([[maybe_unused]] input_t cmd)
 {
     MsgBox(MBoxKey::OK, "About",
         { EDITOR_NAME_C " Version: " EDITOR_VERSION,
@@ -188,13 +188,13 @@ bool    EditorApp::AboutProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::FindInFilesProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::FindInFilesCmd([[maybe_unused]] input_t cmd)
 {
     FindFileDialog dlg(false);
     auto ret = dlg.Activate();
     if (ret == ID_OK)
     {
-        FileSaveAllProc(0);
+        FileSaveAllCmd(0);
         SearchFileDialog sdlg;
         ret = sdlg.Activate();
 
@@ -213,13 +213,13 @@ bool    EditorApp::FindInFilesProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::ReplaceInFilesProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::ReplaceInFilesCmd([[maybe_unused]] input_t cmd)
 {
     FindFileDialog dlg(true);
     auto ret = dlg.Activate();
     if (ret == ID_OK)
     {
-        FileSaveAllProc(0);
+        FileSaveAllCmd(0);
         SearchFileDialog sdlg;
         ret = sdlg.Activate();
 
@@ -238,7 +238,7 @@ bool    EditorApp::ReplaceInFilesProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::FoundFilesProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::FoundFilesCmd([[maybe_unused]] input_t cmd)
 {
     MatchedFileDialog mDlg;
     auto ret = mDlg.Activate();
@@ -254,21 +254,21 @@ bool    EditorApp::FoundFilesProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::HelpProc(input_t cmd)
+bool    EditorApp::HelpCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::HelpKeymapProc(input_t cmd)
+bool    EditorApp::HelpKeymapCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::FileSaveAllProc([[maybe_unused]]input_t cmd)
+bool    EditorApp::FileSaveAllCmd([[maybe_unused]]input_t cmd)
 {
     for (auto & [w, wnd] : m_editors)
     {
@@ -277,7 +277,7 @@ bool    EditorApp::FileSaveAllProc([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool    EditorApp::DiffProc([[maybe_unused]] input_t cmd)
+bool    EditorApp::DiffCmd([[maybe_unused]] input_t cmd)
 {
 #if 0 //???
     LOG(DEBUG) << __FUNC__ << " not implemented";
@@ -316,62 +316,62 @@ bool    EditorApp::DiffProc([[maybe_unused]] input_t cmd)
 
         Diff diff{edWnd1->GetEditor(), edWnd2->GetEditor(), DiffDialog::s_vars.diffWithoutSpace, first1, last1, first2, last2};
         auto d = diff.Compare();
-        return true;
+        return d;
     }
 #endif
     return true;
 }
 
-bool    EditorApp::BookmarkListProc(input_t cmd)
+bool    EditorApp::BookmarkListCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::KeygenProc(input_t cmd)
+bool    EditorApp::KeygenCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::NewSessionProc(input_t cmd)
+bool    EditorApp::NewSessionCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::OpenSessionProc(input_t cmd)
+bool    EditorApp::OpenSessionCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::ColorDlgProc(input_t cmd)
+bool    EditorApp::ColorDlgCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::SettingsDlgProc(input_t cmd)
+bool    EditorApp::SettingsDlgCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::SelectBookmarkProc(input_t cmd)
+bool    EditorApp::SelectBookmarkCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::SelectRecentFileProc(input_t cmd)
+bool    EditorApp::SelectRecentFileCmd(input_t cmd)
 {
     input_t n = cmd - K_APP_FILE_RECENT;
     if (m_recentFiles.size() <= n)
@@ -381,7 +381,7 @@ bool    EditorApp::SelectRecentFileProc(input_t cmd)
     return OpenFile(utf8::utf8to16(path), parse, cp, ro, log);
 }
 
-bool    EditorApp::SelectRecentSessionProc(input_t cmd)
+bool    EditorApp::SelectRecentSessionCmd(input_t cmd)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
