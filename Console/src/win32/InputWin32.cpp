@@ -87,8 +87,6 @@ bool InputWin32::Init()
     HWND wnd = GetForegroundWindow();
     LOG(INFO) << "foregroundwnd=" << wnd << " consolewnd=" << m_hWnd;
     
-    GetFontSize();
-
     return true;
 }
 
@@ -458,7 +456,7 @@ void InputWin32::ProcessMouseEvent(MOUSE_EVENT_RECORD* pMouseEvent)
                     iMKey = K_MOUSEWUP | K_MOUSEW;
                 m_fMouseTrack = false;
             }
-            FixWheelCoord(x, y);
+            GetWheelCoord(x, y);
         }
         break;
 #endif
@@ -526,8 +524,6 @@ void InputWin32::ProcessResizeEvent(WINDOW_BUFFER_SIZE_RECORD* pWindowBufferSize
         }
     }
 
-    GetFontSize();
-
     if (x > MAX_COORD) //???
         x = MAX_COORD;
     if (y > MAX_COORD)
@@ -557,49 +553,17 @@ void InputWin32::ProcessMenuEvent([[maybe_unused]]MENU_EVENT_RECORD* pMenuEvent)
     //LOG(DEBUG) << "MenuEvent id=" << pMenuEvent->dwCommandId;
 }
 
-void InputWin32::GetFontSize()
-{
-    CONSOLE_SCREEN_BUFFER_INFO sbi;
-    if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbi))
-        return;
-
-    WINDOWINFO info;
-    info.cbSize = sizeof(WINDOWINFO);
-
-    if (!GetWindowInfo(m_hWnd, &info))
-        return;
-
-    auto sizex = info.rcClient.right - info.rcClient.left;
-    auto sizey = info.rcClient.bottom - info.rcClient.top;
-
-    m_fontX = static_cast<int>(sizex  / (sbi.srWindow.Right  + 1));
-    m_fontY = static_cast<int>(sizey / (sbi.srWindow.Bottom + 1));
-    LOG(DEBUG) << "  fontX=" << m_fontX << " fontY=" << m_fontY;
-    if (m_fontX == 0 || m_fontY == 0)
-    {
-        m_fontX = 8;
-        m_fontY = 8;
-    }
-}
-
-void InputWin32::FixWheelCoord(pos_t& x, pos_t& y)
+void InputWin32::GetWheelCoord(pos_t& x, pos_t& y)
 {
     //LOG(DEBUG) << " wheel x=" << x << " y=" << y;
-    // get current mouse position insted of the wheel event
-    POINT cursorPos;
-    if (!GetCursorPos(&cursorPos))
-        return;
-
-    auto relativePos = cursorPos;
-    if (!ScreenToClient(m_hWnd, &relativePos))
-        return;
+    // get current mouse position instead of the wheel event
 
     CONSOLE_SCREEN_BUFFER_INFO sbi;
     if (!GetConsoleScreenBufferInfo(GetStdHandle(STD_OUTPUT_HANDLE), &sbi))
         return;
     
-    x = static_cast<pos_t>(std::clamp(static_cast<int>(relativePos.x) / m_fontX, 0, sbi.dwSize.X - 1));
-    y = static_cast<pos_t>(std::clamp(static_cast<int>(relativePos.y) / m_fontY, 0, sbi.dwSize.Y - 1));
+    x = sbi.dwCursorPosition.X;
+    y = sbi.dwCursorPosition.Y;
 }
 
 } //namespace _Console
