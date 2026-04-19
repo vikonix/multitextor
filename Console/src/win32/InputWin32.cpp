@@ -364,7 +364,7 @@ void InputWin32::ProcessKeyEvent(KEY_EVENT_RECORD* pKeyEvent)
         {
             if((iKeyMode & (K_CTRL | K_ALT)) == 0)
             {
-                //simbol code
+                //symbol code
                 iKey = wc;
             }
             else

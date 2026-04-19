@@ -182,7 +182,7 @@ bool EditorWnd::CtrlProperties([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool EditorWnd::CtrlFuncList(input_t cmd)
+bool EditorWnd::CtrlFuncList(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     Application::getInstance().SetErrorLine("Command not implemented");

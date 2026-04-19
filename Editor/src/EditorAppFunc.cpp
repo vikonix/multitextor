@@ -253,14 +253,14 @@ bool    EditorApp::FoundFilesProc([[maybe_unused]] input_t cmd)
     return true;
 }
 
-bool    EditorApp::HelpProc(input_t cmd)
+bool    EditorApp::HelpProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::HelpKeymapProc(input_t cmd)
+bool    EditorApp::HelpKeymapProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
@@ -276,56 +276,56 @@ bool    EditorApp::FileSaveAllProc([[maybe_unused]]input_t cmd)
     return true;
 }
 
-bool    EditorApp::DiffProc(input_t cmd)
+bool    EditorApp::DiffProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::BookmarkListProc(input_t cmd)
+bool    EditorApp::BookmarkListProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::KeygenProc(input_t cmd)
+bool    EditorApp::KeygenProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::NewSessionProc(input_t cmd)
+bool    EditorApp::NewSessionProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::OpenSessionProc(input_t cmd)
+bool    EditorApp::OpenSessionProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::ColorDlgProc(input_t cmd)
+bool    EditorApp::ColorDlgProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::SettingsDlgProc(input_t cmd)
+bool    EditorApp::SettingsDlgProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
     return true;
 }
 
-bool    EditorApp::SelectBookmarkProc(input_t cmd)
+bool    EditorApp::SelectBookmarkProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
@@ -342,7 +342,7 @@ bool    EditorApp::SelectRecentFileProc(input_t cmd)
     return OpenFile(utf8::utf8to16(path), parse, cp, ro, log);
 }
 
-bool    EditorApp::SelectRecentSessionProc(input_t cmd)
+bool    EditorApp::SelectRecentSessionProc(input_t /*cmd*/)
 {
     LOG(DEBUG) << __FUNC__ << " not implemented";
     SetErrorLine("Command not implemented");
